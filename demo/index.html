@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="da" style="font-size: 100%">
+<head>
+	<title>fcoo.dk - leaflet-bootstrap - Demo</title>
+	<meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta http-equiv='x-dns-prefetch-control' content='on'>
+
+	<meta name='copyright' content='FCOO'>
+	<meta name='owner' content='FCOO'>
+
+    <link  href="bower_components.css" rel="stylesheet">
+    <link  href="../src/leaflet-bootstrap.css" rel="stylesheet">
+    <link  href="css/fontawesome-all.css" rel="stylesheet">
+    <style>
+        html, body, #map {
+            padding: 0; margin: 0; width:100%; height:100%;
+        }
+    </style>
+
+</head>
+
+<body>
+	<div id="map" style="cursor: pointer; _width: 800px; _height: 600px"></div>
+
+
+
+
+	<script src="bower_components.js"></script>
+	<script src="../src/leaflet-bootstrap-popup.js"></script>
+	<script src="../src/leaflet-bootstrap.js"></script>
+	<script src="../src/leaflet-bootstrap-marker.js"></script>
+	<script>
+    window.bsIsTouch = false; //true;
+		$(function() {
+            i18next.init();
+            i18next.changeLanguage('da');
+
+
+            var map = L.map('map').setView([56.2, 11.5], 6);
+			L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+				maxZoom: 18,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors</a>'
+            }).addTo(map);
+
+
+            function addMarker( latlng){
+                var marker = L.bsMarker( latlng, {
+                            draggable: true,
+                            color    : 'standard',
+                            whiteBorder: true,
+                            puls: true
+                    }).addTo( map );
+                    marker.on('click', function(){ this.setColor('success'); this.toggleOption('puls'); }, marker );
+            }
+
+
+        map.on('click', function( mouseEvent ){ addMarker( mouseEvent.latlng ); });
+
+		map.on('contextmenu', function( mouseEvent ){
+            var popup = L.popup({
+				    maxWidth	     : 140,
+                    maxHeight        : 200,
+                    scroll           : true,
+
+                    fixable: true,
+                    header		     : {text:'This is a very long header and it should be to long'},
+				    closeButton     : true,
+
+                    _buttons		    : [{
+                        icon:'fas fa-map-marker-alt',
+                        text:'Marker',
+                        closeOnClick: true,
+                        onClick: function(){addMarker(mouseEvent.latlng);}
+                    }],
+
+                    //verticalButtons : true,
+                    content: function( $container ){
+		    	        var content = this.getLatLng() + '<br>',
+	    			        lines = 1 + Math.floor(Math.random()*10);
+                        for (var i=0; i<lines; i++ ){
+                            content += 'line '+i+'<br>';
+                        }
+                    var result = $('<div>' + content + 'This is a random<br>number '+Math.floor(Math.random()*1000000) +'</div>');
+
+                    //$container.append( result );
+                    return result;//[0];
+    		    }
+			});
+
+			popup.setLatLng(mouseEvent.latlng).openOn(map);
+		});
+
+
+    });
+
+	</script>
+</body>
+</html>

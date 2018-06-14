@@ -1,0 +1,43 @@
+/***********************************************
+	leaflet-bootstrap-popup.scss,
+
+************************************************/
+//BOURBON - http://bourbon.io/
+@import "../bower_components/bourbon/core/bourbon";
+
+//MODERNIZR-MIXIN - https://github.com/danielguillan/modernizr-mixin
+@import "../bower_components/modernizr-mixin/stylesheets/modernizr";
+
+//MATHSASS - https://github.com/terkel/mathsass
+@import "../bower_components/mathsass/dist/math";
+
+
+//Overwrite leatlet popup wrapper and popup tip
+.modal-wrapper.leaflet-popup-content-wrapper {
+    background: transparent;
+    padding   : 0;
+
+    box-shadow: $popover-box-shadow;
+
+    //Content
+    .leaflet-popup-content {
+        margin: 0;
+    }
+
+    //Tip
+    & + .leaflet-popup-tip-container {
+        margin-top: -1px; //Hide top-border
+
+
+//background-color: red;
+        .leaflet-popup-tip {
+            box-shadow: $popover-box-shadow;
+
+            //Hard coded adjusting to make tip same size as Bootstrap popover
+            width : 13px;
+            height: 13px;
+            margin: -6px auto 0;
+        }
+    }
+}
+

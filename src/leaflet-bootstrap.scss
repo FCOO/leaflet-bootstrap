@@ -1,0 +1,32 @@
+/***********************************************
+	leaflet-bootstrap.scss,
+
+	(c) 2017, FCOO
+
+	https://github.com/FCOO/leaflet-bootstrap
+	https://github.com/FCOO
+
+
+************************************************/
+//BOURBON - http://bourbon.io/
+@import "../bower_components/bourbon/core/bourbon";
+
+//MODERNIZR-MIXIN - https://github.com/danielguillan/modernizr-mixin
+@import "../bower_components/modernizr-mixin/stylesheets/modernizr";
+
+//MATHSASS - https://github.com/terkel/mathsass
+@import "../bower_components/mathsass/dist/math";
+
+
+@import "../bower_components/bootstrap/scss/functions";
+@import "../bower_components/bootstrap/scss/variables";
+
+//JQUERY-BOOTSTRAP - https://github.com/fcoo/jquery-bootstrap
+//@import "../bower_components/jquery-bootstrap/src/jquery-bootstrap";
+
+
+//Style for bsMarker
+@import "leaflet-bootstrap-marker";
+
+//Style for popup
+@import "leaflet-bootstrap-popup";
