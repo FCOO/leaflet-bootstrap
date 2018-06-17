@@ -22,8 +22,7 @@
     "devDependencies": {
         "bourbon": "latest",
         "modernizr-mixin": "latest",
-        "mathsass": "latest",
-        "leaflet-popup-extensions": "https://github.com/FCOO/leaflet-popup-extensions.git#^0.5.0"
+        "mathsass": "latest"
     },
     "license": "MIT",
     "ignore": [
@@ -35,28 +34,5 @@
     ],
     "moduleType": [
         "es6"
-    ],
-    "overrides": {
-        "select2": {
-            "main": [
-                "dist/js/select2.js"
-            ]
-        },
-        "jquery.scrollbar": {
-            "main": [
-                "jquery.scrollbar.js"
-            ]
-        },
-        "bootstrap": {
-            "dependencies": {
-                "jquery": "latest"
-            },
-            "main": [
-                "dist/js/bootstrap.bundle.js"
-            ]
-        }
-    },
-    "resolutions": {
-        "bootstrap": "^4.0.0"
-    }
+    ]
 }

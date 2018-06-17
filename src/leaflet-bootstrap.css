@@ -76,12 +76,6 @@ lbm-puls        : Has a pulsing ring
 }
 
 /*
-$primary:       $blue !default;
-$secondary:     $gray-600 !default;
-$success:       $green !default;
-$info:          $cyan !default;
-$warning:       $yellow !default;
-$danger:        $red !default;
 $light:         $gray-100 !default;
 $dark:          $gray-800 !default;
 */
@@ -181,6 +175,50 @@ $dark:          $gray-800 !default;
   width: 13px;
   height: 13px;
   margin: -6px auto 0;
+}
+
+/***********************************************
+	leaflet-bootstrap-tooltip.scss,
+
+************************************************/
+.leaflet-tooltip {
+  padding: 0.25rem 0.5rem;
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 0.25rem;
+  color: #212529;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  pointer-events: none;
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+.leaflet-tooltip-top:before,
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+  display: none;
+}
+
+.leaflet-tooltip-bottom {
+  margin-top: 10px;
+}
+
+.leaflet-tooltip-top {
+  margin-top: -10px;
+}
+
+.leaflet-tooltip-left {
+  margin-left: -10px;
+}
+
+.leaflet-tooltip-right {
+  margin-left: 10px;
 }
 
 /*# sourceMappingURL=leaflet-bootstrap.css.map */

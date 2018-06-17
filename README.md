@@ -3,7 +3,7 @@
 
 
 ## Description
-Applying Bootstrap style and component to leaflet maps using fcoo/jquery-bootstrap  
+Applying Bootstrap style and component to leaflet maps using [FCOO/jquery-bootstrap](https://github.com/FCOO/jquery-bootstrap)  
 
 ## Installation
 ### bower
@@ -17,12 +17,13 @@ http://FCOO.github.io/leaflet-bootstrap/demo/
 
     var myMarker = L.bsMarker(latLng, options).addTo( map );
     options: {
-        draggable    : false, //Whether the marker is draggable with mouse/touch or not.
-        transparent  : false, //True to make the marker semi-transparent
-        bigShadow    : false, //true to add big shadow to the marker
-        whiteBorder  : false, //true to have a white border
-        puls         : false, //true to have a pulsart icon
-        color        : '',    //Name of color: "primary", "secondary", "success", "info", "warning", "danger", "standard". "primary"-"danger"=Bootstrap colors. "standard" = Google Maps default iocn color
+        draggable    : false, 	//Whether the marker is draggable with mouse/touch or not.
+        transparent  : false, 	//True to make the marker semi-transparent
+        bigShadow    : false, 	//true to add big shadow to the marker
+        whiteBorder  : false, 	//true to have a white border
+        puls         : false, 	//true to have a pulsart icon
+        color        : '',    	//Name of color: "primary", "secondary", "success", "info", "warning", "danger", "standard". "primary"-"danger"=Bootstrap colors. "standard" = Google Maps default iocn color
+		tooltip      : null,	//Automatic adds a tooltip to the marker. The tooltip is hidden when the marker is dragged. See below on content
     }
 
     //Methods
@@ -31,6 +32,12 @@ http://FCOO.github.io/leaflet-bootstrap/demo/
 
 
 ### L.Control.bsButton
+Create leaflet control a la `$.bsButton`, `$.bsButtonGroup`, and `$.bsRadioButtonGroup`: See [FCOO/jquery-bootstrap](https://github.com/FCOO/jquery-bootstrap#button)
+
+    L.control.bsButton( options )
+    L.control.bsButtonGroup( options )
+    L.control.bsRadioButtonGroup( options )
+
 
 ### L.popup
 Extended to take same options as bsModal (see details [here](https://github.com/FCOO/jquery-bootstrap#modal))
@@ -48,9 +55,9 @@ Extended to take same options as bsModal (see details [here](https://github.com/
         fixable: false, //if true the popup can be pinned/fixed and only closes on the close-button
     }
 
-
 ### L.tooltip
 
+Accepts common content a la [FCOO/jquery-bootstrap](https://github.com/FCOO/jquery-bootstrap#common) 
 
 <!-- 
 ### options

@@ -2,15 +2,6 @@
 	leaflet-bootstrap-popup.scss,
 
 ************************************************/
-//BOURBON - http://bourbon.io/
-@import "../bower_components/bourbon/core/bourbon";
-
-//MODERNIZR-MIXIN - https://github.com/danielguillan/modernizr-mixin
-@import "../bower_components/modernizr-mixin/stylesheets/modernizr";
-
-//MATHSASS - https://github.com/terkel/mathsass
-@import "../bower_components/mathsass/dist/math";
-
 
 //Overwrite leatlet popup wrapper and popup tip
 .modal-wrapper.leaflet-popup-content-wrapper {

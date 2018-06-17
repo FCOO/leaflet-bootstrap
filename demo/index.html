@@ -27,14 +27,17 @@
 
 
 	<script src="bower_components.js"></script>
+	<script src="../src/leaflet-bootstrap-control-button.js"></script>
 	<script src="../src/leaflet-bootstrap-popup.js"></script>
 	<script src="../src/leaflet-bootstrap.js"></script>
 	<script src="../src/leaflet-bootstrap-marker.js"></script>
 	<script>
-    window.bsIsTouch = false; //true;
+    window.bsIsTouch = false;
+    window.bsIsTouch = (window.location.search =='?touch');
+
 		$(function() {
             i18next.init();
-            i18next.changeLanguage('da');
+            i18next.changeLanguage('en');
 
 
             var map = L.map('map').setView([56.2, 11.5], 6);
@@ -43,19 +46,33 @@
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors</a>'
             }).addTo(map);
 
-
+            var tooltip = {icon:'fa-home', text:{da:'Dansk', en:'Eng'}};
             function addMarker( latlng){
                 var marker = L.bsMarker( latlng, {
                             draggable: true,
                             color    : 'standard',
                             whiteBorder: true,
-                            puls: true
+                            puls: true,
+                            tooltip: tooltip
                     }).addTo( map );
+
                     marker.on('click', function(){ this.setColor('success'); this.toggleOption('puls'); }, marker );
             }
 
 
         map.on('click', function( mouseEvent ){ addMarker( mouseEvent.latlng ); });
+
+		var bGroup = L.control.bsButtonGroup({
+            list: [
+                {icon:'fa-home'},
+                {icon:'fa-plus'},
+                {icon:'fa-minus'},
+                {icon:'fa-map'}
+            ]
+        });
+		map.addControl(bGroup);
+
+map.addControl( L.control.bsButton({icon:'fa-home'}) );
 
 		map.on('contextmenu', function( mouseEvent ){
             var popup = L.popup({
