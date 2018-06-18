@@ -26,18 +26,18 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
         return function () {
             this._ignoreNextEvent = {};
             return initialize.apply(this, arguments);
-        }
+        };
     } (L.Map.prototype.initialize);
 
 
     L.Map.prototype.ignoreNextEvent = function( type ){
         this._ignoreNextEvent[type] = true;
         return this;
-    }
+    };
     L.Map.prototype.includeNextEvent = function( type ){
         this._ignoreNextEvent[type] = false;
         return this;
-    }
+    };
 
     var classNames = {
             transparent  : 'lbm-transparent',
@@ -143,7 +143,7 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
 
     L.bsMarker = function bsMarker(latlng, options) {
         return new L.BsMarker(latlng, options);
-    }
+    };
 
 }(jQuery, L, this, document));
 

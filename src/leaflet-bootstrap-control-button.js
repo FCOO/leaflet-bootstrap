@@ -19,12 +19,12 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
         _bsButtons = L.Control.extend({
             options: {
-		        position: 'topleft',
+                position: 'topleft',
             },
 
             _createContent: function(){},
 
-            onAdd: function (map) {
+            onAdd: function() {
                 var _this = this;
                 this.options = $._bsAdjustOptions( this.options, defaultButtonOptions);
                 if (this.options.list)
@@ -37,8 +37,8 @@ Create leaflet-control for jquery-bootstrap button-classes:
                 L.DomEvent.disableClickPropagation( container );
                 L.DomEvent.on(container, 'click', this._refocusOnMap, this);
 
-		        return container;
-	        },
+                return container;
+            },
         }),
 
         bsButton = _bsButtons.extend({

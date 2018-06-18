@@ -14,10 +14,10 @@
     //Override L.DivOverlay._updateContent to also accept content-object from jquery-bootstrap
     L.DivOverlay.prototype._updateContent = function (_updateContent) {
         return function () {
-		    if (!this._content) { return; }
+            if (!this._content) { return; }
 
-		    var $node = $(this._contentNode);
-		    var content = $.isFunction(this._content) ? this._content(this._source || this) : this._content;
+            var $node = $(this._contentNode);
+            var content = $.isFunction(this._content) ? this._content(this._source || this) : this._content;
 
             $node.empty();
 
@@ -26,20 +26,20 @@
                 _updateContent.apply(this, arguments);
             else {
                 $node._bsAddHtml( content );
-		        this.fire('contentupdate');
+                this.fire('contentupdate');
             }
-        }
+        };
     } (L.DivOverlay.prototype._updateContent);
 
 /*
 Map.mergeOptions({
-	zoomControl: true
+    zoomControl: true
 });
 Map.addInitHook(function () {
-	if (this.options.zoomControl) {
-		this.zoomControl = new Zoom();
-		this.addControl(this.zoomControl);
-	}
+    if (this.options.zoomControl) {
+        this.zoomControl = new Zoom();
+        this.addControl(this.zoomControl);
+    }
 });
 
 */

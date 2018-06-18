@@ -21536,7 +21536,7 @@ return i18next;
 
 ;
 /****************************************************************************
-	modernizr-javascript.js,
+	modernizr-javascript.js, 
 
 	(c) 2016, FCOO
 
@@ -21547,20 +21547,20 @@ return i18next;
 
 (function ($, window, document, undefined) {
 	"use strict";
-
+	
 	var ns = window;
 
     //Extend the jQuery prototype
     $.fn.extend({
-        modernizrOn : function( test ){
-            return this.modernizrToggle( test, true );
+        modernizrOn : function( test ){ 
+            return this.modernizrToggle( test, true ); 
         },
 
-        modernizrOff: function( test ){
-            return this.modernizrToggle( test, false );
+        modernizrOff: function( test ){ 
+            return this.modernizrToggle( test, false ); 
         },
-
-        modernizrToggle: function( test, on ){
+        
+        modernizrToggle: function( test, on ){ 
 		if ( on === undefined )
             return this.modernizrToggle( test, !this.hasClass( test ) );
 
@@ -21994,19 +21994,19 @@ return i18next;
 ;
 /* @preserve
  * The MIT License (MIT)
- *
+ * 
  * Copyright (c) 2013-2017 Petka Antonov
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
@@ -22014,7 +22014,7 @@ return i18next;
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- *
+ * 
  */
 /**
  * bluebird build version 3.5.1
@@ -25509,28 +25509,28 @@ _dereq_('./some.js')(Promise, PromiseArray, apiRejection);
 _dereq_('./filter.js')(Promise, INTERNAL);
 _dereq_('./each.js')(Promise, INTERNAL);
 _dereq_('./any.js')(Promise);
-
-    util.toFastProperties(Promise);
-    util.toFastProperties(Promise.prototype);
-    function fillTypes(value) {
-        var p = new Promise(INTERNAL);
-        p._fulfillmentHandler0 = value;
-        p._rejectionHandler0 = value;
-        p._promise0 = value;
-        p._receiver0 = value;
-    }
-    // Complete slack tracking, opt out of field-type tracking and
-    // stabilize map
-    fillTypes({a: 1});
-    fillTypes({b: 2});
-    fillTypes({c: 3});
-    fillTypes(1);
-    fillTypes(function(){});
-    fillTypes(undefined);
-    fillTypes(false);
-    fillTypes(new Promise(INTERNAL));
-    debug.setBounds(Async.firstLineError, util.lastLineError);
-    return Promise;
+                                                         
+    util.toFastProperties(Promise);                                          
+    util.toFastProperties(Promise.prototype);                                
+    function fillTypes(value) {                                              
+        var p = new Promise(INTERNAL);                                       
+        p._fulfillmentHandler0 = value;                                      
+        p._rejectionHandler0 = value;                                        
+        p._promise0 = value;                                                 
+        p._receiver0 = value;                                                
+    }                                                                        
+    // Complete slack tracking, opt out of field-type tracking and           
+    // stabilize map                                                         
+    fillTypes({a: 1});                                                       
+    fillTypes({b: 2});                                                       
+    fillTypes({c: 3});                                                       
+    fillTypes(1);                                                            
+    fillTypes(function(){});                                                 
+    fillTypes(undefined);                                                    
+    fillTypes(false);                                                        
+    fillTypes(new Promise(INTERNAL));                                        
+    debug.setBounds(Async.firstLineError, util.lastLineError);               
+    return Promise;                                                          
 
 };
 
@@ -26318,8 +26318,8 @@ function ReductionPromiseArray(promises, fn, initialValue, _each) {
 util.inherits(ReductionPromiseArray, PromiseArray);
 
 ReductionPromiseArray.prototype._gotAccum = function(accum) {
-    if (this._eachValues !== undefined &&
-        this._eachValues !== null &&
+    if (this._eachValues !== undefined && 
+        this._eachValues !== null && 
         accum !== INTERNAL) {
         this._eachValues.push(accum);
     }
@@ -28718,7 +28718,7 @@ return index;
 })));
 ;
 /****************************************************************************
-	jquery-i18next-phrases.js,
+	jquery-i18next-phrases.js, 
 
 	(c) 2017, FCOO
 
@@ -28729,19 +28729,19 @@ return index;
 
 (function ($, window/*, document, undefined*/) {
 	"use strict";
-
+	
     /***********************************************************
-    Initialize jquery-i18next - i18next plugin for jquery
+    Initialize jquery-i18next - i18next plugin for jquery 
     https://github.com/i18next/jquery-i18next
     ***********************************************************/
     var jQuery_i18n_selectorAttr = 'data-i18n',    // selector for translating elements
         jQuery_i18n_targetAttr   = 'i18n-target',  // data-() attribute to grab target element to translate (if diffrent then itself)
         jQuery_i18n_optionsAttr  = 'i18n-options'; // data-() attribute that contains options, will load/set if useOptionsAttr = true
 
-
+    
     window.jqueryI18next.init(
-        window.i18next/*i18nextInstance*/,
-        $,
+        window.i18next/*i18nextInstance*/, 
+        $, 
         {
             tName         : 't',                        // --> appends $.t = i18next.t
             i18nName      : 'i18n',                     // --> appends $.i18n = i18next
@@ -28756,12 +28756,12 @@ return index;
 
 
     /***********************************************************
-    Add new methods to jQuery prototype:
+    Add new methods to jQuery prototype: 
     $.fn.i18n( htmlOrKeyOrPhrase[, attribute][, options] )
     Add/updates the "data-i18n" attribute
 
-    htmlOrKeyOrPhrase = simple html-string ( "This will <u>always</u> be in English" ) OR
-                        i18next-key ( "myNS:myKey" ) OR
+    htmlOrKeyOrPhrase = simple html-string ( "This will <u>always</u> be in English" ) OR 
+                        i18next-key ( "myNS:myKey" ) OR 
                         a phrase-object - see langValue in i18next.addPhrase ( {da:"Dette er en test", en:"This is a test"} ) OR
                         a string representing a phrase-object ( '{"da":"Dette er en test", "en":"This is a test"}' )
     ***********************************************************/
@@ -28769,14 +28769,14 @@ return index;
         tempNS = '__TEMP__';
 
     $.fn.i18n = function( htmlOrKeyOrPhrase ) {
-        var options = null,
-            attribute = '',
+        var options = null, 
+            attribute = '', 
             argument,
-            keyFound = true,
+            keyFound = true, 
             key = htmlOrKeyOrPhrase;
 
         for (var i=1; i<arguments.length; i++ ){
-            argument = arguments[i];
+            argument = arguments[i];              
             switch ($.type(argument)){
               case 'object': options = argument; break;
               case 'string': attribute = argument; break;
@@ -28788,7 +28788,7 @@ return index;
             htmlOrKeyOrPhrase = JSON.parse(htmlOrKeyOrPhrase);
         }
         catch (e) {
-            htmlOrKeyOrPhrase = original;
+            htmlOrKeyOrPhrase = original; 
         }
 
         //Convert number back to string
@@ -28803,7 +28803,7 @@ return index;
             key = 'jqueryfni18n' + tempKeyId++;
             window.i18next.addPhrase( tempNS, key, htmlOrKeyOrPhrase );
             key = tempNS+':'+key;
-        }
+        }    
 
         return this.each(function() {
             var $this = $(this),
@@ -28813,20 +28813,20 @@ return index;
                 newStr = attribute ? '[' + attribute + ']' + key : key,
                 keep;
             oldData = oldData ? oldData.split(';') : [];
-
+            
             for (var i=0; i<oldData.length; i++ ){
                 oldStr = oldData[i];
                 keep = true;
                 //if the new key has an attribute => remove data with '[attribute]'
                 if (attribute && (oldStr.indexOf('[' + attribute + ']') == 0))
-                    keep = false;
+                    keep = false;                      
                 //if the new key don't has a attribute => only keep other attributes
-                if (!attribute && (oldStr.indexOf('[') == -1))
+                if (!attribute && (oldStr.indexOf('[') == -1)) 
                     keep = false;
                 if (keep)
                     newData.push( oldStr );
             }
-            newData.push( newStr);
+            newData.push( newStr);                                
 
             //Set data-i18n
             $this.attr( jQuery_i18n_selectorAttr, newData.join(';') );
@@ -28843,7 +28843,7 @@ return index;
                     $(this).html( htmlOrKeyOrPhrase );
             }
             //Update contents
-            $this.localize();
+            $this.localize();        
 
         });
     };
@@ -28862,9 +28862,9 @@ return index;
 (function ( $ ) {
 	var attachEvent = document.attachEvent,
 		stylesCreated = false;
-
+	
 	var jQuery_resize = $.fn.resize;
-
+	
 	$.fn.resize = function(callback) {
 		return this.each(function() {
 			if(this == window)
@@ -28879,14 +28879,14 @@ return index;
 			removeResizeListener(this, callback);
 		});
 	}
-
+	
 	if (!attachEvent) {
 		var requestFrame = (function(){
 			var raf = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame ||
 								function(fn){ return window.setTimeout(fn, 20); };
 			return function(fn){ return raf(fn); };
 		})();
-
+		
 		var cancelFrame = (function(){
 			var cancel = window.cancelAnimationFrame || window.mozCancelAnimationFrame || window.webkitCancelAnimationFrame ||
 								   window.clearTimeout;
@@ -28910,7 +28910,7 @@ return index;
 			return element.offsetWidth != element.__resizeLast__.width ||
 						 element.offsetHeight != element.__resizeLast__.height;
 		}
-
+		
 		function scrollListener(e){
 			var element = this;
 			resetTriggers(this);
@@ -28925,7 +28925,7 @@ return index;
 				}
 			});
 		};
-
+		
 		/* Detect CSS Animations support to detect element display/re-attach */
 		var animation = false,
 			animationstring = 'animation',
@@ -28936,8 +28936,8 @@ return index;
 			pfx  = '';
 		{
 			var elm = document.createElement('fakeelement');
-			if( elm.style.animationName !== undefined ) { animation = true; }
-
+			if( elm.style.animationName !== undefined ) { animation = true; }    
+			
 			if( animation === false ) {
 				for( var i = 0; i < domPrefixes.length; i++ ) {
 					if( elm.style[ domPrefixes[i] + 'AnimationName' ] !== undefined ) {
@@ -28951,12 +28951,12 @@ return index;
 				}
 			}
 		}
-
+		
 		var animationName = 'resizeanim';
 		var animationKeyframes = '@' + keyframeprefix + 'keyframes ' + animationName + ' { from { opacity: 0; } to { opacity: 0; } } ';
 		var animationStyle = keyframeprefix + 'animation: 1ms ' + animationName + '; ';
 	}
-
+	
 	function createStyles() {
 		if (!stylesCreated) {
 			//opacity:0 works around a chrome bug https://code.google.com/p/chromium/issues/detail?id=286360
@@ -28965,7 +28965,7 @@ return index;
 					'.resize-triggers, .resize-triggers > div, .contract-trigger:before { content: \" \"; display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; } .resize-triggers > div { background: #eee; overflow: auto; } .contract-trigger:before { width: 200%; height: 200%; }',
 				head = document.head || document.getElementsByTagName('head')[0],
 				style = document.createElement('style');
-
+			
 			style.type = 'text/css';
 			if (style.styleSheet) {
 				style.styleSheet.cssText = css;
@@ -28977,7 +28977,7 @@ return index;
 			stylesCreated = true;
 		}
 	}
-
+	
 	window.addResizeListener = function(element, fn){
 		if (attachEvent) element.attachEvent('onresize', fn);
 		else {
@@ -28992,7 +28992,7 @@ return index;
 				element.appendChild(element.__resizeTriggers__);
 				resetTriggers(element);
 				element.addEventListener('scroll', scrollListener, true);
-
+				
 				/* Listen for a css animation to detect element display/re-attach */
 				animationstartevent && element.__resizeTriggers__.addEventListener(animationstartevent, function(e) {
 					if(e.animationName == animationName)
@@ -29002,7 +29002,7 @@ return index;
 			element.__resizeListeners__.push(fn);
 		}
 	};
-
+	
 	window.removeResizeListener = function(element, fn){
 		if (attachEvent) element.detachEvent('onresize', fn);
 		else {
@@ -29016,7 +29016,7 @@ return index;
 }( jQuery ));
 ;
 /****************************************************************************
-    jquery-scroll-container.js,
+    jquery-scroll-container.js, 
 
     (c) 2017, FCOO
 
@@ -29029,7 +29029,7 @@ return index;
     "use strict";
 
     if ( $('html').hasClass('touchevents') || $('html').hasClass('no-touchevents') )
-        ;    //Modernizr (or someone else) has set the correct class
+        ;    //Modernizr (or someone else) has set the correct class      
     else
         //Default: No touch
         $('html').addClass('no-touchevents');
@@ -29066,16 +29066,16 @@ return index;
             var scrollLeft = Math.ceil( this.scrollLeft() ),
                 scrollTop  = Math.ceil( this.scrollTop()  );
 
-            this._psSetXShadow( 'left',   scrollLeft > 0 );
-            this._psSetXShadow( 'right',  scrollLeft < (this.get(0).scrollWidth - this.get(0).clientWidth) );
+            this._psSetXShadow( 'left',   scrollLeft > 0 ); 
+            this._psSetXShadow( 'right',  scrollLeft < (this.get(0).scrollWidth - this.get(0).clientWidth) ); 
 
-            this._psSetYShadow( 'top',    scrollTop > 0 );
-            this._psSetYShadow( 'bottom', scrollTop < (this.get(0).scrollHeight - this.get(0).clientHeight) );
-
+            this._psSetYShadow( 'top',    scrollTop > 0 ); 
+            this._psSetYShadow( 'bottom', scrollTop < (this.get(0).scrollHeight - this.get(0).clientHeight) ); 
+            
         }
 
     });
-
+    
     var scrollbarOptions = {
         //handlers              //It is a list of handlers to use to scroll the element. Default: ['click-rail', 'drag-scrollbar', 'keyboard', 'wheel', 'touch'] Disabled by default: 'selection'
         //wheelSpeed            //The scroll speed applied to mousewheel event. Default: 1
@@ -29093,7 +29093,7 @@ return index;
         useBothWheelAxes   : true, //=> Mousewheel works in both horizontal and vertical scroll
         scrollXMarginOffset: 1,    //IE11 apears to work betten when == 1
         scrollYMarginOffset: 1,    //                --||--
-
+            
         direction: 'vertical' //["vertical"|"horizontal"|"both"] (default: "vertical")
     };
 
@@ -29126,24 +29126,24 @@ return index;
         //Add background for the bar
         this.scrollbarXRail.prepend( $('<div/>').addClass('ps__scrollbar-x-bg') );
         this.scrollbarYRail.prepend( $('<div/>').addClass('ps__scrollbar-y-bg') );
-
-
-        //Assume the the content is scrolled to the top/left
-        this._psSetXShadow('right',   true  );
+        
+       
+        //Assume the the content is scrolled to the top/left 
+        this._psSetXShadow('right',   true  ); 
         this._psSetYShadow( 'bottom', true  );
 
         // Adding event to update shadows
         this.on('ps-scroll-y ps-scroll-x', $.proxy( this._psUpdateShadow, this ) );
-
-
+        
+        
         //Add inner container to cache resize when adding/removing elements from container
-        this.scrollbarContainer =
+        this.scrollbarContainer = 
             $('<div/>')
                 .addClass('jquery-scroll-container')
                 .appendTo( this );
 
 
-        //Update scrollbar when container or content change size
+        //Update scrollbar when container or content change size        
         var _psUpdate = $.proxy( this._psUpdate, this );
         this.resize( _psUpdate );
         this.scrollbarContainer.resize( _psUpdate );
@@ -29154,8 +29154,8 @@ return index;
 
 /**********************************************************************
 TODO: NEW METHODS
-        //verticalScrollToElement
-        this.verticalScrollToElement = function verticalScrollToElement(elem, options){
+        //verticalScrollToElement    
+        this.verticalScrollToElement = function verticalScrollToElement(elem, options){ 
             elem = elem instanceof $ ? elem : $(elem);
             //Find the different relative positions and heights
             var topInContents = elem.position().top,                                   //The top-position in the hole contentens
@@ -29168,7 +29168,7 @@ TODO: NEW METHODS
 
             if ((topInBox >= 0) && (bottomInBox <= boxHeight)){
                 //Ok - The element is inside the box
-            } else
+            } else 
                 if (topInBox < 0){
                     //The elements top is above the top of the box => scroll element t top of box
                     deltaScroll = topInBox;
@@ -29179,29 +29179,29 @@ TODO: NEW METHODS
                         deltaScroll += (topInBox - deltaScroll);
                     }
                 }
-
+                    
             if (deltaScroll)
                 this.mCustomScrollbar("scrollTo", scrolledBy + deltaScroll, {timeout:0, scrollInertia:0});
         };
 
         //verticalScrollElementToTop( elem ) - scroll elem to the top of the scroll-box. TODO
-
-        //verticalScrollToTop
+        
+        //verticalScrollToTop            
         this.verticalScrollToTop    = function verticalScrollToTop(options){ this.mCustomScrollbar("scrollTo", 'top', options); };
-        //verticalScrollToBottom
+        //verticalScrollToBottom        
         this.verticalScrollToBottom = function verticalScrollToBottom(options){ this.mCustomScrollbar("scrollTo", 'bottom', options);    };
-        //verticalScrollAppend
+        //verticalScrollAppend        
         this.verticalScrollAppend   = function verticalScrollAppend( elem ){ this.find('.mCSB_container').append( elem ); };
-        //verticalScrollPrepend
+        //verticalScrollPrepend        
         this.verticalScrollPrepend  = function verticalScrollPrepend( elem ){ this.find('.mCSB_container').prepend( elem );    };
 
 **********************************************************************/
 
 
-
-    //Initialize/ready
-    $(function() {
-    });
+    
+    //Initialize/ready 
+    $(function() { 
+    }); 
 
 
 
@@ -29212,7 +29212,7 @@ TODO: NEW METHODS
 
     https://github.com/noraesae/perfect-scrollbar
 
-    THIS IS MODIFIED VERSIONS OF THE JS-FILE
+    THIS IS MODIFIED VERSIONS OF THE JS-FILE 
     FROM PERFECT-SCROLLBAR VERSION 0.7.1
 
 ************************************************/
@@ -29239,7 +29239,7 @@ TODO: NEW METHODS
         }
         return n[o].exports
     }
-
+           
     var i=typeof require=="function"&&require;
     for(var o=0;o<r.length;o++)
         s(r[o]);
@@ -30043,7 +30043,7 @@ function bindMouseWheelHandler(element, i) {
   }
 
   function mousewheelHandler(e) {
-    var delta = getDeltaFromEvent(e);
+    var delta = getDeltaFromEvent(e); 
 
     var deltaX = delta[0];
     var deltaY = delta[1];
@@ -30831,7 +30831,7 @@ module.exports = function (element) {
 
 ;
 /****************************************************************************
-	jquery-value-format.js,
+	jquery-value-format.js, 
 
 	(c) 2016, FCOO
 
@@ -30842,7 +30842,7 @@ module.exports = function (element) {
 
 (function ($, window, document, undefined) {
 	"use strict";
-
+	
     var dataId_prefix  = 'vf-',
         dataId_format  = dataId_prefix + 'format',
         dataId_value   = dataId_prefix + 'value',
@@ -30856,13 +30856,13 @@ module.exports = function (element) {
             convertBack: defaultConvert,
             format     : function( value /*, options */) { return '** UNKNOWN FORMAT FOR "' + value + '" **'; }
         };
-
+        
     //Create valueFormat-namespace
 	$.valueFormat = $.valueFormat || {};
 
     //*********************************************************************
     //jQuery.valueFormat.add = append a new format
-	$.valueFormat.add = function( options ){
+	$.valueFormat.add = function( options ){ 
         this.formats = this.formats || {};
 
         options.convert = options.convert || defaultConvert;
@@ -30886,7 +30886,7 @@ module.exports = function (element) {
         return this;
     };
 
-
+   
     //*********************************************************************
     //jQuery.fn.vfFormat( id, options ): Sets the format of the selected elements and update them
 	$.fn.vfFormat = function( id, options, dontUpdate ) {
@@ -30935,15 +30935,15 @@ module.exports = function (element) {
                  .vfFormat( id, options, true )
                  .vfValue( value );
     };
-
+    
     //*********************************************************************
-    //jQuery.fn.vfUpdate(): Update the selected elements
+    //jQuery.fn.vfUpdate(): Update the selected elements 
 	$.fn.vfUpdate = function() {
 		return this.each(function() {
             $( this )._vfUpdate();
 		});
 	};
-
+    
     //*********************************************************************
     //Internal methods
     //jQuery.fn._vfGetFormat()
@@ -30956,7 +30956,7 @@ module.exports = function (element) {
     $.fn._vfGetOptions = function() {
         var options = this.data( dataId_options ) || {};
 
-        //Convert options (if any) from string to json-object
+        //Convert options (if any) from string to json-object 
         if (options && ($.type(options) == 'string') ){
             options = options.split("'").join('"');
             try {
@@ -30964,7 +30964,7 @@ module.exports = function (element) {
                 if ($.type( newOptions ) == 'object')
                     options = newOptions;
             }
-            catch (e) {
+            catch (e) { 
                 options = null;
             }
         }
@@ -30986,7 +30986,7 @@ module.exports = function (element) {
 
             if (options.capitalizeFirstLetter)
                 value = value.charAt(0).toUpperCase() + value.slice(1);
-
+            
             //prefix, postfix
             value = (options.prefix ? options.prefix : '') + value + (options.postfix ? options.postfix : '');
 
@@ -30997,12 +30997,12 @@ module.exports = function (element) {
 
 
 	/******************************************
-	Initialize/ready
+	Initialize/ready 
 	*******************************************/
-	$(function() {
+	$(function() { 
 
-
-	});
+	
+	}); 
 	//******************************************
 
 
@@ -31067,12 +31067,12 @@ module.exports = function (element) {
 
 }(jQuery, this, document));
 ;
-/*
-  @package NOTY - Dependency-free notification library
-  @version version: 3.1.4
-  @contributors https://github.com/needim/noty/graphs/contributors
-  @documentation Examples and Documentation - http://needim.github.com/noty
-  @license Licensed under the MIT licenses: http://www.opensource.org/licenses/mit-license.php
+/* 
+  @package NOTY - Dependency-free notification library 
+  @version version: 3.1.4 
+  @contributors https://github.com/needim/noty/graphs/contributors 
+  @documentation Examples and Documentation - http://needim.github.com/noty 
+  @license Licensed under the MIT licenses: http://www.opensource.org/licenses/mit-license.php 
 */
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -33105,7 +33105,7 @@ Promise$2.prototype = {
     The primary way of interacting with a promise is through its `then` method,
     which registers callbacks to receive either a promise's eventual value or the
     reason why the promise cannot be fulfilled.
-
+  
     ```js
     findUser().then(function(user){
       // user is available
@@ -33113,14 +33113,14 @@ Promise$2.prototype = {
       // user is unavailable, and you are given the reason why
     });
     ```
-
+  
     Chaining
     --------
-
+  
     The return value of `then` is itself a promise.  This second, 'downstream'
     promise is resolved with the return value of the first promise's fulfillment
     or rejection handler, or rejected if the handler throws an exception.
-
+  
     ```js
     findUser().then(function (user) {
       return user.name;
@@ -33130,7 +33130,7 @@ Promise$2.prototype = {
       // If `findUser` fulfilled, `userName` will be the user's name, otherwise it
       // will be `'default name'`
     });
-
+  
     findUser().then(function (user) {
       throw new Error('Found user, but still unhappy');
     }, function (reason) {
@@ -33143,7 +33143,7 @@ Promise$2.prototype = {
     });
     ```
     If the downstream promise does not specify a rejection handler, rejection reasons will be propagated further downstream.
-
+  
     ```js
     findUser().then(function (user) {
       throw new PedagogicalException('Upstream error');
@@ -33155,15 +33155,15 @@ Promise$2.prototype = {
       // The `PedgagocialException` is propagated all the way down to here
     });
     ```
-
+  
     Assimilation
     ------------
-
+  
     Sometimes the value you want to propagate to a downstream promise can only be
     retrieved asynchronously. This can be achieved by returning a promise in the
     fulfillment or rejection handler. The downstream promise will then be pending
     until the returned promise is settled. This is called *assimilation*.
-
+  
     ```js
     findUser().then(function (user) {
       return findCommentsByAuthor(user);
@@ -33171,9 +33171,9 @@ Promise$2.prototype = {
       // The user's comments are now available
     });
     ```
-
+  
     If the assimliated promise rejects, then the downstream promise will also reject.
-
+  
     ```js
     findUser().then(function (user) {
       return findCommentsByAuthor(user);
@@ -33183,15 +33183,15 @@ Promise$2.prototype = {
       // If `findCommentsByAuthor` rejects, we'll have the reason here
     });
     ```
-
+  
     Simple Example
     --------------
-
+  
     Synchronous Example
-
+  
     ```javascript
     let result;
-
+  
     try {
       result = findResult();
       // success
@@ -33199,9 +33199,9 @@ Promise$2.prototype = {
       // failure
     }
     ```
-
+  
     Errback Example
-
+  
     ```js
     findResult(function(result, err){
       if (err) {
@@ -33211,9 +33211,9 @@ Promise$2.prototype = {
       }
     });
     ```
-
+  
     Promise Example;
-
+  
     ```javascript
     findResult().then(function(result){
       // success
@@ -33221,15 +33221,15 @@ Promise$2.prototype = {
       // failure
     });
     ```
-
+  
     Advanced Example
     --------------
-
+  
     Synchronous Example
-
+  
     ```javascript
     let author, books;
-
+  
     try {
       author = findAuthor();
       books  = findBooksByAuthor(author);
@@ -33238,19 +33238,19 @@ Promise$2.prototype = {
       // failure
     }
     ```
-
+  
     Errback Example
-
+  
     ```js
-
+  
     function foundBooks(books) {
-
+  
     }
-
+  
     function failure(reason) {
-
+  
     }
-
+  
     findAuthor(function(author, err){
       if (err) {
         failure(err);
@@ -33275,9 +33275,9 @@ Promise$2.prototype = {
       }
     });
     ```
-
+  
     Promise Example;
-
+  
     ```javascript
     findAuthor().
       then(findBooksByAuthor).
@@ -33287,7 +33287,7 @@ Promise$2.prototype = {
       // something went wrong
     });
     ```
-
+  
     @method then
     @param {Function} onFulfilled
     @param {Function} onRejected
@@ -33299,25 +33299,25 @@ Promise$2.prototype = {
   /**
     `catch` is simply sugar for `then(undefined, onRejection)` which makes it the same
     as the catch block of a try/catch statement.
-
+  
     ```js
     function findAuthor(){
       throw new Error('couldn't find that author');
     }
-
+  
     // synchronous
     try {
       findAuthor();
     } catch(reason) {
       // something went wrong
     }
-
+  
     // async with promises
     findAuthor().catch(function(reason){
       // something went wrong
     });
     ```
-
+  
     @method catch
     @param {Function} onRejection
     Useful for tooling.
@@ -53082,6 +53082,7 @@ var Tooltip = DivOverlay.extend({
 		    tooltipHeight = container.offsetHeight,
 		    offset = toPoint(this.options.offset),
 		    anchor = this._getAnchor();
+
 		if (direction === 'top') {
 			pos = pos.add(toPoint(-tooltipWidth / 2 + offset.x, -tooltipHeight + offset.y + anchor.y, true));
 		} else if (direction === 'bottom') {

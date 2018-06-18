@@ -37,7 +37,7 @@ Adjust standard Leaflet popup to display as Bootstrap modal
             if (this.options.fixable)
                 events.preclick = events.preclick ? popup_getEvents_preclick : null;
             return events;
-        }
+        };
     } (L.Popup.prototype.getEvents);
 
     //Adjust Popup.initialize
@@ -49,7 +49,7 @@ Adjust standard Leaflet popup to display as Bootstrap modal
 
 
             return initialize.apply(this, arguments);
-        }
+        };
     } (L.Popup.prototype.initialize);
 
 

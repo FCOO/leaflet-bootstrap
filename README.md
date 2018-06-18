@@ -78,6 +78,3 @@ This plugin is licensed under the [MIT license](https://github.com/FCOO/leaflet-
 
 Copyright (c) 2017 [FCOO](https://github.com/FCOO)
 
-## Contact information
-
-Niels Holt nho@fcoo.dk
