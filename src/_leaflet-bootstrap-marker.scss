@@ -49,7 +49,7 @@ lbm-puls        : Has a pulsing ring
 }
 
 .lbm-icon {
-    opacity      : 1 !important;
+    opacity      : 1;
     border-radius: 100%;
     border       : 2px solid black;
     &.lbm-border-white { border-color: white; }

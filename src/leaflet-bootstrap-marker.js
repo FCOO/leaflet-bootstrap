@@ -128,14 +128,10 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
         *****************************************************/
         _bsMarker_onDragStart: function(){
             this._map.ignoreNextEvent('click');
-            if (this._tooltip)
-                this._tooltip.setOpacity(0);
         },
 
         _bsMarker_onDragEnd  : function(){
             setTimeout( $.proxy( this._map.includeNextEvent, this._map, 'click'), 100 );
-            if (this._tooltip)
-                this._tooltip.setOpacity(0.9);
         },
 
     });
