@@ -35,6 +35,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
                 var container = this._createContent().get(0);
 
                 L.DomEvent.disableClickPropagation( container );
+                L.DomEvent.on(container, 'click', L.DomEvent.stop);
                 L.DomEvent.on(container, 'click', this._refocusOnMap, this);
 
                 return container;
