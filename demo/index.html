@@ -57,6 +57,9 @@
                     }).addTo( map );
 
                     marker.on('click', function(){ this.setColor('success'); this.toggleOption('puls'); }, marker );
+                    marker.bindPopup( function( $element ){
+                        $element._bsAddHtml({icon: 'fa-home', text: 'Tekst og ikon'});
+                    });
             }
 
 

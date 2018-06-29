@@ -43,7 +43,6 @@ Adjust standard Leaflet popup to display as Bootstrap modal
     //Adjust Popup.initialize
     L.Popup.prototype.initialize = function (initialize) {
         return function (options) {
-
             if (options && options.fixable)
                 this.onPin = $.proxy( this._setPinned, this);
 
@@ -52,6 +51,14 @@ Adjust standard Leaflet popup to display as Bootstrap modal
         };
     } (L.Popup.prototype.initialize);
 
+
+    //Overwrite L.Layer.bindPopup to create popup with Bootstrap-components
+    L.Layer.prototype.bindPopup = function (bindPopup) {
+        return function (content/*, options*/) {
+            //content can be 1: string or function, 2: object with the content, 3: Full popup-options
+            return bindPopup.call(this, L.popup( ($.isPlainObject(content) && !!content.content) ? content : {content: content} ));
+        };
+    } (L.Layer.prototype.bindPopup);
 
     //Overwrite L.Popup._initLayout to create popup with Bootstrap-components
     L.Popup.prototype._initLayout = function (_initLayout) {
@@ -83,8 +90,6 @@ Adjust standard Leaflet popup to display as Bootstrap modal
                     onPin         : this.onPin,
                     noHeader      : !this.options.header,
                     contentContext: this,
-
-
                 },
                 this.options );
 
