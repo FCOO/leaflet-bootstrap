@@ -40,26 +40,26 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
                 return container;
             },
-        }),
+        });
 
-        bsButton = _bsButtons.extend({
+        L.control.BsButton = _bsButtons.extend({
             _createContent: function(){ return $.bsButton(this.options); }
-        }),
+        });
 
-        bsButtonGroup = _bsButtons.extend({
+        L.control.BsButtonGroup = _bsButtons.extend({
             options       : { vertical: true },
             _createContent: function(){ return $.bsButtonGroup(this.options); }
-        }),
+        });
 
-        bsRadioButtonGroup = bsButtonGroup.extend({
+        L.control.BsRadioButtonGroup = L.control.BsButtonGroup.extend({
 //            options       : { vertical: true },
             _createContent: function(){ return $.bsRadioButtonGroup(this.options); }
         });
 
 
-        L.control.bsButton           = function(options){ return new bsButton(options);           };
-        L.control.bsButtonGroup      = function(options){ return new bsButtonGroup(options);      };
-        L.control.bsRadioButtonGroup = function(options){ return new bsRadioButtonGroup(options); };
+        L.control.bsButton           = function(options){ return new  L.control.BsButton(options);           };
+        L.control.bsButtonGroup      = function(options){ return new  L.control.BsButtonGroup(options);      };
+        L.control.bsRadioButtonGroup = function(options){ return new  L.control.BsRadioButtonGroup(options); };
 
 }(jQuery, L, this, document));
 
@@ -136,12 +136,12 @@ Create leaflet-control for jquery-bootstrap modal-content:
                 this.options.show ? this.show() : this.hide();
                 return result;
             },
-        }),
+        });
 
         /***************************************************
-        L_control_bsModal
+        L.control.BsModal
         ***************************************************/
-        L_control_bsModal = _bsModal.extend({
+        L.control.BsModal = _bsModal.extend({
             _defaultOptions : {
                 show               : true,
                 closeButton        : false,
@@ -151,13 +151,13 @@ Create leaflet-control for jquery-bootstrap modal-content:
             _createModal: function(){
                 this.bsModal = $.bsModal( this.options );
             }
-        }),
+        });
 
 
         /***************************************************
-        L_control_bsModalForm
+        L.control.BsModalForm
         ***************************************************/
-        L_control_bsModalForm = _bsModal.extend({
+        L.control.BsModalForm = _bsModal.extend({
             _defaultOptions : {
                 show               : false,
 //                noCloseIconOnHeader: true
@@ -177,8 +177,8 @@ Create leaflet-control for jquery-bootstrap modal-content:
 
 
         //*************************************
-        L.control.bsModal = function(options){ return new L_control_bsModal(options); };
-        L.control.bsModalForm = function(options){ return new L_control_bsModalForm(options); };
+        L.control.bsModal     = function(options){ return new L.control.BsModal(options); };
+        L.control.bsModalForm = function(options){ return new L.control.BsModalForm(options); };
 
 }(jQuery, L, this, document));
 
@@ -508,7 +508,7 @@ Map.addInitHook(function () {
 
     //Default options
         options: {
-            VERSION: "1.1.0"
+            VERSION: "1.2.0"
 
         },
 
