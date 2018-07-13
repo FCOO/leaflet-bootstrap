@@ -3340,6 +3340,610 @@
 }
 
 /***********************************************
+	modernizr-mouse-events.scss,
+
+	(c) 2018, FCOO
+
+	https://github.com/FCOO/modernizr-mouse-events
+	https://github.com/FCOO
+
+
+************************************************/
+html.mouse .hide-for-mouse {
+  display: none !important; }
+
+html.mouse .show-for-no-mouse {
+  display: none !important; }
+
+html.no-mouse .show-for-mouse {
+  display: none !important; }
+
+html.no-mouse .hide-for-no-mouse {
+  display: none !important; }
+
+html.mouse-hover .hide-for-mouse-hover {
+  display: none !important; }
+
+html.mouse-hover .show-for-no-mouse-hover {
+  display: none !important; }
+
+html.no-mouse-hover .show-for-mouse-hover {
+  display: none !important; }
+
+html.no-mouse-hover .hide-for-no-mouse-hover {
+  display: none !important; }
+
+/***********************************************
+jquery-base-slider.scss, Description from README.md
+
+    (c) 2015, FCOO
+
+    https://github.com/fcoo/jquery-base-slider
+    https://github.com/fcoo
+
+There are four different types of sliders:
+default, small, round and range
+
+The type is set by adding the same class-name to the outer <span> eq. <span class="base-slider round....">
+
+The scss is divided in two parts: First the common part equal for all types and then a specified part for the different types
+
+************************************************/
+.base-slider-container-outer {
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden; }
+  .base-slider-container-outer .base-slider-container-full-width {
+    position: relative;
+    left: 0;
+    overflow-y: visible; }
+
+/***************************************************************
+COMMON STYLE
+***************************************************************/
+.base-slider-container {
+  position: relative;
+  display: block;
+  user-select: none;
+  box-sizing: border-box; }
+  .base-slider-container .line-background {
+    position: absolute;
+    display: block;
+    width: 100%;
+    top: 0; }
+  .base-slider-container .line {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 0.25rem;
+    left: -0.0625rem;
+    overflow: hidden;
+    outline: none !important;
+    box-sizing: content-box;
+    background-color: transparent;
+    border: 0.0625rem solid #afb3bb;
+    border-bottom-left-radius: 0.125rem;
+    border-top-left-radius: 0.125rem;
+    border-bottom-right-radius: 0.125rem;
+    border-top-right-radius: 0.125rem; }
+    .base-slider-container .line .line-color {
+      position: absolute;
+      display: block;
+      height: 100%; }
+      .base-slider-container .line .line-color:first-child {
+        border-bottom-left-radius: 0.125rem;
+        border-top-left-radius: 0.125rem; }
+      .base-slider-container .line .line-color:last-child:not(:first-child) {
+        border-bottom-right-radius: 0.125rem;
+        border-top-right-radius: 0.125rem; }
+  .base-slider-container .handle {
+    position: absolute;
+    display: block;
+    z-index: 10;
+    top: 1.270625rem;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-attachment: local;
+    background-position: 0% 0%; }
+    .base-slider-container .handle.type-last {
+      z-index: 12; }
+  .base-slider-container .handle.pin {
+    position: absolute;
+    z-index: 100;
+    height: 0.6428571429rem !important;
+    margin-top: -0.5142857143rem;
+    width: 1rem;
+    margin-left: -0.5rem;
+    font-size: 0.6428571429rem;
+    text-align: center;
+    background-image: none !important; }
+  .base-slider-container .marker-outer {
+    position: absolute;
+    top: 0rem;
+    z-index: 2;
+    cursor: default;
+    font-family: Arial, sans-serif;
+    font-size: 0.625rem; }
+    .base-slider-container .marker-outer .marker {
+      box-sizing: border-box;
+      width: 100%;
+      height: 100%;
+      margin-left: -50%;
+      padding: 0; }
+    .base-slider-container .marker-outer.frame .marker:after {
+      position: absolute;
+      display: block;
+      top: 100%;
+      left: 0;
+      width: 0;
+      height: 0;
+      margin-left: -0.1875rem;
+      content: "";
+      overflow: hidden;
+      border: 0.1875rem solid transparent;
+      border-top-color: black; }
+    .base-slider-container .marker-outer .marker-text {
+      display: inline-block;
+      cursor: inherit;
+      box-sizing: border-box;
+      line-height: 1.333;
+      padding: 0.0625rem 0.3125rem;
+      border: 0.0625rem solid transparent;
+      border-radius: 0.25rem;
+      white-space: nowrap;
+      text-shadow: none; }
+    .base-slider-container .marker-outer.min-max .marker-text {
+      color: #555;
+      background-color: #d1d6e0;
+      border: 0.0625rem solid #afb3bb;
+      border-radius: 0.25rem; }
+    .base-slider-container .marker-outer.single-from-to .marker-text {
+      color: #111; }
+    .base-slider-container .marker-outer.single-from-to.frame .marker-text {
+      background: white;
+      border: 0.0625rem solid black; }
+  html.mouse-hover .base-slider-container.active .marker-outer:hover.single-from-to.frame .marker-text, html.mouse-hover .base-slider-container.active .marker-outer:hover.min-max .marker-text, html.mouse-hover .base-slider-container.active .marker-outer.hover.single-from-to.frame .marker-text, html.mouse-hover .base-slider-container.active .marker-outer.hover.min-max .marker-text {
+    border-color: #007bff; }
+
+.grid {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  width: 100%;
+  height: 1.5625rem;
+  cursor: default; }
+  .grid .grid-pol {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    width: 0.0625rem;
+    height: 0.375rem;
+    background: #555555;
+    box-shadow: 1px 1px 1px 0px rgba(255, 255, 255, 0.75), -1px 1px 1px 0px rgba(255, 255, 255, 0.75); }
+    .grid .grid-pol.major {
+      height: 0.5625rem;
+      background: black; }
+  .grid .grid-label-outer {
+    position: absolute;
+    z-index: 2;
+    top: 0.5625rem;
+    height: 1rem; }
+    .grid .grid-label-outer .grid-label {
+      box-sizing: border-box;
+      width: 100%;
+      height: 100%;
+      margin-left: -50%;
+      padding: 0; }
+      .grid .grid-label-outer .grid-label .grid-label-text {
+        cursor: inherit;
+        display: inline-block;
+        box-sizing: border-box;
+        line-height: 1;
+        height: 100%;
+        padding: 0.125rem;
+        border: 0.0625rem solid transparent;
+        border-radius: 0.25rem; }
+        .grid .grid-label-outer .grid-label .grid-label-text.frame {
+          border-color: #afb3bb; }
+  .grid.label-between-ticks {
+    height: 0.625rem; }
+    .grid.label-between-ticks .grid-label-outer {
+      top: 0;
+      height: 0.625rem; }
+      .grid.label-between-ticks .grid-label-outer .grid-label .grid-label-text {
+        padding: 0;
+        border-radius: 0;
+        border: 0; }
+  .grid .grid-label {
+    background-color: transparent;
+    left: 0;
+    white-space: nowrap;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    font-size: 0.625rem;
+    line-height: 1;
+    font-weight: bold;
+    color: #000; }
+    .grid .grid-label.minor {
+      font-weight: normal;
+      color: #555555; }
+    .grid .grid-label.italic {
+      font-style: italic; }
+  .grid .grid-color {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    height: 0.5625rem;
+    font-size: 1.125rem;
+    text-align: center;
+    line-height: 0.5625rem;
+    overflow: hidden; }
+    .grid .grid-color.gt-max {
+      left: 100%;
+      width: 0;
+      height: 0;
+      border: 0 solid transparent;
+      border-bottom-width: 0.28125rem;
+      border-top-width: 0.28125rem;
+      border-left: 0.5625rem solid black; }
+    .grid .grid-color.lt-min {
+      left: -0.5625rem;
+      width: 0;
+      height: 0;
+      border: 0 solid transparent;
+      border-top-width: 0.28125rem;
+      border-bottom-width: 0.28125rem;
+      border-right: 0.5625rem solid black; }
+
+html.mouse-hover .base-slider-container.active:not(.dragging) .grid-label.clickable:hover .grid-label-text {
+  border-color: #007bff; }
+
+.disabled {
+  opacity: 0.4; }
+
+.hidden-input {
+  position: absolute !important;
+  display: block !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  outline: none !important;
+  z-index: -9999 !important;
+  background: none !important;
+  border-style: solid !important;
+  border-color: transparent !important; }
+
+/***************************************************************
+STYLE FOR SPECIFIC TYPE
+***************************************************************/
+.base-slider-container.horizontal {
+  /****************************************************
+        Special case for no marker and pin:
+        Adjust all top-position by adding top-margin if the pin is heigher than the handle
+        ****************************************************/ }
+  .base-slider-container.horizontal .line-background {
+    height: 2.770625rem; }
+  .base-slider-container.horizontal .line {
+    top: 1.833125rem; }
+  .base-slider-container.horizontal .handle {
+    box-sizing: border-box;
+    width: 1rem;
+    height: 1.5rem;
+    margin-left: -0.5rem;
+    background-image: url("images/handle.horizontal.svg"); }
+  html.mouse-hover .base-slider-container.horizontal.active .handle:hover, html.mouse-hover .base-slider-container.horizontal.active .handle.hover {
+    background-image: url("images/handle.horizontal.hover.svg"); }
+  .base-slider-container.horizontal .pin {
+    top: 1.833125rem; }
+  .base-slider-container.horizontal .grid {
+    top: 2.770625rem; }
+  .base-slider-container.horizontal.ticks-on-line .grid {
+    top: 1.833125rem; }
+  .base-slider-container.horizontal.ticks-on-line.no-marker .grid {
+    top: 0.5625rem; }
+  .base-slider-container.horizontal.no-marker .line,
+  .base-slider-container.horizontal.no-marker .pin {
+    top: 0.5625rem !important; }
+  .base-slider-container.horizontal.no-marker .handle {
+    top: 0rem; }
+  .base-slider-container.horizontal.no-marker .grid {
+    top: 1.5rem; }
+  .base-slider-container.horizontal.no-marker.has-pin {
+    margin-top: 0; }
+
+.base-slider-container.vertical {
+  /****************************************************
+        Special case for no marker and pin:
+        Adjust all top-position by adding top-margin if the pin is heigher than the handle
+        ****************************************************/ }
+  .base-slider-container.vertical .line-background {
+    height: 2.270625rem; }
+  .base-slider-container.vertical .line {
+    top: 1.583125rem; }
+  .base-slider-container.vertical .handle {
+    box-sizing: border-box;
+    width: 1.5rem;
+    height: 1rem;
+    margin-left: -0.75rem;
+    background-image: url("images/handle.vertical.svg"); }
+  html.mouse-hover .base-slider-container.vertical.active .handle:hover, html.mouse-hover .base-slider-container.vertical.active .handle.hover {
+    background-image: url("images/handle.vertical.hover.svg"); }
+  .base-slider-container.vertical .pin {
+    top: 1.583125rem; }
+  .base-slider-container.vertical .grid {
+    top: 2.270625rem; }
+  .base-slider-container.vertical.ticks-on-line .grid {
+    top: 1.583125rem; }
+  .base-slider-container.vertical.ticks-on-line.no-marker .grid {
+    top: 0.3125rem; }
+  .base-slider-container.vertical.no-marker .line,
+  .base-slider-container.vertical.no-marker .pin {
+    top: 0.3125rem !important; }
+  .base-slider-container.vertical.no-marker .handle {
+    top: 0rem; }
+  .base-slider-container.vertical.no-marker .grid {
+    top: 1rem; }
+  .base-slider-container.vertical.no-marker.has-pin {
+    margin-top: 0.2017857143rem; }
+
+.base-slider-container.down {
+  /****************************************************
+        Special case for no marker and pin:
+        Adjust all top-position by adding top-margin if the pin is heigher than the handle
+        ****************************************************/ }
+  .base-slider-container.down .line-background {
+    height: 2.770625rem; }
+  .base-slider-container.down .line {
+    top: 1.833125rem; }
+  .base-slider-container.down .handle {
+    box-sizing: border-box;
+    width: 1rem;
+    height: 1.5rem;
+    margin-left: -0.5rem;
+    background-image: url("images/handle.down.svg"); }
+  html.mouse-hover .base-slider-container.down.active .handle:hover, html.mouse-hover .base-slider-container.down.active .handle.hover {
+    background-image: url("images/handle.down.hover.svg"); }
+  .base-slider-container.down .pin {
+    top: 1.833125rem; }
+  .base-slider-container.down .grid {
+    top: 2.770625rem; }
+  .base-slider-container.down.ticks-on-line .grid {
+    top: 1.833125rem; }
+  .base-slider-container.down.ticks-on-line.no-marker .grid {
+    top: 0.5625rem; }
+  .base-slider-container.down.no-marker .line,
+  .base-slider-container.down.no-marker .pin {
+    top: 0.5625rem !important; }
+  .base-slider-container.down.no-marker .handle {
+    top: 0rem; }
+  .base-slider-container.down.no-marker .grid {
+    top: 1.5rem; }
+  .base-slider-container.down.no-marker.has-pin {
+    margin-top: 0; }
+
+.base-slider-container.up {
+  /****************************************************
+        Special case for no marker and pin:
+        Adjust all top-position by adding top-margin if the pin is heigher than the handle
+        ****************************************************/ }
+  .base-slider-container.up .line-background {
+    height: 2.770625rem; }
+  .base-slider-container.up .line {
+    top: 1.833125rem; }
+  .base-slider-container.up .handle {
+    box-sizing: border-box;
+    width: 1rem;
+    height: 1.5rem;
+    margin-left: -0.5rem;
+    background-image: url("images/handle.up.svg"); }
+  html.mouse-hover .base-slider-container.up.active .handle:hover, html.mouse-hover .base-slider-container.up.active .handle.hover {
+    background-image: url("images/handle.up.hover.svg"); }
+  .base-slider-container.up .pin {
+    top: 1.833125rem; }
+  .base-slider-container.up .grid {
+    top: 2.770625rem; }
+  .base-slider-container.up.ticks-on-line .grid {
+    top: 1.833125rem; }
+  .base-slider-container.up.ticks-on-line.no-marker .grid {
+    top: 0.5625rem; }
+  .base-slider-container.up.no-marker .line,
+  .base-slider-container.up.no-marker .pin {
+    top: 0.5625rem !important; }
+  .base-slider-container.up.no-marker .handle {
+    top: 0rem; }
+  .base-slider-container.up.no-marker .grid {
+    top: 1.5rem; }
+  .base-slider-container.up.no-marker.has-pin {
+    margin-top: 0; }
+
+.base-slider-container.right {
+  /****************************************************
+        Special case for no marker and pin:
+        Adjust all top-position by adding top-margin if the pin is heigher than the handle
+        ****************************************************/ }
+  .base-slider-container.right .line-background {
+    height: 2.270625rem; }
+  .base-slider-container.right .line {
+    top: 1.583125rem; }
+  .base-slider-container.right .handle {
+    box-sizing: border-box;
+    width: 1.5rem;
+    height: 1rem;
+    margin-left: -0.75rem;
+    background-image: url("images/handle.right.svg"); }
+  html.mouse-hover .base-slider-container.right.active .handle:hover, html.mouse-hover .base-slider-container.right.active .handle.hover {
+    background-image: url("images/handle.right.hover.svg"); }
+  .base-slider-container.right .pin {
+    top: 1.583125rem; }
+  .base-slider-container.right .grid {
+    top: 2.270625rem; }
+  .base-slider-container.right.ticks-on-line .grid {
+    top: 1.583125rem; }
+  .base-slider-container.right.ticks-on-line.no-marker .grid {
+    top: 0.3125rem; }
+  .base-slider-container.right.no-marker .line,
+  .base-slider-container.right.no-marker .pin {
+    top: 0.3125rem !important; }
+  .base-slider-container.right.no-marker .handle {
+    top: 0rem; }
+  .base-slider-container.right.no-marker .grid {
+    top: 1rem; }
+  .base-slider-container.right.no-marker.has-pin {
+    margin-top: 0.2017857143rem; }
+
+.base-slider-container.left {
+  /****************************************************
+        Special case for no marker and pin:
+        Adjust all top-position by adding top-margin if the pin is heigher than the handle
+        ****************************************************/ }
+  .base-slider-container.left .line-background {
+    height: 2.270625rem; }
+  .base-slider-container.left .line {
+    top: 1.583125rem; }
+  .base-slider-container.left .handle {
+    box-sizing: border-box;
+    width: 1.5rem;
+    height: 1rem;
+    margin-left: -0.75rem;
+    background-image: url("images/handle.left.svg"); }
+  html.mouse-hover .base-slider-container.left.active .handle:hover, html.mouse-hover .base-slider-container.left.active .handle.hover {
+    background-image: url("images/handle.left.hover.svg"); }
+  .base-slider-container.left .pin {
+    top: 1.583125rem; }
+  .base-slider-container.left .grid {
+    top: 2.270625rem; }
+  .base-slider-container.left.ticks-on-line .grid {
+    top: 1.583125rem; }
+  .base-slider-container.left.ticks-on-line.no-marker .grid {
+    top: 0.3125rem; }
+  .base-slider-container.left.no-marker .line,
+  .base-slider-container.left.no-marker .pin {
+    top: 0.3125rem !important; }
+  .base-slider-container.left.no-marker .handle {
+    top: 0rem; }
+  .base-slider-container.left.no-marker .grid {
+    top: 1rem; }
+  .base-slider-container.left.no-marker.has-pin {
+    margin-top: 0.2017857143rem; }
+
+.base-slider-container.round {
+  /****************************************************
+        Special case for no marker and pin:
+        Adjust all top-position by adding top-margin if the pin is heigher than the handle
+        ****************************************************/ }
+  .base-slider-container.round .line-background {
+    height: 2.520625rem; }
+  .base-slider-container.round .line {
+    top: 1.708125rem; }
+  .base-slider-container.round .handle {
+    box-sizing: border-box;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-left: -0.625rem;
+    background-image: url("images/handle.round.svg"); }
+  html.mouse-hover .base-slider-container.round.active .handle:hover, html.mouse-hover .base-slider-container.round.active .handle.hover {
+    background-image: url("images/handle.round.hover.svg"); }
+  .base-slider-container.round .pin {
+    top: 1.708125rem; }
+  .base-slider-container.round .grid {
+    top: 2.520625rem; }
+  .base-slider-container.round.ticks-on-line .grid {
+    top: 1.708125rem; }
+  .base-slider-container.round.ticks-on-line.no-marker .grid {
+    top: 0.4375rem; }
+  .base-slider-container.round.no-marker .line,
+  .base-slider-container.round.no-marker .pin {
+    top: 0.4375rem !important; }
+  .base-slider-container.round.no-marker .handle {
+    top: 0rem; }
+  .base-slider-container.round.no-marker .grid {
+    top: 1.25rem; }
+  .base-slider-container.round.no-marker.has-pin {
+    margin-top: 0.0767857143rem; }
+
+.base-slider-container.fixed {
+  /****************************************************
+        Special case for no marker and pin:
+        Adjust all top-position by adding top-margin if the pin is heigher than the handle
+        ****************************************************/ }
+  .base-slider-container.fixed .line-background {
+    height: 2.520625rem; }
+  .base-slider-container.fixed .line {
+    top: 1.395625rem; }
+  .base-slider-container.fixed .handle {
+    box-sizing: border-box;
+    width: 0.8333333333rem;
+    height: 1.25rem;
+    margin-left: -0.4166666667rem;
+    background-image: url("images/handle.fixed.svg"); }
+  .base-slider-container.fixed .pin {
+    top: 1.395625rem; }
+  .base-slider-container.fixed .grid {
+    top: 1.770625rem; }
+  .base-slider-container.fixed.ticks-on-line .grid {
+    top: 1.395625rem; }
+  .base-slider-container.fixed.ticks-on-line.no-marker .grid {
+    top: 0.125rem; }
+  .base-slider-container.fixed.no-marker .line,
+  .base-slider-container.fixed.no-marker .pin {
+    top: 0.125rem !important; }
+  .base-slider-container.fixed.no-marker .handle {
+    top: 0rem; }
+  .base-slider-container.fixed.no-marker .grid {
+    top: 1.25rem; }
+  .base-slider-container.fixed.no-marker.has-pin {
+    margin-top: 0.3892857143rem; }
+
+.base-slider-container.range {
+  /****************************************************
+        Special case for no marker and pin:
+        Adjust all top-position by adding top-margin if the pin is heigher than the handle
+        ****************************************************/ }
+  .base-slider-container.range .line-background {
+    height: 1.645625rem; }
+  .base-slider-container.range .line {
+    top: 1.270625rem; }
+  .base-slider-container.range .handle {
+    box-sizing: border-box;
+    width: 0.375rem;
+    height: 0.375rem;
+    margin-left: -0.1875rem; }
+    .base-slider-container.range .handle.from {
+      background-image: url("images/handle.range.from.svg"); }
+    .base-slider-container.range .handle.to {
+      background-image: url("images/handle.range.to.svg"); }
+  .base-slider-container.range .pin {
+    top: 1.270625rem; }
+  .base-slider-container.range .grid {
+    top: 1.645625rem; }
+  .base-slider-container.range.ticks-on-line .grid {
+    top: 1.270625rem; }
+  .base-slider-container.range.ticks-on-line.no-marker .grid {
+    top: 0rem; }
+  .base-slider-container.range.no-marker .line,
+  .base-slider-container.range.no-marker .pin {
+    top: 0rem !important; }
+  .base-slider-container.range.no-marker .handle {
+    top: 0rem; }
+  .base-slider-container.range.no-marker .grid {
+    top: 0.375rem; }
+  .base-slider-container.range.no-marker.has-pin {
+    margin-top: 0.5142857143rem; }
+
+.base-slider-container {
+  width: calc(100% - 1.5rem);
+  margin-left: 0.75rem;
+  margin-right: 0.75rem; }
+
+/***********************************************
     jquery-scroll-container.scss, 
 
     (c) 2017, FCOO
@@ -3549,40 +4153,6 @@ COLOR AND OPACITY
     box-shadow: inset 0 0.375rem 0.375rem -0.25rem transparent, inset 0 -0.375rem 0.375rem -0.25rem rgba(0, 0, 0, 0.5); }
 
 /***********************************************
-	modernizr-mouse-events.scss,
-
-	(c) 2018, FCOO
-
-	https://github.com/FCOO/modernizr-mouse-events
-	https://github.com/FCOO
-
-
-************************************************/
-html.mouse .hide-for-mouse {
-  display: none !important; }
-
-html.mouse .show-for-no-mouse {
-  display: none !important; }
-
-html.no-mouse .show-for-mouse {
-  display: none !important; }
-
-html.no-mouse .hide-for-no-mouse {
-  display: none !important; }
-
-html.mouse-hover .hide-for-mouse-hover {
-  display: none !important; }
-
-html.mouse-hover .show-for-no-mouse-hover {
-  display: none !important; }
-
-html.no-mouse-hover .show-for-mouse-hover {
-  display: none !important; }
-
-html.no-mouse-hover .hide-for-no-mouse-hover {
-  display: none !important; }
-
-/***********************************************
 	jquery-bootstrap.scss,
 
 	(c) 2017, FCOO
@@ -3611,11 +4181,19 @@ Including "size" xs as in Bootstrap 3
 /************************************************************
 Border-colors
 ************************************************************/
+/************************************************************
+Make all font-size and margin for header (<h1>, <h2>,...<h6>)
+releative to container (rem -> em)
+************************************************************/
+/* Defalut not changed:
+$font-size-base         : 1rem !default;
+$spacer                 : 1rem !default;
+*/
 /***********************************************
 IMPORT BOOTSTRAP SCSS
 ************************************************/
 /*!
- * Bootstrap v4.1.1 (https://getbootstrap.com/)
+ * Bootstrap v4.1.2 (https://getbootstrap.com/)
  * Copyright 2011-2018 The Bootstrap Authors
  * Copyright 2011-2018 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
@@ -3689,7 +4267,7 @@ hr {
 
 h1, h2, h3, h4, h5, h6 {
   margin-top: 0;
-  margin-bottom: 0.5rem; }
+  margin-bottom: 0.5em; }
 
 p {
   margin-top: 0;
@@ -3791,7 +4369,8 @@ img {
   border-style: none; }
 
 svg:not(:root) {
-  overflow: hidden; }
+  overflow: hidden;
+  vertical-align: middle; }
 
 table {
   border-collapse: collapse; }
@@ -3914,29 +4493,29 @@ template {
 
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.5em;
   font-family: inherit;
   font-weight: 500;
   line-height: 1.2;
   color: inherit; }
 
 h1, .h1 {
-  font-size: 2.5rem; }
+  font-size: 2.5em; }
 
 h2, .h2 {
-  font-size: 2rem; }
+  font-size: 2em; }
 
 h3, .h3 {
-  font-size: 1.75rem; }
+  font-size: 1.75em; }
 
 h4, .h4 {
-  font-size: 1.5rem; }
+  font-size: 1.5em; }
 
 h5, .h5 {
-  font-size: 1.25rem; }
+  font-size: 1.25em; }
 
 h6, .h6 {
-  font-size: 1rem; }
+  font-size: 1em; }
 
 .lead {
   font-size: 1.25rem;
@@ -6009,10 +6588,6 @@ input[type="button"].btn-block {
     flex: 1 1 auto;
     width: 1%;
     margin-bottom: 0; }
-    .input-group > .form-control:focus,
-    .input-group > .custom-select:focus,
-    .input-group > .custom-file:focus {
-      z-index: 3; }
     .input-group > .form-control + .form-control,
     .input-group > .form-control + .custom-select,
     .input-group > .form-control + .custom-file,
@@ -6023,6 +6598,10 @@ input[type="button"].btn-block {
     .input-group > .custom-file + .custom-select,
     .input-group > .custom-file + .custom-file {
       margin-left: -1px; }
+  .input-group > .form-control:focus,
+  .input-group > .custom-select:focus,
+  .input-group > .custom-file .custom-file-input:focus ~ .custom-file-label {
+    z-index: 3; }
   .input-group > .form-control:not(:last-child),
   .input-group > .custom-select:not(:last-child) {
     border-top-right-radius: 0;
@@ -6203,11 +6782,12 @@ input[type="button"].btn-block {
   background-size: 8px 10px;
   border: 1px solid #ced4da;
   border-radius: 0.25rem;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075);
   appearance: none; }
   .custom-select:focus {
     border-color: #80bdff;
     outline: 0;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075), 0 0 5px rgba(128, 189, 255, 0.5); }
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075), 0 0 0 0.2rem rgba(128, 189, 255, 0.5); }
     .custom-select:focus::-ms-value {
       color: #495057;
       background-color: #fff; }
@@ -6252,6 +6832,8 @@ input[type="button"].btn-block {
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); }
     .custom-file-input:focus ~ .custom-file-label::after {
       border-color: #80bdff; }
+  .custom-file-input:disabled ~ .custom-file-label {
+    background-color: #e9ecef; }
   .custom-file-input:lang(en) ~ .custom-file-label::after {
     content: "Browse"; }
 
@@ -6302,7 +6884,11 @@ input[type="button"].btn-block {
     border: 0;
     border-radius: 1rem;
     box-shadow: 0 0.1rem 0.25rem rgba(0, 0, 0, 0.1);
+    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     appearance: none; }
+    @media screen and (prefers-reduced-motion: reduce) {
+      .custom-range::-webkit-slider-thumb {
+        transition: none; } }
     .custom-range::-webkit-slider-thumb:focus {
       outline: none;
       box-shadow: 0 0 0 1px #fff, 0 0 0 0.2rem rgba(0, 123, 255, 0.25); }
@@ -6324,7 +6910,11 @@ input[type="button"].btn-block {
     border: 0;
     border-radius: 1rem;
     box-shadow: 0 0.1rem 0.25rem rgba(0, 0, 0, 0.1);
+    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     appearance: none; }
+    @media screen and (prefers-reduced-motion: reduce) {
+      .custom-range::-moz-range-thumb {
+        transition: none; } }
     .custom-range::-moz-range-thumb:focus {
       outline: none;
       box-shadow: 0 0 0 1px #fff, 0 0 0 0.2rem rgba(0, 123, 255, 0.25); }
@@ -6346,7 +6936,11 @@ input[type="button"].btn-block {
     border: 0;
     border-radius: 1rem;
     box-shadow: 0 0.1rem 0.25rem rgba(0, 0, 0, 0.1);
+    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     appearance: none; }
+    @media screen and (prefers-reduced-motion: reduce) {
+      .custom-range::-ms-thumb {
+        transition: none; } }
     .custom-range::-ms-thumb:focus {
       outline: none;
       box-shadow: 0 0 0 1px #fff, 0 0 0 0.2rem rgba(0, 123, 255, 0.25); }
@@ -6368,6 +6962,16 @@ input[type="button"].btn-block {
     margin-right: 15px;
     background-color: #dee2e6;
     border-radius: 1rem; }
+
+.custom-control-label::before,
+.custom-file-label,
+.custom-select {
+  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; }
+  @media screen and (prefers-reduced-motion: reduce) {
+    .custom-control-label::before,
+    .custom-file-label,
+    .custom-select {
+      transition: none; } }
 
 .nav {
   display: flex;
@@ -7366,12 +7970,12 @@ input[type="button"].btn-block {
   color: #000;
   text-shadow: 0 1px 0 #fff;
   opacity: .5; }
-  .close:hover, .close:focus {
-    color: #000;
-    text-decoration: none;
-    opacity: .75; }
   .close:not(:disabled):not(.disabled) {
     cursor: pointer; }
+    .close:not(:disabled):not(.disabled):hover, .close:not(:disabled):not(.disabled):focus {
+      color: #000;
+      text-decoration: none;
+      opacity: .75; }
 
 button.close {
   padding: 0;
@@ -7719,17 +8323,19 @@ button.close {
   display: none;
   align-items: center;
   width: 100%;
-  transition: transform 0.6s ease;
   backface-visibility: hidden;
   perspective: 1000px; }
-  @media screen and (prefers-reduced-motion: reduce) {
-    .carousel-item {
-      transition: none; } }
 
 .carousel-item.active,
 .carousel-item-next,
 .carousel-item-prev {
-  display: block; }
+  display: block;
+  transition: transform 0.6s ease; }
+  @media screen and (prefers-reduced-motion: reduce) {
+    .carousel-item.active,
+    .carousel-item-next,
+    .carousel-item-prev {
+      transition: none; } }
 
 .carousel-item-next,
 .carousel-item-prev {
@@ -10649,7 +11255,25 @@ div.btn, div.list-group-item {
 .btn.btn-standard {
   background-color: #f8f9fa;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(0, 0, 0, 0.075);
-  color: #111;
+  /*
+    //normal
+    color: $color;
+    //:active
+    &:active,  &.active     { color: $color-active; }
+    //:focus
+    &:focus, &.focus        { color: $color-focus;  }
+    //:disabled - Disabled comes last to overwrite active and focus
+    &.disabled,  &:disabled { color: $color;        }
+
+
+    //hover, not focus, not disabled
+    .mouse-hover .hover &:not(:focus):not(:disabled):not(.disabled),
+    .mouse-hover &.hover:not(:focus):not(:disabled):not(.disabled),
+    .mouse-hover &:hover:not(:focus):not(:disabled):not(.disabled) {
+        color: $color-hover;
+    }
+*/
+  color: #515961;
   border: 1px solid #ced4da;
   outline: none !important;
   /************************************************************
@@ -10670,6 +11294,16 @@ div.btn, div.list-group-item {
     background-image: none;
     box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
     z-index: 2; }
+  .btn.btn-standard:active, .btn.btn-standard.active {
+    color: #0b0d0e; }
+  .btn.btn-standard:focus, .btn.btn-standard.focus {
+    color: black; }
+  .btn.btn-standard.disabled, .btn.btn-standard:disabled {
+    color: #515961; }
+  .mouse-hover .hover .btn.btn-standard:not(:focus):not(:disabled):not(.disabled),
+  .mouse-hover .btn.btn-standard.hover:not(:focus):not(:disabled):not(.disabled),
+  .mouse-hover .btn.btn-standard:hover:not(:focus):not(:disabled):not(.disabled) {
+    color: #232629; }
   .btn.btn-standard:active, .btn.btn-standard.active {
     border-color: #b8c1ca; }
   .btn.btn-standard:focus, .btn.btn-standard.focus {
@@ -10693,9 +11327,37 @@ div.btn, div.list-group-item {
   .mouse-hover .has-warning .btn.btn-standard:hover:not(:focus):not(:disabled):not(.disabled) {
     border-color: #921925; }
   .btn.btn-standard.primary {
+    /*
+    //normal
+    color: $color;
+    //:active
+    &:active,  &.active     { color: $color-active; }
+    //:focus
+    &:focus, &.focus        { color: $color-focus;  }
+    //:disabled - Disabled comes last to overwrite active and focus
+    &.disabled,  &:disabled { color: $color;        }
+
+
+    //hover, not focus, not disabled
+    .mouse-hover .hover &:not(:focus):not(:disabled):not(.disabled),
+    .mouse-hover &.hover:not(:focus):not(:disabled):not(.disabled),
+    .mouse-hover &:hover:not(:focus):not(:disabled):not(.disabled) {
+        color: $color-hover;
+    }
+*/
     color: #007bff;
     border: 1px solid #007bff;
     outline: none !important; }
+    .btn.btn-standard.primary:active, .btn.btn-standard.primary.active {
+      color: #003166; }
+    .btn.btn-standard.primary:focus, .btn.btn-standard.primary.focus {
+      color: #001933; }
+    .btn.btn-standard.primary.disabled, .btn.btn-standard.primary:disabled {
+      color: #007bff; }
+    .mouse-hover .hover .btn.btn-standard.primary:not(:focus):not(:disabled):not(.disabled),
+    .mouse-hover .btn.btn-standard.primary.hover:not(:focus):not(:disabled):not(.disabled),
+    .mouse-hover .btn.btn-standard.primary:hover:not(:focus):not(:disabled):not(.disabled) {
+      color: #004a99; }
     .btn.btn-standard.primary:active, .btn.btn-standard.primary.active {
       border-color: #0069d9; }
     .btn.btn-standard.primary:focus, .btn.btn-standard.primary.focus {
@@ -10721,10 +11383,10 @@ div.btn, div.list-group-item {
   .btn.btn-standard.disabled, .btn.btn-standard:disabled {
     background-color: #f8f9fa; }
   .btn.btn-standard.allow-zero-selected {
-    color: #111;
+    color: #515961;
     background: #f8f9fa; }
     .mouse-hover .btn.btn-standard.allow-zero-selected:hover {
-      color: #040404;
+      color: #454c53;
       background: #e9ecef; }
     .btn.btn-standard.allow-zero-selected.active {
       color: #fff;
@@ -10740,12 +11402,25 @@ div.btn, div.list-group-item {
       text-align: center; }
   .btn.btn-standard.transparent {
     background-color: transparent;
-    color: #fff;
-    background: transparent;
-    border-color: rgba(0, 0, 0, 0.1); }
-    .mouse-hover .btn.btn-standard.transparent:hover {
-      color: #f2f2f2;
-      background: rgba(0, 0, 0, 0.1); }
+    color: #D4D4D4;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    outline: none !important; }
+    .btn.btn-standard.transparent:active, .btn.btn-standard.transparent.active {
+      color: #e6e5e5; }
+    .btn.btn-standard.transparent:focus, .btn.btn-standard.transparent.focus {
+      color: white; }
+    .btn.btn-standard.transparent.disabled, .btn.btn-standard.transparent:disabled {
+      color: #D4D4D4; }
+    .mouse-hover .hover .btn.btn-standard.transparent:not(:focus):not(:disabled):not(.disabled),
+    .mouse-hover .btn.btn-standard.transparent.hover:not(:focus):not(:disabled):not(.disabled),
+    .mouse-hover .btn.btn-standard.transparent:hover:not(:focus):not(:disabled):not(.disabled) {
+      color: #eeeded; }
+    .btn.btn-standard.transparent:active, .btn.btn-standard.transparent.active {
+      border-color: rgba(0, 0, 0, 0.1); }
+    .btn.btn-standard.transparent:focus, .btn.btn-standard.transparent.focus {
+      border-color: #80bdff; }
+    .btn.btn-standard.transparent.disabled, .btn.btn-standard.transparent:disabled {
+      border-color: rgba(0, 0, 0, 0.1); }
     .btn.btn-standard.transparent.focus:not(:disabled):not(.disabled), .btn.btn-standard.transparent:focus:not(:disabled):not(.disabled),
     .mouse-hover .hover .btn.btn-standard.transparent:not(:disabled):not(.disabled),
     .mouse-hover .btn.btn-standard.transparent.hover:not(:disabled):not(.disabled),
@@ -10756,11 +11431,6 @@ div.btn, div.list-group-item {
     .mouse-hover .btn.btn-standard.transparent.hover:not(:focus):not(:disabled):not(.disabled),
     .mouse-hover .btn.btn-standard.transparent:hover:not(:focus):not(:disabled):not(.disabled) {
       border-color: rgba(0, 0, 0, 0.15); }
-    .btn.btn-standard.transparent.focus, .btn.btn-standard.transparent:focus {
-      border-color: rgba(255, 255, 255, 0.5); }
-    .btn.btn-standard.transparent:active {
-      border-color: rgba(0, 0, 0, 0.2);
-      background-color: rgba(0, 0, 0, 0.15); }
   .btn.btn-standard.square {
     overflow: hidden;
     height: calc(2 * 0.3125rem + 1.5rem + 2 * 1px);
@@ -11016,6 +11686,8 @@ Icons for modal header inside a container
     cursor: default; }
     .header-icon-container .header-icon.disabled {
       opacity: .25; }
+    .header-icon-container .header-icon.hidden {
+      display: none; }
     .header-icon-container .header-icon .show-for-hover {
       display: none; }
     .header-icon-container .header-icon:not(.disabled):hover {
@@ -11339,7 +12011,7 @@ bsSelectList
   font-size: 2rem; }
 
 .selectList .dropdown-item {
-  color: #111;
+  color: #515961;
   background: #fff; }
 
 html.mouse-hover .selectList .dropdown-item.active {
@@ -11374,7 +12046,7 @@ html.no-mouse-hover .selectList .dropdown-item.active {
   line-height: 1.5;
   border-radius: inherit;
   background-color: #fff;
-  color: #111;
+  color: #515961;
   line-height: 1.7142857143; }
   .selectList .dropdown-header span {
     overflow: hidden;
@@ -11483,6 +12155,13 @@ body.modal-open .modal {
     display: none !important; }
   .modal .modal-content.no-modal-pinned .show-for-modal-pinned, .modal-inline .modal-content.no-modal-pinned .show-for-modal-pinned {
     display: none !important; }
+  .modal .modal-content.no-modal-header, .modal-inline .modal-content.no-modal-header {
+    padding-top: calc( 0.3rem - 1px); }
+  .modal .modal-content .modal-footer-header:empty + .modal-footer:empty, .modal-inline .modal-content .modal-footer-header:empty + .modal-footer:empty {
+    display: block;
+    height: calc( 0.3rem - 1px);
+    padding: 0;
+    border: none; }
   .modal .modal-content .modal-header, .modal-inline .modal-content .modal-header {
     flex-shrink: 0;
     flex-grow: 0;
@@ -11712,25 +12391,23 @@ body.modal-open .modal {
 .modal-inline.modal-sm .modal-body.scrollbar-horizontal {
   padding-bottom: 0.0625rem; }
 
-.modal.no-vertical-padding .modal-dialog .modal-content .modal-body-fixed, .modal.no-vertical-padding .modal-dialog .modal-content .modal-body,
-.modal-inline.no-vertical-padding .modal-dialog .modal-content .modal-body-fixed,
-.modal-inline.no-vertical-padding .modal-dialog .modal-content .modal-body,
-.modal.modal-sm.no-vertical-padding .modal-dialog .modal-content .modal-body-fixed,
-.modal.modal-sm.no-vertical-padding .modal-dialog .modal-content .modal-body,
-.modal-inline.modal-sm.no-vertical-padding .modal-dialog .modal-content .modal-body-fixed,
-.modal-inline.modal-sm.no-vertical-padding .modal-dialog .modal-content .modal-body {
-  padding-top: 0;
-  padding-bottom: 0; }
+.modal-content .modal-body-fixed.no-vertical-padding,
+.modal-content .modal-body.no-vertical-padding {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important; }
 
-.modal.no-horizontal-padding .modal-dialog .modal-content .modal-body-fixed, .modal.no-horizontal-padding .modal-dialog .modal-content .modal-body,
-.modal-inline.no-horizontal-padding .modal-dialog .modal-content .modal-body-fixed,
-.modal-inline.no-horizontal-padding .modal-dialog .modal-content .modal-body,
-.modal.modal-sm.no-horizontal-padding .modal-dialog .modal-content .modal-body-fixed,
-.modal.modal-sm.no-horizontal-padding .modal-dialog .modal-content .modal-body,
-.modal-inline.modal-sm.no-horizontal-padding .modal-dialog .modal-content .modal-body-fixed,
-.modal-inline.modal-sm.no-horizontal-padding .modal-dialog .modal-content .modal-body {
-  padding-left: 0;
-  padding-right: 0; }
+.no-vertical-padding .modal-dialog .modal-content .modal-body-fixed, .no-vertical-padding .modal-dialog .modal-content .modal-body {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important; }
+
+.modal-content .modal-body-fixed.no-horizontal-padding,
+.modal-content .modal-body.no-horizontal-padding {
+  padding-left: 0 !important;
+  padding-right: 0 !important; }
+
+.no-horizontal-padding .modal-dialog .modal-content .modal-body-fixed, .no-horizontal-padding .modal-dialog .modal-content .modal-body {
+  padding-left: 0 !important;
+  padding-right: 0 !important; }
 
 /************************************************************
 MODAL-BACKDROP
@@ -11818,6 +12495,15 @@ FORM
   padding: 0.125rem 0.125rem;
   font-size: 0.75rem; }
 
+.input-group-border {
+  margin-top: 0.75em;
+  padding: 0.3125rem 0.3125rem;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem; }
+  .input-group-border.input-group-sm, .input-group-border.input-group-xs {
+    padding: 0.25rem 0.25rem;
+    border-radius: 0.1875rem; }
+
 /************************************************************
 FLOAT-LABEL
 
@@ -11845,14 +12531,13 @@ Only supports the html-structure
   .input-group .has-float-label > span {
     position: absolute;
     left: 0;
-    top: 0;
+    top: -.5em;
     cursor: default;
     opacity: 1;
     transition: all .2s, visibility 0s;
     z-index: 4;
     line-height: 1;
     color: #495057;
-    top: -.5em;
     padding: 0;
     margin-left: 1px;
     font-size: 0.875rem;
@@ -11919,6 +12604,44 @@ Only supports the html-structure
   font-size: 0.75rem;
   top: calc(0.125rem + 1px); }
 
+/***********************************************
+.input-group.input-group-with-fixed-label
+Style for
+<div class="input-group input-group-border">
+    <div class="has-fixed-label">...</div>
+</div>
+***********************************************/
+.input-group.input-group-border .has-fixed-label {
+  position: absolute;
+  left: 0;
+  top: calc(-1 * (1px + .5em));
+  cursor: default;
+  z-index: 4;
+  line-height: 1;
+  color: #495057;
+  padding: 0;
+  margin-left: 1px;
+  font-size: 0.875rem;
+  left: 0.3125rem; }
+  .input-group.input-group-border .has-fixed-label::after {
+    display: block;
+    position: absolute;
+    height: 1em;
+    top: 0;
+    left: -.1em;
+    right: -.1em;
+    z-index: -1;
+    background: white;
+    content: " "; }
+
+.input-group-sm.input-group.input-group-border .has-fixed-label {
+  font-size: 0.75rem;
+  left: 0.25rem; }
+
+.input-group-xs.input-group.input-group-border .has-fixed-label {
+  font-size: 0.65625rem;
+  left: 0.125rem; }
+
 /************************************************************
 TABLE
 
@@ -11936,8 +12659,23 @@ Adjustmernt to Bootstrap table
     Cells
     *************************************/
   /*************************************
-    Truncation
-    *************************************/ }
+    Truncation - TODO
+    *************************************/
+  /*
+    thead tr th,
+    tbody tr td {
+        &.text-truncate {
+            span {
+                display         : inline-block;
+                width           : 100%;
+                background-color: red;
+                overflow        : hidden;
+                text-overflow   : ellipsis;
+                white-space     : nowrap;
+            }
+        }
+    }
+*/ }
   .table:not(:last-child) {
     margin-bottom: 0.5rem; }
   .table.table-with-header,
@@ -11997,7 +12735,7 @@ Adjustmernt to Bootstrap table
     .table.table-selectable tbody tr {
       font-size: 2rem; }
     .table.table-selectable tbody tr {
-      color: #111;
+      color: #515961;
       background: #fff; }
     html.mouse-hover .table.table-selectable tbody tr.active {
       color: #343a40;
@@ -12009,19 +12747,11 @@ Adjustmernt to Bootstrap table
       color: #fff;
       background: #007bff; }
   .table tbody tr td {
-    padding: 0.3125rem 0.3125rem;
-    font-size: 1rem; }
+    padding: 0.25rem 0.25rem;
+    font-size: 0.875rem; }
     .table tbody tr td.no-horizontal-padding {
       padding-left: 0;
       padding-right: 0; }
-  .table thead tr th.text-truncate span,
-  .table tbody tr td.text-truncate span {
-    display: inline-block;
-    width: 100%;
-    background-color: red;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap; }
 
 .modal-sm .table thead tr th,
 .table.table-sm thead tr th {
@@ -12046,12 +12776,12 @@ Adjustmernt to Bootstrap table
     padding-left: 0;
     padding-right: 0; }
 
-.modal-sm .table tbody tr td,
-.table.table-sm tbody tr td {
-  padding: 0.25rem 0.25rem;
-  font-size: 0.875rem; }
-  .modal-sm .table tbody tr td.no-horizontal-padding,
-  .table.table-sm tbody tr td.no-horizontal-padding {
+.modal:not(.modal-sm) .table.table-selectable tbody tr td,
+.table.table-selectable:not(.table-sm) tbody tr td {
+  padding: 0.3125rem 0.3125rem;
+  font-size: 1rem; }
+  .modal:not(.modal-sm) .table.table-selectable tbody tr td.no-horizontal-padding,
+  .table.table-selectable:not(.table-sm) tbody tr td.no-horizontal-padding {
     padding-left: 0;
     padding-right: 0; }
 
@@ -12105,12 +12835,12 @@ Using Bootstrap Collapse to create accordion
   .accordion .card-header.collapsed .chevrolet:before {
     content: "\f054"; }
 
-.accordion .collapse .card-block {
-  padding: 0.3125rem 0.3125rem;
-  font-size: 1rem;
+.accordion .card-block {
+  padding: 0.25rem 0.25rem;
+  font-size: 0.875rem;
   border-radius: 0.25rem; }
 
-.accordion .collapse .card-footer {
+.accordion .card-footer {
   font-weight: 400;
   display: flex;
   align-items: center;
@@ -12125,11 +12855,11 @@ Using Bootstrap Collapse to create accordion
   border-top-left-radius: 0 !important;
   border-top-right-radius: 0 !important;
   border-radius: 0.25rem; }
-  .accordion .collapse .card-footer span {
+  .accordion .card-footer span {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap; }
-  .accordion .collapse .card-footer:empty {
+  .accordion .card-footer:empty {
     display: none; }
 
 .accordion.no-transition .collapsing,
@@ -12504,7 +13234,25 @@ Adjustment to Bootstrap tabs
     outline: none !important;
     background-color: #f8f9fa;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
-    color: #111;
+    /*
+    //normal
+    color: $color;
+    //:active
+    &:active,  &.active     { color: $color-active; }
+    //:focus
+    &:focus, &.focus        { color: $color-focus;  }
+    //:disabled - Disabled comes last to overwrite active and focus
+    &.disabled,  &:disabled { color: $color;        }
+
+
+    //hover, not focus, not disabled
+    .mouse-hover .hover &:not(:focus):not(:disabled):not(.disabled),
+    .mouse-hover &.hover:not(:focus):not(:disabled):not(.disabled),
+    .mouse-hover &:hover:not(:focus):not(:disabled):not(.disabled) {
+        color: $color-hover;
+    }
+*/
+    color: #515961;
     border: 1px solid #ced4da;
     outline: none !important;
     border-right: none;
@@ -12515,6 +13263,16 @@ Adjustment to Bootstrap tabs
       border-top-right-radius: 0.625rem;
       width: 0.625rem;
       right: -0.5rem; }
+    .nav-tabs a.nav-item.nav-link:active, .nav-tabs a.nav-item.nav-link.active {
+      color: #0b0d0e; }
+    .nav-tabs a.nav-item.nav-link:focus, .nav-tabs a.nav-item.nav-link.focus {
+      color: black; }
+    .nav-tabs a.nav-item.nav-link.disabled, .nav-tabs a.nav-item.nav-link:disabled {
+      color: #515961; }
+    .mouse-hover .hover .nav-tabs a.nav-item.nav-link:not(:focus):not(:disabled):not(.disabled),
+    .mouse-hover .nav-tabs a.nav-item.nav-link.hover:not(:focus):not(:disabled):not(.disabled),
+    .mouse-hover .nav-tabs a.nav-item.nav-link:hover:not(:focus):not(:disabled):not(.disabled) {
+      color: #232629; }
     .nav-tabs a.nav-item.nav-link:active, .nav-tabs a.nav-item.nav-link.active {
       border-color: #b8c1ca; }
     .nav-tabs a.nav-item.nav-link:focus, .nav-tabs a.nav-item.nav-link.focus {
@@ -12542,11 +13300,11 @@ Adjustment to Bootstrap tabs
       margin-top: 2px;
       border-bottom-color: #6c757d !important; }
       .nav-tabs a.nav-item.nav-link:not(.active):not(:disabled):not(.disabled) {
-        color: #111;
+        color: #515961;
         background: #f8f9fa;
         margin-top: 2px; }
         .mouse-hover .nav-tabs a.nav-item.nav-link:not(.active):not(:disabled):not(.disabled):hover {
-          color: #040404;
+          color: #454c53;
           background: #e9ecef; }
         .mouse-hover .hover .nav-tabs a.nav-item.nav-link:not(.active):not(:disabled):not(.disabled):not(:focus):not(:disabled):not(.disabled),
         .mouse-hover .nav-tabs a.nav-item.nav-link:not(.active):not(:disabled):not(.disabled).hover:not(:focus):not(:disabled):not(.disabled),
@@ -12601,6 +13359,7 @@ Adjustment to Bootstrap tabs
     background-color: #fff;
     padding: 0.3125rem 0.3125rem;
     font-size: 1rem;
+    font-size: 0.875rem;
     padding-left: 0.5625rem;
     padding-right: 0.5625rem; }
     .tab-content .tab-pane.active .tab-inner-content.scrollbar-vertical, .tab-content .tab-content .tab-pane.active .tab-inner-content {
@@ -12668,7 +13427,7 @@ https://github.com/berkan52/select2-bootstrap4-theme
     ******************************************************/ }
   .select2-container--standard .select2-dropdown {
     background-color: #fff;
-    color: #111; }
+    color: #515961; }
   .select2-container--standard .jquery-scroll-container {
     margin-left: 0; }
   .select2-container--standard .select2-selection {
@@ -12677,9 +13436,37 @@ https://github.com/berkan52/select2-bootstrap4-theme
     font-size: 1rem;
     line-height: 1.5;
     border-radius: 0.25rem;
-    color: #111;
+    /*
+    //normal
+    color: $color;
+    //:active
+    &:active,  &.active     { color: $color-active; }
+    //:focus
+    &:focus, &.focus        { color: $color-focus;  }
+    //:disabled - Disabled comes last to overwrite active and focus
+    &.disabled,  &:disabled { color: $color;        }
+
+
+    //hover, not focus, not disabled
+    .mouse-hover .hover &:not(:focus):not(:disabled):not(.disabled),
+    .mouse-hover &.hover:not(:focus):not(:disabled):not(.disabled),
+    .mouse-hover &:hover:not(:focus):not(:disabled):not(.disabled) {
+        color: $color-hover;
+    }
+*/
+    color: #515961;
     border: 1px solid #ced4da;
     outline: none !important; }
+    .select2-container--standard .select2-selection:active, .select2-container--standard .select2-selection.active {
+      color: #0b0d0e; }
+    .select2-container--standard .select2-selection:focus, .select2-container--standard .select2-selection.focus {
+      color: black; }
+    .select2-container--standard .select2-selection.disabled, .select2-container--standard .select2-selection:disabled {
+      color: #515961; }
+    .mouse-hover .hover .select2-container--standard .select2-selection:not(:focus):not(:disabled):not(.disabled),
+    .mouse-hover .select2-container--standard .select2-selection.hover:not(:focus):not(:disabled):not(.disabled),
+    .mouse-hover .select2-container--standard .select2-selection:hover:not(:focus):not(:disabled):not(.disabled) {
+      color: #232629; }
     .select2-container--standard .select2-selection:active, .select2-container--standard .select2-selection.active {
       border-color: #b8c1ca; }
     .select2-container--standard .select2-selection:focus, .select2-container--standard .select2-selection.focus {
@@ -13555,3 +14342,31 @@ Style for formValidation (via fcoo-form-validation)
 	margin-left: -12px;
 	border-right-color: #fff;
 	}
+
+/***********************************************
+	leaflet-control-topcenter.scss, 
+
+	(c) 2016, FCOO
+
+	https://github.com/FCOO/leaflet-control-topcenter
+	https://github.com/FCOO
+
+
+************************************************/
+/* control positioning */
+.leaflet-center {
+  position: relative !important;
+  left: 0;
+  right: 0;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; }
+  .leaflet-center .leaflet-control {
+    bottom: 0; }
+
+.leaflet-control-container .leaflet-control-bottomcenter {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0; }

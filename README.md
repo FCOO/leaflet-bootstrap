@@ -59,6 +59,12 @@ Extended to take same options as bsModal (see details [here](https://github.com/
 
 Accepts common content a la [FCOO/jquery-bootstrap](https://github.com/FCOO/jquery-bootstrap#common) 
 
+### L.control.bsModal
+Create control a la `$.bsModal`
+
+### L.control.bsModalForm
+Create control a la `$.bsModalForm`
+
 <!-- 
 ### options
 | Id | Type | Default | Description |

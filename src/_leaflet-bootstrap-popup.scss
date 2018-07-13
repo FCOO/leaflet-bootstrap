@@ -18,9 +18,6 @@
     //Tip
     & + .leaflet-popup-tip-container {
         margin-top: -1px; //Hide top-border
-
-
-//background-color: red;
         .leaflet-popup-tip {
             box-shadow: $popover-box-shadow;
 
@@ -28,6 +25,9 @@
             width : 13px;
             height: 13px;
             margin: -6px auto 0;
+
+            border: 2px solid $popover-border-color
+
         }
     }
 }

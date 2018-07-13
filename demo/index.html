@@ -27,6 +27,7 @@
 
 
 	<script src="bower_components.js"></script>
+	<script src="../src/leaflet-bootstrap-control-modal.js"></script>
 	<script src="../src/leaflet-bootstrap-control-button.js"></script>
 	<script src="../src/leaflet-bootstrap-popup.js"></script>
 	<script src="../src/leaflet-bootstrap.js"></script>
@@ -75,13 +76,186 @@
         });
 		map.addControl(bGroup);
 
-map.addControl( L.control.bsButton({icon:'fa-home'}) );
 
+//************************
+    var selectItems3 = [
+            {id: 'item1', text:{da:'Emne#1', en: 'Item#1'} },
+            {id: 'item2', text:{da:'Emne#2', en: 'Item#2'} },
+            {id: 'item3', text:{da:'Emne#3', en: 'Item#3'} },
+            {id: 'item4', text:{da:'Emne#4', en: 'Item#4'} },
+            {id: 'item5', text:{da:'Emne#5', en: 'Item#5'} },
+            {id: 'item6', text:{da:'Emne#6', en: 'Item#6'} },
+            {id: 'item7', text:{da:'Emne#7', en: 'Item#7'} },
+            {id: 'item8', text:{da:'Emne#8', en: 'Item#8'} },
+        ];
+
+
+//************************
+    var modalControl = L.control.bsModal({
+            flex: true,
+            header: 'Header',
+            _minWidth: 200,
+            width: 300,
+
+            content: 'dette er en test<br>Linie2<br>Linie3<br>Linie4<br>Linie5',
+
+            extended: {
+                content: {
+                    type: 'tabs',
+                    hideNotSelectedText: true,
+                    list: [
+                        {
+                            icon: 'fa-home',  text:{da:'Hjem', en:'Home'}, content: 'FIRST Sint sit mollit irure quis est nostrud cillum consequat Lorem esse do quis dolor esse fugiat sunt do. Eu ex commodo veniam Lorem aliquip laborum occaecat qui Lorem esse mollit dolore anim cupidatat. Deserunt officia id Lorem nostrud aute id commodo elit eiusmod enim irure amet eiusmod qui reprehenderit nostrud tempor. Fugiat ipsum excepteur in aliqua non et quis aliquip ad irure in labore cillum elit enim. Consequat aliquip incididunt ipsum et minim laborum laborum laborum et cillum labore. Deserunt adipisicing cillum id nulla minim nostrud labore eiusmod et amet. Laboris consequat consequat commodo non ut non aliquip reprehenderit nulla anim occaecat. Sunt sit ullamco reprehenderit irure ea ullamco Lorem aute nostrud magna.'
+                        },
+                        {
+                            icon: 'fa-map',  text:{da:'Kort', en:'Map'}, content: 'FIRST Sint sit mollit irure quis est nostrud cillum consequat Lorem esse do quis dolor esse fugiat sunt do. Eu ex commodo veniam Lorem aliquip laborum occaecat qui Lorem esse mollit dolore anim cupidatat. Deserunt officia id Lorem nostrud aute id commodo elit eiusmod enim irure amet eiusmod qui reprehenderit nostrud tempor. Fugiat ipsum excepteur in aliqua non et quis aliquip ad irure in labore cillum elit enim. Consequat aliquip incididunt ipsum et minim laborum laborum laborum et cillum labore. Deserunt adipisicing cillum id nulla minim nostrud labore eiusmod et amet. Laboris consequat consequat commodo non ut non aliquip reprehenderit nulla anim occaecat. Sunt sit ullamco reprehenderit irure ea ullamco Lorem aute nostrud magna.'
+                        },
+                        {
+                            icon: 'fa-globe',
+                            title:{da:'Tidszone', en:'Time zone'},
+                            content: {
+                                type: 'tabs',
+                                small: true,
+                                list: [
+                                    {icon: 'fa-home',  text:{da:'Hjem', en:'Home'}, scroll: true, content: 'FIRST  Sint sit mollit irure quis est nostrud cillum consequat Lorem esse do quis dolor esse fugiat sunt do. Eu ex commodo veniam Lorem aliquip laborum occaecat qui Lorem esse mollit dolore anim cupidatat. Deserunt officia id Lorem nostrud aute id commodo elit eiusmod enim irure amet eiusmod qui reprehenderit nostrud tempor.'},
+                                    {icon: 'fa-globe', title:{da:'Tidszone', en:'Time zone'},content: 'SECOND', scroll: true},
+                                    {icon: 'fa-calendar',title:{da:'Dato og tid', en:'Date and time'},selected: true,content: '3.'}
+                                ],
+                            },
+                            footer: [{text: {da:'Format', en:'Format'}}, {text: {da:'Formatet', en:'The format'}, link:function(){ console.log('Skide godt')} }]
+                        },
+                        {
+                            icon: 'fa-calendar',
+                            title:{da:'Dato og tid2', en:'Date and time'},
+                            selected: true,
+                            content: {
+                                type: 'selectlist',
+                                selectedId: 'item2',
+                                items     : [
+                                    {id: 'item1', text:{da:'Emne#1', en: 'Item#1'} },
+                                    {id: 'item2', text:{da:'Emne#2', en: 'Item#2'} },
+                                    {id: 'item3', text:{da:'Emne#3', en: 'Item#3'} },
+                                    {id: 'item4', text:{da:'Emne#4', en: 'Item#4'} },
+                                    {id: 'item5', text:{da:'Emne#5', en: 'Item#5'} },
+                                    {id: 'item6', text:{da:'Emne#6', en: 'Item#6'} },
+                                    {id: 'item7', text:{da:'Emne#7', en: 'Item#7'} },
+                                    {id: 'item8', text:{da:'Emne#8', en: 'Item#8'} },
+                                ],
+                                onChange  : function(id, selected, $buttonGroup){console.log('bsSelectbox2', id, selected)},
+                            }
+                        }
+                    ],
+                    height: 150/16 + 'rem',
+                    scroll: true
+                },
+                scroll: false,
+            }, //end of extended
+
+
+            height: '100px',
+            scroll: true,
+            isExtended: true,
+
+            buttons: [
+                {icon:'fa-map', text:'Kort', onClick: function(){ console.log('Klik på kort'); } }
+            ],
+
+            show: true
+
+        });
+
+        map.addControl( modalControl );
+
+//************************************************************
+        var formControl = L.control.bsModalForm({
+width: 300,
+height: 300,
+                    id: 'formId',
+                    _show: true,
+                    header: 'Davs',
+                    buttons: [
+                        {text:'Reset', onClick: function(){ testModalForm.setValue('formId1', -1);}      },
+                        {text:'Set=2', onClick: function(){ testModalForm.setValue('formId1', 'formSelect1');} }
+                    ],
+                    onSubmit: function( data ){ console.log( 'SUBMIT=', data ); myData = data; },
+                    onCancel: function( data ){ console.log( 'CANCEL=', data ); myData = data; },
+                    content: {
+                        type: 'accordion',
+                        list: [
+                            {
+                                icon: 'fa-globe',
+                                title:{da:'En test', en:'A test'},
+                                content: [
+                        {
+                            id: 'mySlider', type:'slider', label:'Label (NIELS)',
+                            _handle: 'round',
+                            _showFromTo: false,
+                            grid: true,
+                            min:0, max:100, majorTicksOffset:0, _step:5, stepOffset:0, postfix:' km/t', _onChanging: function( obj ){ console.log( obj.value ); }
+                        },
+
+                        {
+                            id:'mySelection', type:'checkbox', text: 'Vælg mig'
+                        },
+                        {
+                            id:'formId2', validators: 'notEmpty _MYvalidatorName', type:'input',placeholder:'Placeholder (INPUT)', label: 'Label (NIELS)', after : {type:'button', text:{da:'kr.', en:'£'}}, before: {type:'button', icon:'fa-calculator'}
+                        },
+                        {
+                            id:'formId1', type: 'select', validators: 'notEmpty', _selectedId: 'formSelect4', placeholder:"Placeholder", label:'Label',
+                            items:[
+                                {id:'formSelect1', icon:'fa-home', text: 'Davs'},
+                                {id:'formSelect2', text:'Item 2'},
+                                {id:'formSelect3', text:'Item 3 SKIDE GODT'},
+                                {id:'formSelect4', text:'Item 4'},
+                                {id:'formSelect5', text:'Item 5'}
+                            ],
+                            showWhen: {'mySelection': false }
+                         },
+                        {
+                            id:'formId2-1', type: 'select', _selectedId: 'formSelect4', placeholder:"Placeholder", label:'Label',
+                            items:[
+                                {id:'formSelect1', icon:'fa-home', text: 'Davs'},
+                                {id:'formSelect2', text:'Item 2'},
+                                {id:'formSelect3', text:'Item 3 SKIDE GODT'},
+                                {id:'formSelect4', text:'Item 4'},
+                                {id:'formSelect5', text:'Item 5'}
+                            ]
+                        },
+                        {
+                            id:'formId3', type:'input',placeholder:'Placeholder (INPUT)', label: 'Label (NIELS)', after : {type:'button', text:{da:'kr.', en:'£'}}, before: {type:'button', icon:'fa-calculator'}
+                        },
+                        {
+                            id:'formId4', type:'input',placeholder:'Placeholder (INPUT)', label: 'Label (NIELS)', after : {type:'button', text:{da:'kr.', en:'£'}}, before: {type:'button', icon:'fa-calculator'}
+                        },
+                    ]
+                    },
+                    {
+                        icon: 'fa-globe',
+                        title:{da:'En anden test', en:'Another test'},
+                    }
+                    ]}
+            });
+
+        map.addControl( formControl );
+        var myData = { mySlider: 33 };
+        map.addControl( L.control.bsButton({
+            icon:'fa-edit',
+            onClick: function(){
+                formControl.bsModalForm.edit( myData );
+            }
+        }) );
+
+
+
+
+//************************************************************
 		map.on('contextmenu', function( mouseEvent ){
             var popup = L.popup({
 				    maxWidth	     : 140,
                     maxHeight        : 200,
                     scroll           : true,
+
+
 
                     fixable: true,
                     header		     : {text:'This is a very long header and it should be to long'},
@@ -101,11 +275,9 @@ map.addControl( L.control.bsButton({icon:'fa-home'}) );
                         for (var i=0; i<lines; i++ ){
                             content += 'line '+i+'<br>';
                         }
-                    var result = $('<div>' + content + 'This is a random<br>number '+Math.floor(Math.random()*1000000) +'</div>');
-
-                    //$container.append( result );
-                    return result;//[0];
-    		    }
+                        var result = $('<div>' + content + 'This is a random<br>number '+Math.floor(Math.random()*1000000) +'</div>');
+                        $container.append( result );
+    		        }
 			});
 
 			popup.setLatLng(mouseEvent.latlng).openOn(map);

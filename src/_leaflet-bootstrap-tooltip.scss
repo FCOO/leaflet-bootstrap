@@ -5,20 +5,20 @@
 
 //Adjust tooltip to bootstrap style
 .leaflet-tooltip {
-	padding: $tooltip-padding-y $tooltip-padding-x;
+	padding         : $tooltip-padding-y $tooltip-padding-x;
 	background-color: $popover-bg;
-	border: $popover-border-width solid $popover-border-color;
-	border-radius: $tooltip-border-radius;
-	color: $popover-body-color;//#222;
-	white-space: nowrap;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	pointer-events: none;
-	box-shadow: $popover-box-shadow;
-    font-size: $tooltip-font-size;
-    opacity: $tooltip-opacity;
+	border          : $popover-border-width solid $popover-border-color;
+	border-radius   : $tooltip-border-radius;
+	color           : $popover-body-color;//#222;
+	white-space     : nowrap;
+	-webkit-user-select : none;
+	-moz-user-select    : none;
+	-ms-user-select     : none;
+	user-select         : none;
+	pointer-events  : none;
+	box-shadow      : $popover-box-shadow;
+    font-size       : $tooltip-font-size;
+    opacity         : $tooltip-opacity;
 }
 
 //Remove arrow

@@ -24,6 +24,14 @@ Including "size" xs as in Bootstrap 3
 /************************************************************
 Border-colors
 ************************************************************/
+/************************************************************
+Make all font-size and margin for header (<h1>, <h2>,...<h6>)
+releative to container (rem -> em)
+************************************************************/
+/* Defalut not changed:
+$font-size-base         : 1rem !default;
+$spacer                 : 1rem !default;
+*/
 /***********************************************
 leaflet-bootstrap-marker.scss
 Style for bsMarker sstimated to look like Google Maps
@@ -155,7 +163,8 @@ $dark:          $gray-800 !default;
       box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
       width: 13px;
       height: 13px;
-      margin: -6px auto 0; }
+      margin: -6px auto 0;
+      border: 2px solid #868e96; }
 
 /***********************************************
 	leaflet-bootstrap-tooltip.scss,
@@ -194,3 +203,9 @@ $dark:          $gray-800 !default;
 
 .leaflet-tooltip-right {
   margin-left: 10px; }
+
+/***********************************************
+	leaflet-bootstrap-modal.scss
+************************************************/
+.leaflet-control .modal-dialog {
+  margin: 0; }
