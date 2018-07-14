@@ -340,9 +340,10 @@ Adjust standard Leaflet popup to display as Bootstrap modal
 (function ($, L/*, window, document, undefined*/) {
     "use strict";
 
-    //Overwrite default Popu-options: Remove default leaflet closeButton
+    /*********************************************************
+    Overwrite default Popu-options: Remove default leaflet closeButton
+    *********************************************************/
     L.Popup.prototype.options.closeButton = false;
-
 
     //Add methods to pin or unpin popup
     L.Popup.prototype._setPinned = function(pinned) {
@@ -351,7 +352,9 @@ Adjust standard Leaflet popup to display as Bootstrap modal
         this.options.autoClose        = !pinned;
     };
 
-    //popup._brintToFocus: Close the open popup (if any and not fixed) and bring this to front
+    /*********************************************************
+    popup._brintToFocus: Close the open popup (if any and not fixed) and bring this to front
+    *********************************************************/
     L.Popup.prototype._brintToFocus = function() {
         this.bringToFront();
         if (this._map && this._map._popup && this._map._popup !== this && !this._map._popup.options._pinned)
@@ -363,7 +366,9 @@ Adjust standard Leaflet popup to display as Bootstrap modal
             this._close();
     }
 
-    //Adjust Popup.getEvents to adjust preclick
+    /*********************************************************
+    Adjust Popup.getEvents to adjust preclick
+    *********************************************************/
     L.Popup.prototype.getEvents = function (getEvents) {
         return function() {
             var events = getEvents.apply(this, arguments);
@@ -373,77 +378,105 @@ Adjust standard Leaflet popup to display as Bootstrap modal
         };
     } (L.Popup.prototype.getEvents);
 
-    //Adjust Popup.initialize
+    /*********************************************************
+    Adjust Popup.initialize
+    *********************************************************/
     L.Popup.prototype.initialize = function (initialize) {
         return function (options) {
             if (options && options.fixable)
                 this.onPin = $.proxy( this._setPinned, this);
-
-
             return initialize.apply(this, arguments);
         };
     } (L.Popup.prototype.initialize);
 
 
-    //Overwrite L.Layer.bindPopup to create popup with Bootstrap-components
-    L.Layer.prototype.bindPopup = function (bindPopup) {
-        return function (content/*, options*/) {
-            //content can be 1: string or function, 2: object with the content, 3: Full popup-options
-            return bindPopup.call(this, L.popup( ($.isPlainObject(content) && !!content.content) ? content : {content: content} ));
-        };
-    } (L.Layer.prototype.bindPopup);
-
-    //Overwrite L.Popup._initLayout to create popup with Bootstrap-components
+    /*********************************************************
+    Extend L.Popup._initLayout to create popup with Bootstrap-components
+    *********************************************************/
     L.Popup.prototype._initLayout = function (_initLayout) {
-        return function () {
-
-            var addCloseButton = this.options.closeButton; //Save options for modal-content
-
-            //Adjust options for leaflet popup
-            this.options.closeButton = false; //No default leaflet close
-            if (this.options.scroll)
-                this.options.maxHeight = this.options.maxHeight || 300; //maxHeight must be set if content is inside a scroll
+        return function (options, source) {
+            options = options || {};
+            options.closeButton = false; //No default leaflet close - close-button part of content
 
             //Original function/method
-            _initLayout.apply(this, arguments);
+            _initLayout.call(this, options, source);
 
             //Set class-name for wrapper to remove margin, bg-color etc.
             $(this._wrapper).addClass('modal-wrapper');
 
-            //Get the content-node
-            var $contentNode = $(this._contentNode),
-                modalOptions = $.extend(true, {
-                    small         : true,
-                    smallButtons  : true,
-                    icons         : {
-                        close: {
-                            onClick: $.proxy(this._onCloseButtonClick, this)
-                        }
-                    },
-                    onPin         : this.onPin,
-                    noHeader      : !this.options.header,
-                    contentContext: this,
-                },
-                this.options );
-
-            modalOptions.closeButton = addCloseButton;
-
-            //Build the content as a Bootstrap modal
-            $contentNode
-                .addClass('modal-inline modal-sm')
-                ._bsModalContent( modalOptions );
-
-
-            //Set max-height of inner modal-container
-            if (this.options.maxHeight)
-                $contentNode.bsModal.$container.css('max-height', this.options.maxHeight);
+            //Set class-name for _contentNode to make it a 'small' bsModal
+            $(this._contentNode).addClass('modal-inline modal-sm');
 
             //Close open popup and brint to front when "touched"
             L.DomEvent.on(this._contentNode, 'mousedown', this._brintToFocus, this );
-
-
         };
     } (L.Popup.prototype._initLayout);
+
+
+    /*********************************************************
+    Overwrite L.Popup._updateContent to create popup with Bootstrap-components
+    *********************************************************/
+    L.Popup.prototype._updateContent = function(){
+		if (!this._content) { return; }
+
+        //this._content can be 1: string or function, 2: object with the content, 3: Full popup-options
+        //Convert this._content into bsModal-options
+        var contentAsModalOptions = ($.isPlainObject(this._content) && !!this._content.content) ? this._content : {content: this._content, closeButton: false},
+            modalOptions = $.extend(true, {
+                small         : true,
+                smallButtons  : true,
+                icons         : {
+                    close: {
+                        onClick: $.proxy(this._onCloseButtonClick, this)
+                    }
+                },
+                onPin         : this.onPin,
+                noHeader      : !contentAsModalOptions.header,
+                contentContext: this,
+            },
+            contentAsModalOptions );
+
+        //Adjust options for leaflet popup
+        if (modalOptions.scroll)
+            this.options.maxHeight = this.options.maxHeight || 300; //maxHeight must be set if content is inside a scroll
+
+        //Get the content-node and build the content as a Bootstrap modal
+        var $contentNode = $(this._contentNode);
+        $contentNode
+            .empty()
+            ._bsModalContent( modalOptions );
+
+        //Set max-height of inner modal-container
+        if (this.options.maxHeight)
+            $contentNode.bsModal.$container.css('max-height', this.options.maxHeight);
+    };
+
+}(jQuery, L, this, document));
+
+;
+/****************************************************************************
+    leaflet-bootstrap.js,
+
+    (c) 2017, FCOO
+
+    https://github.com/FCOO/leaflet-bootstrap
+    https://github.com/FCOO
+
+****************************************************************************/
+(function ($, L/*, window, document, undefined*/) {
+    "use strict";
+
+    /*********************************************************
+    Overwrite L.Tooltip._updateContent to update tooltip with Bootstrap-content
+    *********************************************************/
+    L.Tooltip.prototype._updateContent = function () {
+        $(this._contentNode)
+            .empty()
+            ._bsAddHtml( this._content );
+
+		this.fire('contentupdate');
+    };
+
 
 }(jQuery, L, this, document));
 
@@ -460,107 +493,8 @@ Adjust standard Leaflet popup to display as Bootstrap modal
     https://github.com/FCOO
 
 ****************************************************************************/
-(function ($, L/*, window, document, undefined*/) {
+(function (/*$, L/*, window, document, undefined*/) {
     "use strict";
-
-
-    //Override L.DivOverlay._updateContent to also accept content-object from jquery-bootstrap
-    L.DivOverlay.prototype._updateContent = function (_updateContent) {
-        return function () {
-            if (!this._content) { return; }
-
-            var $node = $(this._contentNode);
-            var content = $.isFunction(this._content) ? this._content(this._source || this) : this._content;
-
-            $node.empty();
-
-            if ((typeof content === 'string') || (content instanceof HTMLElement))
-                //Use original function/method
-                _updateContent.apply(this, arguments);
-            else {
-                $node._bsAddHtml( content );
-                this.fire('contentupdate');
-            }
-        };
-    } (L.DivOverlay.prototype._updateContent);
-
-/*
-Map.mergeOptions({
-    zoomControl: true
-});
-Map.addInitHook(function () {
-    if (this.options.zoomControl) {
-        this.zoomControl = new Zoom();
-        this.addControl(this.zoomControl);
-    }
-});
-
-*/
-
-
-/*
-    //Extend base leaflet class
-    L.LeafletBootstrap = L.Class.extend({
-        includes: L.Mixin.Events,
-
-    //or extend eq. L.Control
-    //L.Control.LeafletBootstrap = L.Control.extend({
-
-    //Default options
-        options: {
-            VERSION: "1.2.0"
-
-        },
-
-        //initialize
-        initialize: function(options) {
-            L.setOptions(this, options);
-
-        },
-
-        //addTo
-        addTo: function (map) {
-            L.Control.prototype.addTo.call(this, map); //Extend eq. L.Control
-
-            return this;
-        },
-
-
-        //onAdd
-        onAdd: function (map) {
-            this._map = map;
-            var result = L.Control.Box.prototype.onAdd.call(this, map );
-
-            //Create the object/control
-
-
-            return result;
-        },
-
-        //myMethod
-        myMethod: function () {
-
-        }
-    });
-*/
-
-    //OR/AND extend a prototype-method (METHOD) of a leaflet {CLASS}
-
-    /***********************************************************
-    Extend the L.{CLASS}.{METHOD} to do something more
-    ***********************************************************/
-/*
-    L.{CLASS}.prototype.{METHOD} = function ({METHOD}) {
-        return function () {
-    //Original function/method
-    {METHOD}.apply(this, arguments);
-
-    //New extended code
-    ......extra code
-
-        }
-    } (L.{CLASS}.prototype.{METHOD});
-*/
 
 
 }(jQuery, L, this, document));

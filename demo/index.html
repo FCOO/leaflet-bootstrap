@@ -32,6 +32,7 @@
 	<script src="../src/leaflet-bootstrap-popup.js"></script>
 	<script src="../src/leaflet-bootstrap.js"></script>
 	<script src="../src/leaflet-bootstrap-marker.js"></script>
+	<script src="../src/leaflet-bootstrap-tooltip.js"></script>
 	<script>
     window.bsIsTouch = false;
     window.bsIsTouch = (window.location.search =='?touch');
@@ -57,10 +58,14 @@
                             tooltip: tooltip
                     }).addTo( map );
 
-                    marker.on('click', function(){ this.setColor('success'); this.toggleOption('puls'); }, marker );
-                    marker.bindPopup( function( $element ){
-                        $element._bsAddHtml({icon: 'fa-home', text: 'Tekst og ikon'});
-                    });
+                    marker.on('click', function(){
+                        this._tooltip.setContent('NY'+Math.round(Math.random()*10000));
+//                        this.setColor('success'); this.toggleOption('puls');
+                          this._popup.setContent('NEW:'+Math.round(Math.random()*10000));
+                        },
+                        marker
+                    );
+                    marker.bindPopup({icon: 'fa-home', text: 'Tekst og ikon'});
             }
 
 
@@ -251,8 +256,12 @@ height: 300,
 //************************************************************
 		map.on('contextmenu', function( mouseEvent ){
             var popup = L.popup({
-				    maxWidth	     : 140,
-                    maxHeight        : 200,
+				    maxWidth : 140,
+                    maxHeight: 200
+                });
+            popup.setContent({
+//HER				    maxWidth	     : 140,
+//HER                    maxHeight        : 200,
                     scroll           : true,
 
 
