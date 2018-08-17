@@ -110,8 +110,19 @@
                     hideNotSelectedText: true,
                     list: [
                         {
-                            icon: 'fa-home',  text:{da:'Hjem', en:'Home'}, content: 'FIRST Sint sit mollit irure quis est nostrud cillum consequat Lorem esse do quis dolor esse fugiat sunt do. Eu ex commodo veniam Lorem aliquip laborum occaecat qui Lorem esse mollit dolore anim cupidatat. Deserunt officia id Lorem nostrud aute id commodo elit eiusmod enim irure amet eiusmod qui reprehenderit nostrud tempor. Fugiat ipsum excepteur in aliqua non et quis aliquip ad irure in labore cillum elit enim. Consequat aliquip incididunt ipsum et minim laborum laborum laborum et cillum labore. Deserunt adipisicing cillum id nulla minim nostrud labore eiusmod et amet. Laboris consequat consequat commodo non ut non aliquip reprehenderit nulla anim occaecat. Sunt sit ullamco reprehenderit irure ea ullamco Lorem aute nostrud magna.'
+                            icon: 'fa-home',  text:{da:'Hjem', en:'Home'},
+                            content: {
+                                type: 'select', _selectedId: 'formSelect4', placeholder:"Placeholder", label:'Label',
+                                items:[
+                                    {id:'formSelect1', icon:'fa-home', text: 'Davs'},
+                                    {id:'formSelect2', text:'Item 2'},
+                                    {id:'formSelect3', text:'Item 3 SKIDE GODT'},
+                                    {id:'formSelect4', text:'Item 4'},
+                                    {id:'formSelect5', text:'Item 5'}
+                                ]
+                            }
                         },
+
                         {
                             icon: 'fa-map',  text:{da:'Kort', en:'Map'}, content: 'FIRST Sint sit mollit irure quis est nostrud cillum consequat Lorem esse do quis dolor esse fugiat sunt do. Eu ex commodo veniam Lorem aliquip laborum occaecat qui Lorem esse mollit dolore anim cupidatat. Deserunt officia id Lorem nostrud aute id commodo elit eiusmod enim irure amet eiusmod qui reprehenderit nostrud tempor. Fugiat ipsum excepteur in aliqua non et quis aliquip ad irure in labore cillum elit enim. Consequat aliquip incididunt ipsum et minim laborum laborum laborum et cillum labore. Deserunt adipisicing cillum id nulla minim nostrud labore eiusmod et amet. Laboris consequat consequat commodo non ut non aliquip reprehenderit nulla anim occaecat. Sunt sit ullamco reprehenderit irure ea ullamco Lorem aute nostrud magna.'
                         },

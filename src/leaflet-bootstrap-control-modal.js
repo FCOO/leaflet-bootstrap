@@ -9,7 +9,7 @@ Create leaflet-control for jquery-bootstrap modal-content:
     "use strict";
 
         /***************************************************
-        _bsModal = common constructor for bsModal and bsFoam as Leaflet controls
+        _bsModal = common constructor for bsModal and bsForm as Leaflet controls
         ***************************************************/
         var _bsModal = L.Control.extend({
             options: {
@@ -34,25 +34,48 @@ Create leaflet-control for jquery-bootstrap modal-content:
                         smallButtons: true,
                     }
                 );
-
-                //Craete the this.bsModal and this.$container
                 var show = this.options.show;
                 this.options.show = false;
+
+                //Create the element
+                var $result = $('<div/>').addClass('leaflet-control'),
+                    $modalContainer = $('<div/>')
+                        .addClass('modal-dialog modal-inline modal-sm')
+                        .append( this.$container )
+                        .appendTo( $result );
+
+
+                //Prevent different events from propagating to the map
+                $modalContainer.on('contextmenu mousewheel', function( event ) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    return false;
+                });
+
+
+                //Add copy of _attachCloseHandler from select2 to close dropdown on mousedown on control
+                $result.on('mousedown', function( event ) {
+                    var $select = $(event.target).closest('.select2');
+
+                    $('.select2.select2-container--open').each(function () {
+                        if (this == $select[0])
+                            return;
+                        $(this).data('element').select2('close');
+                    });
+                });
+
+
+                //Create the this.bsModal and this.$container
                 this._createModal();
                 this.$container  = this.bsModal.bsModal.$container;
+
+                //'Move the container into the control
                 this.$container.detach();
+                $modalContainer.append( this.$container );
 
                 //Adjust this.bsModal
                 this.bsModal.show   = $.proxy(this.show, this);
                 this.bsModal._close = $.proxy(this.hide, this);
-
-
-                //Create the element
-                var $result = $('<div/>').addClass('leaflet-control');
-                $('<div/>')
-                    .addClass('modal-dialog modal-inline modal-sm')
-                    .append( this.$container )
-                    .appendTo( $result );
 
                 if (this.options.maxHeight)
                     this.$container.css('max-height', this.options.maxHeight);
@@ -103,7 +126,7 @@ Create leaflet-control for jquery-bootstrap modal-content:
 
             //edit
             edit: function(  values, tabIndexOrId ){
-                this.bsModalForm.edit(  values, tabIndexOrId );
+                this.bsModalForm.edit( values, tabIndexOrId );
             }
 
         });
