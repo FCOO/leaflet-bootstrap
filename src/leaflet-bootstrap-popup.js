@@ -7,6 +7,8 @@ Adjust standard Leaflet popup to display as Bootstrap modal
 (function ($, L/*, window, document, undefined*/) {
     "use strict";
 
+return; //TODO - IT IS **NOT** WORKING
+
     /*********************************************************
     Overwrite default Popu-options: Remove default leaflet closeButton
     *********************************************************/
