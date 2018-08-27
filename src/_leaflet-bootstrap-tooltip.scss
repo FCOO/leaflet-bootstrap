@@ -35,3 +35,18 @@
 .leaflet-tooltip-left   { margin-left: -10px; }
 .leaflet-tooltip-right  { margin-left:  10px; }
 
+//Adjust position when the icon is big
+.leaflet-tooltip-big-icon {
+    &.leaflet-tooltip-bottom { margin-top :  14px; }
+    &.leaflet-tooltip-top    { margin-top : -14px; }
+    &.leaflet-tooltip-left   { margin-left: -14px; }
+    &.leaflet-tooltip-right  { margin-left:  14px; }
+}
+
+
+//Hide non-permanent tooltips when no mouse browser
+
+.no-mouse .leaflet-tooltip:not(.leaflet-tooltip-permanent){
+    display: none;
+}
+

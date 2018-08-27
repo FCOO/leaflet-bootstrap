@@ -204,6 +204,21 @@ $dark:          $gray-800 !default;
 .leaflet-tooltip-right {
   margin-left: 10px; }
 
+.leaflet-tooltip-big-icon.leaflet-tooltip-bottom {
+  margin-top: 14px; }
+
+.leaflet-tooltip-big-icon.leaflet-tooltip-top {
+  margin-top: -14px; }
+
+.leaflet-tooltip-big-icon.leaflet-tooltip-left {
+  margin-left: -14px; }
+
+.leaflet-tooltip-big-icon.leaflet-tooltip-right {
+  margin-left: 14px; }
+
+.no-mouse .leaflet-tooltip:not(.leaflet-tooltip-permanent) {
+  display: none; }
+
 /***********************************************
 	leaflet-bootstrap-modal.scss
 ************************************************/

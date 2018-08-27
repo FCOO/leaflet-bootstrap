@@ -55,12 +55,14 @@
                             color    : 'standard',
                             whiteBorder: true,
                             puls: true,
-                            tooltip: tooltip
+                            bigIconWhenTouch: true,
+                            tooltip: tooltip,
+                            _tooltipPermanent: true
                     }).addTo( map );
 
                     marker.on('click', function(){
                         this._tooltip.setContent('NY'+Math.round(Math.random()*10000));
-//                        this.setColor('success'); this.toggleOption('puls');
+                        this.setColor('success'); this.toggleOption('puls');
                           this._popup.setContent('NEW:'+Math.round(Math.random()*10000));
                         },
                         marker
