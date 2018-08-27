@@ -11,6 +11,24 @@
     "use strict";
 
     /*********************************************************
+    Overwrite L.Tooltip._initLayout to add leaflet-tooltip-permanent and
+    leaflet-tooltip-big-icon big-to class-name (when needed)
+    *********************************************************/
+    L.Tooltip.prototype._initLayout = function( _initLayout ){
+        return function(){
+            if (this.options.permanent)
+                this.options.className = (this.options.className || '') + ' leaflet-tooltip-permanent';
+
+            if (this._source && this._source.$icon && this._source.$icon.hasClass('lbm-big'))
+                this.options.className = (this.options.className || '') + ' leaflet-tooltip-big-icon';
+
+
+            _initLayout.apply( this, arguments );
+        };
+    }( L.Tooltip.prototype._initLayout );
+
+
+    /*********************************************************
     Overwrite L.Tooltip._updateContent to update tooltip with Bootstrap-content
     *********************************************************/
     L.Tooltip.prototype._updateContent = function () {
