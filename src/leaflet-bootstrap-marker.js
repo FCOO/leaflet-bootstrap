@@ -65,8 +65,9 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
             puls            : false,           //true to have a pulsart icon
             color           : '',              //Name of color: "primary", "secondary", "success", "info", "warning", "danger", "standard". "primary"-"danger"=Bootstrap colors. "standard" = Google Maps default iocn color
 
-            tooltip         : null, //Content of tooltip
-            tooltipPermanent: false //Whether to open the tooltip permanently or only on mouseover.
+            tooltip                : null,  //Content of tooltip
+            tooltipPermanent       : false, //Whether to open the tooltip permanently or only on mouseover.
+            tooltipHideWhenDragging: false  //True and tooltipPermanent: false => the tooltip is hidden when dragged
         },
 
         /*****************************************************
@@ -116,9 +117,10 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
 
             if (this.options.tooltip)
                 this.bindTooltip(this.options.tooltip, {
-                    sticky     : !this.options.tooltipPermanent, //If true, the tooltip will follow the mouse instead of being fixed at the feature center.
-                    interactive: false,                          //If true, the tooltip will listen to the feature events.
-                    permanent  : this.options.tooltipPermanent   //Whether to open the tooltip permanently or only on mouseover.
+                    sticky          : !this.options.tooltipPermanent,       //If true, the tooltip will follow the mouse instead of being fixed at the feature center.
+                    interactive     : false,                                //If true, the tooltip will listen to the feature events.
+                    permanent       : this.options.tooltipPermanent,        //Whether to open the tooltip permanently or only on mouseover.
+                    hideWhenDragging: this.options.tooltipHideWhenDragging  //True and tooltipPermanent: false => the tooltip is hidden when dragged
                 });
         },
 
