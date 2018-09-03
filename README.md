@@ -15,9 +15,9 @@ http://FCOO.github.io/leaflet-bootstrap/demo/
 ## Usage
 ### L.bsMarker
 
-    var myMarker = L.bsMarker(latLng, options).addTo( map );
+
     options: {
-        useBigIcon      : false     //True to make the icon big
+        useBigIcon      : false     //True to make the ico    var myMarker = L.bsMarker(latLng, options).addTo( map );n big
         bigIcon         : object    //L.DivIcon to be used if useBigIcon: true
         bigIconWhenTouch: false     //True to make big icon when window.bsIsTouch == true and options.draggable == true
         draggable       : false, 	//Whether the marker is draggable with mouse/touch or not.
@@ -60,6 +60,11 @@ Extended to take same options as bsModal (see details [here](https://github.com/
 
         fixable: false, //if true the popup can be pinned/fixed and only closes on the close-button
     }
+
+    //Methods
+    .changeContent(content, contentContext) //Only changes the content of the "body" of the bsModal inside the popup
+
+
 
 ### L.tooltip
 

@@ -42,7 +42,11 @@
             i18next.changeLanguage('en');
 
 
-            var map = L.map('map').setView([56.2, 11.5], 6);
+
+            var map = L.map('map', {
+
+            }).setView([56.2, 11.5], 6);
+
 			L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 				maxZoom: 18,
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors</a>'
@@ -63,12 +67,57 @@
 
                     marker.on('click', function(){
                         this._tooltip.setContent('NY'+Math.round(Math.random()*10000));
+
                         this.setColor('success'); this.toggleOption('puls');
-                          this._popup.setContent('NEW:'+Math.round(Math.random()*10000));
                         },
                         marker
                     );
-                    marker.bindPopup({icon: 'fa-home', text: 'Tekst og ikon'});
+                    marker.bindPopup(
+                        'Dette er 1. linie<br>Dette er 2. linie'
+/*                    {
+                        minWidth: 234,
+                        closeButton: false,
+                        header:'Davs',
+                        fixable: true,
+                        _icons: {
+                            back: { onClick: function(){ console.log('BACK!'); } },
+                            forward: { onClick: function(){ console.log('FORWARD!'); } }
+                        },
+                        buttons: [
+                        {
+                            icon: 'fa-map',
+                            text:'Inds.',
+                            onClick: function(){
+                                marker._popup.changeContent({
+                                    content: 'NY'+Math.round(Math.random()*10000),
+                                    extended: {
+                                        content: 'NY EXTENDED'+Math.round(Math.random()*10000)
+                                    }
+                                });
+                            }
+                        },
+                        {
+                            icon:'fa-home',
+                            text:{da:'Skift', en:'Change'},
+                            onClick: function(){
+                                marker._popup.setContent({
+                                    closeButton: true,
+                                    header:'Davs igen',
+                                    fixable: true,
+                                    content: 'NIELS:'+Math.round(Math.random()*10000),
+                                    _extended: {
+                                        content: 'Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>'
+                                    }
+                                });
+                            }
+                        }],
+                        content: {icon: 'fa-home', text: 'Tekst_og_ikon_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord'}, scroll: true,
+
+                        extended: {
+                            content: 'Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>'
+                        }
+                    }*/
+                    );
             }
 
 
@@ -278,21 +327,20 @@ height: 300,
 //************************************************************
 		map.on('contextmenu', function( mouseEvent ){
             var popup = L.popup({
-				    maxWidth : 140,
-                    maxHeight: 200
+				    maxWidth : 240,
+                    maxHeight: 200,
+                    fixable: true,
+                    header		     : {text:'CREATE: This is a very long header and it should be to long'},
+
                 });
             popup.setContent({
-//HER				    maxWidth	     : 140,
-//HER                    maxHeight        : 200,
                     scroll           : true,
 
-
-
-                    fixable: true,
-                    header		     : {text:'This is a very long header and it should be to long'},
+//HER                    fixable: true,
+                    _header		     : {text:'setContent: This is a very long header and it should be to long'},
 				    closeButton     : true,
 
-                    _buttons		    : [{
+                    buttons		    : [{
                         icon:'fas fa-map-marker-alt',
                         text:'Marker',
                         closeOnClick: true,
@@ -309,7 +357,7 @@ height: 300,
                         var result = $('<div>' + content + 'This is a random<br>number '+Math.floor(Math.random()*1000000) +'</div>');
                         $container.append( result );
     		        }
-			});
+            });
 
 			popup.setLatLng(mouseEvent.latlng).openOn(map);
 		});

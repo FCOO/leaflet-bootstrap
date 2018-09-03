@@ -51588,6 +51588,9 @@ TODO:
         content: json-object with full content Samer as content for bsModal with extention of
             id, and
             showWhen and hideWhen = [id] of value: hide or show element when another element with id has value
+
+        extended.content: Same as options.content, but NOT BOTH
+        useExtended: false - When true the extended.content is used as the content of the form
         onChanging: function( values ) - called when the value of any of the elements are changed
         onSubmit  : function( values ) - called when the form is submitted
     *************************************************************************
@@ -51624,7 +51627,12 @@ TODO:
                 if ($.isPlainObject(obj) || ($.type(obj) == 'array'))
                     $.each( obj, setId );
         }
-        setId( 'dummy', this.options.content);
+
+
+        if (this.options.extended && this.options.useExtended)
+            setId( 'dummy', this.options.extended);
+        else
+            setId( 'dummy', this.options.content);
 
         //Create a hidden submit-button to be placed inside the form
         var $hiddenSubmitButton = this.$hiddenSubmitButton = $('<button type="submit" style="display:none"/>');
@@ -51641,16 +51649,23 @@ TODO:
         this.options.show = false; //Only show using method edit(...)
 
         //Create the form
-        this.$form =
-            $('<form/>')
-                ._bsAppendContent( this.options.content, this.options.contentContext );
+        this.$form = $('<form/>');
+
+        if (this.options.extended && this.options.useExtended){
+            this.$form._bsAppendContent( this.options.extended.content, this.options.contentContext );
+            this.options.extended.content = this.$form;
+
+        }
+        else {
+            this.$form._bsAppendContent( this.options.content, this.options.contentContext );
+            this.options.content = this.$form;
+        }
+
 
         if (this.options.formValidation)
             this.$form.addClass('form-validation');
 
-
         //Create the modal
-        this.options.content = this.$form;
         this.$bsModal = $.bsModal( this.options );
 
         //Append the hidden submit-button the the form
@@ -52386,6 +52401,9 @@ TODO:
                     .toggleClass('modal-type-' + options.type, !!options.type)
                     .appendTo( this );
 
+        if (!options.content || (options.content === {}))
+            $modalBody.addClass('modal-body-no-content');
+
         if (!isTabs && options.height)
             $modalBody.height(options.height);
 
@@ -52397,6 +52415,8 @@ TODO:
 
         //Add content
         $modalContent._bsAppendContent( options.content, options.contentContext );
+
+
 
         //Add footer
         parts.$footer =
