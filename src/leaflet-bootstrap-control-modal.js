@@ -38,11 +38,19 @@ Create leaflet-control for jquery-bootstrap modal-content:
                 this.options.show = false;
 
                 //Create the element
-                var $result = $('<div/>').addClass('leaflet-control'),
-                    $modalContainer = $('<div/>')
-                        .addClass('modal-dialog modal-inline modal-sm')
-                        .append( this.$container )
-                        .appendTo( $result );
+                var $result =
+                        $('<div/>')
+                            .addClass('leaflet-control'),
+                    $modalContainer =
+                        $('<div/>')
+                            ._bsAddBaseClassAndSize({
+                                baseClass   : 'modal-dialog',
+                                class       : 'modal-dialog-inline',
+                                useTouchSize: true,
+                                small       : false
+                            })
+                            .append( this.$modalContent )
+                            .appendTo( $result );
 
 
                 //Prevent different events from propagating to the map
@@ -65,25 +73,26 @@ Create leaflet-control for jquery-bootstrap modal-content:
                 });
 
 
-                //Create the this.bsModal and this.$container
+                //Create the this.bsModal and this.$modalContent
                 this._createModal();
-                this.$container  = this.bsModal.bsModal.$container;
+
+                this.$modalContent = this.bsModal.bsModal.$modalContent;
 
                 //'Move the container into the control
-                this.$container.detach();
-                $modalContainer.append( this.$container );
+                this.$modalContent.detach();
+                $modalContainer.append( this.$modalContent );
 
                 //Adjust this.bsModal
                 this.bsModal.show   = $.proxy(this.show, this);
                 this.bsModal._close = $.proxy(this.hide, this);
-
+/*
                 if (this.options.maxHeight)
-                    this.$container.css('max-height', this.options.maxHeight);
+                    this.$modalContent.css('max-height', this.options.maxHeight);
                 if (this.options.minWidth)
-                    this.$container.css('min-width', this.options.minWidth);
+                    this.$modalContent.css('min-width', this.options.minWidth);
                 if (this.options.width)
-                    this.$container.css('width', this.options.width);
-
+                    this.$modalContent.css('width', this.options.width);
+*/
                 var result = $result.get(0);
                 L.DomEvent.disableClickPropagation( result );
 

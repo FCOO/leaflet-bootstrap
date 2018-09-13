@@ -11964,6 +11964,7 @@ Icons for modal header inside a container
 .header-icon-container {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
   justify-content: center;
   margin-left: auto;
   margin-right: 0;
@@ -12281,17 +12282,17 @@ bsSelectList
         ...
 
 ************************************************************/
-.modal .selectList {
+.modal-dialog .selectList {
   border: 1px solid #ced4da;
   border-radius: 0.25rem;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; }
-  .modal .selectList-sm {
+  .modal-dialog .selectList-sm {
     border-radius: 0.1875rem; }
   @media screen and (prefers-reduced-motion: reduce) {
-    .modal .selectList {
+    .modal-dialog .selectList {
       transition: none; } }
-  .modal .selectList:focus, .modal .selectList:active {
+  .modal-dialog .selectList:focus, .modal-dialog .selectList:active {
     border-color: #80bdff !important;
     outline: none !important; }
 
@@ -12395,11 +12396,6 @@ MODAL
 Adjusting size etc. to have modal in normal and small size
 and jusing standard header, buttons and sizes
 
-If the height (and width) of the content is variable (eq. accordion) the class
-.modal-flex is added to .modal given
-    width : max-width = $modal-md-rem (or $modal-lg-rem)
-    height: As default but with fixed height for small devices to prevent rapidly change of height
-
 ************************************************************/
 body.modal-open .modal {
   overflow-x: hidden;
@@ -12407,59 +12403,65 @@ body.modal-open .modal {
   padding: 0 !important; }
 
 .modal .modal-dialog {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  margin: 0 auto;
-  min-height: 100%;
-  max-width: calc(100vw - 1rem);
-  width: 18.75rem;
   opacity: 0;
-  transition: opacity 0.3s linear; }
-  .modal .modal-dialog.modal-flex {
-    width: 31.25rem; }
-    .modal .modal-dialog.modal-flex.extra-width {
-      width: 50rem; }
-  .modal .modal-dialog .modal-content {
-    min-height: 100%;
-    word-break: break-word; }
-  .modal .modal-dialog:not(.modal-flex) .modal-content .modal-body > .jquery-scroll-container {
-    width: calc( 18.75rem - 2*1px - 2*0.625rem);
-    margin-left: auto;
-    margin-right: auto; }
-  .modal .modal-dialog.modal-flex .modal-content .modal-body > .jquery-scroll-container {
-    width: auto; }
+  transition: opacity .3s linear; }
 
 .modal.show .modal-dialog {
   opacity: 1; }
 
-.modal.modal-sm {
-  max-width: none !important; }
-
-.modal-inline .modal-content {
+/****************************************************
+.MODEL-DIALOG
+****************************************************/
+.modal-dialog {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 1rem;
+  margin: 0 auto;
   min-height: 100%;
-  max-height: inherit;
-  word-break: break-word;
-  box-shadow: none; }
-
-.modal, .modal-inline {
-  font-size: 1rem; }
-  .modal .modal-content.modal-extended .hide-for-modal-extended, .modal-inline .modal-content.modal-extended .hide-for-modal-extended {
+  max-width: calc(100vw - 1rem);
+  width: 18.75rem;
+  /****************************************************
+    .MODAL-CONTENT
+    AND ITS COMPONENTS (HEADER, FIXED-BODY, BODY AND FOOTER)
+    ****************************************************/
+  /****************************************************
+    DIFFERENT SIZES
+    .MODAL-DIALOG-SM AND .MODAL-DIALOG-XS
+    ****************************************************/ }
+  .modal-dialog.modal-flex-width {
+    width: 31.25rem; }
+    .modal-dialog.modal-flex-width.modal-extra-width {
+      width: 50rem; }
+  .modal-dialog.modal-dialog-inline .modal-content {
+    box-shadow: none;
+    max-height: inherit; }
+  .modal-dialog .modal-content {
+    min-height: 100%;
+    word-break: break-all;
+    word-break: break-word; }
+  .modal-dialog:not(.modal-flex-width) .modal-content .modal-body > .jquery-scroll-container {
+    width: calc( 100% - 2*1px - 2*0.625rem);
+    margin-left: auto;
+    margin-right: auto; }
+  .modal-dialog.modal-flex-width .modal-content .modal-body > .jquery-scroll-container {
+    width: auto; }
+  .modal-dialog .modal-content.modal-extended .hide-for-modal-extended {
     display: none !important; }
-  .modal .modal-content.no-modal-extended .show-for-modal-extended, .modal-inline .modal-content.no-modal-extended .show-for-modal-extended {
+  .modal-dialog .modal-content.no-modal-extended .show-for-modal-extended {
     display: none !important; }
-  .modal .modal-content.modal-pinned .hide-for-modal-pinned, .modal-inline .modal-content.modal-pinned .hide-for-modal-pinned {
+  .modal-dialog .modal-content.modal-pinned .hide-for-modal-pinned {
     display: none !important; }
-  .modal .modal-content.no-modal-pinned .show-for-modal-pinned, .modal-inline .modal-content.no-modal-pinned .show-for-modal-pinned {
+  .modal-dialog .modal-content.no-modal-pinned .show-for-modal-pinned {
     display: none !important; }
-  .modal .modal-content.no-modal-header, .modal-inline .modal-content.no-modal-header {
+  .modal-dialog .modal-content .modal-body.modal-body-no-content {
+    display: none; }
+  .modal-dialog .modal-content:not(.modal-extended) .modal-body.hide-for-modal-extended.modal-body-no-content ~ .modal-footer,
+  .modal-dialog .modal-content.modal-extended .modal-body.show-for-modal-extended.modal-body-no-content ~ .modal-footer {
+    border-top: none; }
+  .modal-dialog .modal-content.no-modal-header {
     padding-top: calc( 0.3rem - 1px); }
-  .modal .modal-content .modal-footer-header:empty + .modal-footer:empty, .modal-inline .modal-content .modal-footer-header:empty + .modal-footer:empty {
-    display: block;
-    height: calc( 0.3rem - 1px);
-    padding: 0;
-    border: none; }
-  .modal .modal-content .modal-header, .modal-inline .modal-content .modal-header {
+  .modal-dialog .modal-content .modal-header {
     flex-shrink: 0;
     flex-grow: 0;
     font-weight: 400;
@@ -12475,47 +12477,52 @@ body.modal-open .modal {
     border-bottom-left-radius: 0;
     color: #495057;
     background-color: #f2f2f2; }
-    .modal .modal-content .modal-header span, .modal-inline .modal-content .modal-header span {
+    .modal-dialog .modal-content .modal-header span {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap; }
-    .modal .modal-content .modal-header.clickable, .modal-inline .modal-content .modal-header.clickable {
+    .modal-dialog .modal-content .modal-header.clickable {
       cursor: default; }
-      .modal .modal-content .modal-header.clickable:hover, .modal-inline .modal-content .modal-header.clickable:hover {
+      .modal-dialog .modal-content .modal-header.clickable:hover {
         background-color: #e5e5e5; }
-  .modal .modal-content .modal-body-fixed, .modal-inline .modal-content .modal-body-fixed {
+  .modal-dialog .modal-content .modal-body-fixed {
     flex-shrink: 0;
     flex-grow: 0;
     overflow: hidden;
     padding: 0.3125rem 0.3125rem;
     font-size: 1rem; }
-    .modal .modal-content .modal-body-fixed:empty, .modal-inline .modal-content .modal-body-fixed:empty {
+    .modal-dialog .modal-content .modal-body-fixed:empty {
       display: none; }
-  .modal .modal-content .modal-body, .modal-inline .modal-content .modal-body {
+  .modal-dialog .modal-content .modal-body {
     flex-shrink: 1;
     flex-grow: 1;
     padding: 0.3125rem 0.3125rem;
     font-size: 1rem;
     border-radius: calc( 0.3rem - 1px); }
-    .modal .modal-content .modal-body.modal-type-alert, .modal-inline .modal-content .modal-body.modal-type-alert {
+    .modal-dialog .modal-content .modal-body.modal-type-alert {
       background-color: #cce5ff;
       color: #004085; }
-    .modal .modal-content .modal-body.modal-type-success, .modal-inline .modal-content .modal-body.modal-type-success {
+    .modal-dialog .modal-content .modal-body.modal-type-success {
       background-color: #d4edda;
       color: #155724; }
-    .modal .modal-content .modal-body.modal-type-warning, .modal-inline .modal-content .modal-body.modal-type-warning {
+    .modal-dialog .modal-content .modal-body.modal-type-warning {
       background-color: #fff3cd;
       color: #856404; }
-    .modal .modal-content .modal-body.modal-type-error, .modal-inline .modal-content .modal-body.modal-type-error {
+    .modal-dialog .modal-content .modal-body.modal-type-error {
       background-color: #f8d7da;
       color: #721c24; }
-    .modal .modal-content .modal-body.modal-type-info, .modal-inline .modal-content .modal-body.modal-type-info {
+    .modal-dialog .modal-content .modal-body.modal-type-info {
       background-color: #d1ecf1;
       color: #0c5460; }
-    .modal .modal-content .modal-body.modal-type-help, .modal-inline .modal-content .modal-body.modal-type-help {
+    .modal-dialog .modal-content .modal-body.modal-type-help {
       background-color: #fefefe;
       color: #818182; }
-  .modal .modal-content .modal-footer-header, .modal-inline .modal-content .modal-footer-header {
+  .modal-dialog .modal-content .modal-footer-header:empty + .modal-footer:empty {
+    display: block;
+    height: calc( 0.3rem - 1px);
+    padding: 0;
+    border: none; }
+  .modal-dialog .modal-content .modal-footer-header {
     flex-shrink: 0;
     flex-grow: 0;
     font-weight: 400;
@@ -12532,49 +12539,30 @@ body.modal-open .modal {
     border-top: 1px solid #9aa1a8;
     border-top-left-radius: 0 !important;
     border-top-right-radius: 0 !important; }
-    .modal .modal-content .modal-footer-header span, .modal-inline .modal-content .modal-footer-header span {
+    .modal-dialog .modal-content .modal-footer-header span {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap; }
-    .modal .modal-content .modal-footer-header:empty, .modal-inline .modal-content .modal-footer-header:empty {
+    .modal-dialog .modal-content .modal-footer-header:empty {
       display: none; }
-    .modal .modal-content .modal-footer-header:not(:empty) + .modal-footer, .modal-inline .modal-content .modal-footer-header:not(:empty) + .modal-footer {
+    .modal-dialog .modal-content .modal-footer-header:not(:empty) + .modal-footer {
       border-top: none; }
-  .modal .modal-content .modal-footer, .modal-inline .modal-content .modal-footer {
+  .modal-dialog .modal-content .modal-footer {
     flex-shrink: 0;
     flex-grow: 0;
     padding: 0.3125rem; }
-    .modal .modal-content .modal-footer:empty, .modal .modal-content .modal-footer.modal-footer-vertical:empty, .modal-inline .modal-content .modal-footer:empty, .modal-inline .modal-content .modal-footer.modal-footer-vertical:empty {
+    .modal-dialog .modal-content .modal-footer:empty, .modal-dialog .modal-content .modal-footer.modal-footer-vertical:empty {
       display: none; }
-    .modal .modal-content .modal-footer.modal-footer-vertical, .modal-inline .modal-content .modal-footer.modal-footer-vertical {
+    .modal-dialog .modal-content .modal-footer.modal-footer-vertical {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center; }
-      .modal .modal-content .modal-footer.modal-footer-vertical > *, .modal-inline .modal-content .modal-footer.modal-footer-vertical > * {
+      .modal-dialog .modal-content .modal-footer.modal-footer-vertical > * {
         margin: 0; }
-      .modal .modal-content .modal-footer.modal-footer-vertical > *:not(:first-child), .modal-inline .modal-content .modal-footer.modal-footer-vertical > *:not(:first-child) {
+      .modal-dialog .modal-content .modal-footer.modal-footer-vertical > *:not(:first-child) {
         margin-top: .25rem; }
-
-.modal-dialog .modal-content .modal-body.modal-body-no-content {
-  display: none; }
-
-.modal-dialog .modal-content:not(.modal-extended) .modal-body.hide-for-modal-extended.modal-body-no-content ~ .modal-footer,
-.modal-dialog .modal-content.modal-extended .modal-body.show-for-modal-extended.modal-body-no-content ~ .modal-footer {
-  border-top: none; }
-
-/*
-    //Hide top-border for footer when modal-body is empty
-    .modal-content:not(.modal-extended) .modal-body.hide-for-modal-extended.modal-body-no-content ~ .modal-footer,
-    .modal-content.modal-extended       .modal-body.show-for-modal-extended.modal-body-no-content ~ .modal-footer {
-        border-top: none;
-    }
-*/
-.modal.modal-sm,
-.modal-inline.modal-sm {
-  max-width: none !important; }
-  .modal.modal-sm .modal-content .modal-header,
-  .modal-inline.modal-sm .modal-content .modal-header {
+  .modal-dialog.modal-dialog-sm .modal-content .modal-header {
     font-weight: 400;
     display: flex;
     align-items: center;
@@ -12586,19 +12574,15 @@ body.modal-open .modal {
     border-bottom: 1px solid #9aa1a8;
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0; }
-    .modal.modal-sm .modal-content .modal-header span,
-    .modal-inline.modal-sm .modal-content .modal-header span {
+    .modal-dialog.modal-dialog-sm .modal-content .modal-header span {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap; }
-  .modal.modal-sm .modal-content .modal-body,
-  .modal.modal-sm .modal-content .modal-body-fixed,
-  .modal-inline.modal-sm .modal-content .modal-body,
-  .modal-inline.modal-sm .modal-content .modal-body-fixed {
+  .modal-dialog.modal-dialog-sm .modal-content .modal-body,
+  .modal-dialog.modal-dialog-sm .modal-content .modal-body-fixed {
     padding: 0.25rem 0.25rem;
     font-size: 0.875rem; }
-  .modal.modal-sm .modal-content .modal-footer-header,
-  .modal-inline.modal-sm .modal-content .modal-footer-header {
+  .modal-dialog.modal-dialog-sm .modal-content .modal-footer-header {
     font-weight: 400;
     display: flex;
     align-items: center;
@@ -12613,94 +12597,77 @@ body.modal-open .modal {
     border-top: 1px solid #9aa1a8;
     border-top-left-radius: 0 !important;
     border-top-right-radius: 0 !important; }
-    .modal.modal-sm .modal-content .modal-footer-header span,
-    .modal-inline.modal-sm .modal-content .modal-footer-header span {
+    .modal-dialog.modal-dialog-sm .modal-content .modal-footer-header span {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap; }
-    .modal.modal-sm .modal-content .modal-footer-header:empty,
-    .modal-inline.modal-sm .modal-content .modal-footer-header:empty {
+    .modal-dialog.modal-dialog-sm .modal-content .modal-footer-header:empty {
       display: none; }
+  .modal-dialog.modal-dialog-xs .modal-content .modal-header {
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    cursor: default;
+    padding: 0.125rem 0.125rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    border-radius: inherit;
+    border-bottom: 1px solid #9aa1a8;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0; }
+    .modal-dialog.modal-dialog-xs .modal-content .modal-header span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap; }
+  .modal-dialog.modal-dialog-xs .modal-content .modal-body,
+  .modal-dialog.modal-dialog-xs .modal-content .modal-body-fixed {
+    padding: 0.25rem 0.25rem;
+    font-size: 0.875rem; }
+  .modal-dialog.modal-dialog-xs .modal-content .modal-footer-header {
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    cursor: default;
+    padding: 0.25rem 0.25rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    border-radius: inherit;
+    color: #495057;
+    background-color: #f2f2f2;
+    line-height: 1;
+    border-top: 1px solid #9aa1a8;
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important; }
+    .modal-dialog.modal-dialog-xs .modal-content .modal-footer-header span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap; }
+    .modal-dialog.modal-dialog-xs .modal-content .modal-footer-header:empty {
+      display: none; }
+  .modal-dialog.modal-dialog-xs .modal-content .modal-footer {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem; }
 
-.modal.modal-xs .modal-content .modal-header,
-.modal-inline.modal-xs .modal-content .modal-header {
-  font-weight: 400;
-  display: flex;
-  align-items: center;
-  cursor: default;
-  padding: 0.125rem 0.125rem;
-  font-size: 0.75rem;
-  line-height: 1.5;
-  border-radius: inherit;
-  border-bottom: 1px solid #9aa1a8;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0; }
-  .modal.modal-xs .modal-content .modal-header span,
-  .modal-inline.modal-xs .modal-content .modal-header span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap; }
-
-.modal.modal-xs .modal-content .modal-body,
-.modal.modal-xs .modal-content .modal-body-fixed,
-.modal-inline.modal-xs .modal-content .modal-body,
-.modal-inline.modal-xs .modal-content .modal-body-fixed {
-  padding: 0.25rem 0.25rem;
-  font-size: 0.875rem; }
-
-.modal.modal-xs .modal-content .modal-footer-header,
-.modal-inline.modal-xs .modal-content .modal-footer-header {
-  font-weight: 400;
-  display: flex;
-  align-items: center;
-  cursor: default;
-  padding: 0.25rem 0.25rem;
-  font-size: 0.75rem;
-  line-height: 1.5;
-  border-radius: inherit;
-  color: #495057;
-  background-color: #f2f2f2;
-  line-height: 1;
-  border-top: 1px solid #9aa1a8;
-  border-top-left-radius: 0 !important;
-  border-top-right-radius: 0 !important; }
-  .modal.modal-xs .modal-content .modal-footer-header span,
-  .modal-inline.modal-xs .modal-content .modal-footer-header span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap; }
-  .modal.modal-xs .modal-content .modal-footer-header:empty,
-  .modal-inline.modal-xs .modal-content .modal-footer-header:empty {
-    display: none; }
-
-.modal.modal-xs .modal-content .modal-footer,
-.modal-inline.modal-xs .modal-content .modal-footer {
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem; }
-
-.modal .modal-body-fixed.scrollbar-vertical, .modal-inline .modal-body-fixed.scrollbar-vertical {
+.modal-dialog .modal-body-fixed.scrollbar-vertical {
   padding-left: 0.625rem;
   padding-right: 0.625rem; }
 
-.modal .modal-body.scrollbar-vertical, .modal-inline .modal-body.scrollbar-vertical {
+.modal-dialog .modal-body.scrollbar-vertical {
   padding-left: 0.0625rem;
   padding-right: 0.0625rem; }
 
-.modal .modal-body.scrollbar-horizontal, .modal-inline .modal-body.scrollbar-horizontal {
+.modal-dialog .modal-body.scrollbar-horizontal {
   padding-bottom: 0.0625rem; }
 
-.modal.modal-sm .modal-body-fixed.scrollbar-vertical,
-.modal-inline.modal-sm .modal-body-fixed.scrollbar-vertical {
+.modal-dialog.modal-dialog-sm .modal-body-fixed.scrollbar-vertical {
   padding-left: 0.625rem;
   padding-right: 0.625rem; }
 
-.modal.modal-sm .modal-body.scrollbar-vertical,
-.modal-inline.modal-sm .modal-body.scrollbar-vertical {
+.modal-dialog.modal-dialog-sm .modal-body.scrollbar-vertical {
   padding-left: 0.0625rem;
   padding-right: 0.0625rem; }
 
-.modal.modal-sm .modal-body.scrollbar-horizontal,
-.modal-inline.modal-sm .modal-body.scrollbar-horizontal {
+.modal-dialog.modal-dialog-sm .modal-body.scrollbar-horizontal {
   padding-bottom: 0.0625rem; }
 
 .modal-content .modal-body-fixed.no-vertical-padding,
@@ -12708,7 +12675,7 @@ body.modal-open .modal {
   padding-top: 0 !important;
   padding-bottom: 0 !important; }
 
-.no-vertical-padding .modal-dialog .modal-content .modal-body-fixed, .no-vertical-padding .modal-dialog .modal-content .modal-body {
+.no-vertical-padding .modal-content .modal-body-fixed, .no-vertical-padding .modal-content .modal-body {
   padding-top: 0 !important;
   padding-bottom: 0 !important; }
 
@@ -12717,7 +12684,7 @@ body.modal-open .modal {
   padding-left: 0 !important;
   padding-right: 0 !important; }
 
-.no-horizontal-padding .modal-dialog .modal-content .modal-body-fixed, .no-horizontal-padding .modal-dialog .modal-content .modal-body {
+.no-horizontal-padding .modal-content .modal-body-fixed, .no-horizontal-padding .modal-content .modal-body {
   padding-left: 0 !important;
   padding-right: 0 !important; }
 
@@ -13150,7 +13117,7 @@ Adjustmernt to Bootstrap table
       padding-left: 0;
       padding-right: 0; }
 
-.modal-sm .table thead tr th,
+.modal-dialog-sm .table thead tr th,
 .table.table-sm thead tr th {
   font-weight: 400;
   display: flex;
@@ -13160,24 +13127,24 @@ Adjustmernt to Bootstrap table
   font-size: 0.875rem;
   line-height: 1.5;
   border-radius: inherit; }
-  .modal-sm .table thead tr th span,
+  .modal-dialog-sm .table thead tr th span,
   .table.table-sm thead tr th span {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap; }
-  .modal-sm .table thead tr th.sortable,
+  .modal-dialog-sm .table thead tr th.sortable,
   .table.table-sm thead tr th.sortable {
     padding-right: 1em; }
-  .modal-sm .table thead tr th.no-horizontal-padding,
+  .modal-dialog-sm .table thead tr th.no-horizontal-padding,
   .table.table-sm thead tr th.no-horizontal-padding {
     padding-left: 0;
     padding-right: 0; }
 
-.modal:not(.modal-sm) .table.table-selectable tbody tr td,
+.modal-dialog:not(.modal-dialog-sm) .table.table-selectable tbody tr td,
 .table.table-selectable:not(.table-sm) tbody tr td {
   padding: 0.3125rem 0.3125rem;
   font-size: 1rem; }
-  .modal:not(.modal-sm) .table.table-selectable tbody tr td.no-horizontal-padding,
+  .modal-dialog:not(.modal-dialog-sm) .table.table-selectable tbody tr td.no-horizontal-padding,
   .table.table-selectable:not(.table-sm) tbody tr td.no-horizontal-padding {
     padding-left: 0;
     padding-right: 0; }
@@ -13263,8 +13230,8 @@ Using Bootstrap Collapse to create accordion
 .accordion.no-transition .collapse {
   transition: none !important; }
 
-.modal-sm .accordion .card-header,
-.modal-xs .accordion .card-header,
+.modal-dialog-sm .accordion .card-header,
+.modal-dialog-xs .accordion .card-header,
 .accordion-sm .card-header {
   font-weight: 400;
   display: flex;
@@ -13274,21 +13241,21 @@ Using Bootstrap Collapse to create accordion
   font-size: 0.875rem;
   line-height: 1.5;
   border-radius: inherit; }
-  .modal-sm .accordion .card-header span,
-  .modal-xs .accordion .card-header span,
+  .modal-dialog-sm .accordion .card-header span,
+  .modal-dialog-xs .accordion .card-header span,
   .accordion-sm .card-header span {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap; }
 
-.modal-sm .accordion .card-block,
-.modal-xs .accordion .card-block,
+.modal-dialog-sm .accordion .card-block,
+.modal-dialog-xs .accordion .card-block,
 .accordion-sm .card-block {
   padding: 0.25rem 0.25rem;
   font-size: 0.875rem; }
 
-.modal-sm .accordion .card-footer,
-.modal-xs .accordion .card-footer,
+.modal-dialog-sm .accordion .card-footer,
+.modal-dialog-xs .accordion .card-footer,
 .accordion-sm .card-footer {
   font-weight: 400;
   display: flex;
@@ -13304,14 +13271,14 @@ Using Bootstrap Collapse to create accordion
   border-top-left-radius: 0 !important;
   border-top-right-radius: 0 !important;
   border-radius: 0.25rem; }
-  .modal-sm .accordion .card-footer span,
-  .modal-xs .accordion .card-footer span,
+  .modal-dialog-sm .accordion .card-footer span,
+  .modal-dialog-xs .accordion .card-footer span,
   .accordion-sm .card-footer span {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap; }
-  .modal-sm .accordion .card-footer:empty,
-  .modal-xs .accordion .card-footer:empty,
+  .modal-dialog-sm .accordion .card-footer:empty,
+  .modal-dialog-xs .accordion .card-footer:empty,
   .accordion-sm .card-footer:empty {
     display: none; }
 
@@ -13381,8 +13348,10 @@ for noty is copyed and modified
   .noty-container.noty-container-topRight, .noty-container.noty-container-centerRight, .noty-container.noty-container-bottomRight {
     right: 20px; }
   .noty-container.noty-container-topCenter, .noty-container.noty-container-bottomCenter {
+    transform: translate(-50%) translateZ(0) scale(1, 1);
     transform: translate(calc(-50% - 1px/2)) translateZ(0) scale(1, 1); }
   .noty-container.noty-container-center {
+    transform: translate(-50%, -50%) translateZ(0) scale(1, 1);
     transform: translate(calc(-50% - 1px/2), calc(-50% - 1px/2)) translateZ(0) scale(1, 1); }
   .noty-container.noty-container-centerLeft, .noty-container.noty-container-centerRight {
     transform: translate(0, calc(-50% - 1px/2)) translateZ(0) scale(1, 1); }
@@ -13417,7 +13386,7 @@ for noty is copyed and modified
       .noty_bar.noty_theme__jquery-bootstrap .noty_body * {
         word-wrap: break-word; }
     .noty_bar.noty_theme__jquery-bootstrap.no-header .header-icon-container {
-      position: fixed;
+      position: absolute;
       top: 0;
       right: 0;
       margin-top: 0.3125rem;

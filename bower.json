@@ -17,7 +17,7 @@
     "dependencies": {
         "jquery": "latest",
         "leaflet": "latest",
-        "jquery-bootstrap": "fcoo/jquery-bootstrap#^1.0.0",
+        "jquery-bootstrap": "fcoo/jquery-bootstrap#^1.35.0",
         "leaflet-control-topcenter": "FCOO/leaflet-control-topcenter#^2.0.1"
     },
     "devDependencies": {

@@ -17,9 +17,9 @@ Adjust standard Leaflet popup to display as Bootstrap modal
         this._pinned = pinned = !!pinned;
 
         //Update pin-icon (if avaiable)
-        if (this.bsModal && this.bsModal.$container){
+        if (this.bsModal && this.bsModal.$modalContent){
             this.bsModal.isPinned = pinned;
-            this.bsModal.$container.modernizrToggle('modal-pinned', pinned );
+            this.bsModal.$modalContent.modernizrToggle('modal-pinned', pinned );
         }
 
         //Update related options
@@ -65,11 +65,11 @@ Adjust standard Leaflet popup to display as Bootstrap modal
     *********************************************************/
     L.Popup.prototype._initLayout = function (_initLayout) {
         return function () {
+/*
             //Some options can be given in this._content
             if ($.isPlainObject(this._content)){
                 this.options.minWidth  = this._content.minWidth  || this.options.minWidth;
                 this.options.maxWidth  = this._content.maxWidth  || this.options.maxWidth;
-                this.options.maxHeight = this._content.maxHeight || this.options.maxHeight;
                 this.options.width     = this._content.width     || this.options.width;
             }
             //Set fixed width
@@ -78,6 +78,17 @@ Adjust standard Leaflet popup to display as Bootstrap modal
                 this.options.maxWidth = this.options.width;
             }
 
+//HER ER FEJL
+            //maxHeight is always null. The height is controlled by modalOptions
+            this._content.height = this._content.height || this.options.height;
+            this._content.maxHeight = this._content.maxHeight || this.options.maxHeight;
+            this.options.height    = null;
+            this.options.maxHeight = null;
+*/
+
+//HERthis.options.minWidth = 200;
+//HERthis.options.maxWidth = 400;
+
             //Original function/method
             _initLayout.apply(this, arguments);
 
@@ -85,7 +96,12 @@ Adjust standard Leaflet popup to display as Bootstrap modal
             $(this._wrapper).addClass('modal-wrapper');
 
             //Set class-name for _contentNode to make it a 'small' bsModal
-            $(this._contentNode).addClass('modal-inline modal-sm');
+            $(this._contentNode)._bsAddBaseClassAndSize({
+                baseClass   : 'modal-dialog',
+                class       : 'modal-dialog-inline',
+                useTouchSize: true,
+                small       : true
+            });
 
             //Close open popup and brint to front when "touched"
             L.DomEvent.on(this._contentNode, 'mousedown', this._brintToFocus, this );
@@ -93,6 +109,26 @@ Adjust standard Leaflet popup to display as Bootstrap modal
             return this;
         };
     } (L.Popup.prototype._initLayout);
+
+
+    /*********************************************************
+    Overwrite L.Popup._updateLayout to simple get _containerWidth
+    as the width of the container
+    *********************************************************/
+    L.Popup.prototype._updateLayout = function(){
+        this._containerWidth = $(this._container).width();
+    };
+
+    /*********************************************************
+    Overwrite L.Popup._updatePosition to get correct width every time
+    *********************************************************/
+    L.Popup.prototype._updatePosition = function(_updatePosition){
+        return function () {
+            this._updateLayout();
+            _updatePosition.apply(this, arguments);
+        };
+    } (L.Popup.prototype._updatePosition);
+
 
 
     /*********************************************************
@@ -115,22 +151,29 @@ Adjust standard Leaflet popup to display as Bootstrap modal
                         onClick: $.proxy(this._onCloseButtonClick, this)
                     }
                 },
-                closeButton   : contentAsModalOptions.closeButton,
+                closeButton   : contentAsModalOptions.closeButton === true, //Change default to false
                 noHeader      : !contentAsModalOptions.header,
                 contentContext: this,
+
+                onChange: $.proxy( this._updatePosition, this )
             },
             contentAsModalOptions );
-
-
 
         if (modalOptions.fixable){
             this.options.fixable = true;
             modalOptions.onPin = $.proxy( this._setPinned, this);
         }
 
-        //Adjust options for leaflet popup
-        if (modalOptions.scroll)
-            this.options.maxHeight = this.options.maxHeight || 300; //maxHeight must be set if content is inside a scroll
+        //Adjust options for bsModal
+        if (modalOptions.extended){
+            modalOptions.extended.scroll = true;
+            //If no extended height or width is given => use same as not-extended
+            if (!modalOptions.extended.height && !modalOptions.extended.maxHeight)
+                modalOptions.extended.height = true;
+
+            if (!modalOptions.extended.width && !modalOptions.extended.maxWidth)
+                modalOptions.extended.width = true;
+        }
 
         //Save modal-options and content
         this.modalOptions = modalOptions;
@@ -143,10 +186,6 @@ Adjust standard Leaflet popup to display as Bootstrap modal
 
         //Save the modal-object
         this.bsModal = $contentNode.bsModal;
-
-        //Set max-height of inner modal-container
-        if (this.options.maxHeight)
-            $contentNode.bsModal.$container.css('max-height', this.options.maxHeight);
 
         this._setPinned(isPinned);
 

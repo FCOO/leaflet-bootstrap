@@ -151,8 +151,7 @@
     var modalControl = L.control.bsModal({
             flex: true,
             header: 'Header',
-            _minWidth: 200,
-            width: 300,
+            width: 450,
 
             content: 'dette er en test<br>Linie2<br>Linie3<br>Linie4<br>Linie5',
 
@@ -221,7 +220,7 @@
                             }
                         }
                     ],
-                    height: 150/16 + 'rem',
+//                    height: 150/16 + 'rem',
                     scroll: true
                 },
                 scroll: false,
@@ -240,12 +239,12 @@
 
         });
 
-        map.addControl( modalControl );
+//        map.addControl( modalControl );
 
 //************************************************************
         var formControl = L.control.bsModalForm({
-width: 300,
-height: 300,
+//12-09-2018width: 300,
+//maxHeight: 200,
                     id: 'formId',
                     _show: true,
                     header: 'Davs',
@@ -326,37 +325,46 @@ height: 300,
 
 //************************************************************
 		map.on('contextmenu', function( mouseEvent ){
-            var popup = L.popup({
-				    maxWidth : 240,
-                    maxHeight: 200,
-                    fixable: true,
-                    header		     : {text:'CREATE: This is a very long header and it should be to long'},
+            var longContent = function(){
+    	            var content = '';
+                     lines = 15;
+                    for (var i=0; i<lines; i++ ){
+                        content += 'line '+i+'<br>';
+                    }
+                    return $('<div>' + content + 'This is a random<br>number '+Math.floor(Math.random()*1000000) +'</div>');
+		        }(),
+                shortContent = 'Det er bare mig';
 
+/*
+            var popup = L.popup({
+                    width: 200,
                 });
             popup.setContent({
-                    scroll           : true,
+*/
 
-//HER                    fixable: true,
-                    _header		     : {text:'setContent: This is a very long header and it should be to long'},
-				    closeButton     : true,
+            var popup = L.popup().setContent({
 
-                    buttons		    : [{
-                        icon:'fas fa-map-marker-alt',
-                        text:'Marker',
-                        closeOnClick: true,
-                        onClick: function(){addMarker(mouseEvent.latlng);}
-                    }],
+                scroll      : true,
+                fixable     : true,
+                header      : {text:'setContent: This is a very long header and it should be to long'},
+                closeButton : true,
+                buttons     : [{
+                    icon:'fas fa-map-marker-alt',
+                    text:'Marker',
+                    closeOnClick: true,
+                    onClick: function(){addMarker(mouseEvent.latlng);}
+                }],
 
-                    //verticalButtons : true,
-                    content: function( $container ){
-		    	        var content = this.getLatLng() + '<br>',
-	    			        lines = 1 + Math.floor(Math.random()*10);
-                        for (var i=0; i<lines; i++ ){
-                            content += 'line '+i+'<br>';
-                        }
-                        var result = $('<div>' + content + 'This is a random<br>number '+Math.floor(Math.random()*1000000) +'</div>');
-                        $container.append( result );
-    		        }
+                //verticalButtons : true,
+                width: 234,
+                content: shortContent,
+
+                isExtended: true,
+                extended: {
+                    width  : 345,
+                    content: longContent,
+                    scroll : true
+                },
             });
 
 			popup.setLatLng(mouseEvent.latlng).openOn(map);

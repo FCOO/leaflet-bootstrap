@@ -3,6 +3,11 @@
 
 ************************************************/
 
+//Default width for popups = 100px
+.leaflet-popup-content {
+    width: 100px;
+}
+
 //Overwrite leatlet popup wrapper and popup tip
 .modal-wrapper.leaflet-popup-content-wrapper {
     background: transparent;
@@ -13,6 +18,7 @@
     //Content
     .leaflet-popup-content {
         margin: 0;
+        display: flex; //IE11 bug fix
     }
 
     //Tip
