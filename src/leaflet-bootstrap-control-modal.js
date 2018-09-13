@@ -19,12 +19,16 @@ Create leaflet-control for jquery-bootstrap modal-content:
             show: function() { this.$outerContainer.show(); },
             hide: function() { this.$outerContainer.hide(); },
 
-            //_createModal
+            /********************************************************
+            _createModal
+            ********************************************************/
             _createModal: function(){
                 //this.bsModal = ...;
             },
 
-            //onAdd
+            /********************************************************
+            onAdd
+            ********************************************************/
             onAdd: function() {
                 this.options = $._bsAdjustOptions(
                     this.options,
@@ -60,7 +64,6 @@ Create leaflet-control for jquery-bootstrap modal-content:
                     return false;
                 });
 
-
                 //Add copy of _attachCloseHandler from select2 to close dropdown on mousedown on control
                 $result.on('mousedown', function( event ) {
                     var $select = $(event.target).closest('.select2');
@@ -72,11 +75,12 @@ Create leaflet-control for jquery-bootstrap modal-content:
                     });
                 });
 
-
-                //Create the this.bsModal and this.$modalContent
+                //Create this.bsModal and this.$modalContent
                 this._createModal();
 
                 this.$modalContent = this.bsModal.bsModal.$modalContent;
+
+                $modalContainer.bsModal = this.bsModal.bsModal;
 
                 //'Move the container into the control
                 this.$modalContent.detach();
@@ -85,14 +89,10 @@ Create leaflet-control for jquery-bootstrap modal-content:
                 //Adjust this.bsModal
                 this.bsModal.show   = $.proxy(this.show, this);
                 this.bsModal._close = $.proxy(this.hide, this);
-/*
-                if (this.options.maxHeight)
-                    this.$modalContent.css('max-height', this.options.maxHeight);
-                if (this.options.minWidth)
-                    this.$modalContent.css('min-width', this.options.minWidth);
-                if (this.options.width)
-                    this.$modalContent.css('width', this.options.width);
-*/
+
+                //ASdjust width and height
+                $modalContainer._bsModalSetHeightAndWidth();
+
                 var result = $result.get(0);
                 L.DomEvent.disableClickPropagation( result );
 
@@ -139,7 +139,6 @@ Create leaflet-control for jquery-bootstrap modal-content:
             }
 
         });
-
 
         //*************************************
         L.control.bsModal     = function(options){ return new L.control.BsModal(options); };

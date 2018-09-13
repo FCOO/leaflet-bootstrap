@@ -36,7 +36,6 @@ Adjust standard Leaflet popup to display as Bootstrap modal
             this._map.closePopup(this._map._popup);
     };
 
-
     /*********************************************************
     Adjust Popup._close and Popup._onCloseButtonClick
     to only close popup if it isn't pinned or it is closed from close-button
@@ -57,38 +56,11 @@ Adjust standard Leaflet popup to display as Bootstrap modal
         };
     } (L.Popup.prototype._onCloseButtonClick);
 
-
-
-
     /*********************************************************
     Extend L.Popup._initLayout to create popup with Bootstrap-components
     *********************************************************/
     L.Popup.prototype._initLayout = function (_initLayout) {
         return function () {
-/*
-            //Some options can be given in this._content
-            if ($.isPlainObject(this._content)){
-                this.options.minWidth  = this._content.minWidth  || this.options.minWidth;
-                this.options.maxWidth  = this._content.maxWidth  || this.options.maxWidth;
-                this.options.width     = this._content.width     || this.options.width;
-            }
-            //Set fixed width
-            if (this.options.width){
-                this.options.minWidth = this.options.width;
-                this.options.maxWidth = this.options.width;
-            }
-
-//HER ER FEJL
-            //maxHeight is always null. The height is controlled by modalOptions
-            this._content.height = this._content.height || this.options.height;
-            this._content.maxHeight = this._content.maxHeight || this.options.maxHeight;
-            this.options.height    = null;
-            this.options.maxHeight = null;
-*/
-
-//HERthis.options.minWidth = 200;
-//HERthis.options.maxWidth = 400;
-
             //Original function/method
             _initLayout.apply(this, arguments);
 

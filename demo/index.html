@@ -150,12 +150,17 @@
 //************************
     var modalControl = L.control.bsModal({
             flex: true,
-            header: 'Header',
-            width: 450,
+            header: 'Header max h = 111/222',
 
-            content: 'dette er en test<br>Linie2<br>Linie3<br>Linie4<br>Linie5',
+            width: 222,
+            maxHeight: 111,
+            content: 'w=222, dette er en test<br>Linie2<br>Linie3<br>Linie4<br>Linie5',
 
+            isExtended: true,
             extended: {
+                width: 555,
+                maxHeight: 222,
+                scroll: true,
                 content: {
                     type: 'tabs',
                     hideNotSelectedText: true,
@@ -181,7 +186,7 @@
                                 type:'slider', label:'Label (NIELS)',
                                 _handle: 'round',
                                 _showFromTo: false,
-                                grid: true,
+                                grid: true, resizeable: true,
                                 min:0, max:100, majorTicksOffset:0, _step:5, stepOffset:0, postfix:' km/t', _onChanging: function( obj ){ console.log( obj.value ); }
                             }
                         },
@@ -220,16 +225,8 @@
                             }
                         }
                     ],
-//                    height: 150/16 + 'rem',
-                    scroll: true
                 },
-                scroll: false,
             }, //end of extended
-
-
-            height: '100px',
-            scroll: true,
-            isExtended: true,
 
             buttons: [
                 {icon:'fa-map', text:'Kort', onClick: function(){ console.log('Klik på kort'); } }
@@ -239,12 +236,10 @@
 
         });
 
-//        map.addControl( modalControl );
+        map.addControl( modalControl );
 
 //************************************************************
         var formControl = L.control.bsModalForm({
-//12-09-2018width: 300,
-//maxHeight: 200,
                     id: 'formId',
                     _show: true,
                     header: 'Davs',
@@ -254,6 +249,7 @@
                     ],
                     onSubmit: function( data ){ console.log( 'SUBMIT=', data ); myData = data; },
                     onCancel: function( data ){ console.log( 'CANCEL=', data ); myData = data; },
+                    width: 321,
                     content: {
                         type: 'accordion',
                         list: [

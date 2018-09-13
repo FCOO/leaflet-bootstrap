@@ -86,12 +86,16 @@ Create leaflet-control for jquery-bootstrap modal-content:
             show: function() { this.$outerContainer.show(); },
             hide: function() { this.$outerContainer.hide(); },
 
-            //_createModal
+            /********************************************************
+            _createModal
+            ********************************************************/
             _createModal: function(){
                 //this.bsModal = ...;
             },
 
-            //onAdd
+            /********************************************************
+            onAdd
+            ********************************************************/
             onAdd: function() {
                 this.options = $._bsAdjustOptions(
                     this.options,
@@ -105,11 +109,19 @@ Create leaflet-control for jquery-bootstrap modal-content:
                 this.options.show = false;
 
                 //Create the element
-                var $result = $('<div/>').addClass('leaflet-control'),
-                    $modalContainer = $('<div/>')
-                        .addClass('modal-dialog modal-inline modal-sm')
-                        .append( this.$container )
-                        .appendTo( $result );
+                var $result =
+                        $('<div/>')
+                            .addClass('leaflet-control'),
+                    $modalContainer =
+                        $('<div/>')
+                            ._bsAddBaseClassAndSize({
+                                baseClass   : 'modal-dialog',
+                                class       : 'modal-dialog-inline',
+                                useTouchSize: true,
+                                small       : false
+                            })
+                            .append( this.$modalContent )
+                            .appendTo( $result );
 
 
                 //Prevent different events from propagating to the map
@@ -118,7 +130,6 @@ Create leaflet-control for jquery-bootstrap modal-content:
                     event.stopPropagation();
                     return false;
                 });
-
 
                 //Add copy of _attachCloseHandler from select2 to close dropdown on mousedown on control
                 $result.on('mousedown', function( event ) {
@@ -131,25 +142,23 @@ Create leaflet-control for jquery-bootstrap modal-content:
                     });
                 });
 
-
-                //Create the this.bsModal and this.$container
+                //Create this.bsModal and this.$modalContent
                 this._createModal();
-                this.$container  = this.bsModal.bsModal.$container;
+
+                this.$modalContent = this.bsModal.bsModal.$modalContent;
+
+                $modalContainer.bsModal = this.bsModal.bsModal;
 
                 //'Move the container into the control
-                this.$container.detach();
-                $modalContainer.append( this.$container );
+                this.$modalContent.detach();
+                $modalContainer.append( this.$modalContent );
 
                 //Adjust this.bsModal
                 this.bsModal.show   = $.proxy(this.show, this);
                 this.bsModal._close = $.proxy(this.hide, this);
 
-                if (this.options.maxHeight)
-                    this.$container.css('max-height', this.options.maxHeight);
-                if (this.options.minWidth)
-                    this.$container.css('min-width', this.options.minWidth);
-                if (this.options.width)
-                    this.$container.css('width', this.options.width);
+                //ASdjust width and height
+                $modalContainer._bsModalSetHeightAndWidth();
 
                 var result = $result.get(0);
                 L.DomEvent.disableClickPropagation( result );
@@ -197,7 +206,6 @@ Create leaflet-control for jquery-bootstrap modal-content:
             }
 
         });
-
 
         //*************************************
         L.control.bsModal     = function(options){ return new L.control.BsModal(options); };
@@ -401,9 +409,9 @@ Adjust standard Leaflet popup to display as Bootstrap modal
         this._pinned = pinned = !!pinned;
 
         //Update pin-icon (if avaiable)
-        if (this.bsModal && this.bsModal.$container){
+        if (this.bsModal && this.bsModal.$modalContent){
             this.bsModal.isPinned = pinned;
-            this.bsModal.$container.modernizrToggle('modal-pinned', pinned );
+            this.bsModal.$modalContent.modernizrToggle('modal-pinned', pinned );
         }
 
         //Update related options
@@ -419,7 +427,6 @@ Adjust standard Leaflet popup to display as Bootstrap modal
         if (this._map && this._map._popup && this._map._popup !== this && !this._map._popup._pinned)
             this._map.closePopup(this._map._popup);
     };
-
 
     /*********************************************************
     Adjust Popup._close and Popup._onCloseButtonClick
@@ -441,27 +448,11 @@ Adjust standard Leaflet popup to display as Bootstrap modal
         };
     } (L.Popup.prototype._onCloseButtonClick);
 
-
-
-
     /*********************************************************
     Extend L.Popup._initLayout to create popup with Bootstrap-components
     *********************************************************/
     L.Popup.prototype._initLayout = function (_initLayout) {
         return function () {
-            //Some options can be given in this._content
-            if ($.isPlainObject(this._content)){
-                this.options.minWidth  = this._content.minWidth  || this.options.minWidth;
-                this.options.maxWidth  = this._content.maxWidth  || this.options.maxWidth;
-                this.options.maxHeight = this._content.maxHeight || this.options.maxHeight;
-                this.options.width     = this._content.width     || this.options.width;
-            }
-            //Set fixed width
-            if (this.options.width){
-                this.options.minWidth = this.options.width;
-                this.options.maxWidth = this.options.width;
-            }
-
             //Original function/method
             _initLayout.apply(this, arguments);
 
@@ -469,7 +460,12 @@ Adjust standard Leaflet popup to display as Bootstrap modal
             $(this._wrapper).addClass('modal-wrapper');
 
             //Set class-name for _contentNode to make it a 'small' bsModal
-            $(this._contentNode).addClass('modal-inline modal-sm');
+            $(this._contentNode)._bsAddBaseClassAndSize({
+                baseClass   : 'modal-dialog',
+                class       : 'modal-dialog-inline',
+                useTouchSize: true,
+                small       : true
+            });
 
             //Close open popup and brint to front when "touched"
             L.DomEvent.on(this._contentNode, 'mousedown', this._brintToFocus, this );
@@ -477,6 +473,26 @@ Adjust standard Leaflet popup to display as Bootstrap modal
             return this;
         };
     } (L.Popup.prototype._initLayout);
+
+
+    /*********************************************************
+    Overwrite L.Popup._updateLayout to simple get _containerWidth
+    as the width of the container
+    *********************************************************/
+    L.Popup.prototype._updateLayout = function(){
+        this._containerWidth = $(this._container).width();
+    };
+
+    /*********************************************************
+    Overwrite L.Popup._updatePosition to get correct width every time
+    *********************************************************/
+    L.Popup.prototype._updatePosition = function(_updatePosition){
+        return function () {
+            this._updateLayout();
+            _updatePosition.apply(this, arguments);
+        };
+    } (L.Popup.prototype._updatePosition);
+
 
 
     /*********************************************************
@@ -499,22 +515,29 @@ Adjust standard Leaflet popup to display as Bootstrap modal
                         onClick: $.proxy(this._onCloseButtonClick, this)
                     }
                 },
-                closeButton   : contentAsModalOptions.closeButton,
+                closeButton   : contentAsModalOptions.closeButton === true, //Change default to false
                 noHeader      : !contentAsModalOptions.header,
                 contentContext: this,
+
+                onChange: $.proxy( this._updatePosition, this )
             },
             contentAsModalOptions );
-
-
 
         if (modalOptions.fixable){
             this.options.fixable = true;
             modalOptions.onPin = $.proxy( this._setPinned, this);
         }
 
-        //Adjust options for leaflet popup
-        if (modalOptions.scroll)
-            this.options.maxHeight = this.options.maxHeight || 300; //maxHeight must be set if content is inside a scroll
+        //Adjust options for bsModal
+        if (modalOptions.extended){
+            modalOptions.extended.scroll = true;
+            //If no extended height or width is given => use same as not-extended
+            if (!modalOptions.extended.height && !modalOptions.extended.maxHeight)
+                modalOptions.extended.height = true;
+
+            if (!modalOptions.extended.width && !modalOptions.extended.maxWidth)
+                modalOptions.extended.width = true;
+        }
 
         //Save modal-options and content
         this.modalOptions = modalOptions;
@@ -527,10 +550,6 @@ Adjust standard Leaflet popup to display as Bootstrap modal
 
         //Save the modal-object
         this.bsModal = $contentNode.bsModal;
-
-        //Set max-height of inner modal-container
-        if (this.options.maxHeight)
-            $contentNode.bsModal.$container.css('max-height', this.options.maxHeight);
 
         this._setPinned(isPinned);
 
