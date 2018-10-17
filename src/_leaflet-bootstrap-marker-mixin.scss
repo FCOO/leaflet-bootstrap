@@ -1,0 +1,50 @@
+/***********************************************
+leaflet-bootstrap-marker-mixin.scss
+Style for bsMarker estimated to look like Google Maps
+
+The pulsate is a djusted version of leaflet-icon-pulse by Filip Zavadil
+https://github.com/mapshakers/leaflet-icon-pulse
+
+lbm-icon lbm-COLOR [lbm-border-COLOR] [lbm-transparent] [lbm-puls] [lbm-hover]
+
+lbm-icon          : Standard icon with black border and tin white shadow
+lbm-[COLOR]       : Sets inner color to [COLOR]
+lbm-border-[COLOR]: border-color = [COLOR]
+
+lbm-big-shadow    : Big shadow in same color as inner color
+lbm-puls          : Has a pulsing ring
+lbm-transparent   : Inner color get opacity: 0.7
+lbm-hover         : When hover: get big-shadow and opacity: 0.9 for ibm-transparent
+************************************************/
+@mixin icon-color( $color: white ){
+    background-color: $color;
+
+    &.lbm-transparent {
+        background-color: rgba($color, 0.7);
+        &.lbm-hover:hover {
+            background-color: rgba($color, 0.9);
+        }
+    }
+
+    //Big shadow in same color
+    &.lbm-big-shadow, &.leaflet-drag-target, &.lbm-hover:hover {
+        box-shadow: 0px 0px 0px 5px rgba($color, .28); //.28 = estimate to look like google maps
+    }
+
+    //Color for puls
+    &:after { box-shadow: 0 0 6px 2px $color; }
+}
+@mixin icon-name-color( $name, $color: white ){
+    .lbm-#{$name} {
+        @include icon-color($color);
+    }
+}
+
+@mixin icon-border-color($border-color: black ){
+    border-color: $border-color;
+}
+@mixin icon-border-name-color( $name, $border-color: black ){
+    .lbm-border-#{$name} {
+        @include icon-border-color($border-color);
+    }
+}

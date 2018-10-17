@@ -1,22 +1,25 @@
 /***********************************************
 leaflet-bootstrap-marker.scss
-Style for bsMarker sstimated to look like Google Maps
+Style for bsMarker estimated to look like Google Maps
 
 The pulsate is a djusted version of leaflet-icon-pulse by Filip Zavadil
 https://github.com/mapshakers/leaflet-icon-pulse
 
 
-lbm-icon lbm-COLOR [lbm-border-white] [lbm-transparent] [lbm-puls]
+lbm-icon lbm-COLOR [lbm-border-COLOR] [lbm-transparent] [lbm-puls] [lbm-hover]
 
 
-lbm-icon        : Standard icon with black border and tin white shadow
-lbm-[COLOR]     : Sets inner color to [COLOR]
-lbm-border-white: White border and big shadow in same color as inner color
+lbm-icon          : Standard icon with black border and tin white shadow
+lbm-[COLOR]       : Sets inner color to [COLOR]
+lbm-border-[COLOR]: border-color = [COLOR]
 
-lbm-big-shadow  : Same as lbm-border-white for black border
-lbm-puls        : Has a pulsing ring
-
+lbm-big-shadow    : Big shadow in same color as inner color
+lbm-puls          : Has a pulsing ring
+lbm-transparent   : Inner color get opacity: 0.7
+lbm-hover         : When hover: get big-shadow and opacity: 0.9 for ibm-transparent
 ************************************************/
+@import "leaflet-bootstrap-marker-mixin";
+
 @keyframes pulsate {
     0% {
         transform: scale(0.1, 0.1);
@@ -31,32 +34,15 @@ lbm-puls        : Has a pulsing ring
     }
 }
 
-@mixin icon-colors( $color: white, $opacity: 1 ){
-    background-color: rgba($color, $opacity);
-
-    &.lbm-border-white, &.lbm-big-shadow, &.leaflet-drag-target {
-        box-shadow: 0px 0px 0px 5px rgba($color, .28); //.28 = estiamte to look like google maps
-    }
-
-    //Color for puls
-    &:after { box-shadow: 0 0 6px 2px $color; }
-}
-
-@mixin icon-name-colors( $name, $color: white, $opacity: 1 ){
-    .lbm-#{$name} {
-        @include icon-colors($color, $opacity);
-    }
-}
-
 .lbm-icon {
     opacity      : 1;
     border-radius: 100%;
     border       : 2px solid black;
-    &.lbm-border-white { border-color: white; }
 
-    box-shadow  : 0px 0px 0px 1px rgba(white, .5); //.5 = estiamte to look like google maps
+    box-shadow  : 0px 0px 0px 1px rgba(white, .5); //.5 = estimate to look like google maps
 
-    @include icon-colors();
+    @include icon-color();
+    @include icon-border-color();
 
     //The puls
     &:after {
@@ -76,28 +62,35 @@ lbm-puls        : Has a pulsing ring
     }
 }
 
-.lbm-transparent {
-    opacity: .4 !important;
-}
-
-
-
 //Create different colors
 /*
 $light:         $gray-100 !default;
 $dark:          $gray-800 !default;
 */
 @each $name, $color in (
-    primary  : $primary,
-    secondary: $secondary,
-    success  : $success,
-    info     : $info,
-    warning  : $warning,
-    danger   : $danger,
-    standard : #4285F4 //= rgba(66, 133, 244) = google maps color for location icon
+    "blue"      : blue,
+    "indigo"    : indigo,
+    "purple"    : purple,
+    "pink"      : pink,
+    "green"     : green,
+    "teal"      : teal,
+    "cyan"      : cyan,
+    "white"     : white,
+    "gray"      : gray,
+    "darkgray"  : darkgray,
+    primary     : $primary,
+    secondary   : $secondary,
+    success     : $success,
+    info        : $info,
+    warning     : $warning,
+    danger      : $danger,
+    light       : $light,
+    dark        : $dark,
+    standard    : #4285F4 //= rgba(66, 133, 244) = google maps color for location icon
 
 ){
-    @include icon-name-colors( $name, $color );
+    @include icon-name-color( $name, $color );
+    @include icon-border-name-color( $name, $color );
 }
 
 

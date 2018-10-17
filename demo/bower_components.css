@@ -5793,7 +5793,7 @@ select.form-control:focus::-ms-value {
 .col-form-label-sm {
   padding-top: calc(0.25rem + 1px);
   padding-bottom: calc(0.25rem + 1px);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   line-height: 1.5; }
 
 .form-control-plaintext {
@@ -5812,9 +5812,9 @@ select.form-control:focus::-ms-value {
     padding-left: 0; }
 
 .form-control-sm, .input-group-sm > label.has-float-label > .form-control {
-  height: calc(1.8125rem + 2px);
+  height: calc(1.71875rem + 2px);
   padding: 0.25rem 0.25rem;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   line-height: 1.5;
   border-radius: 0.1875rem; }
 
@@ -6526,7 +6526,7 @@ fieldset:disabled a.btn {
 
 .btn-sm, .btn-group-sm > .btn {
   padding: 0.25rem 0.25rem;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   line-height: 1.5;
   border-radius: 0.1875rem; }
 
@@ -6728,7 +6728,7 @@ input[type="button"].btn-block {
   display: block;
   padding: 0.5rem 1.5rem;
   margin-bottom: 0;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: #495057;
   white-space: nowrap; }
 
@@ -6945,9 +6945,9 @@ input[type="button"].btn-block {
 .input-group-sm > .input-group-append > .input-group-text,
 .input-group-sm > .input-group-prepend > .btn,
 .input-group-sm > .input-group-append > .btn {
-  height: calc(1.8125rem + 2px);
+  height: calc(1.71875rem + 2px);
   padding: 0.25rem 0.25rem;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   line-height: 1.5;
   border-radius: 0.1875rem; }
 
@@ -7091,7 +7091,7 @@ input[type="button"].btn-block {
     opacity: 0; }
 
 .custom-select-sm {
-  height: calc(1.8125rem + 2px);
+  height: calc(1.71875rem + 2px);
   padding-top: 0.3125rem;
   padding-bottom: 0.3125rem;
   font-size: 75%; }
@@ -7861,7 +7861,7 @@ input[type="button"].btn-block {
 
 .pagination-sm .page-link {
   padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   line-height: 1.5; }
 
 .pagination-sm .page-item:first-child .page-link {
@@ -8498,7 +8498,7 @@ button.close {
   word-spacing: normal;
   white-space: normal;
   line-break: auto;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   word-wrap: break-word;
   background-color: #fff;
   background-clip: padding-box;
@@ -11395,7 +11395,7 @@ HEADER
 Font-sizes for headers are one 'size' smaller than normal font
 $font-size-lg  : 1.25rem    20px
 $font-size-base: 1rem       16px
-$font-size-sm  : .875rem    14px
+$font-size-sm  : .8125rem   13px
 $font-size-xs  : .75rem     12px
 ************************************************************/
 /************************************************************
@@ -11452,6 +11452,7 @@ Headers for modal, popover, popup etc.
 ************************************************************/
 /************************************************************
 color-hover - Background-color and text-color for 'normal' and hover
+SKAL DER BRUGES background ELLER background-color???????
 ************************************************************/
 /************************************************************
 header-color - Colors for headers
@@ -11493,7 +11494,10 @@ FONTAWESOME
 Additions and adjustments to Fontawesome 5 (when included)
 ************************************************************/
 .fa-inside-circle {
-  font-size: 0.65em; }
+  font-size: .65em; }
+
+.fa-inside-circle2 {
+  font-size: .55em; }
 
 /************************************************
 STYLE FOR DIFFERENT ELEMENTS
@@ -11527,7 +11531,7 @@ Bootstrap allready have the following classes
 .font-italic
 
 */
-.container-icon-and-text > *.after-icon {
+.container-icon-and-text:not(.fa-stack) > *:not(:first-child) {
   padding-left: 0.3em; }
 
 /************************************************************
@@ -11679,17 +11683,17 @@ div.btn, div.list-group-item {
     background-color: #f8f9fa; }
   .btn.btn-standard.allow-zero-selected {
     color: #515961;
-    background: #f8f9fa; }
+    background-color: #f8f9fa; }
     .mouse-hover .btn.btn-standard.allow-zero-selected:hover {
       color: #454c53;
-      background: #e9ecef; }
+      background-color: #e9ecef; }
     .btn.btn-standard.allow-zero-selected.active {
       color: #fff;
-      background: #007bff; }
+      background-color: #007bff; }
   .allow-zero-selected .btn.btn-standard.allow-zero-selected.active {
-    background: #007bff; }
+    background-color: #007bff; }
     .mouse-hover .allow-zero-selected .btn.btn-standard.allow-zero-selected.active:hover {
-      background: #006fe6; }
+      background-color: #006fe6; }
   .btn.btn-standard > i.fa {
     min-width: 1em;
     text-align: left; }
@@ -11732,21 +11736,20 @@ div.btn, div.list-group-item {
     min-width: calc(2 * 0.3125rem + 1.5rem + 2 * 1px);
     padding: 0.3125rem; }
     .btn.btn-standard.square.btn-sm, .btn-group-sm > .btn.btn-standard.square {
-      height: calc(2 * 0.25rem + 1.3125rem + 2 * 1px);
-      min-width: calc(2 * 0.25rem + 1.3125rem + 2 * 1px);
+      height: calc(2 * 0.25rem + 1.21875rem + 2 * 1px);
+      min-width: calc(2 * 0.25rem + 1.21875rem + 2 * 1px);
       padding: 0.25rem; }
     .btn.btn-standard.square > i.fa {
       text-align: center; }
   .btn.btn-standard.big-icon {
     line-height: 1;
     padding: 0.25rem !important;
-    display: inline-flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     font-size: 1.625rem; }
     .btn.btn-standard.big-icon.btn-sm, .btn-group-sm > .btn.btn-standard.big-icon {
-      font-size: 1.3125rem; }
+      font-size: 1.21875rem; }
 
 /************************************************************
 Modernizr-test for elements with class="active" when selected
@@ -11871,7 +11874,7 @@ POPOVER
   align-items: center;
   cursor: default;
   padding: 0.3125rem 0.3125rem;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   line-height: 1.5;
   border-radius: inherit;
   border-bottom: 1px solid #9aa1a8;
@@ -11897,7 +11900,7 @@ POPOVER
   align-items: center;
   cursor: default;
   padding: 0.3125rem 0.3125rem;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   line-height: 1.5;
   border-radius: inherit;
   color: #495057;
@@ -12196,35 +12199,35 @@ div.radio input[type="radio"] + label::after {
   border-width: 0.3rem; }
 
 div.checkbox-sm, div.radio-sm {
-  height: 1.5625rem;
-  font-size: 0.875rem; }
+  height: 1.46875rem;
+  font-size: 0.8125rem; }
   div.checkbox-sm input[type="checkbox"] + label,
   div.checkbox-sm input[type="radio"] + label, div.radio-sm input[type="checkbox"] + label,
   div.radio-sm input[type="radio"] + label {
-    padding-left: 1.2375rem;
+    padding-left: 1.1625rem;
     padding-top: 0.125rem;
     padding-bottom: 0.125rem;
-    font-size: 0.875rem; }
+    font-size: 0.8125rem; }
     div.checkbox-sm input[type="checkbox"] + label::before,
     div.checkbox-sm input[type="radio"] + label::before, div.radio-sm input[type="checkbox"] + label::before,
     div.radio-sm input[type="radio"] + label::before {
-      margin-top: 0.13125rem;
-      width: 1.05rem;
-      height: 1.05rem; }
+      margin-top: 0.121875rem;
+      width: 0.975rem;
+      height: 0.975rem; }
     div.checkbox-sm input[type="checkbox"] + label::after,
     div.checkbox-sm input[type="radio"] + label::after, div.radio-sm input[type="checkbox"] + label::after,
     div.radio-sm input[type="radio"] + label::after {
-      margin-top: 0.13125rem;
-      width: 1.05rem;
-      height: 1.05rem; }
+      margin-top: 0.121875rem;
+      width: 0.975rem;
+      height: 0.975rem; }
     div.checkbox-sm input[type="checkbox"] + label i,
     div.checkbox-sm input[type="radio"] + label i, div.radio-sm input[type="checkbox"] + label i,
     div.radio-sm input[type="radio"] + label i {
-      font-size: 0.7rem;
-      width: 0.7rem;
-      height: 0.7rem;
-      margin-top: 0.30625rem;
-      margin-left: 0.175rem; }
+      font-size: 0.65rem;
+      width: 0.65rem;
+      height: 0.65rem;
+      margin-top: 0.284375rem;
+      margin-left: 0.1625rem; }
 
 /* Special styles for div.checkbox */
 div.checkbox-sm input[type="checkbox"] + label::before,
@@ -12233,13 +12236,13 @@ div.checkbox-sm input[type="radio"] + label::before {
 
 div.checkbox-sm input[type="checkbox"] + label::after,
 div.checkbox-sm input[type="radio"] + label::after {
-  font-size: 0.84rem;
+  font-size: 0.78rem;
   line-height: 1.25; }
 
 /* Special styles for div.radio */
 div.radio-sm input[type="checkbox"] + label::after,
 div.radio-sm input[type="radio"] + label::after {
-  border-width: 0.2625rem; }
+  border-width: 0.24375rem; }
 
 /*REMOVED - Only ONE size
 //Large and samll
@@ -12303,9 +12306,11 @@ bsSelectList
 .dropdown-menu.scrollbar-vertical.ps--active-y .dropdown-item, .dropdown-menu.scrollbar-vertical.ps--active-y .dropdown-header {
   width: calc(100% + 0.5625rem); }
 
-.selectList .dropdown-item {
-  font-size: 2rem; }
-
+/*
+    .selectList .dropdown-item{
+        font-size: 2rem;
+    }
+*/
 .selectList .dropdown-item {
   color: #515961;
   background: #fff; }
@@ -12338,12 +12343,12 @@ html.no-mouse-hover .selectList .dropdown-item.active {
   align-items: center;
   cursor: default;
   padding: 0.3125rem 0.3125rem;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   line-height: 1.5;
   border-radius: inherit;
   background-color: #fff;
   color: #515961;
-  line-height: 1.7142857143; }
+  line-height: 1.8461538462; }
   .selectList .dropdown-header span {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -12351,7 +12356,7 @@ html.no-mouse-hover .selectList .dropdown-item.active {
 
 .selectList.selectList-sm .dropdown-item {
   padding: 0.25rem 0.25rem;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   line-height: 1.5;
   border-radius: 0.1875rem; }
 
@@ -12364,7 +12369,7 @@ html.no-mouse-hover .selectList .dropdown-item.active {
   font-size: 0.75rem;
   line-height: 1.5;
   border-radius: inherit;
-  line-height: 1.75; }
+  line-height: 1.625; }
   .selectList.selectList-sm .dropdown-header span {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -12433,13 +12438,15 @@ body.modal-open .modal {
     width: 31.25rem; }
     .modal-dialog.modal-flex-width.modal-extra-width {
       width: 50rem; }
+    .modal-dialog.modal-flex-width.modal-mega-width {
+      width: 75rem; }
   .modal-dialog.modal-dialog-inline .modal-content {
     box-shadow: none;
     max-height: inherit; }
   .modal-dialog .modal-content {
     min-height: 100%;
-    word-break: break-all;
-    word-break: break-word; }
+    -ms-word-break: break-all;
+    overflow-wrap: break-word; }
   .modal-dialog:not(.modal-flex-width) .modal-content .modal-body > .jquery-scroll-container {
     width: calc( 100% - 2*1px - 2*0.625rem);
     margin-left: auto;
@@ -12454,8 +12461,14 @@ body.modal-open .modal {
     display: none !important; }
   .modal-dialog .modal-content.no-modal-pinned .show-for-modal-pinned {
     display: none !important; }
+  .modal-dialog .modal-content:not(.modal-fixed-height).no-modal-extended:not(.modal-content-always-max-height), .modal-dialog .modal-content:not(.modal-fixed-height).modal-extended:not(.modal-extended-content-always-max-height) {
+    height: auto !important; }
   .modal-dialog .modal-content .modal-body.modal-body-no-content {
     display: none; }
+  .modal-dialog .modal-content .modal-body.modal-body-always-max-height {
+    display: flex;
+    flex-direction: column;
+    height: fit-content; }
   .modal-dialog .modal-content:not(.modal-extended) .modal-body.hide-for-modal-extended.modal-body-no-content ~ .modal-footer,
   .modal-dialog .modal-content.modal-extended .modal-body.show-for-modal-extended.modal-body-no-content ~ .modal-footer {
     border-top: none; }
@@ -12469,7 +12482,7 @@ body.modal-open .modal {
     align-items: center;
     cursor: default;
     padding: 0.3125rem 0.3125rem;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     line-height: 1.5;
     border-radius: inherit;
     border-bottom: 1px solid #9aa1a8;
@@ -12530,7 +12543,7 @@ body.modal-open .modal {
     align-items: center;
     cursor: default;
     padding: 0.3125rem 0.3125rem;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     line-height: 1.5;
     border-radius: inherit;
     color: #495057;
@@ -12581,7 +12594,7 @@ body.modal-open .modal {
   .modal-dialog.modal-dialog-sm .modal-content .modal-body,
   .modal-dialog.modal-dialog-sm .modal-content .modal-body-fixed {
     padding: 0.25rem 0.25rem;
-    font-size: 0.875rem; }
+    font-size: 0.8125rem; }
   .modal-dialog.modal-dialog-sm .modal-content .modal-footer-header {
     font-weight: 400;
     display: flex;
@@ -12622,7 +12635,7 @@ body.modal-open .modal {
   .modal-dialog.modal-dialog-xs .modal-content .modal-body,
   .modal-dialog.modal-dialog-xs .modal-content .modal-body-fixed {
     padding: 0.25rem 0.25rem;
-    font-size: 0.875rem; }
+    font-size: 0.8125rem; }
   .modal-dialog.modal-dialog-xs .modal-content .modal-footer-header {
     font-weight: 400;
     display: flex;
@@ -12687,6 +12700,38 @@ body.modal-open .modal {
 .no-horizontal-padding .modal-content .modal-body-fixed, .no-horizontal-padding .modal-content .modal-body {
   padding-left: 0 !important;
   padding-right: 0 !important; }
+
+/************************************************************
+MODAL-FILE
+
+Style for elements used to display any file in a modal-window
+
+************************************************************/
+.object-with-file {
+  width: 100%;
+  height: 100%;
+  border: 0; }
+
+.file-view-header {
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  cursor: default;
+  padding: 0.125rem 0.125rem;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  border-radius: inherit;
+  border-bottom: 1px solid #9aa1a8;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0; }
+  .file-view-header span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; }
+
+.file-view-content {
+  padding: 0.25rem 0.25rem;
+  font-size: 0.8125rem; }
 
 /************************************************************
 MODAL-BACKDROP
@@ -12775,7 +12820,7 @@ form-group inside a <form class="form-validation"> gets special style for valida
 ************************************************************/
 form.form-validation .form-group {
   padding-top: 0.3125rem;
-  padding-bottom: 1.5rem; }
+  padding-bottom: 1.4375rem; }
   form.form-validation .form-group .form-control-feedback {
     line-height: 1;
     padding-top: 0;
@@ -12785,8 +12830,8 @@ form.form-validation .form-group {
   form.form-validation .form-group.no-validation {
     padding-bottom: 0.3125rem; }
   form.form-validation .form-group .form-control-feedback {
-    height: 1.5rem;
-    font-size: 0.875rem;
+    height: 1.4375rem;
+    font-size: 0.8125rem;
     color: #dc3545;
     padding-left: 0.3125rem;
     vertical-align: top; }
@@ -12904,7 +12949,7 @@ Only supports the html-structure
     color: #495057;
     padding: 0;
     margin-left: 1px;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     left: 0.3125rem; }
     .input-group .has-float-label > span::after {
       display: block;
@@ -12956,7 +13001,7 @@ Only supports the html-structure
 
 .input-group-sm.input-group .has-float-label .form-control-with-label.show-label-as-placeholder + *,
 .input-group-sm.input-group .has-float-label .form-control-with-label:placeholder-shown:not(:focus) + * {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   top: calc(0.25rem + 1px); }
 
 .input-group-xs.input-group .has-float-label > span {
@@ -12985,7 +13030,7 @@ Style for
   color: #495057;
   padding: 0;
   margin-left: 1px;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   left: 0.3125rem; }
   .input-group.input-group-border .has-fixed-label::after {
     display: block;
@@ -13018,6 +13063,7 @@ Adjustmernt to Bootstrap table
     *************************************/
   /*************************************
     Rows
+    table-sort-group-header is used for row that are the header of a group of rows with the same 'value' in the column that the table is sorted by
     *************************************/
   /*************************************
     Cells
@@ -13047,6 +13093,10 @@ Adjustmernt to Bootstrap table
     box-sizing: border-box;
     padding: 0;
     margin: 0; }
+  .table.table-center-in-container {
+    margin: 0 auto; }
+  .table.table-not-full-width {
+    width: inherit !important; }
   .table thead tr th {
     display: table-cell !important;
     font-weight: 400;
@@ -13058,7 +13108,7 @@ Adjustmernt to Bootstrap table
     line-height: 1.5;
     border-radius: inherit;
     color: #495057;
-    background: #e9ecef; }
+    background-color: #e9ecef; }
     .table thead tr th span {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -13068,7 +13118,7 @@ Adjustmernt to Bootstrap table
       padding-right: 0; }
     .table thead tr th.sortable {
       color: #495057;
-      background: #e9ecef;
+      background-color: #e9ecef;
       cursor: default;
       background-position: right center;
       background-repeat: no-repeat;
@@ -13077,27 +13127,36 @@ Adjustmernt to Bootstrap table
       background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QAAKqNIzIAAAAJcEhZcwAADdcAAA3XAUIom3gAAAAHdElNRQfhBwwRJC7Z4CQBAAACPklEQVRo3u3Zu07DMBQG4N/EiA0hwQCIoRtMPAKoKzBCC2nLG8ALMCAGXgAWZi4pDR2BNRKPwAQbAwKGIrEiEh2GMqBc7VNbpahnqpyo/1dHjexjAXb5TlSlXUAcOa1KxP0WwY//OhVu9zN5o9tcAhPwO743AgsQj++FwAD4TniGrZQLTdnQJ2gDMuOZBE1AbjyLoAXwnfAcmwU3Xcq6DkEDoBSvTVAGKMdrEhQBvvN1IaqqWIBaozU1ghJAN16HoADgxKsTCgHceFXCSP7lQIYeNx4Q1dALZA8zEMjXC1S48T/lz9TKIQtgJL6QkAkI5JtHGwbiAYiraTeLkAEwGZ9PSAWYjs8jpAAC+drEutl4AEB7ZitJSPkbvuxbiQfWX/YVZuB27OMZU1YAQGdibuWzYAbeS9bigan3UnwoAWg84s4a4K7xWAgAsCOuQcbDSVxjJzmc8R44nxOGHwR16s/Gf9SwhjWsYf2L6vurOAXgLYpDWuW3r7IE4ob23Pv4cNq24ZiWDIcDgKA1jGO5cAbO5p0HC/E/FS3EVwSJ9cDkEzrW8juTT/GhBGDlk05s5dNJfEWYuiKaPUDbSn579iA5+Bc3JjYImlsz04S8zWlmg6IcTrvwjeT72fF/u0FhhFAQX9gjKofSpRY3nVrSzY8fhDYdl2CwUckhGG7Vdgl9bVZrEey065UJmgcWI+q3ApVI1tHMvaWpFz94h1a5BNaxndYj6FYlkg3y4qPkceIH9eg2TujD4XWXYOL4/htN/xm86wMQxwAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxNy0wNy0xMlQxNzozNjo0NiswMjowMGyLBscAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTctMDctMTJUMTc6MzY6NDYrMDI6MDAd1r57AAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAABJRU5ErkJggg=="); }
       .mouse-hover .table thead tr th.sortable:hover {
         color: #3d4349;
-        background: #dadfe4; }
+        background-color: #dadfe4; }
       .table thead tr th.sortable.asc, .table thead tr th.sortable.desc {
         color: #343a40;
-        background: #dee2e6; }
+        background-color: #dee2e6; }
         .mouse-hover .table thead tr th.sortable.asc:hover, .mouse-hover .table thead tr th.sortable.desc:hover {
           color: #292d32;
-          background: #cfd5db; }
+          background-color: #cfd5db; }
       .table thead tr th.sortable.text-center {
-        padding-left: 1em; }
-      .table thead tr th.sortable.asc, .table thead tr th.sortable.desc {
+        padding-left: .5em; }
+      .table thead tr th.sortable.sorting-asc, .table thead tr th.sortable.sorting-desc {
         border-bottom-color: #dee2e6; }
-      .table thead tr th.sortable.asc {
+      .table thead tr th.sortable.sorting-asc {
         background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAAAAmJLR0QA/4ePzL8AAAAJcEhZcwAADdcAAA3XAUIom3gAAAAHdElNRQfhBwwPOR4W7fbLAAACBklEQVRo3u2ZvU7CUBSAz7FldcEBiYuTJiQ+goZVXS1awCcwvoATgy+gDswCRSqrs+9gYqKLYTDRgRcgtLmOEuv9Oz23MZEzNbTc70vbe3vOuQjkqInv42ekjoIc+DwKyIOnKyAXnqqAfHiaAnLiKQrIi7dXQG68rQLy4+0U0AXeRgHd4M0V0BXeVAHd4c0U0CXeRGFFffrRh5yhGwHVfz6bQ+64KdUTkgAPXqeA7vFqBSwCr1LAYvByBSwKL1NA/plvtypk1oHaGziM7OjZhWjTpUB29L/3CIoOdPMJ4kral7GMZSzjP4Rkeexv4BovSExb74YC0Q5eigPgXrkFPoiL8Onnz7+VDddi18W9FoewCnvaO9Db8l7cPfF0u/2qyQfKE5g640/LE21Csj8TXVd80d2fGWRE1Q6MnfDH1Y5xYfIZiSPmd/C+EhoWJi4UZHhlccqnIMcrsuJ6UgkhZuHHcry2QfExgCAvfr1JbFCwKGjw2sKknvihGJHn/cgP1XijNl3szQfYoOBLzSAlfo7zK5jhjVu1tgqmeItmdewlfTg2vPjOb5nhrdr1xgoWeMsNCyMFK7xlfyBI/RYMlZcM7fCETavYS3pwIsW37fCkbTupAgFPatEEqd8WUWbiRRQ8ees29ua3GC7iS6cUfI7N60UFOh7ylB+xlzbEOQBeeSMqHuALEGzMJuIB3qEAAAAASUVORK5CYII="); }
-      .table thead tr th.sortable.desc {
+      .table thead tr th.sortable.sorting-desc {
         background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAAAAmJLR0QA/4ePzL8AAAAJcEhZcwAADdcAAA3XAUIom3gAAAAHdElNRQfhBwwPNhKYw6YvAAAB9klEQVRo3u2ZP04CURCHZ2CJrQWFJBT0nsLWGkH+eQLxCtzBeAKFRdCS2G7CHaagoiFoAYmtYclaWCm7+2Zm3zOa7FQkkN/38R67y5tBUNe0uG9GNwB4W5w09toU1ON399j+eh35pSutAmbHZ1NAG/gsCqjBhw/Qinlj7PXkCmgNr1RAi3iVAgrxQ7g0fOjR60oU0DJerIDW8UIFZF94I2zyVyualDo8BXSBlyigGzxfAV3huQqF9LcDL/S1eABshn7gZViBwHsdQQOy1bTSOQtVAlbwRgVMxr/50QVYKXw6aScpoHt8ugL+Bj5NAWP3fgx1sF/PldahQsxluB44wQPU1wPGCrwcva+gDG5qc1w9/zCswLbmDA9Q3taMW9BbwNyZwLy34NyK+ziDyDo8whn02feBYRUtb0S06a4gr7zyyisv/l+yU/vPAiBkCriAJ0sU/twWuPz+cWtwuAJLp/zlf/gN3JVc4eOSEw4m1zsXeObBxI1CPD71cGpTIQlvOJ7bUkjGGxsUNhTS8MYeUXaFdDyjSZX1rkCoehraUiBjPqtRqVUgRjqzVatRIFY2u1ktVSBmsqBdL1Egdq5oYMFVIEGqcGTDUSBRpnhoZVIgYaJibJemQOI81eAySYEUacrRbZwCqbLUw+ufCqRMUgt8VyB1ziesOMqPm7tGQgAAAABJRU5ErkJggg=="); }
-  .table tbody tr:hover {
+  .table.table-hover tbody tr:not(.table-sort-group-header):hover {
     background-color: #f2f2f2; }
+  .table tbody tr.table-sort-group-header td {
+    background-color: #e9ecef !important;
+    color: #495057 !important;
+    font-weight: bold; }
+    .table tbody tr.table-sort-group-header td *:last-child {
+      margin-right: .3em; }
   .table.table-selectable tbody tr {
+    /*
+    &{
+        font-size: 2rem;
+    }
+*/
     cursor: default; }
-    .table.table-selectable tbody tr {
-      font-size: 2rem; }
     .table.table-selectable tbody tr {
       color: #515961;
       background: #fff; }
@@ -13112,10 +13171,16 @@ Adjustmernt to Bootstrap table
       background: #007bff; }
   .table tbody tr td {
     padding: 0.25rem 0.25rem;
-    font-size: 0.875rem; }
+    font-size: 0.8125rem; }
     .table tbody tr td.no-horizontal-padding {
       padding-left: 0;
       padding-right: 0; }
+  .table.table-no-border tbody tr td {
+    border: none; }
+  .table.table-no-padding tbody tr td,
+  .table.table-no-padding thead tr th {
+    padding-top: 0;
+    padding-bottom: 0; }
 
 .modal-dialog-sm .table thead tr th,
 .table.table-sm thead tr th {
@@ -13124,7 +13189,7 @@ Adjustmernt to Bootstrap table
   align-items: center;
   cursor: default;
   padding: 0.25rem 0.25rem;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   line-height: 1.5;
   border-radius: inherit; }
   .modal-dialog-sm .table thead tr th span,
@@ -13154,81 +13219,114 @@ ACCORDION
 
 Using Bootstrap Collapse to create accordion
 ************************************************************/
-.accordion .card.show {
-  border-color: #6c757d; }
+.accordion {
+  /**********************************************************************
+    BUG FIX for Bootstrap 4.1.3:
+    When only one card in accordion the card gets style as if was intermediate
+    Both condition :first-of-type and :last-of-type are met if only one card
+    **********************************************************************/
+  /* This style are correct
+    .card:not(:first-of-type):not(:last-of-type) {
+        border-bottom: 0;
+        border-radius: 0;
+    }
 
-.accordion .card-header {
-  color: #343a40;
-  background: #dee2e6;
-  font-weight: 400;
-  display: flex;
-  align-items: center;
-  cursor: default;
-  padding: 0.3125rem 0.3125rem;
-  font-size: 1rem;
-  line-height: 1.5;
-  border-radius: inherit;
-  display: flex;
-  align-items: center;
-  border-radius: 0.25rem; }
-  .mouse-hover .accordion .card-header:hover {
-    color: #292d32;
-    background: #cfd5db; }
-  .accordion .card-header.collapsed {
-    color: #495057;
-    background: #e9ecef; }
-    .mouse-hover .accordion .card-header.collapsed:hover {
-      color: #3d4349;
-      background: #dadfe4; }
-  .accordion .card-header span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap; }
-  .accordion .card-header .chevrolet {
-    font-size: 0.8em;
-    color: #000;
-    text-shadow: 0 1px 0 #fff;
+    .card:not(:first-of-type) {
+        .card-header:first-child {
+            border-radius: 0;
+        }
+    }
+    */ }
+  .accordion .card.show {
+    border-color: #6c757d !important; }
+  .accordion .card-header {
+    font-weight: 400;
+    display: flex;
+    align-items: center;
     cursor: default;
-    line-height: 1;
-    margin-left: auto;
-    margin-right: 0;
-    opacity: 0.3; }
-    .accordion .card-header .chevrolet:before {
+    padding: 0.3125rem 0.3125rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: inherit;
+    display: flex;
+    align-items: center;
+    border-radius: 0.25rem; }
+    .accordion .card-header.collapsible {
+      color: #343a40;
+      background-color: #dee2e6; }
+      .mouse-hover .accordion .card-header.collapsible:hover {
+        color: #292d32;
+        background-color: #cfd5db; }
+      .accordion .card-header.collapsible.collapsed {
+        color: #495057;
+        background-color: #e9ecef; }
+        .mouse-hover .accordion .card-header.collapsible.collapsed:hover {
+          color: #3d4349;
+          background-color: #dadfe4; }
+    .accordion .card-header:not(.collapsible) {
+      color: #495057;
+      background-color: #e9ecef; }
+    .accordion .card-header span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap; }
+    .accordion .card-header .chevrolet {
       font-size: 0.8em;
-      content: "\f078"; }
-  .accordion .card-header.collapsed .chevrolet:before {
-    content: "\f054"; }
-
-.accordion .card-block {
-  padding: 0.25rem 0.25rem;
-  font-size: 0.875rem;
-  border-radius: 0.25rem; }
-
-.accordion .card-footer {
-  font-weight: 400;
-  display: flex;
-  align-items: center;
-  cursor: default;
-  padding: 0.3125rem 0.3125rem;
-  font-size: 0.875rem;
-  line-height: 1.5;
-  border-radius: inherit;
-  color: #495057;
-  background-color: #f2f2f2;
-  line-height: 1;
-  border-top-left-radius: 0 !important;
-  border-top-right-radius: 0 !important;
-  border-radius: 0.25rem; }
-  .accordion .card-footer span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap; }
-  .accordion .card-footer:empty {
-    display: none; }
-
-.accordion.no-transition .collapsing,
-.accordion.no-transition .collapse {
-  transition: none !important; }
+      color: #000;
+      text-shadow: 0 1px 0 #fff;
+      cursor: default;
+      line-height: 1;
+      margin-left: auto;
+      margin-right: 0;
+      opacity: 0.3; }
+      .accordion .card-header .chevrolet:before {
+        font-size: 0.8em;
+        content: "\f078"; }
+    .accordion .card-header.collapsed .chevrolet:before {
+      content: "\f054"; }
+  .accordion .card-block {
+    padding: 0.25rem 0.25rem;
+    font-size: 0.8125rem;
+    border-radius: 0.25rem; }
+  .accordion .card-footer {
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    cursor: default;
+    padding: 0.3125rem 0.3125rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    border-radius: inherit;
+    color: #495057;
+    background-color: #f2f2f2;
+    line-height: 1;
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+    border-radius: 0.25rem; }
+    .accordion .card-footer span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap; }
+    .accordion .card-footer:empty {
+      display: none; }
+  .accordion.no-transition .collapsing,
+  .accordion.no-transition .collapse {
+    transition: none !important; }
+  .accordion .card:first-of-type {
+    border-bottom: 1px solid #afb4ba;
+    border-bottom: 1px solid #afb4ba;
+    border-bottom-right-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem; }
+    .accordion .card:first-of-type:not(:last-of-type) {
+      border-bottom: 0;
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0; }
+  .accordion .card:last-of-type {
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem; }
+    .accordion .card:last-of-type:not(:first-of-type) {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0; }
 
 .modal-dialog-sm .accordion .card-header,
 .modal-dialog-xs .accordion .card-header,
@@ -13238,7 +13336,7 @@ Using Bootstrap Collapse to create accordion
   align-items: center;
   cursor: default;
   padding: 0.25rem 0.25rem;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   line-height: 1.5;
   border-radius: inherit; }
   .modal-dialog-sm .accordion .card-header span,
@@ -13252,7 +13350,7 @@ Using Bootstrap Collapse to create accordion
 .modal-dialog-xs .accordion .card-block,
 .accordion-sm .card-block {
   padding: 0.25rem 0.25rem;
-  font-size: 0.875rem; }
+  font-size: 0.8125rem; }
 
 .modal-dialog-sm .accordion .card-footer,
 .modal-dialog-xs .accordion .card-footer,
@@ -13375,16 +13473,18 @@ for noty is copyed and modified
     margin: 4px 0;
     overflow: hidden;
     position: relative;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     border: 1px solid #868e96;
     border-radius: 0.3rem;
     box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.5); }
     .noty_bar.noty_theme__jquery-bootstrap .noty_body {
       padding: 0.3125rem 0.3125rem;
       font-size: 1rem;
-      font-size: 0.875rem; }
+      font-size: 0.8125rem; }
       .noty_bar.noty_theme__jquery-bootstrap .noty_body * {
-        word-wrap: break-word; }
+        -ms-word-break: break-all;
+        white-space: pre-wrap;
+        overflow-wrap: break-word; }
     .noty_bar.noty_theme__jquery-bootstrap.no-header .header-icon-container {
       position: absolute;
       top: 0;
@@ -13402,7 +13502,7 @@ for noty is copyed and modified
     align-items: center;
     cursor: default;
     padding: 0.3125rem 0.3125rem;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     line-height: 1.5;
     border-radius: inherit;
     border-bottom: 1px solid #9aa1a8;
@@ -13667,11 +13767,11 @@ Adjustment to Bootstrap tabs
       border-bottom-color: #6c757d !important; }
       .nav-tabs a.nav-item.nav-link:not(.active):not(:disabled):not(.disabled) {
         color: #515961;
-        background: #f8f9fa;
+        background-color: #f8f9fa;
         margin-top: 2px; }
         .mouse-hover .nav-tabs a.nav-item.nav-link:not(.active):not(:disabled):not(.disabled):hover {
           color: #454c53;
-          background: #e9ecef; }
+          background-color: #e9ecef; }
         .mouse-hover .hover .nav-tabs a.nav-item.nav-link:not(.active):not(:disabled):not(.disabled):not(:focus):not(:disabled):not(.disabled),
         .mouse-hover .nav-tabs a.nav-item.nav-link:not(.active):not(:disabled):not(.disabled).hover:not(:focus):not(:disabled):not(.disabled),
         .mouse-hover .nav-tabs a.nav-item.nav-link:not(.active):not(:disabled):not(.disabled):hover:not(:focus):not(:disabled):not(.disabled) {
@@ -13689,7 +13789,7 @@ Adjustment to Bootstrap tabs
     display: none; }
   .nav-tabs.nav-tabs-sm a.nav-item.nav-link {
     padding: 0.25rem 0.25rem;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     line-height: 1.5;
     border-radius: 0.1875rem;
     border-bottom-left-radius: 0px;
@@ -13725,7 +13825,7 @@ Adjustment to Bootstrap tabs
     background-color: #fff;
     padding: 0.3125rem 0.3125rem;
     font-size: 1rem;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     padding-left: 0.5625rem;
     padding-right: 0.5625rem; }
     .tab-content .tab-pane.active .tab-inner-content.scrollbar-vertical, .tab-content .tab-content .tab-pane.active .tab-inner-content {
@@ -13738,7 +13838,7 @@ Adjustment to Bootstrap tabs
     align-items: center;
     cursor: default;
     padding: 0.3125rem 0.3125rem;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     line-height: 1.5;
     border-radius: inherit;
     color: #495057;
@@ -13882,13 +13982,13 @@ https://github.com/berkan52/select2-bootstrap4-theme
     align-items: center;
     cursor: default;
     padding: 0.3125rem 0.3125rem;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     line-height: 1.5;
     border-radius: inherit;
     color: #495057;
     display: block;
     white-space: nowrap;
-    line-height: 1.7142857143; }
+    line-height: 1.8461538462; }
     .select2-container--standard .select2-results__group span {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -13933,11 +14033,11 @@ https://github.com/berkan52/select2-bootstrap4-theme
   .select2-container--standard.select2-hide-placeholder .select2-selection--single .select2-selection__placeholder > .container-icon-and-text:first-child {
     opacity: 0; }
   .select2-container--standard.select2-container-sm .select2-results {
-    max-height: 7.25rem; }
+    max-height: 6.875rem; }
   .select2-container--standard.select2-container-sm .select2-selection,
   .select2-container--standard.select2-container-sm .select2-results__option {
     padding: 0.25rem 0.25rem;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     line-height: 1.5;
     border-radius: 0.1875rem; }
     .select2-container--standard.select2-container-sm .select2-selection[role=group],
@@ -13952,7 +14052,7 @@ https://github.com/berkan52/select2-bootstrap4-theme
     font-size: 0.75rem;
     line-height: 1.5;
     border-radius: inherit;
-    line-height: 1.75; }
+    line-height: 1.625; }
     .select2-container--standard.select2-container-sm .select2-results__group span {
       overflow: hidden;
       text-overflow: ellipsis;

@@ -22,19 +22,42 @@ http://FCOO.github.io/leaflet-bootstrap/demo/
         bigIconWhenTouch: false     //True to make big icon when window.bsIsTouch == true and options.draggable == true
         draggable       : false, 	//Whether the marker is draggable with mouse/touch or not.
         transparent     : false, 	//True to make the marker semi-transparent
+        hover           : false,    //True to show big-shadow and 0.9 opacuity for lbm-transparent when hover
         bigShadow       : false, 	//true to add big shadow to the marker
-        whiteBorder     : false, 	//true to have a white border
         puls            : false, 	//true to have a pulsart icon
-        color           : '',    	//Name of color: "primary", "secondary", "success", "info", "warning", "danger", "standard". "primary"-"danger"=Bootstrap colors. "standard" = Google Maps default iocn color
-		tooltip         : null,	    //Automatic adds a tooltip to the marker. The tooltip is hidden when the marker is dragged. See below on content
+        color           : '',    	//Name of color
+        borderColor     : ''        //Name of border-color. Same as color. "" => black border
+        tooltip         : null,	    //Automatic adds a tooltip to the marker. The tooltip is hidden when the marker is dragged. See below on content
         tooltipPermanent: false     //Whether to open the tooltip permanently or only on mouseover.
-
-
     }
 
+    /*
+    color and border-color:
+    "blue"
+    "indigo"
+    "purple"
+    "pink"
+    "green"
+    "teal"
+    "cyan"
+    "white"
+    "gray"
+    "darkgray"
+    "primary"
+    "secondary"
+    "success"
+    "info"
+    "warning"
+    "danger"
+    "light"
+    "dark"        
+    "standard" = rgba(66, 133, 244) = google maps color for location icon
+    */
+    
     //Methods
     .toggleOption(optionId) //Toggle the state of options[optionId]
     .setColor( colorName )  //Set the color
+    .setBorderColor( borderColorName )  //Set the border-color
 
 
 ### L.Control.bsButton

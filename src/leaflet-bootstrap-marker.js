@@ -47,7 +47,7 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
     var classNames = {
             transparent  : 'lbm-transparent',
             bigShadow    : 'lbm-big-shadow',
-            whiteBorder  : 'lbm-border-white',
+            hover        : 'lbm-hover',
             puls         : 'lbm-puls'
         };
 
@@ -57,18 +57,43 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
             autoPan         : true,            //Sit to true if you want the map to do panning animation when marker hits the edges.
             icon            : bsMarkerIcon,
             bigIcon         : bigBsMarkerIcon,
-            useBigIcon      : false,           //True to make the icon big
-            bigIconWhenTouch: false,           //True to make big icon when window.bsIsTouch == true and options.draggable == true
-            transparent     : false,           //True to make the marker semi-transparent
-            bigShadow       : false,           //true to add big shadow to the marker
-            whiteBorder     : false,           //true to have a white border
-            puls            : false,           //true to have a pulsart icon
-            color           : '',              //Name of color: "primary", "secondary", "success", "info", "warning", "danger", "standard". "primary"-"danger"=Bootstrap colors. "standard" = Google Maps default iocn color
-
+            useBigIcon      : false,            //True to make the icon big
+            bigIconWhenTouch: false,            //True to make big icon when window.bsIsTouch == true and options.draggable == true
+            transparent     : false,            //True to make the marker semi-transparent
+            hover           : false,            //True to show big-shadow and 0.9 opacuity for lbm-transparent when hover
+            bigShadow       : false,            //true to add big shadow to the marker
+            puls            : false,            //true to have a pulsart icon
+            color           : '',    	        //Name of color
+            borderColor     : '',               //Name of border-color. Same as color
             tooltip                : null,  //Content of tooltip
             tooltipPermanent       : false, //Whether to open the tooltip permanently or only on mouseover.
             tooltipHideWhenDragging: false  //True and tooltipPermanent: false => the tooltip is hidden when dragged
         },
+
+    /*
+    color and border-color:
+    "blue"
+    "indigo"
+    "purple"
+    "pink"
+    "green"
+    "teal"
+    "cyan"
+    "white"
+    "gray"
+    "darkgray"
+    "primary"
+    "secondary"
+    "success"
+    "info"
+    "warning"
+    "danger"
+    "light"
+    "dark"
+    "standard" = rgba(66, 133, 244) = google maps color for location icon
+    */
+
+
 
         /*****************************************************
         initialize
@@ -81,10 +106,12 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
 
             this.toggleOption('transparent', !!this.options.transparent );
             this.toggleOption('bigShadow',   !!this.options.bigShadow );
-            this.toggleOption('whiteBorder', !!this.options.whiteBorder );
+            this.toggleOption('hover',       !!this.options.hover );
             this.toggleOption('puls',        !!this.options.puls );
             if (this.options.color)
                 this.setColor(this.options.color);
+            if (this.options.borderColor)
+                this.setBorderColor(this.options.borderColor);
 
             if (this.options.useBigIcon)
                 this._setBigIcon();
@@ -150,6 +177,16 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
                 this.addClass('lbm-'+this.colorName);
         },
 
+        /*****************************************************
+        setBorderColor( borderColorName )
+        *****************************************************/
+        setBorderColor: function( borderColorName ){
+            if (this.borderColorName)
+                this.removeClass('lbm-border-'+this.colorName);
+            this.borderColorName = borderColorName;
+            if (this.borderColorName)
+                this.addClass('lbm-border-'+this.borderColorName);
+        },
         /*****************************************************
         _bsMarker_onDragStart - Fired when the drag starts: Mark the map to ignore next click
         _bsMarker_onDragEnd - Fired when the drag ends: Mark the map to include click within 10ms

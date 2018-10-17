@@ -43,6 +43,7 @@
 
 
 
+
             var map = L.map('map', {
 
             }).setView([56.2, 11.5], 6);
@@ -52,13 +53,15 @@
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors</a>'
             }).addTo(map);
 
-            var tooltip = {icon:'fa-home', text:{da:'Dansk', en:'Eng'}};
+            var tooltip = [{icon:'fa-home', text:{da:'Dansk', en:'Eng'}},'<br>', {icon:'fa-home', text:{da:'Lang Dansk', en:'Long Eng'}}];
             function addMarker( latlng){
                 var marker = L.bsMarker( latlng, {
                             draggable: true,
                             color    : 'standard',
-                            whiteBorder: true,
+                            borderColor: 'orange',
                             puls: true,
+                            transparent: true,
+                            hover: true,
                             bigIconWhenTouch: true,
                             tooltip: tooltip,
                             _tooltipPermanent: true,
@@ -68,7 +71,7 @@
                     marker.on('click', function(){
                         this._tooltip.setContent('NY'+Math.round(Math.random()*10000));
 
-                        this.setColor('success'); this.toggleOption('puls');
+                        this.setColor('orange'); this.setBorderColor('standard'); this.toggleOption('puls');
                         },
                         marker
                     );

@@ -16828,6 +16828,387 @@ return jQuery;
 
 ;
 /****************************************************************************
+    color.js,
+    Functions to caluclate the brightness of a color
+    Taken from http://codepen.io/lunelson/pen/jENxwB
+
+****************************************************************************/
+
+(function (window/*, document, undefined*/) {
+    "use strict";
+
+    //Create fcoo-namespace
+    var nsColor = window;
+
+
+    function lin2log(n) {
+        if (n <= 0.0031308)
+            return n * 12.92;
+        else
+            return 1.055 * Math.pow(n,1/2.4) - 0.055;
+    }
+
+    function log2lin(n) {
+        if (n <= 0.04045)
+            return n / 12.92;
+        else
+            return Math.pow(((n + 0.055)/1.055),2.4);
+    }
+
+    /********************************************
+    brightness
+    ********************************************/
+    nsColor.brightness = function brightness(r, g, b) {
+        r = log2lin(r/255);
+        g = log2lin(g/255);
+        b = log2lin(b/255);
+        return lin2log(0.2126 * r + 0.7152 * g + 0.0722 * b) * 100;
+    };
+
+    /********************************************
+    colorContrastHEX
+    ********************************************/
+    nsColor.colorContrastHEX = function colorContrastHEX( color ) {
+        if (color.length === 3)
+            color = color.charAt(0) + color.charAt(0) + color.charAt(1) + color.charAt(1) + color.charAt(2) + color.charAt(2);
+        var rgb = [];
+        for (var i = 0; i <= 2; i++)
+            rgb[i] = parseInt(color.substr(1+i*2, 2), 16);
+        return nsColor.colorContrastRGB(rgb[0], rgb[1], rgb[2]);
+    };
+
+    /********************************************
+    colorContrastRGB
+    ********************************************/
+    nsColor.colorContrastRGB = function colorContrastRGB(r, g, b) {
+        var colorBrightness = nsColor.brightness(r, g, b),
+                whiteBrightness = nsColor.brightness(255, 255, 255),
+                blackBrightness = nsColor.brightness(0, 0, 0);
+        return Math.abs(colorBrightness - whiteBrightness) > Math.abs(colorBrightness - blackBrightness) ? '#ffffff' : '#000000';
+    };
+
+    /********************************************
+    rgbHex
+    Convert RGB color to HEX
+    From https://github.com/sindresorhus/rgb-hex
+    ********************************************/
+    nsColor.rgbHex = function(red, green, blue, alpha){
+        var isPercent = (red + (alpha || '')).toString().includes('%');
+
+        if (typeof red === 'string') {
+            var res = red.match(/(0?\.?\d{1,3})%?\b/g).map(Number);
+            red = res[0];
+            green = res[1];
+            blue = res[2];
+            alpha = res[3];
+        }
+        else
+            if (alpha !== undefined) {
+                alpha = parseFloat(alpha);
+            }
+
+        if (typeof red !== 'number' ||
+            typeof green !== 'number' ||
+            typeof blue !== 'number' ||
+            red > 255 ||
+            green > 255 ||
+            blue > 255) {
+                throw new TypeError('Expected three numbers below 256');
+        }
+
+        if (typeof alpha === 'number') {
+            if (!isPercent && alpha >= 0 && alpha <= 1) {
+                alpha = Math.round(255 * alpha);
+            }
+            else
+                if (isPercent && alpha >= 0 && alpha <= 100) {
+                    alpha = Math.round(255 * alpha / 100);
+                }
+                else {
+                    throw new TypeError('Expected alpha value (${alpha}) as a fraction or percentage');
+                }
+            alpha = (alpha | 1 << 8).toString(16).slice(1);
+        }
+        else {
+            alpha = '';
+        }
+
+        return ((blue | green << 8 | red << 16) | 1 << 24).toString(16).slice(1) + alpha;
+    };
+
+    /********************************************
+    hexRgb
+    Convert HEX color to RGB
+    From https://github.com/sindresorhus/hex-rgb
+    ********************************************/
+    var hexChars = 'a-f\\d',
+        match3or4Hex = '#?[' + hexChars + ']{3}[' + hexChars + ']?',
+        match6or8Hex = '#?[' + hexChars + ']{6}([' + hexChars + ']{2})?',
+        nonHexChars = new RegExp('[^#' + hexChars + ']', 'gi'),
+        validHexSize = new RegExp('^' + match3or4Hex + '$|^' + match6or8Hex + '$', 'i');
+
+    nsColor.hexRgb = function(hex, options) {
+        options = options || {};
+        if (typeof hex !== 'string' || nonHexChars.test(hex) || !validHexSize.test(hex)) {
+            throw new TypeError('Expected a valid hex string');
+        }
+
+        hex = hex.replace(/^#/, '');
+        var alpha = 255;
+
+        if (hex.length === 8) {
+            alpha = parseInt(hex.slice(6, 8), 16) / 255;
+            hex = hex.substring(0, 6);
+        }
+
+        if (hex.length === 4) {
+            alpha = parseInt(hex.slice(3, 4).repeat(2), 16) / 255;
+            hex = hex.substring(0, 3);
+        }
+
+        if (hex.length === 3) {
+            hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+        }
+
+        var num = parseInt(hex, 16),
+            red = num >> 16,
+            green = (num >> 8) & 255,
+            blue = num & 255;
+
+        return options.format === 'array' ? [red, green, blue, alpha] : { red: red, green: green, blue: blue, alpha: alpha };
+    };
+
+    /********************************************
+    hexSetAlpha
+    Set the alpha-value in a hex-color
+    ********************************************/
+    nsColor.hexSetAlpha = function(hex, alpha){
+        var rgba = nsColor.hexRgb(hex, {format: 'array'});
+        rgba[3] = alpha;
+        return nsColor.rgbHex.apply(this, rgba);
+    };
+
+}(this, document));
+;
+/****************************************************************************
+    json.js,
+****************************************************************************/
+
+(function (window/*, document, undefined*/) {
+    "use strict";
+
+    //Create fcoo-namespace
+    var nsJSON = window;
+
+    /******************************************
+    serializeJSON
+    Converts a json-object a la {id1:'value1', id2:'value2'}
+    to [ { name: "id1", value: "value1" }, { name: "id2", value: "value2" } ]
+    *******************************************/
+    nsJSON.serializeJSON = function( jsonObj ){
+        var result = [];
+        for (var id in jsonObj)
+            if (jsonObj.hasOwnProperty(id))
+                result.push( {name: id, value: jsonObj[id] });
+        return result;
+    };
+
+
+}(this, document));
+;
+/****************************************************************************
+    math.js,
+
+****************************************************************************/
+
+(function (window/*, document, undefined*/) {
+    "use strict";
+
+    var nsMath = window;
+
+    /*******************************************
+    significant - return n rounded to significant sf
+    *******************************************/
+    nsMath.significant = function significant(n, sf) {
+        sf = sf - Math.floor(Math.log(n) / Math.LN10) - 1;
+        sf = Math.pow(10, sf);
+        n = Math.round(n * sf);
+        n = n / sf;
+        return n;
+    };
+
+    /*******************************************
+    precision
+    *******************************************/
+    nsMath.precision = function precision(n, dp) {
+        dp = Math.pow(10, dp);
+        n = n * dp;
+        n = Math.round(n);
+        n = n / dp;
+        return n;
+    };
+
+    /*******************************************
+    nearest
+    *******************************************/
+    nsMath.nearest = function nearest(n, v) {
+        v = v ? v : 1;
+        n = n / v;
+        n = Math.round(n) * v;
+        return n;
+    };
+
+    /*******************************************
+    roundDownTo
+    *******************************************/
+    nsMath.roundDownTo = function roundDownTo(n, v) {
+        v = v ? v : 1;
+        n = n / v;
+        n = Math.floor(n) * v;
+        return n;
+    };
+
+    /*******************************************
+    roundToRange
+    *******************************************/
+    nsMath.roundToRange = function roundToRange(v, min, max) {
+        return Math.max( Math.min(v, max), min);
+    };
+
+    /*******************************************
+    toDecimal
+    Convert a integer value v to a decimal
+    Eq    toDecimal(89)        = 0.89
+            toDecimal(9)        = 0.9
+            toDecimal(1234)    = 0.1234
+    *******************************************/
+    nsMath.toDecimal = function toDecimal(v) {
+        var l = v.toString().length;
+        return v / Math.pow(10, l);
+    };
+
+}(this, document));
+;
+/*
+ * jQuery.bind-first library v0.2.3
+ * Copyright (c) 2013 Vladimir Zhuravlev
+ *
+ * Released under MIT License
+ * @license
+ *
+ * Date: Thu Feb  6 10:13:59 ICT 2014
+ **/
+
+(function($) {
+	var splitVersion = $.fn.jquery.split(".");
+	var major = parseInt(splitVersion[0]);
+	var minor = parseInt(splitVersion[1]);
+
+	var JQ_LT_17 = (major < 1) || (major == 1 && minor < 7);
+	
+	function eventsData($el) {
+		return JQ_LT_17 ? $el.data('events') : $._data($el[0]).events;
+	}
+	
+	function moveHandlerToTop($el, eventName, isDelegated) {
+		var data = eventsData($el);
+		var events = data[eventName];
+
+		if (!JQ_LT_17) {
+			var handler = isDelegated ? events.splice(events.delegateCount - 1, 1)[0] : events.pop();
+			events.splice(isDelegated ? 0 : (events.delegateCount || 0), 0, handler);
+
+			return;
+		}
+
+		if (isDelegated) {
+			data.live.unshift(data.live.pop());
+		} else {
+			events.unshift(events.pop());
+		}
+	}
+	
+	function moveEventHandlers($elems, eventsString, isDelegate) {
+		var events = eventsString.split(/\s+/);
+		$elems.each(function() {
+			for (var i = 0; i < events.length; ++i) {
+				var pureEventName = $.trim(events[i]).match(/[^\.]+/i)[0];
+				moveHandlerToTop($(this), pureEventName, isDelegate);
+			}
+		});
+	}
+	
+	function makeMethod(methodName) {
+		$.fn[methodName + 'First'] = function() {
+			var args = $.makeArray(arguments);
+			var eventsString = args.shift();
+
+			if (eventsString) {
+				$.fn[methodName].apply(this, arguments);
+				moveEventHandlers(this, eventsString);
+			}
+
+			return this;
+		}
+	}
+
+	// bind
+	makeMethod('bind');
+
+	// one
+	makeMethod('one');
+
+	// delegate
+	$.fn.delegateFirst = function() {
+		var args = $.makeArray(arguments);
+		var eventsString = args[1];
+		
+		if (eventsString) {
+			args.splice(0, 2);
+			$.fn.delegate.apply(this, arguments);
+			moveEventHandlers(this, eventsString, true);
+		}
+
+		return this;
+	};
+
+	// live
+	$.fn.liveFirst = function() {
+		var args = $.makeArray(arguments);
+
+		// live = delegate to the document
+		args.unshift(this.selector);
+		$.fn.delegateFirst.apply($(document), args);
+
+		return this;
+	};
+	
+	// on (jquery >= 1.7)
+	if (!JQ_LT_17) {
+		$.fn.onFirst = function(types, selector) {
+			var $el = $(this);
+			var isDelegated = typeof selector === 'string';
+
+			$.fn.on.apply($el, arguments);
+
+			// events map
+			if (typeof types === 'object') {
+				for (type in types)
+					if (types.hasOwnProperty(type)) {
+						moveEventHandlers($el, type, isDelegated);
+					}
+			} else if (typeof types === 'string') {
+				moveEventHandlers($el, types, isDelegated);
+			}
+
+			return $el;
+		};
+	}
+
+})(jQuery);
+
+;
+/****************************************************************************
 	bootstrap-popover-extensions.js,
 
 	(c) 2017, FCOO
@@ -20360,7 +20741,7 @@ var Translator = function (_EventEmitter) {
       var needsPluralHandling = options.count !== undefined && typeof options.count !== 'string';
       var needsContextHandling = options.context !== undefined && typeof options.context === 'string' && options.context !== '';
 
-      var codes = options.lngs ? options.lngs : _this4.languageUtils.toResolveHierarchy(options.lng || _this4.language);
+      var codes = options.lngs ? options.lngs : _this4.languageUtils.toResolveHierarchy(options.lng || _this4.language, options.fallbackLng);
 
       namespaces.forEach(function (ns) {
         if (_this4.isValidLookup(found)) return;
@@ -31479,6 +31860,30 @@ module.exports = ret;
     "use strict";
 
     /***********************************************************************
+    _isInitialized()
+    Return true if the i18next is initialized (i18next.init has been called
+    ***********************************************************************/
+//HER    i18next._isInitialized = function(){
+//HER        return !$.isEmptyObject(this.options);
+//HER    }
+
+
+    /***********************************************************************
+    While i18next hasn't been initialized a temporary version of addResource
+    is used to store the resource until i18next is initialized
+    ***********************************************************************/
+    i18next.resourceList = [];
+    i18next.addResource = function(){
+        this.resourceList.push(arguments);
+    };
+
+    i18next.on('initialized', function() {
+        $.each(i18next.resourceList, function(index, argum){
+            i18next.addResource.apply(i18next, argum);
+        });
+    });
+
+    /***********************************************************************
     _loadJSON( jsonFileName, options, resolve )
     Loading (key-)phrases from json-file(s) using fcoo/promise-get
     ***********************************************************************/
@@ -31626,8 +32031,8 @@ module.exports = ret;
     A single translation of a sentence. No key used or added
     ***********************************************************************/
     i18next.sentence = function( langValues, options ){
-        var nsTemp = '__TEMP__',
-            keyTemp = '__KEY__',
+        var nsTemp = '__SENTENCE_TEMP__',
+            keyTemp = '__SENTENCE_KEY__',
             _this = this,
             nsSeparator = this.options.nsSeparator;
 
@@ -31783,7 +32188,7 @@ return index;
 })));
 ;
 /****************************************************************************
-	jquery-i18next-phrases.js, 
+	jquery-i18next-phrases.js,
 
 	(c) 2017, FCOO
 
@@ -31792,21 +32197,21 @@ return index;
 
 ****************************************************************************/
 
-(function ($, window/*, document, undefined*/) {
+(function ($, i18next, window/*, document, undefined*/) {
 	"use strict";
-	
+
     /***********************************************************
-    Initialize jquery-i18next - i18next plugin for jquery 
+    Initialize jquery-i18next - i18next plugin for jquery
     https://github.com/i18next/jquery-i18next
     ***********************************************************/
     var jQuery_i18n_selectorAttr = 'data-i18n',    // selector for translating elements
         jQuery_i18n_targetAttr   = 'i18n-target',  // data-() attribute to grab target element to translate (if diffrent then itself)
         jQuery_i18n_optionsAttr  = 'i18n-options'; // data-() attribute that contains options, will load/set if useOptionsAttr = true
 
-    
+
     window.jqueryI18next.init(
-        window.i18next/*i18nextInstance*/, 
-        $, 
+        i18next/*i18nextInstance*/,
+        $,
         {
             tName         : 't',                        // --> appends $.t = i18next.t
             i18nName      : 'i18n',                     // --> appends $.i18n = i18next
@@ -31821,27 +32226,27 @@ return index;
 
 
     /***********************************************************
-    Add new methods to jQuery prototype: 
+    Add new methods to jQuery prototype:
     $.fn.i18n( htmlOrKeyOrPhrase[, attribute][, options] )
     Add/updates the "data-i18n" attribute
 
-    htmlOrKeyOrPhrase = simple html-string ( "This will <u>always</u> be in English" ) OR 
-                        i18next-key ( "myNS:myKey" ) OR 
+    htmlOrKeyOrPhrase = simple html-string ( "This will <u>always</u> be in English" ) OR
+                        i18next-key ( "myNS:myKey" ) OR
                         a phrase-object - see langValue in i18next.addPhrase ( {da:"Dette er en test", en:"This is a test"} ) OR
                         a string representing a phrase-object ( '{"da":"Dette er en test", "en":"This is a test"}' )
     ***********************************************************/
     var tempKeyId = 0,
-        tempNS = '__TEMP__';
+        tempNS = '__JQ_TEMP__';
 
     $.fn.i18n = function( htmlOrKeyOrPhrase ) {
-        var options = null, 
-            attribute = '', 
+        var options = null,
+            attribute = '',
             argument,
-            keyFound = true, 
+            keyFound = true,
             key = htmlOrKeyOrPhrase;
 
         for (var i=1; i<arguments.length; i++ ){
-            argument = arguments[i];              
+            argument = arguments[i];
             switch ($.type(argument)){
               case 'object': options = argument; break;
               case 'string': attribute = argument; break;
@@ -31853,7 +32258,7 @@ return index;
             htmlOrKeyOrPhrase = JSON.parse(htmlOrKeyOrPhrase);
         }
         catch (e) {
-            htmlOrKeyOrPhrase = original; 
+            htmlOrKeyOrPhrase = original;
         }
 
         //Convert number back to string
@@ -31862,13 +32267,13 @@ return index;
 
         //Get the key or add a temp-phrase
         if (typeof htmlOrKeyOrPhrase == 'string')
-            keyFound = window.i18next.exists(htmlOrKeyOrPhrase);
+            keyFound = i18next.exists(htmlOrKeyOrPhrase);
         else {
             //It is a {da:'...', en:'...', de:'...'} object
             key = 'jqueryfni18n' + tempKeyId++;
-            window.i18next.addPhrase( tempNS, key, htmlOrKeyOrPhrase );
+            i18next.addPhrase( tempNS, key, htmlOrKeyOrPhrase );
             key = tempNS+':'+key;
-        }    
+        }
 
         return this.each(function() {
             var $this = $(this),
@@ -31878,20 +32283,20 @@ return index;
                 newStr = attribute ? '[' + attribute + ']' + key : key,
                 keep;
             oldData = oldData ? oldData.split(';') : [];
-            
+
             for (var i=0; i<oldData.length; i++ ){
                 oldStr = oldData[i];
                 keep = true;
                 //if the new key has an attribute => remove data with '[attribute]'
                 if (attribute && (oldStr.indexOf('[' + attribute + ']') == 0))
-                    keep = false;                      
+                    keep = false;
                 //if the new key don't has a attribute => only keep other attributes
-                if (!attribute && (oldStr.indexOf('[') == -1)) 
+                if (!attribute && (oldStr.indexOf('[') == -1))
                     keep = false;
                 if (keep)
                     newData.push( oldStr );
             }
-            newData.push( newStr);                                
+            newData.push( newStr);
 
             //Set data-i18n
             $this.attr( jQuery_i18n_selectorAttr, newData.join(';') );
@@ -31908,12 +32313,12 @@ return index;
                     $(this).html( htmlOrKeyOrPhrase );
             }
             //Update contents
-            $this.localize();        
+            $this.localize();
 
         });
     };
 
-}(jQuery, this, document));
+}(jQuery, this.i18next, this, document));
 ;
 /****************************************************************************
     jquery-scroll-container.js, 
@@ -33728,6 +34133,289 @@ module.exports = function (element) {
 };
 
 },{"../lib/dom":3,"../lib/helper":6,"./instances":18,"./update-geometry":19,"./update-scroll":20}]},{},[1]);
+
+;
+// Stupid jQuery table plugin.
+
+(function($) {
+  $.fn.stupidtable = function(sortFns) {
+    return this.each(function() {
+      var $table = $(this);
+      sortFns = sortFns || {};
+      sortFns = $.extend({}, $.fn.stupidtable.default_sort_fns, sortFns);
+      $table.data('sortFns', sortFns);
+      $table.stupidtable_build();
+
+      $table.on("click.stupidtable", "thead th", function() {
+          $(this).stupidsort();
+      });
+
+      // Sort th immediately if data-sort-onload="yes" is specified. Limit to
+      // the first one found - only one default sort column makes sense anyway.
+      var $th_onload_sort = $table.find("th[data-sort-onload=yes]").eq(0);
+      $th_onload_sort.stupidsort();
+    });
+  };
+
+  // ------------------------------------------------------------------
+  // Default settings
+  // ------------------------------------------------------------------
+  $.fn.stupidtable.default_settings = {
+    should_redraw: function(sort_info){
+      return true;
+    },
+    will_manually_build_table: false
+  };
+  $.fn.stupidtable.dir = {ASC: "asc", DESC: "desc"};
+  $.fn.stupidtable.default_sort_fns = {
+    "int": function(a, b) {
+      return parseInt(a, 10) - parseInt(b, 10);
+    },
+    "float": function(a, b) {
+      return parseFloat(a) - parseFloat(b);
+    },
+    "string": function(a, b) {
+      return a.toString().localeCompare(b.toString());
+    },
+    "string-ins": function(a, b) {
+      a = a.toString().toLocaleLowerCase();
+      b = b.toString().toLocaleLowerCase();
+      return a.localeCompare(b);
+    }
+  };
+
+  // Allow specification of settings on a per-table basis. Call on a table
+  // jquery object. Call *before* calling .stuidtable();
+  $.fn.stupidtable_settings = function(settings) {
+    return this.each(function() {
+      var $table = $(this);
+      var final_settings = $.extend({}, $.fn.stupidtable.default_settings, settings);
+      $table.stupidtable.settings = final_settings;
+    });
+  };
+
+
+  // Expects $("#mytable").stupidtable() to have already been called.
+  // Call on a table header.
+  $.fn.stupidsort = function(force_direction){
+    var $this_th = $(this);
+    var datatype = $this_th.data("sort") || null;
+
+    // No datatype? Nothing to do.
+    if (datatype === null) {
+      return;
+    }
+
+    var dir = $.fn.stupidtable.dir;
+    var $table = $this_th.closest("table");
+
+    var sort_info = {
+        $th: $this_th,
+        $table: $table,
+        datatype: datatype
+    };
+
+
+    // Bring in default settings if none provided
+    if(!$table.stupidtable.settings){
+        $table.stupidtable.settings = $.extend({}, $.fn.stupidtable.default_settings);
+    }
+
+    sort_info.compare_fn = $table.data('sortFns')[datatype];
+    sort_info.th_index = calculateTHIndex(sort_info);
+    sort_info.sort_dir = calculateSortDir(force_direction, sort_info);
+
+    $this_th.data("sort-dir", sort_info.sort_dir);
+    $table.trigger("beforetablesort", {column: sort_info.th_index, direction: sort_info.sort_dir, $th: $this_th});
+
+    // More reliable method of forcing a redraw
+    $table.css("display");
+
+    // Run sorting asynchronously on a timout to force browser redraw after
+    // `beforetablesort` callback. Also avoids locking up the browser too much.
+    setTimeout(function() {
+      if(!$table.stupidtable.settings.will_manually_build_table){
+        $table.stupidtable_build();
+      }
+      var table_structure = sortTable(sort_info);
+      var trs = getTableRowsFromTableStructure(table_structure, sort_info);
+
+      if(!$table.stupidtable.settings.should_redraw(sort_info)){
+        return;
+      }
+      $table.children("tbody").append(trs);
+
+      updateElementData(sort_info);
+      $table.trigger("aftertablesort", {column: sort_info.th_index, direction: sort_info.sort_dir, $th: $this_th});
+      $table.css("display");
+
+    }, 10);
+    return $this_th;
+  };
+
+  // Call on a sortable td to update its value in the sort. This should be the
+  // only mechanism used to update a cell's sort value. If your display value is
+  // different from your sort value, use jQuery's .text() or .html() to update
+  // the td contents, Assumes stupidtable has already been called for the table.
+  $.fn.updateSortVal = function(new_sort_val){
+  var $this_td = $(this);
+    if($this_td.is('[data-sort-value]')){
+      // For visual consistency with the .data cache
+      $this_td.attr('data-sort-value', new_sort_val);
+    }
+    $this_td.data("sort-value", new_sort_val);
+    return $this_td;
+  };
+
+
+  $.fn.stupidtable_build = function(){
+    return this.each(function() {
+      var $table = $(this);
+      var table_structure = [];
+      var trs = $table.children("tbody").children("tr");
+      trs.each(function(index,tr) {
+
+        // ====================================================================
+        // Transfer to using internal table structure
+        // ====================================================================
+        var ele = {
+            $tr: $(tr),
+            columns: [],
+            index: index
+        };
+
+        $(tr).children('td').each(function(idx, td){
+            var sort_val = $(td).data("sort-value");
+
+            // Store and read from the .data cache for display text only sorts
+            // instead of looking through the DOM every time
+            if(typeof(sort_val) === "undefined"){
+              var txt = $(td).text();
+              $(td).data('sort-value', txt);
+              sort_val = txt;
+            }
+            ele.columns.push(sort_val);
+        });
+        table_structure.push(ele);
+      });
+      $table.data('stupidsort_internaltable', table_structure);
+    });
+  };
+
+  // ====================================================================
+  // Private functions
+  // ====================================================================
+  var sortTable = function(sort_info){
+    var table_structure = sort_info.$table.data('stupidsort_internaltable');
+    var th_index = sort_info.th_index;
+    var $th = sort_info.$th;
+
+    var multicolumn_target_str = $th.data('sort-multicolumn');
+    var multicolumn_targets;
+    if(multicolumn_target_str){
+        multicolumn_targets = multicolumn_target_str.split(',');
+    }
+    else{
+        multicolumn_targets = [];
+    }
+    var multicolumn_th_targets = $.map(multicolumn_targets, function(identifier, i){
+        return get_th(sort_info.$table, identifier);
+    });
+
+    table_structure.sort(function(e1, e2){
+      var multicolumns = multicolumn_th_targets.slice(0); // shallow copy
+      var diff = sort_info.compare_fn(e1.columns[th_index], e2.columns[th_index]);
+      while(diff === 0 && multicolumns.length){
+          var multicolumn = multicolumns[0];
+          var datatype = multicolumn.$e.data("sort");
+          var multiCloumnSortMethod = sort_info.$table.data('sortFns')[datatype];
+          diff = multiCloumnSortMethod(e1.columns[multicolumn.index], e2.columns[multicolumn.index]);
+          multicolumns.shift();
+      }
+      // Sort by position in the table if values are the same. This enforces a
+      // stable sort across all browsers. See https://bugs.chromium.org/p/v8/issues/detail?id=90
+      if (diff === 0)
+        return e1.index - e2.index;
+      else
+        return diff;
+
+    });
+
+    if (sort_info.sort_dir != $.fn.stupidtable.dir.ASC){
+      table_structure.reverse();
+    }
+      return table_structure;
+  };
+
+  var get_th = function($table, identifier){
+      // identifier can be a th id or a th index number;
+      var $table_ths = $table.find('th');
+      var index = parseInt(identifier, 10);
+      var $th;
+      if(!index && index !== 0){
+          $th = $table_ths.siblings('#' + identifier);
+          index = $table_ths.index($th);
+      }
+      else{
+          $th = $table_ths.eq(index);
+      }
+      return {index: index, $e: $th};
+  };
+
+  var getTableRowsFromTableStructure = function(table_structure, sort_info){
+    // Gather individual column for callbacks
+    var column = $.map(table_structure, function(ele, i){
+        return [[ele.columns[sort_info.th_index], ele.$tr, i]];
+    });
+
+    /* Side effect */
+    sort_info.column = column;
+
+    // Replace the content of tbody with the sorted rows. Strangely
+    // enough, .append accomplishes this for us.
+    return $.map(table_structure, function(ele) { return ele.$tr; });
+
+  };
+
+  var updateElementData = function(sort_info){
+    var $table = sort_info.$table;
+    var $this_th = sort_info.$th;
+    var sort_dir = $this_th.data('sort-dir');
+    var th_index = sort_info.th_index;
+
+
+    // Reset siblings
+    $table.find("th").data("sort-dir", null).removeClass("sorting-desc sorting-asc");
+    $this_th.data("sort-dir", sort_dir).addClass("sorting-"+sort_dir);
+  };
+
+  var calculateSortDir = function(force_direction, sort_info){
+    var sort_dir;
+    var $this_th = sort_info.$th;
+    var dir = $.fn.stupidtable.dir;
+
+    if(!!force_direction){
+        sort_dir = force_direction;
+    }
+    else{
+        sort_dir = force_direction || $this_th.data("sort-default") || dir.ASC;
+        if ($this_th.data("sort-dir"))
+           sort_dir = $this_th.data("sort-dir") === dir.ASC ? dir.DESC : dir.ASC;
+    }
+    return sort_dir;
+  };
+
+  var calculateTHIndex = function(sort_info){
+    var th_index = 0;
+    var base_index = sort_info.$th.index();
+    sort_info.$th.parents("tr").find("th").slice(0, base_index).each(function() {
+      var cols = $(this).attr("colspan") || 1;
+      th_index += parseInt(cols,10);
+    });
+    return th_index;
+  };
+
+})(jQuery);
 
 ;
 //! moment.js
@@ -42161,6 +42849,207 @@ options:
 
 }(jQuery, this, document));
 ;
+(function() {
+    var url = (function() {
+
+        function _t() {
+            return new RegExp(/(.*?)\.?([^\.]*?)\.(gl|com|net|org|biz|ws|in|me|co\.uk|co|org\.uk|ltd\.uk|plc\.uk|me\.uk|edu|mil|br\.com|cn\.com|eu\.com|hu\.com|no\.com|qc\.com|sa\.com|se\.com|se\.net|us\.com|uy\.com|ac|co\.ac|gv\.ac|or\.ac|ac\.ac|af|am|as|at|ac\.at|co\.at|gv\.at|or\.at|asn\.au|com\.au|edu\.au|org\.au|net\.au|id\.au|be|ac\.be|adm\.br|adv\.br|am\.br|arq\.br|art\.br|bio\.br|cng\.br|cnt\.br|com\.br|ecn\.br|eng\.br|esp\.br|etc\.br|eti\.br|fm\.br|fot\.br|fst\.br|g12\.br|gov\.br|ind\.br|inf\.br|jor\.br|lel\.br|med\.br|mil\.br|net\.br|nom\.br|ntr\.br|odo\.br|org\.br|ppg\.br|pro\.br|psc\.br|psi\.br|rec\.br|slg\.br|tmp\.br|tur\.br|tv\.br|vet\.br|zlg\.br|br|ab\.ca|bc\.ca|mb\.ca|nb\.ca|nf\.ca|ns\.ca|nt\.ca|on\.ca|pe\.ca|qc\.ca|sk\.ca|yk\.ca|ca|cc|ac\.cn|com\.cn|edu\.cn|gov\.cn|org\.cn|bj\.cn|sh\.cn|tj\.cn|cq\.cn|he\.cn|nm\.cn|ln\.cn|jl\.cn|hl\.cn|js\.cn|zj\.cn|ah\.cn|gd\.cn|gx\.cn|hi\.cn|sc\.cn|gz\.cn|yn\.cn|xz\.cn|sn\.cn|gs\.cn|qh\.cn|nx\.cn|xj\.cn|tw\.cn|hk\.cn|mo\.cn|cn|cx|cz|de|dk|fo|com\.ec|tm\.fr|com\.fr|asso\.fr|presse\.fr|fr|gf|gs|co\.il|net\.il|ac\.il|k12\.il|gov\.il|muni\.il|ac\.in|co\.in|org\.in|ernet\.in|gov\.in|net\.in|res\.in|is|it|ac\.jp|co\.jp|go\.jp|or\.jp|ne\.jp|ac\.kr|co\.kr|go\.kr|ne\.kr|nm\.kr|or\.kr|li|lt|lu|asso\.mc|tm\.mc|com\.mm|org\.mm|net\.mm|edu\.mm|gov\.mm|ms|nl|no|nu|pl|ro|org\.ro|store\.ro|tm\.ro|firm\.ro|www\.ro|arts\.ro|rec\.ro|info\.ro|nom\.ro|nt\.ro|se|si|com\.sg|org\.sg|net\.sg|gov\.sg|sk|st|tf|ac\.th|co\.th|go\.th|mi\.th|net\.th|or\.th|tm|to|com\.tr|edu\.tr|gov\.tr|k12\.tr|net\.tr|org\.tr|com\.tw|org\.tw|net\.tw|ac\.uk|uk\.com|uk\.net|gb\.com|gb\.net|vg|sh|kz|ch|info|ua|gov|name|pro|ie|hk|com\.hk|org\.hk|net\.hk|edu\.hk|us|tk|cd|by|ad|lv|eu\.lv|bz|es|jp|cl|ag|mobi|eu|co\.nz|org\.nz|net\.nz|maori\.nz|iwi\.nz|io|la|md|sc|sg|vc|tw|travel|my|se|tv|pt|com\.pt|edu\.pt|asia|fi|com\.ve|net\.ve|fi|org\.ve|web\.ve|info\.ve|co\.ve|tel|im|gr|ru|net\.ru|org\.ru|hr|com\.hr|ly|xyz)$/);
+        }
+
+        function _d(s) {
+          return decodeURIComponent(s.replace(/\+/g, ' '));
+        }
+
+        function _i(arg, str) {
+            var sptr = arg.charAt(0),
+                split = str.split(sptr);
+
+            if (sptr === arg) { return split; }
+
+            arg = parseInt(arg.substring(1), 10);
+
+            return split[arg < 0 ? split.length + arg : arg - 1];
+        }
+
+        function _f(arg, str) {
+            var sptr = arg.charAt(0),
+                split = str.split('&'),
+                field = [],
+                params = {},
+                tmp = [],
+                arg2 = arg.substring(1);
+
+            for (var i = 0, ii = split.length; i < ii; i++) {
+                field = split[i].match(/(.*?)=(.*)/);
+
+                // TODO: regex should be able to handle this.
+                if ( ! field) {
+                    field = [split[i], split[i], ''];
+                }
+
+                if (field[1].replace(/\s/g, '') !== '') {
+                    field[2] = _d(field[2] || '');
+
+                    // If we have a match just return it right away.
+                    if (arg2 === field[1]) { return field[2]; }
+
+                    // Check for array pattern.
+                    tmp = field[1].match(/(.*)\[([0-9]+)\]/);
+
+                    if (tmp) {
+                        params[tmp[1]] = params[tmp[1]] || [];
+
+                        params[tmp[1]][tmp[2]] = field[2];
+                    }
+                    else {
+                        params[field[1]] = field[2];
+                    }
+                }
+            }
+
+            if (sptr === arg) { return params; }
+
+            return params[arg2];
+        }
+
+        return function(arg, url) {
+            var _l = {}, tmp, tmp2;
+
+            if (arg === 'tld?') { return _t(); }
+
+            url = url || window.location.toString();
+
+            if ( ! arg) { return url; }
+
+            arg = arg.toString();
+
+            if (tmp = url.match(/^mailto:([^\/].+)/)) {
+                _l.protocol = 'mailto';
+                _l.email = tmp[1];
+            }
+            else {
+
+                // Ignore Hashbangs.
+                if (tmp = url.match(/(.*?)\/#\!(.*)/)) {
+                    url = tmp[1] + tmp[2];
+                }
+
+                // Hash.
+                if (tmp = url.match(/(.*?)#(.*)/)) {
+                    _l.hash = tmp[2];
+                    url = tmp[1];
+                }
+
+                // Return hash parts.
+                if (_l.hash && arg.match(/^#/)) { return _f(arg, _l.hash); }
+
+                // Query
+                if (tmp = url.match(/(.*?)\?(.*)/)) {
+                    _l.query = tmp[2];
+                    url = tmp[1];
+                }
+
+                // Return query parts.
+                if (_l.query && arg.match(/^\?/)) { return _f(arg, _l.query); }
+
+                // Protocol.
+                if (tmp = url.match(/(.*?)\:?\/\/(.*)/)) {
+                    _l.protocol = tmp[1].toLowerCase();
+                    url = tmp[2];
+                }
+
+                // Path.
+                if (tmp = url.match(/(.*?)(\/.*)/)) {
+                    _l.path = tmp[2];
+                    url = tmp[1];
+                }
+
+                // Clean up path.
+                _l.path = (_l.path || '').replace(/^([^\/])/, '/$1');
+
+                // Return path parts.
+                if (arg.match(/^[\-0-9]+$/)) { arg = arg.replace(/^([^\/])/, '/$1'); }
+                if (arg.match(/^\//)) { return _i(arg, _l.path.substring(1)); }
+
+                // File.
+                tmp = _i('/-1', _l.path.substring(1));
+
+                if (tmp && (tmp = tmp.match(/(.*?)\.([^.]+)$/))) {
+                    _l.file = tmp[0];
+                    _l.filename = tmp[1];
+                    _l.fileext = tmp[2];
+                }
+
+                // Port.
+                if (tmp = url.match(/(.*)\:([0-9]+)$/)) {
+                    _l.port = tmp[2];
+                    url = tmp[1];
+                }
+
+                // Auth.
+                if (tmp = url.match(/(.*?)@(.*)/)) {
+                    _l.auth = tmp[1];
+                    url = tmp[2];
+                }
+
+                // User and pass.
+                if (_l.auth) {
+                    tmp = _l.auth.match(/(.*)\:(.*)/);
+
+                    _l.user = tmp ? tmp[1] : _l.auth;
+                    _l.pass = tmp ? tmp[2] : undefined;
+                }
+
+                // Hostname.
+                _l.hostname = url.toLowerCase();
+
+                // Return hostname parts.
+                if (arg.charAt(0) === '.') { return _i(arg, _l.hostname); }
+
+                // Domain, tld and sub domain.
+                if (_t()) {
+                    tmp = _l.hostname.match(_t());
+
+                    if (tmp) {
+                        _l.tld = tmp[3];
+                        _l.domain = tmp[2] ? tmp[2] + '.' + tmp[3] : undefined;
+                        _l.sub = tmp[1] || undefined;
+                    }
+                }
+
+                // Set port and protocol defaults if not set.
+                _l.port = _l.port || (_l.protocol === 'https' ? '443' : '80');
+                _l.protocol = _l.protocol || (_l.port === '443' ? 'https' : 'http');
+            }
+
+            // Return arg.
+            if (arg in _l) { return _l[arg]; }
+
+            // Return everything.
+            if (arg === '{}') { return _l; }
+
+            // Default to undefined for no match.
+            return undefined;
+        };
+    })();
+
+	if (typeof window.define === 'function' && window.define.amd) {
+		window.define('js-url', [], function () {
+		    return url;
+		});
+	} else {
+		if(typeof window.jQuery !== 'undefined') {
+			window.jQuery.extend({
+				url: function(arg, url) { return window.url(arg, url); }
+			});
+		}
+
+		window.url = url;
+	}
+
+})();
+
+;
 /* 
   @package NOTY - Dependency-free notification library 
   @version version: 3.1.4 
@@ -45238,6 +46127,293 @@ module.exports = g;
 /******/ ]);
 });
 //# sourceMappingURL=noty.js.map
+;
+/*global ActiveXObject, window, console, define, module, jQuery */
+//jshint unused:false, strict: false
+
+/*
+    PDFObject v2.1.1
+    https://github.com/pipwerks/PDFObject
+    Copyright (c) 2008-2018 Philip Hutchison
+    MIT-style license: http://pipwerks.mit-license.org/
+    UMD module pattern from https://github.com/umdjs/umd/blob/master/templates/returnExports.js
+*/
+
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define([], factory);
+    } else if (typeof module === 'object' && module.exports) {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory();
+    } else {
+        // Browser globals (root is window)
+        root.PDFObject = factory();
+  }
+}(this, function () {
+
+    "use strict";
+    //jshint unused:true
+
+    //PDFObject is designed for client-side (browsers), not server-side (node)
+    //Will choke on undefined navigator and window vars when run on server
+    //Return boolean false and exit function when running server-side
+
+    if(typeof window === "undefined" || typeof navigator === "undefined"){ return false; }
+
+    var pdfobjectversion = "2.1.1",
+        ua = window.navigator.userAgent,
+
+        //declare booleans
+        supportsPDFs,
+        isIE,
+        supportsPdfMimeType = (typeof navigator.mimeTypes['application/pdf'] !== "undefined"),
+        supportsPdfActiveX,
+        isModernBrowser = (function (){ return (typeof window.Promise !== "undefined"); })(),
+        isFirefox = (function (){ return (ua.indexOf("irefox") !== -1); } )(),
+        isFirefoxWithPDFJS = (function (){
+            //Firefox started shipping PDF.js in Firefox 19.
+            //If this is Firefox 19 or greater, assume PDF.js is available
+            if(!isFirefox){ return false; }
+            //parse userAgent string to get release version ("rv")
+            //ex: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:57.0) Gecko/20100101 Firefox/57.0
+            return (parseInt(ua.split("rv:")[1].split(".")[0], 10) > 18);
+        })(),
+        isIOS = (function (){ return (/iphone|ipad|ipod/i.test(ua.toLowerCase())); })(),
+
+        //declare functions
+        createAXO,
+        buildFragmentString,
+        log,
+        embedError,
+        embed,
+        getTargetElement,
+        generatePDFJSiframe,
+        generateEmbedElement;
+
+
+    /* ----------------------------------------------------
+       Supporting functions
+       ---------------------------------------------------- */
+
+    createAXO = function (type){
+        var ax;
+        try {
+            ax = new ActiveXObject(type);
+        } catch (e) {
+            ax = null; //ensure ax remains null
+        }
+        return ax;
+    };
+
+    //IE11 still uses ActiveX for Adobe Reader, but IE 11 doesn't expose
+    //window.ActiveXObject the same way previous versions of IE did
+    //window.ActiveXObject will evaluate to false in IE 11, but "ActiveXObject" in window evaluates to true
+    //so check the first one for older IE, and the second for IE11
+    //FWIW, MS Edge (replacing IE11) does not support ActiveX at all, both will evaluate false
+    //Constructed as a method (not a prop) to avoid unneccesarry overhead -- will only be evaluated if needed
+    isIE = function (){ return !!(window.ActiveXObject || "ActiveXObject" in window); };
+
+    //If either ActiveX support for "AcroPDF.PDF" or "PDF.PdfCtrl" are found, return true
+    //Constructed as a method (not a prop) to avoid unneccesarry overhead -- will only be evaluated if needed
+    supportsPdfActiveX = function (){ return !!(createAXO("AcroPDF.PDF") || createAXO("PDF.PdfCtrl")); };
+
+    //Determines whether PDF support is available
+    supportsPDFs = (
+        //as of iOS 12, inline PDF rendering is still not supported in Safari or native webview
+        //3rd-party browsers (eg Chrome, Firefox) use Apple's webview for rendering, and thus the same result as Safari
+        //Therefore if iOS, we shall assume that PDF support is not available
+        !isIOS && (
+            //Modern versions of Firefox come bundled with PDFJS
+            isFirefoxWithPDFJS || 
+            //Browsers that still support the original MIME type check
+            supportsPdfMimeType || (
+                //Pity the poor souls still using IE
+                isIE() && supportsPdfActiveX()
+            )
+        )
+    );
+
+    //Create a fragment identifier for using PDF Open parameters when embedding PDF
+    buildFragmentString = function(pdfParams){
+
+        var string = "",
+            prop;
+
+        if(pdfParams){
+
+            for (prop in pdfParams) {
+                if (pdfParams.hasOwnProperty(prop)) {
+                    string += encodeURIComponent(prop) + "=" + encodeURIComponent(pdfParams[prop]) + "&";
+                }
+            }
+
+            //The string will be empty if no PDF Params found
+            if(string){
+
+                string = "#" + string;
+
+                //Remove last ampersand
+                string = string.slice(0, string.length - 1);
+
+            }
+
+        }
+
+        return string;
+
+    };
+
+    log = function (msg){
+        if(typeof console !== "undefined" && console.log){
+            console.log("[PDFObject] " + msg);
+        }
+    };
+
+    embedError = function (msg){
+        log(msg);
+        return false;
+    };
+
+    getTargetElement = function (targetSelector){
+
+        //Default to body for full-browser PDF
+        var targetNode = document.body;
+
+        //If a targetSelector is specified, check to see whether
+        //it's passing a selector, jQuery object, or an HTML element
+
+        if(typeof targetSelector === "string"){
+
+            //Is CSS selector
+            targetNode = document.querySelector(targetSelector);
+
+        } else if (typeof jQuery !== "undefined" && targetSelector instanceof jQuery && targetSelector.length) {
+
+            //Is jQuery element. Extract HTML node
+            targetNode = targetSelector.get(0);
+
+        } else if (typeof targetSelector.nodeType !== "undefined" && targetSelector.nodeType === 1){
+
+            //Is HTML element
+            targetNode = targetSelector;
+
+        }
+
+        return targetNode;
+
+    };
+
+    generatePDFJSiframe = function (targetNode, url, pdfOpenFragment, PDFJS_URL, id){
+
+        var fullURL = PDFJS_URL + "?file=" + encodeURIComponent(url) + pdfOpenFragment;
+        var scrollfix = (isIOS) ? "-webkit-overflow-scrolling: touch; overflow-y: scroll; " : "overflow: hidden; ";
+        var iframe = "<div style='" + scrollfix + "position: absolute; top: 0; right: 0; bottom: 0; left: 0;'><iframe  " + id + " src='" + fullURL + "' style='border: none; width: 100%; height: 100%;' frameborder='0'></iframe></div>";
+        targetNode.className += " pdfobject-container";
+        targetNode.style.position = "relative";
+        targetNode.style.overflow = "auto";
+        targetNode.innerHTML = iframe;
+        return targetNode.getElementsByTagName("iframe")[0];
+
+    };
+
+    generateEmbedElement = function (targetNode, targetSelector, url, pdfOpenFragment, width, height, id){
+
+        var style = "";
+
+        if(targetSelector && targetSelector !== document.body){
+            style = "width: " + width + "; height: " + height + ";";
+        } else {
+            style = "position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%;";
+        }
+
+        targetNode.className += " pdfobject-container";
+        targetNode.innerHTML = "<embed " + id + " class='pdfobject' src='" + url + pdfOpenFragment + "' type='application/pdf' style='overflow: auto; " + style + "'/>";
+
+        return targetNode.getElementsByTagName("embed")[0];
+
+    };
+
+    embed = function(url, targetSelector, options){
+
+        //Ensure URL is available. If not, exit now.
+        if(typeof url !== "string"){ return embedError("URL is not valid"); }
+
+        //If targetSelector is not defined, convert to boolean
+        targetSelector = (typeof targetSelector !== "undefined") ? targetSelector : false;
+
+        //Ensure options object is not undefined -- enables easier error checking below
+        options = (typeof options !== "undefined") ? options : {};
+
+        //Get passed options, or set reasonable defaults
+        var id = (options.id && typeof options.id === "string") ? "id='" + options.id + "'" : "",
+            page = (options.page) ? options.page : false,
+            pdfOpenParams = (options.pdfOpenParams) ? options.pdfOpenParams : {},
+            fallbackLink = (typeof options.fallbackLink !== "undefined") ? options.fallbackLink : true,
+            width = (options.width) ? options.width : "100%",
+            height = (options.height) ? options.height : "100%",
+            assumptionMode = (typeof options.assumptionMode === "boolean") ? options.assumptionMode : true,
+            forcePDFJS = (typeof options.forcePDFJS === "boolean") ? options.forcePDFJS : false,
+            PDFJS_URL = (options.PDFJS_URL) ? options.PDFJS_URL : false,
+            targetNode = getTargetElement(targetSelector),
+            fallbackHTML = "",
+            pdfOpenFragment = "",
+            fallbackHTML_default = "<p>This browser does not support inline PDFs. Please download the PDF to view it: <a href='[url]'>Download PDF</a></p>";
+
+        //If target element is specified but is not valid, exit without doing anything
+        if(!targetNode){ return embedError("Target element cannot be determined"); }
+
+
+        //page option overrides pdfOpenParams, if found
+        if(page){
+            pdfOpenParams.page = page;
+        }
+
+        //Stringify optional Adobe params for opening document (as fragment identifier)
+        pdfOpenFragment = buildFragmentString(pdfOpenParams);
+
+        //Do the dance
+
+        //If the forcePDFJS option is invoked, skip everything else and embed as directed
+        if(forcePDFJS && PDFJS_URL){
+
+            return generatePDFJSiframe(targetNode, url, pdfOpenFragment, PDFJS_URL, id);
+
+        //If traditional support is provided, or if this is a modern browser and not iOS (see comment for supportsPDFs declaration)
+        } else if(supportsPDFs || (assumptionMode && isModernBrowser && !isIOS)){
+
+            return generateEmbedElement(targetNode, targetSelector, url, pdfOpenFragment, width, height, id);
+
+        //If everything else has failed and a PDFJS fallback is provided, try to use it
+        } else if(PDFJS_URL){
+
+            return generatePDFJSiframe(targetNode, url, pdfOpenFragment, PDFJS_URL, id);
+
+        } else {
+
+            //Display the fallback link if available
+            if(fallbackLink){
+
+                fallbackHTML = (typeof fallbackLink === "string") ? fallbackLink : fallbackHTML_default;
+                targetNode.innerHTML = fallbackHTML.replace(/\[url\]/g, url);
+
+            }
+
+            return embedError("This browser does not support embedded PDFs");
+
+        }
+
+    };
+
+    return {
+        embed: function (a,b,c){ return embed(a,b,c); },
+        pdfobjectversion: (function () { return pdfobjectversion; })(),
+        supportsPDFs: (function (){ return supportsPDFs; })()
+    };
+
+}));
 ;
 /*!
  * Select2 4.0.5
@@ -50995,9 +52171,6 @@ S2.define('jquery.select2',[
 	https://github.com/fcoo/jquery-bootstrap
 	https://github.com/fcoo
 
-TODO:
-- More than one card open at the same time (apply to one or all card(s) )
-
 ****************************************************************************/
 
 (function ($ /*, window, document, undefined*/) {
@@ -51024,9 +52197,11 @@ TODO:
     //card_onShown_close_siblings: Close all open siblings when card is shown BUT without animation
     function card_onShown_close_siblings(){
         var $this = $(this);
-        $this.addClass('no-transition');
-        card_onShow_close_siblings.call(this);
-        $this.removeClass('no-transition');
+        if ($this.hasClass('show')){
+            $this.addClass('no-transition');
+            card_onShow_close_siblings.call(this);
+            $this.removeClass('no-transition');
+        }
     }
 
     /**********************************************************
@@ -51075,6 +52250,10 @@ TODO:
                 content     : ''
             });
 
+        if (options.neverClose){
+            options.multiOpen = true;
+            options.allOpen   = true;
+        }
 
         var $result = $('<div/>')
                         ._bsAddBaseClassAndSize( options )
@@ -51087,44 +52266,55 @@ TODO:
 
         //Adding the children {icon, text, content}
         $.each( options.list, function( index, opt ){
+
+
             //Create the header
             opt = $._bsAdjustOptions( opt );
 
             var headerId   = id + 'header'+index,
                 collapseId = id + 'collapse'+index,
+                isOpen     = !!options.allOpen || !!opt.selected,
                 $card = $('<div/>')
                             .addClass('card')
+                            .toggleClass('show', isOpen)
                             .attr({'data-user-id': opt.id || null})
                             .on( 'shown.bs.collapse',  card_onShown )
                             .on( 'hidden.bs.collapse', card_onHidden )
                             .on( 'show.bs.collapse',   options.multiOpen ? null : card_onShow_close_siblings )
-                            .on( 'shown.bs.collapse',  options.multiOpen ? null : card_onShown_close_siblings )
-                            .appendTo( $result );
+/*HER*/                            .on( 'shown.bs.collapse',  options.multiOpen ? null : card_onShown_close_siblings )
+                            .appendTo( $result ),
+                headerAttr = {
+                    'id'  : headerId,
+                    'role': 'tab',
+                };
 
             //Add header
+            if (!options.neverClose)
+                $.extend(headerAttr, {
+                    'data-toggle'  : "collapse",
+                    'data-parent'  : '#'+id,
+                    'href'         : '#'+collapseId,
+                    'aria-expanded': true,
+                    'aria-controls': collapseId,
+                    'aria-target': '#'+collapseId
+                });
+
             $card.append(
                 $('<div/>')
-                    .addClass('card-header collapsed')
-                    .attr({
-                        'id'           : headerId,
-                        'role'         : 'tab',
-                        'data-toggle'  : "collapse",
-                        'data-parent'  : '#'+id,
-                        'href'         : '#'+collapseId,
-                        'aria-expanded': true,
-                        'aria-controls': collapseId,
-                        'aria-target': '#'+collapseId
-                    })
+                    .addClass('card-header')
+                    .toggleClass('collapsed', !isOpen)
+                    .toggleClass('collapsible', !options.neverClose)
+                    .attr(headerAttr)
                     ._bsAddHtml( opt.header || opt )
                     //Add chevrolet-icon
-                    .append( $('<i/>').addClass('fa chevrolet') )
-
+                    .append( options.neverClose ? null : $('<i/>').addClass('fa chevrolet') )
             );
 
             //Add content-container
             var $outer =
                 $('<div/>')
                     .addClass('collapse')
+                    .toggleClass('show', isOpen)
                     .attr({
                         'id'             : collapseId,
                         'role'           : 'tabpanel',
@@ -51145,14 +52335,19 @@ TODO:
                     .appendTo( $outer );
 
             //Add content: string, element, function or children (=accordion)
-                if (opt.content)
-                    $contentContainer._bsAppendContent( opt.content, opt.contentContext );
+            if (opt.content)
+                $contentContainer._bsAppendContent( opt.content, opt.contentContext );
 
             //If opt.list exists => create a accordion inside $contentContainer
             if ($.isArray(opt.list))
-                $.bsAccordion( { list: opt.list } )
+                $.bsAccordion( {
+                    allOpen   : options.allOpen,
+                    multiOpen : options.multiOpen,
+                    neverClose: options.neverClose,
+                    list: opt.list
+                } )
                     .appendTo( $contentContainer );
-        });
+        }); //End of $.each( options.list, function( index, opt ){
 
         $result.collapse(/*options*/);
         $result.asModal = bsAccordion_asModal;
@@ -51224,9 +52419,15 @@ TODO:
 
         var result = $('<'+ options.tagName + ' tabindex="0"/>');
 
-        //Adding href that don't scroll to top to allow anchor to get focus
-        if (options.tagName == 'a')
-            result.prop('href', 'javascript:undefined');
+        if (options.tagName == 'a'){
+            if (options.link)
+                result
+                    .i18n($._bsAdjustText(options.link), 'href')
+                    .prop('target', '_blank');
+            else
+                //Adding href that don't scroll to top to allow anchor to get focus
+                result.prop('href', 'javascript:undefined');
+        }
 
         result
             ._bsAddIdAndName( options )
@@ -51434,6 +52635,105 @@ TODO:
 
 ;
 /****************************************************************************
+	jquery-bootstrap-file-view.js,
+
+	(c) 2017, FCOO
+
+	https://github.com/fcoo/jquery-bootstrap
+	https://github.com/fcoo
+
+    $.bsFileView creates a <div>-element with viewer of a file (if possible) and
+    buttons to view the file in bsModalFile and in a new Tab Page
+
+****************************************************************************/
+
+(function ($, i18next,  window /*, document, undefined*/) {
+	"use strict";
+
+    //fileViewModalList = list of {fileNames, bsModal}  where bsModal is the $.bsModalFile showing the file
+    var fileViewModalList = [];
+    function showFileInModal( fileName, header ){
+        var fileViewModal = null,
+            fileNames     = fileName.da + fileName.en;
+        $.each( fileViewModalList, function( index, fileView ){
+            if (fileView.fileNames == fileNames){
+                fileViewModal = fileView;
+                return false;
+            }
+        });
+
+        if (!fileViewModal){
+            fileViewModal = {
+                fileNames: fileNames,
+                bsModal  : $.bsModalFile( fileName, {header: header, show: false})
+            };
+            fileViewModalList.push(fileViewModal);
+        }
+        fileViewModal.bsModal.show();
+    }
+
+
+    /**********************************************************
+    **********************************************************/
+    $.bsFileView = $.bsFileview = function( options ){
+        options = options || {};
+        var fileName    = $._bsAdjustText(options.fileName),
+            theFileName = i18next.sentence(fileName),
+            fileNameExt = window.url('fileext', theFileName),
+            $result     = $('<div/>');
+
+        //Create the header (if any)
+        if (options.header)
+            $('<div/>')
+                .addClass('file-view-header')
+                ._bsAddHtml(options.header)
+                .appendTo($result);
+
+        //Create the view
+        var $container =
+                $('<div/>')
+                    .addClass('file-view-content text-center')
+                    .appendTo($result);
+
+        switch (fileNameExt){
+            //*********************************************
+            case 'jpg':
+            case 'jpeg':
+            case 'gif':
+            case 'png':
+            case 'tiff':
+            case 'bmp':
+            case 'ico':
+                $('<img src="' + theFileName + '"/>')
+                    .css('width', '100%')
+                    .appendTo($container);
+
+                break;
+
+            //*********************************************
+            default:
+                $container._bsAddHtml({ text: {
+                    da: 'Klik på <i class="far fa-window-maximize"/> for at se dokumentet i et nyt vindue<br>Klik på <i class="fas ' + $.bsExternalLinkIcon + '"/> for at se dokumentet i en ny fane',
+                    en: 'Click on <i class="far fa-window-maximize"/> to see the document in a new window<br>Click on <i class="fas ' + $.bsExternalLinkIcon + '"/> to see the document in a new Tab Page'
+                }});
+        }
+
+        //Create the Show and Open-buttons
+        $('<div/>')
+            .addClass('modal-footer')
+            .css('justify-content',  'center')
+            ._bsAppendContent([
+                $.bsButton( {icon:'far fa-window-maximize',  text: {da:'Vis',  en:'Show'},   onClick: function(){ showFileInModal( fileName, options.header ); } } ),
+                $.bsButton( {icon: $.bsExternalLinkIcon, text: {da: 'Åbne', en: 'Open'}, link: fileName } )
+            ])
+            .appendTo($result);
+
+        return $result;
+    };
+
+}(jQuery, this.i18next, this, document));
+;
+/****************************************************************************
 	jquery-bootstrap-form.js
 
 	(c) 2018, FCOO
@@ -51494,6 +52794,7 @@ TODO:
             this.radioGroup = this.radioGroup || this.getElement().data('radioGroup');
             return this.radioGroup;
         },
+
         /*******************************************************
         getFormGroup
         *******************************************************/
@@ -51501,7 +52802,6 @@ TODO:
             this.$formGroup = this.$formGroup || this.getElement().parents('.form-group').first();
             return this.$formGroup;
         },
-
 
         /*******************************************************
         setValue
@@ -51593,7 +52893,6 @@ TODO:
             return this;
         },
 
-
         /*******************************************************
         onChanging
         *******************************************************/
@@ -51634,7 +52933,6 @@ TODO:
             return this;
         },
     }; //End of BsModalInput.prototype
-
 
     /************************************************************************
     *************************************************************************
@@ -51743,7 +53041,6 @@ TODO:
 
         return this;
     }
-
 
     /*******************************************************
     Export to jQuery
@@ -52009,10 +53306,15 @@ TODO:
     $.bsHeaderIcons = {
         back    : 'fa-chevron-left',
         forward : 'fa-chevron-right',
-        extend  : 'fa-chevron-up',
-        diminish: 'fa-chevron-down',
+
         pin     : ['fas fa-thumbtack fa-stack-1x fa-inside-circle', 'far fa-circle fa-stack-1x'],
         unpin   : 'fa-thumbtack',
+
+        extend  : 'fa-chevron-up',
+        diminish: 'fa-chevron-down',
+
+        new     : ['far fa-window-maximize fa-stack-1x fa-inside-circle2', 'far fa-circle fa-stack-1x'],
+
         close   : ['far fa-times-circle fa-stack-1x hide-for-hover', 'fas fa-times-circle text-danger fa-stack-1x show-for-hover']
     };
 
@@ -52060,7 +53362,7 @@ TODO:
                         .appendTo( this );
 
             //Add icons
-            $.each( ['back', 'forward', 'pin', 'unpin', 'extend', 'diminish', 'close'], function( index, id ){
+            $.each( ['back', 'forward', 'pin', 'unpin', 'extend', 'diminish', 'new', 'close'], function( index, id ){
                 var iconOptions = options.icons[id],
                     classAndTitle = mandatoryHeaderIconClassAndTitle[id] || {};
                 if (iconOptions && iconOptions.onClick){
@@ -52153,6 +53455,97 @@ TODO:
 }(jQuery, this, document));
 ;
 /****************************************************************************
+	jquery-bootstrap-list.js,
+
+	(c) 2017, FCOO
+
+	https://github.com/fcoo/jquery-bootstrap
+	https://github.com/fcoo
+
+****************************************************************************/
+
+(function ($/*, window, document, undefined*/) {
+	"use strict";
+
+/******************************************************************
+bsList( options )
+options
+    columns = [] of {
+        vfFormat,
+        vfOptions:  The content of a element can be set and updated using [jquery-value-format].
+                    The options vfFormat and (optional) vfOptions defines witch format used to display the content
+
+        align        :  'left','center','right'. Defalut = 'left'
+        verticalAlign: 'top', 'middle','bottom'. Default = 'middle'
+        noWrap       : false. If true the column will not be wrapped = fixed width
+    }
+
+    verticalBorder: [boolean] true. When true vertical borders are added together with default horizontal borders
+    noBorder      : [boolean] true. When true no borders are visible
+
+    align        : 'left','center','right'. Defalut = 'left' = default align for all columns
+    verticalAlign: 'top', 'middle','bottom'. Default = 'middle' = default verticalAlign for all columns
+
+
+
+*******************************************************************/
+    var defaultColunmOptions = {
+            align        : 'left',
+            verticalAlign: 'middle',
+            noWrap       : false,
+            truncate     : false,
+            sortable     : false
+        },
+
+        defaultOptions = {
+            showHeader      : false,
+            verticalBorder  : false,
+            noBorder        : true,
+            hoverRow        : false,
+            noPadding       : true,
+
+            align           : defaultColunmOptions.align,
+            verticalAlign   : defaultColunmOptions.verticalAlign,
+
+            content         : []
+        };
+
+    $.bsList = function( options ){
+        //Adjust options but without content since it isn't standard
+        var content = options.content;
+        options.content = [];
+        options = $._bsAdjustOptions( options, defaultOptions );
+        options.content = content;
+
+        var nofColumns = 1;
+        //Adjust options.content and count number of columns
+        $.each(options.content, function( index, rowContent ){
+            rowContent = $.isArray( rowContent ) ? rowContent : [rowContent];
+            nofColumns = Math.max(nofColumns, rowContent.length);
+
+            var rowContentObj = {};
+            $.each(rowContent, function( index, cellContent ){
+                rowContentObj['_'+index] = cellContent;
+            });
+
+            options.content[index] = rowContentObj;
+        });
+
+        options.columns = options.columns || [];
+        var optionsAlign = {
+                align        : options.align,
+                verticalAlign: options.verticalAlign
+            };
+
+        //Create columns-options for bsTable
+        for (var i=0; i<nofColumns; i++ )
+            options.columns[i] = $.extend({id:'_'+i}, defaultColunmOptions, optionsAlign, options.columns[i]);
+
+        return $.bsTable( options );
+    };
+}(jQuery, this, document));
+;
+/****************************************************************************
 	jquery-bootstrap-modal-backdrop.js,
 
 	(c) 2017, FCOO
@@ -52227,6 +53620,201 @@ TODO:
 }(jQuery, this, document));
 ;
 /****************************************************************************
+	jquery-bootstrap-modal-file.js,
+
+	(c) 2017, FCOO
+
+	https://github.com/fcoo/jquery-bootstrap
+	https://github.com/fcoo
+
+****************************************************************************/
+
+(function ($, i18next,  window /*, document, undefined*/) {
+	"use strict";
+
+
+
+    //$.bsHeaderIcons = class-names for the different icons on the header
+    $.bsExternalLinkIcon = 'fa-external-link-alt';
+
+    /**********************************************************
+    modalFileLink( fileName, bsModalOptions )
+    Return a link to bsModalFile
+    **********************************************************/
+    $.modalFileLink = function( fileName, bsModalOptions ){
+        fileName = $._bsAdjustText(fileName);
+        return window.PDFObject.supportsPDFs ?
+            function(){ return $.bsModalFile( fileName, bsModalOptions ); } :
+            fileName;
+    };
+
+
+    /**********************************************************
+    updateImgZoom( $im)
+    **********************************************************/
+    var ZoomControl = function( $img ){
+        this.$img = $img;
+        this.zooms = [25, 33, 50, 67, 75, 80, 90, 100, 110, 125, 150, 175, 200, 250, 300, 400, 500];
+        this.zoomIndex = this.zooms.indexOf(100);
+    };
+
+    ZoomControl.prototype = {
+        getButtons: function(){
+            var _this = this;
+            this.$zoomOutButton = $.bsButton({type:'button', icon:'fa-search-minus',  text:{da:'Zoom ud',  en:'Zoom Out'}, onClick: _this.zoomOut, context: _this });
+            this.$zoomInButton  = $.bsButton({type:'button', icon:'fa-search-plus',   text:{da:'Zoom ind', en:'Zoom In'},  onClick: _this.zoomIn,  context: _this });
+
+            return [this.$zoomOutButton, this.$zoomInButton];
+        },
+
+        zoomIn : function(){ this.update(false); },
+        zoomOut: function(){ this.update(true);  },
+
+        mousewheel: function( event ){
+            var delta =
+                    event.deltaX ? event.deltaX :
+                    event.deltaY ? event.deltaY :
+                    0;
+            if (delta)
+                this.update( delta < 0 );
+            event.stopPropagation();
+            event.preventDefault();
+        },
+
+        update: function(zoomOut){
+            this.zoomIndex = this.zoomIndex + (zoomOut ? -1 : + 1);
+            this.zoomIndex = Math.max( 0, Math.min( this.zoomIndex, this.zooms.length-1) );
+
+            this.$img.css('width', this.zooms[this.zoomIndex]+'%');
+            var isMin = this.zoomIndex == 0;
+            var isMax = this.zoomIndex == this.zooms.length-1;
+
+            this.$zoomOutButton.attr('disabled', isMin).toggleClass('disabled', isMin);
+            this.$zoomInButton.attr('disabled', isMax).toggleClass('disabled', isMax);
+         }
+    };
+
+
+    /**********************************************************
+    bsModalFile( fileName, options )
+    **********************************************************/
+    $.bsModalFile = function( fileName, options ){
+        options = options || {};
+        fileName = $._bsAdjustText(fileName);
+        var theFileName = i18next.sentence(fileName),
+            fileNameExt = window.url('fileext', theFileName),
+            $content,
+            footer = {
+                da: 'Hvis filen ikke kan vises, klik på <i class="fas ' + $.bsExternalLinkIcon + '"/> for at se dokumentet i en ny fane',
+                en: 'If the file doesn\'t show correctly click on <i class="fas ' + $.bsExternalLinkIcon + '"/> to see the document in a new Tab Page'
+            },
+            fullWidth       = true,
+            noPadding       = true,
+            scroll          = false,
+            alwaysMaxHeight = true;
+
+        fileNameExt = fileNameExt ? fileNameExt.toLowerCase() : 'unknown';
+
+        //Check for ext == 'pdf' and support for pdf
+        if ((fileNameExt == 'pdf') && !window.PDFObject.supportsPDFs){
+            $content =
+                $('<div/>')
+                    .addClass('text-center')
+                    ._bsAddHtml({text: {
+                        da: 'Denne browser understøtter ikke visning<br>af pdf-filer i popup-vinduer<br>Klik på <i class="fas ' + $.bsExternalLinkIcon + '"/> for at se dokumentet i en ny fane',
+                        en: 'This browser does not support<br>pdf-files in popup windows<br>Click on <i class="fas ' + $.bsExternalLinkIcon + '"/> to see the document<br>in a new Tab page'
+                    }});
+            fullWidth       = false;
+            footer          = null;
+            noPadding       = false;
+            alwaysMaxHeight = false;
+
+        }
+        else {
+            switch (fileNameExt){
+                //*********************************************
+                case 'pdf':
+                    //passes a jQuery object (HTML node) for target
+                    $content = $('<div/>').addClass('object-with-file');
+                    window.PDFObject.embed(
+                        theFileName,
+                        $content,
+                        { pdfOpenParams: { view: 'FitH' } }
+                    );
+                    break;
+
+                //*********************************************
+                case 'jpg':
+                case 'jpeg':
+                case 'gif':
+                case 'png':
+                case 'tiff':
+                case 'bmp':
+                case 'ico':
+                    var $iframe =
+                            $('<iframe></iframe>')
+                                .addClass('object-with-file'),
+                        $img =
+                            $('<img src="' + theFileName + '"/>')
+                                .css('width', '100%');
+
+                    //Create a ZoomControl to zoom in and out
+                    var zoomControl = new ZoomControl( $img );
+
+                    //Add the images to the iframe when the iframe is loaded into the DOM
+                    setTimeout( function(){
+                        var $iFrameBody = $iframe.contents().find('body');
+                        $iFrameBody.on('mousewheel', $.proxy( zoomControl.mousewheel, zoomControl ) );
+                        $iFrameBody.append($img);
+                    }, 200);
+
+
+                    $content = [
+                        $iframe,
+                        $('<div></div>')
+                            .addClass('modal-footer')
+                            .css('justify-content',  'center')
+                            ._bsAppendContent( zoomControl.getButtons() )
+                    ];
+
+                    scroll = false;
+                    break;
+
+                //*********************************************
+                case 'html':
+                case 'unknown':
+                    $content = $('<iframe src="' + theFileName + '"/>').addClass('object-with-file');
+                    break;
+
+                //*********************************************
+                default:
+                    //Try default <object> to display the file
+                    $content = $('<object data="' + theFileName + '"/>').addClass('object-with-file');
+
+            } //end of switch (fileNameExt){...
+        }
+
+        //Create the bsModal
+        return $.bsModal({
+                    header    : options.header,
+                    scroll    : scroll,
+                    flexWidth : fullWidth,
+                    megaWidth : fullWidth,
+
+                    noVerticalPadding  : noPadding,
+                    noHorizontalPadding: noPadding,
+                    alwaysMaxHeight    : alwaysMaxHeight,
+
+                    buttons   : [{text: {da: 'Åbne', en: 'Open'}, icon: $.bsExternalLinkIcon, link: fileName }],
+                    content   : $content,
+                    footer    : footer
+
+               });
+    };
+
+}(jQuery, this.i18next, this, document));
+;
+/****************************************************************************
 	jquery-bootstrap-modal.js,
 
 	(c) 2017, FCOO
@@ -52244,21 +53832,28 @@ TODO:
 
     options
         header
+        modalContentClassName
         icons: {
             close   : {onClick, attr, className, attr, data }
             extend  : {onClick, attr, className, attr, data }
             diminish: {onClick, attr, className, attr, data }
 }       type //"", "alert", "success", "warning", "error", "info"
         fixedContent
+
+        alwaysMaxHeight
         flexWidth
         extraWidth
+        megaWidth
         noVerticalPadding
+        noHorizontalPadding
         content
         scroll: boolean | 'vertical' | 'horizontal'
         extended: {
             type
             fixedContent
             noVerticalPadding
+            noHorizontalPadding
+            alwaysMaxHeight
             content
             scroll: boolean | 'vertical' | 'horizontal'
             footer
@@ -52266,7 +53861,7 @@ TODO:
         isExtended: boolean
         footer
         buttons = [];
-        colseIcon
+        closeIcon
         closeText
         noCloseIconOnHeader
 
@@ -52282,10 +53877,15 @@ TODO:
     as expected/needed
     Instead a resize-event is added to update the max-height of
     elements with the current value of window.innerHeight
+    Sets both max-height and haight to allow always-max-heigth options
     **********************************************************/
     function adjustModalMaxHeight( $modalContent ){
         $modalContent = $modalContent || $('.modal-content.modal-flex-height');
-        $modalContent.css('max-height', (parseInt(window.innerHeight) - 2*modalVerticalMargin)+'px');
+        var maxHeight = parseInt(window.innerHeight) - 2*modalVerticalMargin;
+        $modalContent.css({
+            'max-height': maxHeight+'px',
+            'height'    : maxHeight+'px'
+        });
     }
 
     window.addEventListener('resize',            function(){ adjustModalMaxHeight(); }, false );
@@ -52300,6 +53900,7 @@ TODO:
     The width of a modal is by default 300px.
     options.flexWidth :  If true the width of the modal will adjust to the width of the browser up to 500px
     options.extraWidth:  Only when flexWidth is set: If true the width of the modal will adjust to the width of the browser up to 800px
+    options.megaWidth :  Only when flexWidth is set: If true the width of the modal will adjust to the width of the browser up to 1200px
     options.width     : Set if different from 300
 
     ******************************************************/
@@ -52313,6 +53914,7 @@ TODO:
         return {
             flexWidth : !!options.flexWidth,
             extraWidth: !!options.extraWidth,
+            megaWidth: !!options.megaWidth,
             width     : options.width ? options.width+'px' : null
         };
     }
@@ -52394,6 +53996,9 @@ TODO:
 
         show  : function(){
                     this.modal('show');
+
+                    this.data('bsModalDialog')._bsModalSetHeightAndWidth();
+
                     if (this.bsModal.onChange)
                         this.bsModal.onChange( this.bsModal );
                 },
@@ -52451,17 +54056,14 @@ TODO:
                 $('<div/>')
                     .addClass('modal-body-fixed ' + (noClassNameForFixed ? '' : className) + (hasScroll ? ' scrollbar-'+scrollDirection : ''))
                     .appendTo( this );
-        if (options.fixedContent){
-            if ($.isFunction( options.fixedContent ))
-                options.fixedContent( $modalFixedContent );
-            else
-                $modalFixedContent.append( options.fixedContent );
-        }
+        if (options.fixedContent)
+            $modalFixedContent._bsAddHtml( options.fixedContent, true );
 
         //Append body and content
         var $modalBody = parts.$body =
                 $('<div/>')
                     .addClass('modal-body ' + className)
+                    .toggleClass('modal-body-always-max-height', !!options.alwaysMaxHeight)
                     .toggleClass('modal-type-' + options.type, !!options.type)
                     .appendTo( this );
 
@@ -52498,6 +54100,7 @@ TODO:
 
         //Set height
         $modalContent
+            .toggleClass('modal-fixed-height', !!cssHeight)
             .toggleClass('modal-flex-height', !cssHeight)
             .css( cssHeight ? cssHeight : {height: 'auto', maxHeight: null});
         if (!cssHeight)
@@ -52507,6 +54110,7 @@ TODO:
         $modalDialog
             .toggleClass('modal-flex-width', cssWidth.flexWidth )
             .toggleClass('modal-extra-width', cssWidth.extraWidth )
+            .toggleClass('modal-mega-width', cssWidth.megaWidth )
             .css('width', cssWidth.width );
 
         //Call onChange (if any)
@@ -52600,7 +54204,13 @@ TODO:
         this.bsModal.cssWidth = getWidthFromOptions( options );
         if (options.extended){
             //If options.extended.width == true or none width-options is set in extended => use same width as normal-mode
-            if ((options.extended.width == true) || ((options.extended.flexWidth == undefined) && (options.extended.extraWidth == undefined) && (options.extended.width == undefined)))
+            if ( (options.extended.width == true) ||
+                 ( (options.extended.flexWidth == undefined) &&
+                   (options.extended.extraWidth == undefined) &&
+                   (options.extended.megaWidth == undefined) &&
+                   (options.extended.width == undefined)
+                 )
+              )
                 this.bsModal.cssExtendedWidth = this.bsModal.cssWidth;
             else
                 this.bsModal.cssExtendedWidth = getWidthFromOptions( options.extended );
@@ -52610,9 +54220,16 @@ TODO:
         var $modalContent = this.bsModal.$modalContent =
                 $('<div/>')
                     .addClass('modal-content')
+                    .addClass(options.modalContentClassName)
                     .modernizrToggle('modal-extended', !!options.isExtended )
+
+                    .toggleClass('modal-content-always-max-height',          !!options.alwaysMaxHeight)
+                    .toggleClass('modal-extended-content-always-max-height', !!options.extended && !!options.extended.alwaysMaxHeight)
+
                     .modernizrOff('modal-pinned')
                     .appendTo( this );
+
+
 
         this._bsModalSetHeightAndWidth();
 
@@ -52641,7 +54258,8 @@ TODO:
                 pin     : { className: 'hide-for-modal-pinned',   onClick: options.onPin    ? modalPin      : null },
                 unpin   : { className: 'show-for-modal-pinned',   onClick: options.onPin    ? modalUnpin    : null },
                 extend  : { className: 'hide-for-modal-extended', onClick: options.extended ? modalExtend   : null, altEvents:'swipeup'   },
-                diminish: { className: 'show-for-modal-extended', onClick: options.extended ? modalDiminish : null, altEvents:'swipedown' }
+                diminish: { className: 'show-for-modal-extended', onClick: options.extended ? modalDiminish : null, altEvents:'swipedown' },
+                new     : { className: '',                        onClick: options.onNew    ? $.proxy(options.onNew, this) : null },
             }
         }, options );
 
@@ -53794,32 +55412,57 @@ options
         vfOptions:  The content of a element can be set and updated using [jquery-value-format].
                     The options vfFormat and (optional) vfOptions defines witch format used to display the content
 
-        align        :  'left','center','right'. Defalut = 'left'
+        align        : 'left','center','right'. Defalut = 'left'
         verticalAlign: 'top', 'middle','bottom'. Default = 'middle'
         noWrap       : false. If true the column will not be wrapped = fixed width
-TODO:         truncate     : false. If true the column will be truncated. Normally only one column get truncate: true
+TODO:   truncate     : false. If true the column will be truncated. Normally only one column get truncate: true
+        fixedWidth   : false. If true the column will not change width when the tables width is changed
 
-        sortable :  [boolean] false
+        sortable     :  [boolean] false
+        sortBy       : [string or function(e1, e2): int] "string". Possible values: "int" (sort as float), "moment", "moment_date", "moment_time" (sort as moment-obj) or function(e1, e2) return int
+        sortIndex    : [int] null. When sorting and to values are equal the values from an other column is used.
+                                   The default order of the other columns to test is given by the its index in options.columns. Default sortIndex is (column-index+1)*100 (first column = 100). sortIndex can be set to alter the order.
+        sortDefault  : [string or boolean]. false. Possible values = false, true, "asc" or "desc". true => "asc"
+        sortHeader   : [boolean] false. If true a header-row is added every time the sorted value changes
+
     }
-    showHeader: [boolean] true
-    verticalBorder [boolean] true
-    selectable [boolean] false
-    selectedId [string] "" id for selected row
-    onChange          [function(id, selected, trElement)] null Called when a row is selected or unselected (if options.allowZeroSelected == true)
-	allowZeroSelected [boolean] false. If true it is allowed to un-select a selected row
-    allowReselect     [Boolean] false. If true the onChange is called when a selected item is reselected/clicked
 
-TODO
-Add sort-functions + save col-index for sorted column
+    showHeader          [boolean] true
+    verticalBorder      [boolean] true. When true vertical borders are added together with default horizontal borders
+    noBorder            [boolean] false. When true no borders are visible
+    hoverRow            [boolean] true. When true the row get hightlightet when hovered
+    noPadding           [boolean] false. When true the vertical padding of all cells are 0px
+
+    notFullWidth        [boolean] false. When true the table is not 100% width and will adjust to it content
+    centerInContainer   [boolean] false. When true the table is centered inside its container. Normaally it require notFullWidth: true
+
+    selectable          [boolean] false
+    selectedId          [string] "" id for selected row
+    onChange            [function(id, selected, trElement)] null Called when a row is selected or unselected (if options.allowZeroSelected == true)
+	allowZeroSelected   [boolean] false. If true it is allowed to un-select a selected row
+    allowReselect       [Boolean] false. If true the onChange is called when a selected item is reselected/clicked
+
+    defaultColunmOptions: {}. Any of the options for columns to be used as default values
+
+    rowClassName      : [] of string. []. Class-names for each row
+
+    Sorting is done by https://github.com/joequery/Stupid-Table-Plugin
 
 
 *******************************************************************/
     var defaultOptions = {
-            baseClass     : 'table',
-            styleClass    : 'fixed',
-            showHeader    : true,
-            verticalBorder: true,
-            useTouchSize  : true
+            baseClass           : 'table',
+            styleClass          : 'fixed',
+            showHeader          : true,
+            verticalBorder      : true,
+            noBorder            : false,
+            hoverRow            : true,
+            noPadding           : false,
+            notFullWidth        : false,
+            centerInContainer   : false,
+            useTouchSize        : true,
+            defaultColunmOptions: {},
+            rowClassName        : []
 
         },
 
@@ -53828,6 +55471,8 @@ Add sort-functions + save col-index for sorted column
             verticalAlign: 'middle',
             noWrap       : false,
             truncate     : false,
+            fixedWidth   : false,
+            sortBy       : 'string',
             sortable     : false
         },
 
@@ -53853,6 +55498,37 @@ Add sort-functions + save col-index for sorted column
         return $element;
     }
 
+    /********************************************************************
+    Different sort-functions for moment-objects: (a,b) return a-b
+    ********************************************************************/
+    function momentSort(m1, m2){
+        if (m1.isSame(m2)) return 0;
+        if (m1.isBefore(m2)) return -1;
+        return 1;
+    }
+
+    //momentDateSort - sort by date despide the time
+    function momentDateSort(m1, m2){
+        return momentSort(
+            moment(m1).startOf('day'),
+            moment(m2).startOf('day')
+        );
+    }
+
+    //momentTimeSort - sort by time despide ther date
+    function momentTimeSort(m1, m2){
+        return momentSort(
+            moment(m1).date(1).month(0).year(2000),
+            moment(m2).date(1).month(0).year(2000)
+        );
+    }
+
+    var stupidtableOptions = {
+            'moment'     : momentSort,
+            'moment_date': momentDateSort,
+            'moment_time': momentTimeSort
+        };
+
     /**********************************************************
     Prototype for bsTable
     **********************************************************/
@@ -53865,14 +55541,23 @@ Add sort-functions + save col-index for sorted column
                 $tbody  = this.find('tbody').first(),
                 $tr     = $('<tr/>').appendTo( $tbody );
 
+            if (options.rowClassName.length){
+                var rowIndex = $tbody.children('tr').length - 1;
+                if (options.rowClassName.length > rowIndex)
+                    $tr.addClass(options.rowClassName[rowIndex]);
+            }
+
             if (options.selectable)
                 $tr.attr('id', rowContent.id || 'rowId_'+rowId++);
 
             $.each( options.columns, function( index, columnOptions ){
                 var content = rowContent[columnOptions.id],
-                    $td = $('<td/>')
-                            .appendTo($tr);
+                    $td = $('<td/>').appendTo($tr);
+
                 adjustThOrTd( $td, columnOptions, !options.showHeader );
+
+                if ($.isPlainObject(content) && content.className)
+                    $td.addClass(content.className);
 
                 //Build the content using _bsAppendContent or jquery-value-format
                 if (columnOptions.vfFormat)
@@ -53888,9 +55573,96 @@ Add sort-functions + save col-index for sorted column
                 $tr
                     .on('mouseenter', $.proxy($tr._selectlist_onMouseenter, $tr) )
                     .on('mouseleave', $.proxy($tr._selectlist_onMouseleave, $tr) );
+            }
+        },
 
-//            .on('mouseleave', $.proxy($result._selectlist_onMouseleaveList, $result) )
 
+        /**********************************************************
+        _getColumn - Return the column with id or index
+        **********************************************************/
+        _getColumn: function( idOrIndex ){
+            return $.isNumeric(idOrIndex) ? this.columns[idOrIndex] : this.columnIds[idOrIndex];
+        },
+
+        /**********************************************************
+        sortBy - Sort the table
+        **********************************************************/
+        sortBy: function( idOrIndex, dir ){
+            var column = this._getColumn(idOrIndex);
+            if (column)
+                column.$th.stupidsort( dir );
+        },
+
+        /**********************************************************
+        beforeTableSort - Called before the table is being sorted by StupidTable
+        **********************************************************/
+        beforeTableSort: function(event, sortInfo){
+            var column          = this._getColumn(sortInfo.column),
+                sortMulticolumn = column.$th.data('sort-multicolumn') || '',
+                _this           = this;
+
+            //Remove all group-header-rows
+            this.find('.table-sort-group-header').remove();
+
+            //Convert sortMulticolumn to array
+            sortMulticolumn = sortMulticolumn.split(',');
+            sortMulticolumn.push(''+column.index);
+
+            $.each( sortMulticolumn, function( dummy, columnIndex ){
+                var column = _this._getColumn( parseInt( columnIndex ) );
+                //If cell-content is vfFormat-object => Set 'sort-value' from vfFormat
+                if (column.vfFormat){
+                    _this.find('td:nth-child('+(column.index+1)+')').each( function( dummy, td ){
+                        var $td = $(td);
+                        $td.data( 'sort-value', $td.data('vf-value') );
+                    });
+                }
+            });
+        },
+
+        /**********************************************************
+        afterTableSort - Called after the table is being sorted by StupidTable
+        **********************************************************/
+        afterTableSort: function(event, sortInfo){
+            //Update the class-names of the cloned <thead>
+            var cloneThList = this.$theadClone.find('th');
+            this.find('thead th').each( function( index, th ){
+                $(cloneThList[index])
+                    .removeClass()
+                    .addClass( $(th).attr('class') );
+            });
+
+            var column = this._getColumn( sortInfo.column );
+
+            //Marks first row of changed value
+            if (column.sortHeader) {
+
+                //$tdBase = a <td> as $-object acting as base for all tds in header-row
+                var $tdBase =
+                        $('<td/>')
+                            .addClass('container-icon-and-text')
+                            .attr('colspan', this.columns.length );
+                column.$th.contents().clone().appendTo( $tdBase );
+                $tdBase.append( $('<span>:</span>') );
+
+                var lastText = "Denne her text kommer sikkert ikke igen";
+                this.find('tbody tr td:nth-child(' + (sortInfo.column+1) +')').each( function( index, td ){
+                    var $td = $(td),
+                        nextText = $td.text();
+                    if (nextText != lastText){
+                        //Create a clone of $tdBase and 'copy' all children from $td to $newTd
+                        var $newTd = $tdBase.clone(true);
+                        $td.contents().clone().appendTo( $newTd );
+
+                        //Create new row and insert before current row
+                        $('<tr/>')
+                            .addClass('table-sort-group-header')
+                            .append( $newTd )
+                            .insertBefore( $td.parent() );
+
+                        lastText = nextText;
+                    }
+                });
             }
         },
 
@@ -53900,21 +55672,28 @@ Add sort-functions + save col-index for sorted column
         asModal: function( modalOptions ){
             var showHeader = this.find('.no-header').length == 0,
                 _this      = this,
-                $theadClone,
                 $tableWithHeader = null,
                 $result, $thead, count;
 
             if (showHeader){
                 //Clone the header and place them in fixed-body of the modal. Hide the original header by padding the table
-                $theadClone = this.find('thead').clone( true );
+                //Add on-click on the clone to 'pass' the click to the original header
+                this.$theadClone = this.find('thead').clone( true, false );
+
+                this.$theadClone.find('th').on('click', function( event ){
+                    var columnIndex = $(event.delegateTarget).index();
+                    _this.sortBy( columnIndex );
+                });
+
                 $tableWithHeader =
                     $('<table/>')
                         ._bsAddBaseClassAndSize( this.data(dataTableId) )
                         .addClass('table-with-header')
-                        .append( $theadClone );
+                        .append( this.$theadClone );
                 $thead = this.find('thead');
                 count  = 20;
             }
+
 
 
             $result = $.bsModal(
@@ -53948,7 +55727,7 @@ Add sort-functions + save col-index for sorted column
 
                     setHeaderWidth = function(){
                         $thead.find('th').each(function( index, th ){
-                            $theadClone.find('th:nth-child(' + (index+1) + ')')
+                            _this.$theadClone.find('th:nth-child(' + (index+1) + ')')
                                 .width( $(th).width()+'px' );
                         });
                         $tableWithHeader.width( _this.width()+'px' );
@@ -53963,19 +55742,6 @@ Add sort-functions + save col-index for sorted column
 
     }; //end of bsTable_prototype = {
 
-    //**********************************************************
-    function table_th_onClick( event ){
-        var $th = $( event.currentTarget ),
-            sortable = $th.hasClass('sortable'),
-            newClass = $th.hasClass('desc') ? 'asc' : 'desc'; //desc = default
-
-        if (sortable){
-            //Remove .asc and .desc from all th
-            $th.parent().find('th').removeClass('asc desc');
-            $th.addClass(newClass);
-        }
-    }
-
     /**********************************************************
     bsTable( options ) - create a Bootstrap-table
     **********************************************************/
@@ -53987,17 +55753,31 @@ Add sort-functions + save col-index for sorted column
         options = $._bsAdjustOptions( options, defaultOptions );
         options.class =
 //Removed because useTouchSize added to options            (options.small ? 'table-sm ' : '' ) +
-            (options.verticalBorder ? 'table-bordered ' : '' ) +
+            (options.verticalBorder && !options.noBorder ? 'table-bordered ' : '' ) +
+            (options.noBorder ? 'table-no-border ' : '' ) +
+            (options.hoverRow ? 'table-hover ' : '' ) +
+            (options.noPadding ? 'table-no-padding ' : '' ) +
+            (options.notFullWidth ? 'table-not-full-width ' : '' ) +
+            (options.centerInContainer ? 'table-center-in-container ' : '' ) +
             (options.selectable ? 'table-selectable ' : '' ) +
-            (options.allowZeroSelected ? 'allow-zero-selected ' : '' ),
+            (options.allowZeroSelected ? 'allow-zero-selected ' : '' );
 
-        //Adjust text-style for each column
-        $.each( options.columns, function( index, column ){
-            column = $.extend( true, {}, defaultColunmOptions, column );
+        //Adjust each column
+        var columnIds = {};
+        $.each( options.columns, function( index, columnOptions ){
+            columnOptions.sortable = columnOptions.sortable || columnOptions.sortBy;
+            columnOptions = $.extend( true,
+                {
+                    index    : index,
+                    sortIndex: (index+1)*100
+                },
+                defaultColunmOptions,
+                options.defaultColunmOptions,
+                columnOptions
+            );
 
-            column.index = index;
-
-            options.columns[index] = column;
+            columnIds[columnOptions.id] = columnOptions;
+            options.columns[index] = columnOptions;
         });
 
         var id = 'bsTable'+ tableId++,
@@ -54015,17 +55795,66 @@ Add sort-functions + save col-index for sorted column
         //Extend with prototype
         $table.init.prototype.extend( bsTable_prototype );
 
+        $table.columns = options.columns;
+        $table.columnIds = columnIds;
+
+        //Create colgroup
+        var $colgroup = $('<colgroup/>').appendTo($table);
+        $.each( options.columns, function( index, columnOptions ){
+            var $col = $('<col/>').appendTo( $colgroup );
+            if (columnOptions.fixedWidth)
+                $col.attr('width', '1');
+        });
+
+        var sortableTable  = false,
+            sortDefaultId  = '',
+            sortDefaultDir = 'asc',
+            multiSortList  = [];
+
+        /* From https://github.com/joequery/Stupid-Table-Plugin:
+            "A multicolumn sort allows you to define secondary columns to sort by in the event of a tie with two elements in the sorted column.
+                Specify a comma-separated list of th identifiers in a data-sort-multicolumn attribute on a <th> element..."
+
+            multiSortList = []{columnIndex, sortIndex} sorted by sortIndex. Is used be each th to define alternative sort-order
+        */
+        $.each( options.columns, function( index, columnOptions ){
+            if (columnOptions.sortable)
+                multiSortList.push( {columnIndex: index, sortIndex: columnOptions.sortIndex });
+        });
+        multiSortList.sort(function( c1, c2){ return c1.sortIndex - c2.sortIndex; });
+
         //Create headers
         if (options.showHeader)
-            $.each( options.columns, function( index, columnOptions ){
-                var $th = $('<th/>')
-                            .toggleClass('sortable', !!columnOptions.sortable )
-                            .on('click', table_th_onClick )
-                            .appendTo( $tr );
+            $.each( $table.columns, function( index, columnOptions ){
+                columnOptions.$th = $('<th/>').appendTo( $tr );
 
-                adjustThOrTd( $th, columnOptions, true );
+                if (columnOptions.sortable){
+                    columnOptions.$th
+                        .addClass('sortable')
+                        .attr('data-sort', columnOptions.sortBy);
 
-                $th._bsAddHtml( columnOptions.header );
+                    if (columnOptions.sortDefault){
+                        sortDefaultId  = columnOptions.id;
+                        sortDefaultDir = columnOptions.sortDefault == 'desc' ? 'desc' : sortDefaultDir;
+                    }
+
+                    //Create alternative/secondary columns to sort by
+                    var sortMulticolumn = '';
+                    $.each( multiSortList, function( index, multiSort ){
+                        if (multiSort.columnIndex != columnOptions.index)
+                            sortMulticolumn = (sortMulticolumn ? sortMulticolumn + ',' : '') + multiSort.columnIndex;
+                    });
+
+                    if (sortMulticolumn)
+                        columnOptions.$th.attr('data-sort-multicolumn', sortMulticolumn);
+
+                    sortableTable = true;
+                }
+
+
+                adjustThOrTd( columnOptions.$th, columnOptions, true );
+
+                columnOptions.$th._bsAddHtml( columnOptions.header );
             });
 
         if (options.selectable){
@@ -54050,8 +55879,19 @@ Add sort-functions + save col-index for sorted column
                 .find('.active').addClass('highlighted');
 
 
+        if (sortableTable){
+            $table.stupidtable =
+                $table.stupidtable( stupidtableOptions )
+                    .bind('beforetablesort', $.proxy( $table.beforeTableSort, $table ) )
+                    .bind('aftertablesort',  $.proxy( $table.afterTableSort,  $table ) );
+
+            if (sortDefaultId)
+                $table.sortBy(sortDefaultId, sortDefaultDir);
+        }
         return $table;
     };
+
+
 
 }(jQuery, this, document));
 ;
@@ -54226,7 +56066,7 @@ Add sort-functions + save col-index for sorted column
 
 ****************************************************************************/
 
-(function ($, window/*, document, undefined*/) {
+(function ($, i18next, window /*, document, undefined*/) {
 	"use strict";
 
     /*
@@ -54293,6 +56133,17 @@ Add sort-functions + save col-index for sorted column
 
     };
 
+    //$._bsAdjustText: Adjust options to fit with {da:"...", en:"..."}
+    // options == {da:"..", en:".."} => return options
+    // options == STRING             => return {da: options}
+    $._bsAdjustText = function( options ){
+        if (!options)
+            return options;
+        if ($.type( options ) == "string")
+            return {da: options, en:options};
+        return options;
+    };
+
     //$._bsAdjustOptions: Adjust options to allow text/name/title/header etc.
     $._bsAdjustOptions = function( options, defaultOptions, forceOptions ){
         //*********************************************************************
@@ -54322,7 +56173,7 @@ Add sort-functions + save col-index for sorted column
 
         options = $.extend( true, {}, defaultOptions || {}, options, forceOptions || {} );
 
-        options.selected = options.selected || options.checked || options.active;
+        options.selected = options.selected || options.checked || options.active || options.open || options.isOpen;
         options.list     = options.list     || options.buttons || options.items || options.children;
 
         options = adjustContentAndContextOptions( options, options.context );
@@ -54374,7 +56225,7 @@ Add sort-functions + save col-index for sorted column
     /****************************************************************************************
     $._bsCreateElement = internal method to create $-element
     ****************************************************************************************/
-    $._bsCreateElement = function( tagName, link, title, textStyle, className ){
+    $._bsCreateElement = function( tagName, link, title, textStyle, className, data ){
         var $result;
         if (link){
             $result = $('<a/>');
@@ -54397,6 +56248,9 @@ Add sort-functions + save col-index for sorted column
 
         if (className)
             $result.addClass( className );
+
+        if (data)
+            $result.data( data );
 
         return $result;
     };
@@ -54539,6 +56393,7 @@ Add sort-functions + save col-index for sorted column
             title    : String or array of String
             iconClass: string or array of String
             textClass: string or array of String
+            textData : obj or array of obj
         }
         checkForContent: [Boolean] If true AND options.content exists => use options.content instead
         ****************************************************************************************/
@@ -54587,7 +56442,8 @@ Add sort-functions + save col-index for sorted column
                 linkArray       = getArray( ignoreLink ? [] : options.link || options.onClick ),
                 titleArray      = getArray( options.title ),
                 iconClassArray  = getArray( options.iconClass ),
-                textClassArray  = getArray( options.textClass );
+                textClassArray  = getArray( options.textClass ),
+                textDataArray   = getArray( options.textData );
 
             //Add icons (optional)
             $.each( iconArray, function( index, icon ){
@@ -54600,22 +56456,23 @@ Add sort-functions + save col-index for sorted column
 
             //Add text
             $.each( textArray, function( index, text ){
-                var $text = $._bsCreateElement( 'span', linkArray[ index ], titleArray[ index ], textStyleArray[ index ], textClassArray[index] );
+                var $text = $._bsCreateElement( 'span', linkArray[ index ], titleArray[ index ], textStyleArray[ index ], textClassArray[index], textDataArray[index] );
                 if ($.isFunction( text ))
                     text( $text );
                 else
                     if (text == $.EMPTY_TEXT)
                         $text.html( '&nbsp;');
                     else
-                        $text.i18n( text, 'html' );
+                        if (text != ""){
+                            //If text is a string and not a key to i18next => just add the text
+                            if ( ($.type( text ) == "string") && !i18next.exists(text) )
+                                $text.html( text );
+                            else
+                                $text.i18n( text, 'html' );
+                        }
 
                 if (index < textClassArray.length)
                     $text.addClass( textClassArray[index] );
-
-                //If the text is 'together' with an icon => add class "after-icon"
-                if (index < iconArray.length)
-                    $text.addClass( 'after-icon' );
-
 
                 $text.appendTo( _this );
             });
@@ -54720,10 +56577,12 @@ Add sort-functions + save col-index for sorted column
                         case 'checkbox'     :   buildFunc = $.bsCheckbox;       insideFormGroup = true; break;
                         case 'tabs'         :   buildFunc = $.bsTabs;           break;
                         case 'table'        :   buildFunc = $.bsTable;          break;
+                        case 'list'         :   buildFunc = $.bsList;           break;
                         case 'accordion'    :   buildFunc = $.bsAccordion;      break;
                         case 'slider'       :   buildFunc = buildBaseSlider;    insideFormGroup = true; addBorder = true; buildInsideParent = true; break;
                         case 'timeslider'   :   buildFunc = buildTimeSlider;    insideFormGroup = true; addBorder = true; buildInsideParent = true; break;
                         case 'text'         :   buildFunc = buildText;          insideFormGroup = true; addBorder = true; noValidation = true; break;
+                        case 'fileview'     :   buildFunc = $.bsFileView;       break;
                         case 'hidden'       :   buildFunc = buildHidden;        noValidation = true; break;
 //                        case 'xx'           :   buildFunc = $.bsXx;               break;
                     }
@@ -54788,7 +56647,7 @@ Add sort-functions + save col-index for sorted column
     }); //$.fn.extend
 
 
-}(jQuery, this, document));
+}(jQuery, this.i18next, this, document));
 ;
 /* @preserve
  * Leaflet 1.3.4, a JS library for interactive maps. http://leafletjs.com
