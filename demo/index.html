@@ -53,7 +53,10 @@
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors</a>'
             }).addTo(map);
 
-            var tooltip = [{icon:'fa-home', text:{da:'Dansk', en:'Eng'}},'<br>', {icon:'fa-home', text:{da:'Lang Dansk', en:'Long Eng'}}];
+            var tooltip = [
+                    $('<div/>')._bsAddHtml({icon:'fa-home', text:{da:'Dansk', en:'Eng'}}),
+                    $('<div/>')._bsAddHtml({icon:'fa-home', text:{da:'Lang Dansk', en:'LongEng'}})
+                ];
             function addMarker( latlng){
                 var marker = L.bsMarker( latlng, {
                             draggable: true,
@@ -64,21 +67,21 @@
                             hover: true,
                             bigIconWhenTouch: true,
                             tooltip: tooltip,
-                            _tooltipPermanent: true,
+                            tooltipPermanent: true,
                             tooltipHideWhenDragging: true
                     }).addTo( map );
 
                     marker.on('click', function(){
-                        this._tooltip.setContent('NY'+Math.round(Math.random()*10000));
+                        this._tooltip.setContent('<p style="background-color:red">NY'+Math.round(Math.random()*10000)+'</p>');
 
                         this.setColor('orange'); this.setBorderColor('standard'); this.toggleOption('puls');
                         },
                         marker
                     );
                     marker.bindPopup(
-                        'Dette er 1. linie<br>Dette er 2. linie'
-/*                    {
-                        minWidth: 234,
+//                        'Dette er 1. linie<br>Dette er 2. linie'
+                    {
+                        width: 234,
                         closeButton: false,
                         header:'Davs',
                         fixable: true,
@@ -117,9 +120,9 @@
                         content: {icon: 'fa-home', text: 'Tekst_og_ikon_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord'}, scroll: true,
 
                         extended: {
-                            content: 'Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>'
+                            content: ['<p>Dette er en p</p>', 'Jeg vil i span', 'Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>']
                         }
-                    }*/
+                    }
                     );
             }
 

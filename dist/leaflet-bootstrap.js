@@ -669,7 +669,7 @@ Adjust standard Leaflet popup to display as Bootstrap modal
     L.Tooltip.prototype._updateContent = function () {
         $(this._contentNode)
             .empty()
-            ._bsAddHtml( this._content );
+            ._bsAddHtml( this._content, true );
 
 		this.fire('contentupdate');
     };

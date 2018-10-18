@@ -11531,8 +11531,15 @@ Bootstrap allready have the following classes
 .font-italic
 
 */
-.container-icon-and-text:not(.fa-stack) > *:not(:first-child) {
+.container-icon-and-text:not(.fa-stack) > i:not(:first-child),
+.container-icon-and-text:not(.fa-stack) > span:not(:first-child) {
   padding-left: 0.3em; }
+
+.container-icon-and-text:not(.fa-stack) * {
+  margin: 0; }
+
+.container-icon-and-text:not(.fa-stack) ol, .container-icon-and-text:not(.fa-stack) ul, .container-icon-and-text:not(.fa-stack) dl {
+  padding-left: 2em; }
 
 /************************************************************
 BUTTON
@@ -12463,6 +12470,11 @@ body.modal-open .modal {
     display: none !important; }
   .modal-dialog .modal-content:not(.modal-fixed-height).no-modal-extended:not(.modal-content-always-max-height), .modal-dialog .modal-content:not(.modal-fixed-height).modal-extended:not(.modal-extended-content-always-max-height) {
     height: auto !important; }
+  .modal-dialog .modal-content .modal-body p {
+    margin: 0; }
+  .modal-dialog .modal-content .modal-body ol, .modal-dialog .modal-content .modal-body ul, .modal-dialog .modal-content .modal-body dl {
+    margin: 0;
+    padding-left: 2em; }
   .modal-dialog .modal-content .modal-body.modal-body-no-content {
     display: none; }
   .modal-dialog .modal-content .modal-body.modal-body-always-max-height {
