@@ -20696,7 +20696,7 @@ var Translator = function (_EventEmitter) {
       // interpolate
       var data = options.replace && typeof options.replace !== 'string' ? options.replace : options;
       if (this.options.interpolation.defaultVariables) data = _extends({}, this.options.interpolation.defaultVariables, data);
-      res = this.interpolator.interpolate(res, data, options.lng || this.language);
+      res = this.interpolator.interpolate(res, data, options.lng || this.language, options);
 
       // nesting
       if (options.nest !== false) res = this.interpolator.nest(res, function () {
@@ -21154,7 +21154,7 @@ var Interpolator = function () {
     this.nestingRegexp = new RegExp(nestingRegexpStr, 'g');
   };
 
-  Interpolator.prototype.interpolate = function interpolate(str, data, lng) {
+  Interpolator.prototype.interpolate = function interpolate(str, data, lng, options) {
     var _this = this;
 
     var match = void 0;
@@ -21177,6 +21177,8 @@ var Interpolator = function () {
 
     this.resetRegExp();
 
+    var missingInterpolationHandler = options && options.missingInterpolationHandler || this.options.missingInterpolationHandler;
+
     replaces = 0;
     // unescape if has unescapePrefix/Suffix
     /* eslint no-cond-assign: 0 */
@@ -21195,8 +21197,8 @@ var Interpolator = function () {
     while (match = this.regexp.exec(str)) {
       value = handleFormat(match[1].trim());
       if (value === undefined) {
-        if (typeof this.options.missingInterpolationHandler === 'function') {
-          var temp = this.options.missingInterpolationHandler(str, match);
+        if (typeof missingInterpolationHandler === 'function') {
+          var temp = missingInterpolationHandler(str, match);
           value = typeof temp === 'string' ? temp : '';
         } else {
           this.logger.warn('missed to pass in variable ' + match[1] + ' for interpolating ' + str);
@@ -53347,9 +53349,14 @@ S2.define('jquery.select2',[
         options = $.extend( true, {headerClassName: '', inclHeader: true, icons: {} }, options );
         this.addClass( options.headerClassName );
 
-        if (options.inclHeader)
+        if (options.inclHeader){
+            options.header = $._bsAdjustIconAndText(options.header);
+            //If header contents more than one text => set the first to "fixed" so that only the following text are truncated
+            if ($.isArray(options.header) && (options.header.length > 1)){
+                options.header[0].textClass = 'fixed-header';
+            }
             this._bsAddHtml( options.header || $.EMPTY_TEXT );
-
+        }
         //Add icons (if any)
         if ( !$.isEmptyObject(options.icons) ) {
             //Container for icons
