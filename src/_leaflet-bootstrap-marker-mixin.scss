@@ -16,27 +16,27 @@ lbm-puls          : Has a pulsing ring
 lbm-transparent   : Inner color get opacity: 0.7
 lbm-hover         : When hover: get big-shadow and opacity: 0.9 for ibm-transparent
 ************************************************/
-@mixin icon-color( $color: white ){
-    background-color: $color;
-
+@mixin icon-color( $background-color: white ){
+    background-color: $background-color;
+    color           : ch-best-color-contrast($background-color);
     &.lbm-transparent {
-        background-color: rgba($color, 0.7);
+        background-color: rgba($background-color, 0.7);
         &.lbm-hover:hover {
-            background-color: rgba($color, 0.9);
+            background-color: rgba($background-color, 0.9);
         }
     }
 
     //Big shadow in same color
     &.lbm-big-shadow, &.leaflet-drag-target, &.lbm-hover:hover {
-        box-shadow: 0px 0px 0px 5px rgba($color, .28); //.28 = estimate to look like google maps
+        box-shadow: 0px 0px 0px 5px rgba($background-color, .28); //.28 = estimate to look like google maps
     }
 
     //Color for puls
-    &:after { box-shadow: 0 0 6px 2px $color; }
+    &:after { box-shadow: 0 0 6px 2px $background-color; }
 }
-@mixin icon-name-color( $name, $color: white ){
+@mixin icon-name-color( $name, $background-color: white ){
     .lbm-#{$name} {
-        @include icon-color($color);
+        @include icon-color($background-color);
     }
 }
 

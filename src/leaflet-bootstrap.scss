@@ -18,6 +18,11 @@
 @import "../bower_components/mathsass/dist/math";
 
 
+//COLOR-HELPER - https://github.com/voxpelli/sass-color-helpers
+@import "../bower_components/sass-color-helpers/stylesheets/color-helpers";
+
+
+//BOOTSTRAP
 @import "../bower_components/bootstrap/scss/functions";
 @import "../bower_components/bootstrap/scss/variables";
 

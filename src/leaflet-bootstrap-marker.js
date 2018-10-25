@@ -9,6 +9,7 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
 
     var bsMarkerIcon = L.divIcon({
             iconSize : [14, 14],    //Size of the icon image in pixels.
+//            iconSize : [20, 20],    //Size of the icon image in pixels.
             className: 'lbm-icon',  //A custom class name to assign to both icon and shadow images. Empty by default.
     });
 
@@ -65,9 +66,10 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
             puls            : false,            //true to have a pulsart icon
             color           : '',    	        //Name of color
             borderColor     : '',               //Name of border-color. Same as color
-            tooltip                : null,  //Content of tooltip
-            tooltipPermanent       : false, //Whether to open the tooltip permanently or only on mouseover.
-            tooltipHideWhenDragging: false  //True and tooltipPermanent: false => the tooltip is hidden when dragged
+            tooltip                 : null,     //Content of tooltip
+            tooltipPermanent        : false,    //Whether to open the tooltip permanently or only on mouseover.
+            tooltipHideWhenDragging : false,    //True and tooltipPermanent: false => the tooltip is hidden when dragged
+            tooltipHideWhenPopupOpen: false     //True and tooltipPermanent: false => the tooltip is hidden when popup is displayed
         },
 
     /*
@@ -118,6 +120,13 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
 
             this.on('dragstart', this._bsMarker_onDragStart, this );
             this.on('dragend',   this._bsMarker_onDragEnd,   this );
+
+            if (this.options.tooltipHideWhenPopupOpen && !this.options.tooltipPermanent){
+                this.on('popupopen',  this.hideTooltip, this);
+                this.on('popupclose', this.showTooltip, this);
+            }
+
+
         },
 
         /*****************************************************

@@ -60,14 +60,14 @@
             function addMarker( latlng){
                 var marker = L.bsMarker( latlng, {
                             draggable: true,
-                            color    : 'standard',
-                            borderColor: 'orange',
+                            color    : 'orange',
+                            borderColor: 'black',
                             puls: true,
-                            transparent: true,
+                            _transparent: true,
                             hover: true,
                             bigIconWhenTouch: true,
                             tooltip: tooltip,
-                            tooltipPermanent: true,
+                            _tooltipPermanent: true,
                             tooltipHideWhenDragging: true
                     }).addTo( map );
 

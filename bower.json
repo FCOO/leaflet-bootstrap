@@ -24,7 +24,8 @@
   "devDependencies": {
     "bourbon": "latest",
     "modernizr-mixin": "latest",
-    "mathsass": "latest"
+    "mathsass": "latest",
+    "sass-color-helpers": "^2.1.1"
   },
   "license": "MIT",
   "ignore": [

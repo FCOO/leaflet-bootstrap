@@ -17,18 +17,20 @@ http://FCOO.github.io/leaflet-bootstrap/demo/
 
 
     options: {
-        useBigIcon      : false     //True to make the ico    var myMarker = L.bsMarker(latLng, options).addTo( map );n big
-        bigIcon         : object    //L.DivIcon to be used if useBigIcon: true
-        bigIconWhenTouch: false     //True to make big icon when window.bsIsTouch == true and options.draggable == true
-        draggable       : false, 	//Whether the marker is draggable with mouse/touch or not.
-        transparent     : false, 	//True to make the marker semi-transparent
-        hover           : false,    //True to show big-shadow and 0.9 opacuity for lbm-transparent when hover
-        bigShadow       : false, 	//true to add big shadow to the marker
-        puls            : false, 	//true to have a pulsart icon
-        color           : '',    	//Name of color
-        borderColor     : ''        //Name of border-color. Same as color. "" => black border
-        tooltip         : null,	    //Automatic adds a tooltip to the marker. The tooltip is hidden when the marker is dragged. See below on content
-        tooltipPermanent: false     //Whether to open the tooltip permanently or only on mouseover.
+        draggable       : false,           //Whether the marker is draggable with mouse/touch or not.
+        autoPan         : true,            //Sit to true if you want the map to do panning animation when marker hits the edges.
+        useBigIcon      : false,            //True to make the icon big
+        bigIconWhenTouch: false,            //True to make big icon when window.bsIsTouch == true and options.draggable == true
+        transparent     : false,            //True to make the marker semi-transparent
+        hover           : false,            //True to show big-shadow and 0.9 opacuity for lbm-transparent when hover
+        bigShadow       : false,            //true to add big shadow to the marker
+        puls            : false,            //true to have a pulsart icon
+        color           : '',    	        //Name of color
+        borderColor     : '',               //Name of border-color. Same as color
+        tooltip                 : null,     //Content of tooltip
+        tooltipPermanent        : false,    //Whether to open the tooltip permanently or only on mouseover.
+        tooltipHideWhenDragging : false,    //True and tooltipPermanent: false => the tooltip is hidden when dragged
+        tooltipHideWhenPopupOpen: false     //True and tooltipPermanent: false => the tooltip is hidden when popup is displayed
     }
 
     /*
@@ -43,6 +45,7 @@ http://FCOO.github.io/leaflet-bootstrap/demo/
     "white"
     "gray"
     "darkgray"
+    "orange"
     "primary"
     "secondary"
     "success"
@@ -50,7 +53,7 @@ http://FCOO.github.io/leaflet-bootstrap/demo/
     "warning"
     "danger"
     "light"
-    "dark"        
+    "dark"
     "standard" = rgba(66, 133, 244) = google maps color for location icon
     */
     

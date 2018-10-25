@@ -44,6 +44,12 @@ lbm-hover         : When hover: get big-shadow and opacity: 0.9 for ibm-transpar
     @include icon-color();
     @include icon-border-color();
 
+    //Text
+    text-align: center;
+    &:before {
+        content: '12';
+    }
+
     //The puls
     &:after {
         display : none;
@@ -78,6 +84,7 @@ $dark:          $gray-800 !default;
     "white"     : white,
     "gray"      : gray,
     "darkgray"  : darkgray,
+    "orange"    : orange,
     primary     : $primary,
     secondary   : $secondary,
     success     : $success,
@@ -90,6 +97,7 @@ $dark:          $gray-800 !default;
 
 ){
     @include icon-name-color( $name, $color );
+
     @include icon-border-name-color( $name, $color );
 }
 
