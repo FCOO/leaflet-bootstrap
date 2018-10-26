@@ -33,15 +33,13 @@ $font-size-base         : 1rem !default;
 $spacer                 : 1rem !default;
 */
 /***********************************************
-leaflet-bootstrap-marker.scss
+leaflet-bootstrap-marker-mixin.scss
 Style for bsMarker estimated to look like Google Maps
 
 The pulsate is a djusted version of leaflet-icon-pulse by Filip Zavadil
 https://github.com/mapshakers/leaflet-icon-pulse
 
-
 lbm-icon lbm-COLOR [lbm-border-COLOR] [lbm-transparent] [lbm-puls] [lbm-hover]
-
 
 lbm-icon          : Standard icon with black border and tin white shadow
 lbm-[COLOR]       : Sets inner color to [COLOR]
@@ -53,13 +51,15 @@ lbm-transparent   : Inner color get opacity: 0.7
 lbm-hover         : When hover: get big-shadow and opacity: 0.9 for ibm-transparent
 ************************************************/
 /***********************************************
-leaflet-bootstrap-marker-mixin.scss
+leaflet-bootstrap-marker.scss
 Style for bsMarker estimated to look like Google Maps
 
 The pulsate is a djusted version of leaflet-icon-pulse by Filip Zavadil
 https://github.com/mapshakers/leaflet-icon-pulse
 
+
 lbm-icon lbm-COLOR [lbm-border-COLOR] [lbm-transparent] [lbm-puls] [lbm-hover]
+
 
 lbm-icon          : Standard icon with black border and tin white shadow
 lbm-[COLOR]       : Sets inner color to [COLOR]
