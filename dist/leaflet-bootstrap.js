@@ -460,13 +460,20 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
                 this.hideTooltip();
             if (this.options.bigShadowWhenPopupOpen && !this.options.bigShadow)
                 this.addClass( classNames['bigShadow'] );
-
+            if (this.options.transparent)
+                this.removeClass( classNames['transparent'] );
+            if (this.options.hover)
+                this.removeClass( classNames['hover'] );
         },
         _popupclose: function(){
             if (this.options.tooltipHideWhenPopupOpen && !this.options.tooltipPermanent)
                 this.showTooltip();
             if (this.options.bigShadowWhenPopupOpen && !this.options.bigShadow)
                 this.removeClass( classNames['bigShadow'] );
+            if (this.options.transparent)
+                this.addClass( classNames['transparent'] );
+            if (this.options.hover)
+                this.addClass( classNames['hover'] );
         },
 
         /*****************************************************
