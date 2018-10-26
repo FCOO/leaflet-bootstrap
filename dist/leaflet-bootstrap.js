@@ -456,6 +456,7 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
 
         *****************************************************/
         _popupopen: function(){
+            this._bringToFront();
             if (this.options.tooltipHideWhenPopupOpen && !this.options.tooltipPermanent)
                 this.hideTooltip();
             if (this.options.bigShadowWhenPopupOpen && !this.options.bigShadow)
