@@ -2,6 +2,7 @@
 	leaflet-bootstrap-tooltip.scss,
 
 ************************************************/
+$markerSizeList: 14px, 20px, 24px; //MUST match markerSizeList in leaflet-bootstrap-marker.js AND _leaflet-bootstrap-marker.scss
 
 //Adjust tooltip to bootstrap style
 .leaflet-tooltip {
@@ -29,18 +30,24 @@
     display: none;
 }
 
+
 //Adjust position to allways be 10px from position
 .leaflet-tooltip-bottom { margin-top :  10px; }
 .leaflet-tooltip-top    { margin-top : -10px; }
 .leaflet-tooltip-left   { margin-left: -10px; }
 .leaflet-tooltip-right  { margin-left:  10px; }
 
-//Adjust position when the icon is big
-.leaflet-tooltip-big-icon {
-    &.leaflet-tooltip-bottom { margin-top :  14px; }
-    &.leaflet-tooltip-top    { margin-top : -14px; }
-    &.leaflet-tooltip-left   { margin-left: -14px; }
-    &.leaflet-tooltip-right  { margin-left:  14px; }
+//Adjust position when for differnet marker-size
+@each $size in $markerSizeList {
+    $index: index($markerSizeList, $size) - 1;
+    $margin: $size / 2 + 3px;
+
+    .leaflet-tooltip-icon-#{$index} {
+        &.leaflet-tooltip-bottom { margin-top :      $margin; }
+        &.leaflet-tooltip-top    { margin-top : -1 * $margin; }
+        &.leaflet-tooltip-left   { margin-left: -1 * $margin; }
+        &.leaflet-tooltip-right  { margin-left:      $margin; }
+    }
 }
 
 

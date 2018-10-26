@@ -17,8 +17,13 @@ http://FCOO.github.io/leaflet-bootstrap/demo/
 
 
     options: {
+        iconSize        : 0,                //0: normal, 1. larger with icon or umber, 2: Very large (touch-mode)
+        iconClass       : '',               //Fontawesome Font class-name ("fa-home") for icon inside the marker
+        number          : undefined,        //Number inside the marker
+
         draggable       : false,           //Whether the marker is draggable with mouse/touch or not.
         autoPan         : true,            //Sit to true if you want the map to do panning animation when marker hits the edges.
+
         useBigIcon      : false,            //True to make the icon big
         bigIconWhenTouch: false,            //True to make big icon when window.bsIsTouch == true and options.draggable == true
         transparent     : false,            //True to make the marker semi-transparent
@@ -31,6 +36,7 @@ http://FCOO.github.io/leaflet-bootstrap/demo/
         tooltipPermanent        : false,    //Whether to open the tooltip permanently or only on mouseover.
         tooltipHideWhenDragging : false,    //True and tooltipPermanent: false => the tooltip is hidden when dragged
         tooltipHideWhenPopupOpen: false     //True and tooltipPermanent: false => the tooltip is hidden when popup is displayed
+        bigShadowWhenPopupOpen  : true      //When true a big-sdhadow is shown when the popup for the marker is open
     }
 
     /*
@@ -58,9 +64,14 @@ http://FCOO.github.io/leaflet-bootstrap/demo/
     */
     
     //Methods
-    .toggleOption(optionId) //Toggle the state of options[optionId]
-    .setColor( colorName )  //Set the color
+    .toggleOption(optionId)             //Toggle the state of options[optionId]
+    .setColor( colorName )              //Set the color
     .setBorderColor( borderColorName )  //Set the border-color
+    .setSize(sizeIndex)                 //Set the size of the marker (0-2)
+    .setIconClass( iconClass, minSize ) //Set the classname for the icon inside the marker
+    .setNumber( number, minSize )       //Set a number inside the marker
+
+
 
 
 ### L.Control.bsButton

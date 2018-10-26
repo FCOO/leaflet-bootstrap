@@ -25,9 +25,12 @@
                 this.options.className +=  ' leaflet-tooltip-hide-when-dragging';
 
 
-            if (this._source && this._source.$icon && this._source.$icon.hasClass('lbm-big'))
-                this.options.className += ' leaflet-tooltip-big-icon';
-
+            if (this._source && this._source.$icon){
+                if (this._source.$icon.hasClass('lbm-number'))
+                    this.options.className += ' leaflet-tooltip-number-icon';
+                if (this._source.$icon.hasClass('lbm-big'))
+                    this.options.className += ' leaflet-tooltip-big-icon';
+            }
 
             _initLayout.apply( this, arguments );
         };

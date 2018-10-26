@@ -28,7 +28,7 @@
             tooltip.setOpacity(0);
         }
         return this;
-    }
+    };
 
 
 

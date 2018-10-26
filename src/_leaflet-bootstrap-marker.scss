@@ -20,6 +20,10 @@ lbm-hover         : When hover: get big-shadow and opacity: 0.9 for ibm-transpar
 ************************************************/
 @import "leaflet-bootstrap-marker-mixin";
 
+$markerSizeList: 14px, 20px, 24px; //MUST match markerSizeList in leaflet-bootstrap-marker.js AND _leaflet-bootstrap-tooltip.scss
+
+$border-width: 2px;
+
 @keyframes pulsate {
     0% {
         transform: scale(0.1, 0.1);
@@ -37,7 +41,7 @@ lbm-hover         : When hover: get big-shadow and opacity: 0.9 for ibm-transpar
 .lbm-icon {
     opacity      : 1;
     border-radius: 100%;
-    border       : 2px solid black;
+    border       : $border-width solid black;
 
     box-shadow  : 0px 0px 0px 1px rgba(white, .5); //.5 = estimate to look like google maps
 
@@ -45,13 +49,13 @@ lbm-hover         : When hover: get big-shadow and opacity: 0.9 for ibm-transpar
     @include icon-border-color();
 
     //Text
-    text-align: center;
-    &:before {
-        content: '12';
-    }
+    text-align    : center;
+    font-family   : $font-family-monospace;
+    letter-spacing: 0px;
+    font-weight   : bold;
 
     //The puls
-    &:after {
+    &:before {
         display : none;
         position: absolute;
         content : "";
@@ -61,12 +65,26 @@ lbm-hover         : When hover: get big-shadow and opacity: 0.9 for ibm-transpar
         margin       : -100% 0 0 -100%;
     }
 
-    &.lbm-puls:after {
+    &.lbm-puls:before {
         display  : block;
         animation: pulsate 1s ease-out;
         animation-iteration-count: infinite;
     }
 }
+
+//Create different size
+@each $size in $markerSizeList {
+    $index: index($markerSizeList, $size) - 1;
+
+    $innerHeight: $size - 2 * $border-width;
+    $font-size  : floor($innerHeight / 1.41) - 1px;
+
+    .lbm-icon-#{$index} {
+        font-size: $font-size;
+        line-height: $innerHeight / $font-size;
+    }
+}
+
 
 //Create different colors
 /*
@@ -85,6 +103,7 @@ $dark:          $gray-800 !default;
     "gray"      : gray,
     "darkgray"  : darkgray,
     "orange"    : orange,
+    "black"     : black,
     primary     : $primary,
     secondary   : $secondary,
     success     : $success,

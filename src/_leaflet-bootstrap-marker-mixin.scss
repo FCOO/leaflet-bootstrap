@@ -32,7 +32,7 @@ lbm-hover         : When hover: get big-shadow and opacity: 0.9 for ibm-transpar
     }
 
     //Color for puls
-    &:after { box-shadow: 0 0 6px 2px $background-color; }
+    &:before { box-shadow: 0 0 6px 2px $background-color; }
 }
 @mixin icon-name-color( $name, $background-color: white ){
     .lbm-#{$name} {

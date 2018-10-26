@@ -59,6 +59,8 @@
                 ];
             function addMarker( latlng){
                 var marker = L.bsMarker( latlng, {
+                            iconSize: 2, iconClass: 'fa-home',
+                            bigShadow: true,
                             draggable: true,
                             color    : 'orange',
                             borderColor: 'black',
@@ -74,7 +76,13 @@
                     marker.on('click', function(){
                         this._tooltip.setContent('<p style="background-color:red">NY'+Math.round(Math.random()*10000)+'</p>');
 
-                        this.setColor('orange'); this.setBorderColor('standard'); this.toggleOption('puls');
+                        this.setColor('black');
+                        this.setBorderColor('orange');
+                        this.toggleOption('puls');
+                        //this.setIconClass('fa-home', 1);
+                        this.setSize(1);
+                        this.setNumber(999, 1);
+
                         },
                         marker
                     );

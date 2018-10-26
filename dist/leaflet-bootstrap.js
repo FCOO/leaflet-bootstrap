@@ -221,20 +221,14 @@ leaflet-bootstrap-marker.js,
 Create L.bsMarker = a round marker with options for color, shadow and pulsart
 
 ****************************************************************************/
-(function ($, L/*, window, document, undefined*/) {
+(function ($, L, window, document, undefined) {
     "use strict";
 
-    var bsMarkerIcon = L.divIcon({
-            iconSize : [14, 14],    //Size of the icon image in pixels.
-            className: 'lbm-icon',  //A custom class name to assign to both icon and shadow images. Empty by default.
+    var markerSizeList = [14, 20, 24], //MUST match $markerSizeList in _leaflet-bootstrap-marker.scss AND _leaflet-bootstrap-tooltip.scss
+        iconList = [];
+    $.each( markerSizeList, function( index, size ){
+        iconList.push( L.divIcon({iconSize: [size, size], className: 'lbm-icon lbm-icon-'+index }) );
     });
-
-    var bigBsMarkerIcon = L.divIcon({
-            iconSize : [24, 24],    //Size of the icon image in pixels.
-            className: 'lbm-icon',  //A custom class name to assign to both icon and shadow images. Empty by default.
-    });
-
-
 
 
     //Extend L.Map with ignoreNextEvent(type) and includeNextEvent(type) to prevent the next firing of a event
@@ -270,10 +264,15 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
 
     L.BsMarker = L.Marker.extend({
         options: {
-            draggable       : false,           //Whether the marker is draggable with mouse/touch or not.
-            autoPan         : true,            //Sit to true if you want the map to do panning animation when marker hits the edges.
-            icon            : bsMarkerIcon,
-            bigIcon         : bigBsMarkerIcon,
+            icon            : iconList[0],
+
+            iconSize        : 0,                //0: normal, 1. larger with icon or umber, 2: Very large (touch-mode)
+            iconClass       : '',               //Fontawesome Font class-name ("fa-home") for icon inside the marker
+            number          : undefined,        //Number inside the marker
+
+            draggable       : false,            //Whether the marker is draggable with mouse/touch or not.
+            autoPan         : true,             //Set to true if you want the map to do panning animation when marker hits the edges.
+
             useBigIcon      : false,            //True to make the icon big
             bigIconWhenTouch: false,            //True to make big icon when window.bsIsTouch == true and options.draggable == true
             transparent     : false,            //True to make the marker semi-transparent
@@ -282,34 +281,36 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
             puls            : false,            //true to have a pulsart icon
             color           : '',    	        //Name of color
             borderColor     : '',               //Name of border-color. Same as color
-            tooltip                : null,  //Content of tooltip
-            tooltipPermanent       : false, //Whether to open the tooltip permanently or only on mouseover.
-            tooltipHideWhenDragging: false  //True and tooltipPermanent: false => the tooltip is hidden when dragged
+            tooltip                 : null,     //Content of tooltip
+            tooltipPermanent        : false,    //Whether to open the tooltip permanently or only on mouseover.
+            tooltipHideWhenDragging : false,    //True and tooltipPermanent: false => the tooltip is hidden when dragged
+            tooltipHideWhenPopupOpen: false,    //True and tooltipPermanent: false => the tooltip is hidden when popup is displayed
+            bigShadowWhenPopupOpen  : true      //When true a big-sdhadow is shown when the popup for the marker is open
         },
 
-    /*
-    color and border-color:
-    "blue"
-    "indigo"
-    "purple"
-    "pink"
-    "green"
-    "teal"
-    "cyan"
-    "white"
-    "gray"
-    "darkgray"
-    "primary"
-    "secondary"
-    "success"
-    "info"
-    "warning"
-    "danger"
-    "light"
-    "dark"
-    "standard" = rgba(66, 133, 244) = google maps color for location icon
-    */
-
+        /*
+        color and border-color:
+        "blue"
+        "indigo"
+        "purple"
+        "pink"
+        "green"
+        "teal"
+        "cyan"
+        "white"
+        "gray"
+        "darkgray"
+        "orange"
+        "primary"
+        "secondary"
+        "success"
+        "info"
+        "warning"
+        "danger"
+        "light"
+        "dark"
+        "standard" = rgba(66, 133, 244) = google maps color for location icon
+        */
 
 
         /*****************************************************
@@ -317,6 +318,15 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
         *****************************************************/
         initialize: function(latLng, options){
             L.Marker.prototype.initialize.call(this, latLng, options);
+
+            if (this.options.useBigIcon)
+                this.iconSizeIndex = 2;
+            else
+                //Change to big icon if bigIconWhenTouch == false and window.bsIsTouch == true and options.draggable == true
+                if (this.options.bigIconWhenTouch && this.options.draggable && window.bsIsTouch)
+                    this.iconSizeIndex = 2;
+                else
+                    this.iconSizeIndex = options.iconSize || 0;
 
             //Create $icon to hold class-names
             this.$icon = $('<div/>');
@@ -330,20 +340,35 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
             if (this.options.borderColor)
                 this.setBorderColor(this.options.borderColor);
 
-            if (this.options.useBigIcon)
-                this._setBigIcon();
+            //this.setSize(this.iconSizeIndex);
 
             this.on('dragstart', this._bsMarker_onDragStart, this );
             this.on('dragend',   this._bsMarker_onDragEnd,   this );
+
+            this.on('popupopen',  this._popupopen, this);
+            this.on('popupclose', this._popupclose, this);
         },
 
         /*****************************************************
-        _setBigIcon
+        setSize
         *****************************************************/
-        _setBigIcon: function(){
-            this.setIcon( this.options.bigIcon );
-            this.$icon.addClass('lbm-big');
+        setSize: function(sizeIndex){
+
+            this.$icon.removeClass('lbm-icon-'+this.iconSizeIndex);
+            var className = this.$icon.get(0).className,
+                tooltip = this.getTooltip();
+            if (tooltip)
+                $(tooltip._container).removeClass('leaflet-tooltip-icon-'+this.iconSizeIndex);
+
+            this.iconSizeIndex = sizeIndex;
+
+            this.setIcon( iconList[sizeIndex] );
+            this.$icon = $(this._icon);
+            this.$icon.addClass(className+' lbm-icon-'+sizeIndex);
+            if (tooltip)
+                $(tooltip._container).addClass('leaflet-tooltip-icon-'+this.iconSizeIndex);
         },
+
 
         /*****************************************************
         onAdd
@@ -351,13 +376,8 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
         onAdd: function( map ){
             L.Marker.prototype.onAdd.call(this, map);
 
-            //Change to big icon if bigIconWhenTouch == false and window.bsIsTouch == true and options.draggable == true
-            if (this.options.bigIconWhenTouch && this.options.draggable && window.bsIsTouch)
-                this._setBigIcon();
 
-            var classNames = this.$icon[0].className;
-            this.$icon = $(this._icon);
-            this.$icon.addClass( classNames );
+            this.$content = null;
 
             if (this.options.tooltip)
                 this.bindTooltip(this.options.tooltip, {
@@ -366,6 +386,13 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
                     permanent       : this.options.tooltipPermanent,        //Whether to open the tooltip permanently or only on mouseover.
                     hideWhenDragging: this.options.tooltipHideWhenDragging  //True and tooltipPermanent: false => the tooltip is hidden when dragged
                 });
+
+            this.setSize(this.iconSizeIndex);
+            if (this.options.number !== undefined)
+                this.setNumber(this.options.number);
+            if (this.options.iconClass)
+                this.setIconClass(this.options.iconClass);
+
         },
 
         /*****************************************************
@@ -404,6 +431,44 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
             if (this.borderColorName)
                 this.addClass('lbm-border-'+this.borderColorName);
         },
+
+        /*****************************************************
+        setIconClass( icon )
+        *****************************************************/
+        setIconClass: function( icon, minSize ){
+            if (minSize && (minSize > this.iconSizeIndex))
+                this.setSize( minSize );
+            this.$icon.empty();
+            $._bsCreateIcon('fa-home', this.$icon);
+        },
+        /*****************************************************
+        setNumber( number )
+        *****************************************************/
+        setNumber: function( number, minSize ){
+            if (minSize && (minSize > this.iconSizeIndex))
+                this.setSize( minSize );
+            this.$icon.empty();
+            this.$icon.text(number);
+        },
+
+
+        /*****************************************************
+
+        *****************************************************/
+        _popupopen: function(){
+            if (this.options.tooltipHideWhenPopupOpen && !this.options.tooltipPermanent)
+                this.hideTooltip();
+            if (this.options.bigShadowWhenPopupOpen && !this.options.bigShadow)
+                this.addClass( classNames['bigShadow'] );
+
+        },
+        _popupclose: function(){
+            if (this.options.tooltipHideWhenPopupOpen && !this.options.tooltipPermanent)
+                this.showTooltip();
+            if (this.options.bigShadowWhenPopupOpen && !this.options.bigShadow)
+                this.removeClass( classNames['bigShadow'] );
+        },
+
         /*****************************************************
         _bsMarker_onDragStart - Fired when the drag starts: Mark the map to ignore next click
         _bsMarker_onDragEnd - Fired when the drag ends: Mark the map to include click within 10ms
@@ -654,9 +719,12 @@ Adjust standard Leaflet popup to display as Bootstrap modal
                 this.options.className +=  ' leaflet-tooltip-hide-when-dragging';
 
 
-            if (this._source && this._source.$icon && this._source.$icon.hasClass('lbm-big'))
-                this.options.className += ' leaflet-tooltip-big-icon';
-
+            if (this._source && this._source.$icon){
+                if (this._source.$icon.hasClass('lbm-number'))
+                    this.options.className += ' leaflet-tooltip-number-icon';
+                if (this._source.$icon.hasClass('lbm-big'))
+                    this.options.className += ' leaflet-tooltip-big-icon';
+            }
 
             _initLayout.apply( this, arguments );
         };
@@ -692,6 +760,27 @@ Adjust standard Leaflet popup to display as Bootstrap modal
 ****************************************************************************/
 (function (/*$, L/*, window, document, undefined*/) {
     "use strict";
+
+
+    /*********************************************************
+    Extend XX with methods to show and hide tooltip
+    *********************************************************/
+    L.Layer.prototype.showTooltip = function() {
+        var tooltip = this.getTooltip();
+        if (tooltip)
+            tooltip.setOpacity(this._saveTooltipOpacity);
+        return this;
+    };
+
+    L.Layer.prototype.hideTooltip = function() {
+        var tooltip = this.getTooltip();
+        if (tooltip){
+            this._saveTooltipOpacity = tooltip.options.opacity;
+            tooltip.setOpacity(0);
+        }
+        return this;
+    };
+
 
 
 }(jQuery, L, this, document));
