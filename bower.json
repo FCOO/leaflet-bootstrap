@@ -1,6 +1,6 @@
 {
   "name": "leaflet-bootstrap",
-  "version": "1.8.3",
+  "version": "1.8.4",
   "homepage": "https://github.com/FCOO/leaflet-bootstrap",
   "authors": [
     "Niels Holt"
@@ -19,13 +19,13 @@
     "leaflet": "latest",
     "jquery-bootstrap": "fcoo/jquery-bootstrap#^1.35.0",
     "leaflet-control-topcenter": "FCOO/leaflet-control-topcenter#^2.0.1",
-    "javascript-utilities": "fcoo/javascript-utilities#^1.1.0"
+    "javascript-utilities": "fcoo/javascript-utilities#^1.1.0",
+    "sass-color-helpers": "^2.1.1"
   },
   "devDependencies": {
     "bourbon": "latest",
     "modernizr-mixin": "latest",
-    "mathsass": "latest",
-    "sass-color-helpers": "^2.1.1"
+    "mathsass": "latest"
   },
   "license": "MIT",
   "ignore": [
