@@ -27,10 +27,7 @@
 @import "../bower_components/bootstrap/scss/variables";
 
 //JQUERY-BOOTSTRAP - https://github.com/fcoo/jquery-bootstrap
-//@import "../bower_components/jquery-bootstrap/src/jquery-bootstrap";
-
 @import "../bower_components/jquery-bootstrap/src/bootstrap-variables";
-
 
 //Style for bsMarker
 @import "leaflet-bootstrap-marker";
@@ -41,5 +38,6 @@
 //Style for tooltip
 @import "leaflet-bootstrap-tooltip";
 
-//Slyle for modal-controls
+//Style for modal-controls
 @import "leaflet-bootstrap-modal";
+

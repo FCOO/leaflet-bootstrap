@@ -19,6 +19,7 @@ lbm-hover         : When hover: get big-shadow and opacity: 0.9 for ibm-transpar
 @mixin icon-color( $background-color: white ){
     background-color: $background-color;
     color           : ch-best-color-contrast($background-color);
+
     &.lbm-transparent {
         background-color: rgba($background-color, 0.7);
         &.lbm-hover:hover {
