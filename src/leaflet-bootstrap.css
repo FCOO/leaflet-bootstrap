@@ -50,6 +50,9 @@ lbm-puls          : Has a pulsing ring
 lbm-transparent   : Inner color get opacity: 0.7
 lbm-hover         : When hover: get big-shadow and opacity: 0.9 for ibm-transparent
 ************************************************/
+/**********************************************************
+lbm-marker-and-icon-classes
+**********************************************************/
 /***********************************************
 leaflet-bootstrap-marker.scss
 Style for bsMarker estimated to look like Google Maps
@@ -88,10 +91,7 @@ lbm-hover         : When hover: get big-shadow and opacity: 0.9 for ibm-transpar
   background-color: white;
   color: #000;
   border-color: black;
-  text-align: center;
-  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  letter-spacing: 0px;
-  font-weight: bold; }
+  text-align: center; }
   .lbm-icon.lbm-transparent {
     background-color: rgba(255, 255, 255, 0.7); }
     .lbm-icon.lbm-transparent.lbm-hover:hover {
@@ -100,6 +100,15 @@ lbm-hover         : When hover: get big-shadow and opacity: 0.9 for ibm-transpar
     box-shadow: 0px 0px 0px 5px rgba(255, 255, 255, 0.28); }
   .lbm-icon:before {
     box-shadow: 0 0 6px 2px white; }
+  .lbm-icon .inner-text {
+    font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    letter-spacing: 0px;
+    font-weight: bold;
+    overflow: visible;
+    white-space: nowrap;
+    width: calc(100% + 2*2px);
+    margin-left: -2px;
+    overflow: hidden; }
   .lbm-icon:before {
     display: none;
     position: absolute;
@@ -144,6 +153,12 @@ $dark:          $gray-800 !default;
 .lbm-border-blue {
   border-color: blue; }
 
+.fa-lbm-icon-blue {
+  color: blue; }
+
+.fa-lbm-icon-border-blue {
+  color: blue; }
+
 .lbm-indigo {
   background-color: indigo;
   color: #fff; }
@@ -158,6 +173,12 @@ $dark:          $gray-800 !default;
 
 .lbm-border-indigo {
   border-color: indigo; }
+
+.fa-lbm-icon-indigo {
+  color: indigo; }
+
+.fa-lbm-icon-border-indigo {
+  color: indigo; }
 
 .lbm-purple {
   background-color: purple;
@@ -174,6 +195,12 @@ $dark:          $gray-800 !default;
 .lbm-border-purple {
   border-color: purple; }
 
+.fa-lbm-icon-purple {
+  color: purple; }
+
+.fa-lbm-icon-border-purple {
+  color: purple; }
+
 .lbm-pink {
   background-color: pink;
   color: #000; }
@@ -188,6 +215,12 @@ $dark:          $gray-800 !default;
 
 .lbm-border-pink {
   border-color: pink; }
+
+.fa-lbm-icon-pink {
+  color: pink; }
+
+.fa-lbm-icon-border-pink {
+  color: pink; }
 
 .lbm-green {
   background-color: green;
@@ -204,6 +237,12 @@ $dark:          $gray-800 !default;
 .lbm-border-green {
   border-color: green; }
 
+.fa-lbm-icon-green {
+  color: green; }
+
+.fa-lbm-icon-border-green {
+  color: green; }
+
 .lbm-teal {
   background-color: teal;
   color: #fff; }
@@ -218,6 +257,12 @@ $dark:          $gray-800 !default;
 
 .lbm-border-teal {
   border-color: teal; }
+
+.fa-lbm-icon-teal {
+  color: teal; }
+
+.fa-lbm-icon-border-teal {
+  color: teal; }
 
 .lbm-cyan {
   background-color: cyan;
@@ -234,6 +279,12 @@ $dark:          $gray-800 !default;
 .lbm-border-cyan {
   border-color: cyan; }
 
+.fa-lbm-icon-cyan {
+  color: cyan; }
+
+.fa-lbm-icon-border-cyan {
+  color: cyan; }
+
 .lbm-white {
   background-color: white;
   color: #000; }
@@ -248,6 +299,12 @@ $dark:          $gray-800 !default;
 
 .lbm-border-white {
   border-color: white; }
+
+.fa-lbm-icon-white {
+  color: white; }
+
+.fa-lbm-icon-border-white {
+  color: white; }
 
 .lbm-gray {
   background-color: gray;
@@ -264,6 +321,12 @@ $dark:          $gray-800 !default;
 .lbm-border-gray {
   border-color: gray; }
 
+.fa-lbm-icon-gray {
+  color: gray; }
+
+.fa-lbm-icon-border-gray {
+  color: gray; }
+
 .lbm-darkgray {
   background-color: darkgray;
   color: #000; }
@@ -278,6 +341,12 @@ $dark:          $gray-800 !default;
 
 .lbm-border-darkgray {
   border-color: darkgray; }
+
+.fa-lbm-icon-darkgray {
+  color: darkgray; }
+
+.fa-lbm-icon-border-darkgray {
+  color: darkgray; }
 
 .lbm-orange {
   background-color: orange;
@@ -294,6 +363,12 @@ $dark:          $gray-800 !default;
 .lbm-border-orange {
   border-color: orange; }
 
+.fa-lbm-icon-orange {
+  color: orange; }
+
+.fa-lbm-icon-border-orange {
+  color: orange; }
+
 .lbm-black {
   background-color: black;
   color: #fff; }
@@ -308,6 +383,12 @@ $dark:          $gray-800 !default;
 
 .lbm-border-black {
   border-color: black; }
+
+.fa-lbm-icon-black {
+  color: black; }
+
+.fa-lbm-icon-border-black {
+  color: black; }
 
 .lbm-primary {
   background-color: #007bff;
@@ -324,6 +405,12 @@ $dark:          $gray-800 !default;
 .lbm-border-primary {
   border-color: #007bff; }
 
+.fa-lbm-icon-primary {
+  color: #007bff; }
+
+.fa-lbm-icon-border-primary {
+  color: #007bff; }
+
 .lbm-secondary {
   background-color: #6c757d;
   color: #fff; }
@@ -338,6 +425,12 @@ $dark:          $gray-800 !default;
 
 .lbm-border-secondary {
   border-color: #6c757d; }
+
+.fa-lbm-icon-secondary {
+  color: #6c757d; }
+
+.fa-lbm-icon-border-secondary {
+  color: #6c757d; }
 
 .lbm-success {
   background-color: #28a745;
@@ -354,6 +447,12 @@ $dark:          $gray-800 !default;
 .lbm-border-success {
   border-color: #28a745; }
 
+.fa-lbm-icon-success {
+  color: #28a745; }
+
+.fa-lbm-icon-border-success {
+  color: #28a745; }
+
 .lbm-info {
   background-color: #17a2b8;
   color: #000; }
@@ -368,6 +467,12 @@ $dark:          $gray-800 !default;
 
 .lbm-border-info {
   border-color: #17a2b8; }
+
+.fa-lbm-icon-info {
+  color: #17a2b8; }
+
+.fa-lbm-icon-border-info {
+  color: #17a2b8; }
 
 .lbm-warning {
   background-color: #ffc107;
@@ -384,6 +489,12 @@ $dark:          $gray-800 !default;
 .lbm-border-warning {
   border-color: #ffc107; }
 
+.fa-lbm-icon-warning {
+  color: #ffc107; }
+
+.fa-lbm-icon-border-warning {
+  color: #ffc107; }
+
 .lbm-danger {
   background-color: #dc3545;
   color: #000; }
@@ -398,6 +509,12 @@ $dark:          $gray-800 !default;
 
 .lbm-border-danger {
   border-color: #dc3545; }
+
+.fa-lbm-icon-danger {
+  color: #dc3545; }
+
+.fa-lbm-icon-border-danger {
+  color: #dc3545; }
 
 .lbm-light {
   background-color: #f8f9fa;
@@ -414,6 +531,12 @@ $dark:          $gray-800 !default;
 .lbm-border-light {
   border-color: #f8f9fa; }
 
+.fa-lbm-icon-light {
+  color: #f8f9fa; }
+
+.fa-lbm-icon-border-light {
+  color: #f8f9fa; }
+
 .lbm-dark {
   background-color: #343a40;
   color: #fff; }
@@ -429,6 +552,12 @@ $dark:          $gray-800 !default;
 .lbm-border-dark {
   border-color: #343a40; }
 
+.fa-lbm-icon-dark {
+  color: #343a40; }
+
+.fa-lbm-icon-border-dark {
+  color: #343a40; }
+
 .lbm-standard {
   background-color: #4285F4;
   color: #000; }
@@ -443,6 +572,12 @@ $dark:          $gray-800 !default;
 
 .lbm-border-standard {
   border-color: #4285F4; }
+
+.fa-lbm-icon-standard {
+  color: #4285F4; }
+
+.fa-lbm-icon-border-standard {
+  color: #4285F4; }
 
 .fa-pulsate {
   animation: pulsate 1s ease-out;

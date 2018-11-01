@@ -11,6 +11,7 @@
 
     <link  href="bower_components.css" rel="stylesheet">
     <link  href="../src/leaflet-bootstrap.css" rel="stylesheet">
+    <!-- <link  href="test.css" rel="stylesheet"> -->
     <link  href="css/fontawesome-all.css" rel="stylesheet">
     <style>
         html, body, #map {
@@ -76,12 +77,12 @@
                     marker.on('click', function(){
                         this._tooltip.setContent('<p style="background-color:red">NY'+Math.round(Math.random()*10000)+'</p>');
 
-                        this.setColor('black');
-                        this.setBorderColor('orange');
-                        this.toggleOption('puls');
+                        //this.setColor('black');
+                        //this.setBorderColor('orange');
+                        //this.toggleOption('puls');
                         //this.setIconClass('fa-home', 1);
                         this.setSize(1);
-                        this.setNumber(999, 1);
+                        this.setNumber('123456789', 1);
 
                         },
                         marker
@@ -91,7 +92,10 @@
                     {
                         width: 234,
                         closeButton: false,
-                        header:'Davs',
+                        header: {
+                            icon: marker.asIcon(),
+                            text: 'Davs',
+                        },
                         fixable: true,
                         _icons: {
                             back: { onClick: function(){ console.log('BACK!'); } },
@@ -328,6 +332,12 @@
             onClick: function(){
                 formControl.bsModalForm.edit( myData );
             }
+        }) );
+
+
+//************************************************************
+        map.addControl( L.control.bsButton({
+            icon:['fa-edit', 'fa-home'],
         }) );
 
 

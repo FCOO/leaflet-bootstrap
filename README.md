@@ -70,7 +70,7 @@ http://FCOO.github.io/leaflet-bootstrap/demo/
     .setSize(sizeIndex)                 //Set the size of the marker (0-2)
     .setIconClass( iconClass, minSize ) //Set the classname for the icon inside the marker
     .setNumber( number, minSize )       //Set a number inside the marker
-
+    .asIcon()                           //Return options for this as icon in bsHeader etc.
 
 
 

@@ -16,7 +16,7 @@ lbm-puls          : Has a pulsing ring
 lbm-transparent   : Inner color get opacity: 0.7
 lbm-hover         : When hover: get big-shadow and opacity: 0.9 for ibm-transparent
 ************************************************/
-@mixin icon-color( $background-color: white ){
+@mixin marker-color( $background-color: white ){
     background-color: $background-color;
     color           : ch-best-color-contrast($background-color);
 
@@ -35,17 +35,46 @@ lbm-hover         : When hover: get big-shadow and opacity: 0.9 for ibm-transpar
     //Color for puls
     &:before { box-shadow: 0 0 6px 2px $background-color; }
 }
-@mixin icon-name-color( $name, $background-color: white ){
+@mixin marker-name-color( $name, $background-color: white ){
     .lbm-#{$name} {
-        @include icon-color($background-color);
+        @include marker-color($background-color);
     }
 }
 
-@mixin icon-border-color($border-color: black ){
+@mixin marker-border-color($border-color: black ){
     border-color: $border-color;
 }
-@mixin icon-border-name-color( $name, $border-color: black ){
+@mixin marker-name-border-color( $name, $border-color: black ){
     .lbm-border-#{$name} {
-        @include icon-border-color($border-color);
+        @include marker-border-color($border-color);
     }
+}
+
+
+@mixin icon-color( $color: black ){
+    color: $color;
+}
+@mixin icon-name-color( $name, $color: white ){
+    .fa-lbm-icon-#{$name} {
+        @include icon-color($color);
+    }
+}
+@mixin icon-name-border-color( $name, $border-color ){
+    .fa-lbm-icon-border-#{$name} {
+        @include icon-color($border-color);
+    }
+}
+
+
+/**********************************************************
+lbm-marker-and-icon-classes
+**********************************************************/
+@mixin lbm-marker-and-icon-classes( $name, $color, $border-color ){
+
+    @include marker-name-color( $name, $color );
+    @include marker-name-border-color( $name, $border-color );
+
+    @include icon-name-color( $name, $color );
+    @include icon-name-border-color( $name, $border-color );
+
 }

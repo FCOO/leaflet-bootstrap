@@ -224,6 +224,18 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
 (function ($, L, window, document, undefined) {
     "use strict";
 
+    /*****************************************************
+    L.bsMarkerAsIcon
+    Return the options to create a icon locking like a bsMarker
+    with the given color and border-color
+    *****************************************************/
+    L.bsMarkerAsIcon = function(colorName, borderColorName){
+        colorName = colorName || 'white';
+        borderColorName = borderColorName || 'black';
+        return $.bsMarkerIcon('fa-lbm-icon-'+colorName, 'fa-lbm-icon-border-'+borderColorName);
+    };
+
+
     var markerSizeList = [14, 20, 24], //MUST match $markerSizeList in _leaflet-bootstrap-marker.scss AND _leaflet-bootstrap-tooltip.scss
         iconList = [];
     $.each( markerSizeList, function( index, size ){
@@ -262,6 +274,9 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
             puls         : 'lbm-puls'
         };
 
+    /*****************************************************
+    L.BsMarker
+    *****************************************************/
     L.BsMarker = L.Marker.extend({
         options: {
             icon            : iconList[0],
@@ -448,9 +463,23 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
             if (minSize && (minSize > this.iconSizeIndex))
                 this.setSize( minSize );
             this.$icon.empty();
-            this.$icon.text(number);
+            $('<div/>')
+                .addClass('inner-text')
+                .text(number)
+                .appendTo( this.$icon );
         },
 
+
+        /*****************************************************
+        asIcon()
+        *****************************************************/
+        asIcon: function( /*inclPuls*/ ){
+            var result = L.bsMarkerAsIcon(this.colorName, this.borderColorName);
+            //if (inclPuls ){
+            //TODO
+            //}
+            return result;
+        },
 
         /*****************************************************
 

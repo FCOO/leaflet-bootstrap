@@ -11494,10 +11494,16 @@ FONTAWESOME
 Additions and adjustments to Fontawesome 5 (when included)
 ************************************************************/
 .fa-inside-circle {
-  font-size: .65em; }
+  position: relative;
+  top: -.1em; }
+  .fa-inside-circle:before {
+    font-size: .65em; }
 
 .fa-inside-circle2 {
-  font-size: .55em; }
+  position: relative;
+  top: -.2em; }
+  .fa-inside-circle2:before {
+    font-size: .55em; }
 
 /************************************************
 STYLE FOR DIFFERENT ELEMENTS
@@ -11531,9 +11537,9 @@ Bootstrap allready have the following classes
 .font-italic
 
 */
-.container-icon-and-text:not(.fa-stack) > i:not(:first-child),
-.container-icon-and-text:not(.fa-stack) > span:not(:first-child) {
-  padding-left: 0.3em; }
+.container-icon-and-text:not(.fa-stack) > .container-stacked-icons:not(:last-child),
+.container-icon-and-text:not(.fa-stack) > i:not(:last-child) {
+  margin-right: .4em; }
 
 .container-icon-and-text:not(.fa-stack) * {
   margin-top: 0;
@@ -11541,6 +11547,24 @@ Bootstrap allready have the following classes
 
 .container-icon-and-text:not(.fa-stack) ol, .container-icon-and-text:not(.fa-stack) ul, .container-icon-and-text:not(.fa-stack) dl {
   padding-left: 2em; }
+
+.container-stacked-icons {
+  text-align: center;
+  display: inline-block;
+  line-height: 1; }
+  .container-stacked-icons .stacked-icon {
+    width: 1em; }
+    .container-stacked-icons .stacked-icon:not(:first-child) {
+      margin-left: -1em; }
+
+/************************************************************
+Modernizr-test for stacted icon with parent with class="active" when selected
+************************************************************/
+.active .container-stacked-icons i.icon-hide-for-active {
+  opacity: inherit; }
+
+.no-active .container-stacked-icons i.icon-show-for-active {
+  opacity: 0; }
 
 /************************************************************
 BUTTON
@@ -11702,11 +11726,30 @@ div.btn, div.list-group-item {
     background-color: #007bff; }
     .mouse-hover .allow-zero-selected .btn.btn-standard.allow-zero-selected.active:hover {
       background-color: #006fe6; }
+  html.mouse-hover .btn.btn-standard.allow-zero-selected.active:hover {
+    background: #006fe6; }
+  .btn.btn-standard.allow-zero-selected.active {
+    color: #fff; }
+    .btn.btn-standard.allow-zero-selected.active:active, .btn.btn-standard.allow-zero-selected.active.active {
+      color: #e6e5e5; }
+    .btn.btn-standard.allow-zero-selected.active:focus, .btn.btn-standard.allow-zero-selected.active.focus {
+      color: #fff; }
+    .btn.btn-standard.allow-zero-selected.active.disabled, .btn.btn-standard.allow-zero-selected.active:disabled {
+      color: #fff; }
+    .mouse-hover .hover .btn.btn-standard.allow-zero-selected.active:not(:focus):not(:disabled):not(.disabled),
+    .mouse-hover .btn.btn-standard.allow-zero-selected.active.hover:not(:focus):not(:disabled):not(.disabled),
+    .mouse-hover .btn.btn-standard.allow-zero-selected.active:hover:not(:focus):not(:disabled):not(.disabled) {
+      color: #fff; }
   .btn.btn-standard > i.fa {
     min-width: 1em;
     text-align: left; }
     .btn.btn-standard > i.fa:only-child {
       text-align: center; }
+  .btn.btn-standard > span.fa-stack {
+    width: 1em;
+    height: 1em;
+    line-height: 1.21875rem;
+    vertical-align: top; }
   .btn.btn-standard.transparent {
     background-color: transparent;
     color: #D4D4D4;
@@ -11762,26 +11805,14 @@ div.btn, div.list-group-item {
 /************************************************************
 Modernizr-test for elements with class="active" when selected
 ************************************************************/
-.btn.active .show-for-active {
-  display: true; }
-
 .btn.active .hide-for-active {
   display: none !important; }
-
-.btn.active .hide-for-no-active {
-  display: true; }
 
 .btn.active .show-for-no-active {
   display: none !important; }
 
-.btn.no-active .hide-for-active {
-  display: true; }
-
 .btn.no-active .show-for-active {
   display: none !important; }
-
-.btn.no-active .show-for-no-active {
-  display: true; }
 
 .btn.no-active .hide-for-no-active {
   display: none !important; }
@@ -11999,6 +12030,8 @@ Icons for modal header inside a container
     width: 1em;
     line-height: 1em; }
   .header-icon-container .header-icon {
+    width: 1em;
+    text-align: center;
     color: #000;
     text-shadow: 0 1px 0 #fff;
     opacity: .5;
@@ -12007,22 +12040,28 @@ Icons for modal header inside a container
       opacity: .25; }
     .header-icon-container .header-icon.hidden {
       display: none; }
-    .header-icon-container .header-icon .show-for-hover {
-      display: none; }
     .header-icon-container .header-icon:not(.disabled):hover {
       color: #000;
       text-decoration: none;
       opacity: .75; }
-      .header-icon-container .header-icon:not(.disabled):hover .show-for-hover {
-        display: inherit; }
-      .header-icon-container .header-icon:not(.disabled):hover .hide-for-hover {
-        display: none; }
       .header-icon-container .header-icon:not(.disabled):hover:active {
         opacity: .9; }
+    .header-icon-container .header-icon.header-icon-close .back {
+      opacity: 0;
+      color: white; }
+    .header-icon-container .header-icon.header-icon-close .front {
+      opacity: 0;
+      color: #dc3545; }
     .header-icon-container .header-icon.header-icon-close:not(.disabled):hover {
       opacity: .9; }
       .header-icon-container .header-icon.header-icon-close:not(.disabled):hover:active {
         opacity: 1; }
+      .header-icon-container .header-icon.header-icon-close:not(.disabled):hover .back {
+        opacity: inherit; }
+      .header-icon-container .header-icon.header-icon-close:not(.disabled):hover .middle {
+        opacity: 0; }
+      .header-icon-container .header-icon.header-icon-close:not(.disabled):hover .front {
+        opacity: inherit; }
 
 /**************************************************
 CHECKBOX
@@ -12685,7 +12724,7 @@ body.modal-open .modal {
   .modal-dialog.modal-dialog-xs .modal-content .modal-body,
   .modal-dialog.modal-dialog-xs .modal-content .modal-body-fixed {
     padding: 0.25rem 0.25rem;
-    font-size: 0.8125rem; }
+    font-size: 0.75rem; }
   .modal-dialog.modal-dialog-xs .modal-content .modal-footer-header {
     font-weight: 400;
     display: flex;

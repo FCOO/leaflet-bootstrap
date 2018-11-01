@@ -44,14 +44,21 @@ $border-width: 2px;
 
     box-shadow  : 0px 0px 0px 1px rgba(white, .5); //.5 = estimate to look like google maps
 
-    @include icon-color();
-    @include icon-border-color();
+    @include marker-color();
+    @include marker-border-color();
 
     //Text
-    text-align    : center;
-    font-family   : $font-family-monospace;
-    letter-spacing: 0px;
-    font-weight   : bold;
+    text-align: center;
+    .inner-text {
+        font-family   : $font-family-monospace;
+        letter-spacing: 0px;
+        font-weight   : bold;
+        overflow      : visible;
+        white-space   : nowrap;
+        width         : calc(100% + 2*#{$border-width});
+        margin-left   : -1 * $border-width;
+        overflow      : hidden;
+    }
 
     //The puls
     &:before {
@@ -114,9 +121,7 @@ $dark:          $gray-800 !default;
     standard    : #4285F4 //= rgba(66, 133, 244) = google maps color for location icon
 
 ){
-    @include icon-name-color( $name, $color );
-
-    @include icon-border-name-color( $name, $color );
+    @include lbm-marker-and-icon-classes( $name, $color, $color );
 }
 
 
