@@ -85,13 +85,16 @@ lbm-hover         : When hover: get big-shadow and opacity: 0.9 for ibm-transpar
 
 .lbm-icon {
   opacity: 1;
-  border-radius: 100%;
   border: 2px solid black;
   box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.5);
   background-color: white;
   color: #000;
   border-color: black;
   text-align: center; }
+  .lbm-icon.lbm-round {
+    border-radius: 100%; }
+    .lbm-icon.lbm-round:before {
+      border-radius: 100%; }
   .lbm-icon.lbm-transparent {
     background-color: rgba(255, 255, 255, 0.7); }
     .lbm-icon.lbm-transparent.lbm-hover:hover {
@@ -113,7 +116,6 @@ lbm-hover         : When hover: get big-shadow and opacity: 0.9 for ibm-transpar
     display: none;
     position: absolute;
     content: "";
-    border-radius: 100%;
     height: 300%;
     width: 300%;
     margin: -100% 0 0 -100%; }

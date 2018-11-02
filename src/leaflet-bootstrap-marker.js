@@ -12,10 +12,10 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
     Return the options to create a icon locking like a bsMarker
     with the given color and border-color
     *****************************************************/
-    L.bsMarkerAsIcon = function(colorName, borderColorName){
+    L.bsMarkerAsIcon = function(colorName, borderColorName, options){
         colorName = colorName || 'white';
         borderColorName = borderColorName || 'black';
-        return $.bsMarkerIcon('fa-lbm-icon-'+colorName, 'fa-lbm-icon-border-'+borderColorName);
+        return $.bsMarkerIcon('fa-lbm-icon-'+colorName, 'fa-lbm-icon-border-'+borderColorName, options);
     };
 
 
@@ -51,6 +51,7 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
     };
 
     var classNames = {
+            round        : 'lbm-round',
             transparent  : 'lbm-transparent',
             bigShadow    : 'lbm-big-shadow',
             hover        : 'lbm-hover',
@@ -66,6 +67,7 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
 
             iconSize        : 0,                //0: normal, 1. larger with icon or umber, 2: Very large (touch-mode)
             iconClass       : '',               //Fontawesome Font class-name ("fa-home") for icon inside the marker
+            round           : true,             //If false the icon is square
             number          : undefined,        //Number inside the marker
 
             draggable       : false,            //Whether the marker is draggable with mouse/touch or not.
@@ -129,10 +131,11 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
             //Create $icon to hold class-names
             this.$icon = $('<div/>');
 
-            this.toggleOption('transparent', !!this.options.transparent );
-            this.toggleOption('bigShadow',   !!this.options.bigShadow );
-            this.toggleOption('hover',       !!this.options.hover );
-            this.toggleOption('puls',        !!this.options.puls );
+            var _this = this;
+            $.each(['round', 'transparent', 'bigShadow', 'hover', 'puls'], function( index, id ){
+                _this.toggleOption(id, !!_this.options[id] );
+            });
+
             if (this.options.color)
                 this.setColor(this.options.color);
             if (this.options.borderColor)
@@ -256,12 +259,12 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
         /*****************************************************
         asIcon()
         *****************************************************/
-        asIcon: function( /*inclPuls*/ ){
-            var result = L.bsMarkerAsIcon(this.colorName, this.borderColorName);
-            //if (inclPuls ){
-            //TODO
-            //}
-            return result;
+        asIcon: function( options ){
+            options = $.extend(
+                        this.options.round ? {} : {baseClass: 'fa-square'},
+                        options || {}
+                      );
+            return L.bsMarkerAsIcon(this.colorName, this.borderColorName, options);
         },
 
         /*****************************************************

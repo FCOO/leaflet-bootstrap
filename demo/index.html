@@ -59,11 +59,14 @@
                     $('<div/>')._bsAddHtml({icon:'fa-home', text:{da:'Lang Dansk', en:'LongEng'}})
                 ];
             function addMarker( latlng){
+                var isRoundAndOrange = Math.random() >= 0.5;
+
                 var marker = L.bsMarker( latlng, {
+                            round: isRoundAndOrange,
                             iconSize: 2, iconClass: 'fa-home',
                             bigShadow: true,
                             draggable: true,
-                            color    : 'orange',
+                            color    : isRoundAndOrange ? 'orange' : 'danger',
                             borderColor: 'black',
                             puls: true,
                             transparent: true,
