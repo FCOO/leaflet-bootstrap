@@ -1,13 +1,13 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="da" style="font-size: 100%">
 <head>
-	<title>fcoo.dk - leaflet-bootstrap - Demo</title>
-	<meta charset="utf-8" />
+    <title>fcoo.dk - leaflet-bootstrap - Demo</title>
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta http-equiv='x-dns-prefetch-control' content='on'>
 
-	<meta name='copyright' content='FCOO'>
-	<meta name='owner' content='FCOO'>
+    <meta name='copyright' content='FCOO'>
+    <meta name='owner' content='FCOO'>
 
     <link  href="bower_components.css" rel="stylesheet">
     <link  href="../src/leaflet-bootstrap.css" rel="stylesheet">
@@ -22,129 +22,233 @@
 </head>
 
 <body>
-	<div id="map" style="cursor: pointer; _width: 800px; _height: 600px"></div>
+    <div id="map" style="cursor: pointer; _width: 800px; _height: 600px"></div>
 
 
 
 
-	<script src="bower_components.js"></script>
-	<script src="../src/leaflet-bootstrap-control-modal.js"></script>
-	<script src="../src/leaflet-bootstrap-control-button.js"></script>
-	<script src="../src/leaflet-bootstrap-popup.js"></script>
-	<script src="../src/leaflet-bootstrap.js"></script>
-	<script src="../src/leaflet-bootstrap-marker.js"></script>
-	<script src="../src/leaflet-bootstrap-tooltip.js"></script>
-	<script>
+    <script src="bower_components.js"></script>
+    <script src="../src/leaflet-bootstrap-polyline.js"></script>
+    <script src="../src/leaflet-bootstrap-control-modal.js"></script>
+    <script src="../src/leaflet-bootstrap-control-button.js"></script>
+    <script src="../src/leaflet-bootstrap-popup.js"></script>
+    <script src="../src/leaflet-bootstrap.js"></script>
+    <script src="../src/leaflet-bootstrap-marker.js"></script>
+    <script src="../src/leaflet-bootstrap-tooltip.js"></script>
+    <script>
     window.bsIsTouch = false;
     window.bsIsTouch = (window.location.search =='?touch');
 
-		$(function() {
-            i18next.init();
-            i18next.changeLanguage('en');
+    i18next.init();
+    i18next.changeLanguage('en');
+
+    var map = L.map('map', {
+
+    }).setView([56.2, 11.5], 6);
+
+    L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors</a>'
+    }).addTo(map);
+
+    //**************************************
+    var polyLine = L.polyline([[56.5, 10.5], [57,12], [55,12]], {
+            lineColorName: 'teal',
+            border: true,
+            _shadow: true,
+            hover: true,
+            transparent: true,
+            shadowWhenPopupOpen: true,
+            addInteractive: true,
+            interactive: true,
+        }).addTo(map);
+
+    polyLine.bindTooltip('Tooltip');
+    polyLine.bindPopup('Popup')
+
+    var polygon = L.polygon([[56.5, 1+10.5], [57,2+12], [55,2+12]], {
+
+            colorName: 'green',
+            borderColorName: 'black',
+            border: true,
+            _shadow: true,
+
+            fill: true,
+            hover: true,
+            transparent: true,
+            shadowWhenPopupOpen: true,
+
+            addInteractive: true,
+            interactive: true,
+        }).addTo(map);
 
 
+    polygon.bindTooltip('Tooltip2')
+    polygon.bindPopup('Popup2')
 
 
-            var map = L.map('map', {
+    //map.on('click', function(){ polyLine.setInteractive(); polygon.setInteractive(); });
 
-            }).setView([56.2, 11.5], 6);
 
-			L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-				maxZoom: 18,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors</a>'
-            }).addTo(map);
-
-            var tooltip = [
-                    $('<div/>')._bsAddHtml({icon:'fa-home', text:{da:'Dansk', en:'Eng'}}),
-                    $('<div/>')._bsAddHtml({icon:'fa-home', text:{da:'Lang Dansk', en:'LongEng'}})
-                ];
-            function addMarker( latlng){
-                var isRoundAndOrange = Math.random() >= 0.5;
-
-                var marker = L.bsMarker( latlng, {
-                            round: isRoundAndOrange,
-                            iconSize: 2, iconClass: 'fa-home',
-                            bigShadow: true,
-                            draggable: true,
-                            color    : isRoundAndOrange ? 'orange' : 'danger',
-                            borderColor: 'black',
-                            puls: true,
-                            transparent: true,
-                            hover: true,
-                            bigIconWhenTouch: true,
-                            tooltip: tooltip,
-                            _tooltipPermanent: true,
-                            tooltipHideWhenDragging: true
-                    }).addTo( map );
-
-                    marker.on('click', function(){
-                        this._tooltip.setContent('<p style="background-color:red">NY'+Math.round(Math.random()*10000)+'</p>');
-
-                        //this.setColor('black');
-                        //this.setBorderColor('orange');
-                        //this.toggleOption('puls');
-                        //this.setIconClass('fa-home', 1);
-                        this.setSize(1);
-                        this.setNumber('123456789', 1);
-
-                        },
-                        marker
-                    );
-                    marker.bindPopup(
-//                        'Dette er 1. linie<br>Dette er 2. linie'
-                    {
-                        width: 234,
-                        closeButton: false,
-                        header: {
-                            icon: marker.asIcon(),
-                            text: 'Davs',
-                        },
-                        fixable: true,
-                        _icons: {
-                            back: { onClick: function(){ console.log('BACK!'); } },
-                            forward: { onClick: function(){ console.log('FORWARD!'); } }
-                        },
-                        buttons: [
-                        {
-                            icon: 'fa-map',
-                            text:'Inds.',
-                            onClick: function(){
-                                marker._popup.changeContent({
-                                    content: 'NY'+Math.round(Math.random()*10000),
-                                    extended: {
-                                        content: 'NY EXTENDED'+Math.round(Math.random()*10000)
-                                    }
-                                });
-                            }
-                        },
-                        {
-                            icon:'fa-home',
-                            text:{da:'Skift', en:'Change'},
-                            onClick: function(){
-                                marker._popup.setContent({
-                                    closeButton: true,
-                                    header:'Davs igen',
-                                    fixable: true,
-                                    content: 'NIELS:'+Math.round(Math.random()*10000),
-                                    _extended: {
-                                        content: 'Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>'
-                                    }
-                                });
-                            }
-                        }],
-                        content: {icon: 'fa-home', text: 'Tekst_og_ikon_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord'}, scroll: true,
-
-                        extended: {
-                            content: ['<p>Dette er en p</p>', 'Jeg vil i span', 'Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>']
-                        }
-                    }
-                    );
+    var data = {
+        "type": "FeatureCollection",
+        "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [9, 52]
             }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                    "coordinates": [
+                        [10, 56.0], [11, 57.0], [10, 58.0], [11, 57]
+                    ]
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [[10, 54], [10, 55], [12, 55],[12, 54]]
+                ]
+            }
+        }
+        ]
+    }
+
+    L.geoJSON(data,{
+        onEachFeature: function (feature, layer) {
+            layer.bindTooltip('Tooltip geoJSON');
+            layer.bindPopup('popup geoJSON');
+            layer.on('mouseover', function () {
+                console.log(this.hideTooltip, 'mouseOVER');
+            });
+            layer.on('mouseout', function () {
+                console.log('mouseOUT');
+            });
+        },
+
+        polyline: {
+            borderColorName: "orange", width: 4,
+            addInteractive: true,
+            interactive: true,
+            _hover: true,
+            border: true,
+            shadow:false,
+            tooltipHideWhenPopupOpen: true,
+            shadowWhenPopupOpen: true,
+            transparent: true,
+        },
+        polygon: {
+            colorName: 'red',
+            borderColorName: "teal", width: 4,
+            addInteractive: true,
+            interactive: true,
+            hover: true,
+            border: true,
+            _shadow:true,
+            transparent: true,
+        }
+    }).addTo(map);
+
+    //**************************************
+    var tooltip = [
+            $('<div/>')._bsAddHtml({icon:'fa-home', text:{da:'Dansk', en:'Eng'}}),
+            $('<div/>')._bsAddHtml({icon:'fa-home', text:{da:'Lang Dansk', en:'LongEng'}})
+        ];
+    function addMarker( latlng){
+        var isRoundAndOrange = Math.random() >= 0.5;
+
+        var marker = L.bsMarker( latlng, {
+                    round: isRoundAndOrange,
+                    iconSize: 2, iconClass: 'fa-home',
+                    _shadow: true,
+                    draggable: true,
+                    colorName    : isRoundAndOrange ? 'orange' : 'danger',
+                    borderColorName: 'black',
+                    puls: true,
+                    transparent: true,
+                    hover: true,
+                    bigIconWhenTouch: true,
+                    tooltip: tooltip,
+                    _tooltipPermanent: true,
+                    tooltipHideWhenDragging: true,
+                    shadowWhenPopupOpen: true
+            }).addTo( map );
+
+            marker.on('click', function(){
+                this._tooltip.setContent('<p style="background-color:red">NY'+Math.round(Math.random()*10000)+'</p>');
+
+                //this.setColor('black');
+                //this.setBorderColor('orange');
+                this.toggleOption('puls');
+                //this.setIconClass('fa-home', 1);
+                //this.setSize(1);
+                this.setNumber('123456789', 1);
+
+                },
+                marker
+            );
+            marker.bindPopup(
+//                'Dette er 1. linie<br>Dette er 2. linie'
+            {
+                width: 234,
+                closeButton: false,
+                header: {
+                    icon: marker.asIcon(),
+                    text: 'Davs',
+                },
+                fixable: true,
+                _icons: {
+                    back: { onClick: function(){ console.log('BACK!'); } },
+                    forward: { onClick: function(){ console.log('FORWARD!'); } }
+                },
+                buttons: [
+                {
+                    icon: 'fa-map',
+                    text:'Inds.',
+                    onClick: function(){
+                        marker._popup.changeContent({
+                            content: 'NY'+Math.round(Math.random()*10000),
+                            extended: {
+                                content: 'NY EXTENDED'+Math.round(Math.random()*10000)
+                            }
+                        });
+                    }
+                },
+                {
+                    icon:'fa-home',
+                    text:{da:'Skift', en:'Change'},
+                    onClick: function(){
+                        marker._popup.setContent({
+                            closeButton: true,
+                            header:'Davs igen',
+                            fixable: true,
+                            content: 'NIELS:'+Math.round(Math.random()*10000),
+                            _extended: {
+                                content: 'Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>'
+                            }
+                        });
+                    }
+           }],
+                content: {icon: 'fa-home', text: 'Tekst_og_ikon_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord'}, scroll: true,
+
+                extended: {
+                    content: ['<p>Dette er en p</p>', 'Jeg vil i span', 'Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>']
+                }
+            }
+            );
+    }
 
 
-        map.on('click', function( mouseEvent ){ addMarker( mouseEvent.latlng ); });
+    map.on('click', function( mouseEvent ){ addMarker( mouseEvent.latlng ); });
 
-		var bGroup = L.control.bsButtonGroup({
+    var bGroup = L.control.bsButtonGroup({
             list: [
                 {icon:'fa-home'},
                 {icon:'fa-plus'},
@@ -152,10 +256,10 @@
                 {icon:'fa-map'}
             ]
         });
-		map.addControl(bGroup);
+        map.addControl(bGroup);
 
 
-//************************
+    //************************
     var selectItems3 = [
             {id: 'item1', text:{da:'Emne#1', en: 'Item#1'} },
             {id: 'item2', text:{da:'Emne#2', en: 'Item#2'} },
@@ -168,7 +272,7 @@
         ];
 
 
-//************************
+    //************************
     var modalControl = L.control.bsModal({
             flex: true,
             header: 'Header max h = 111/222',
@@ -259,143 +363,129 @@
 
         map.addControl( modalControl );
 
-//************************************************************
-        var formControl = L.control.bsModalForm({
-                    id: 'formId',
-                    _show: true,
-                    header: 'Davs',
-                    buttons: [
-                        {text:'Reset', onClick: function(){ testModalForm.setValue('formId1', -1);}      },
-                        {text:'Set=2', onClick: function(){ testModalForm.setValue('formId1', 'formSelect1');} }
-                    ],
-                    onSubmit: function( data ){ console.log( 'SUBMIT=', data ); myData = data; },
-                    onCancel: function( data ){ console.log( 'CANCEL=', data ); myData = data; },
-                    width: 321,
-                    content: {
-                        type: 'accordion',
-                        list: [
-                            {
-                                icon: 'fa-globe',
-                                title:{da:'En test', en:'A test'},
-                                content: [
-                        {
-                            id: 'mySlider', type:'slider', label:'Label (NIELS)',
-                            _handle: 'round',
-                            _showFromTo: false,
-                            grid: true,
-                            min:0, max:100, majorTicksOffset:0, _step:5, stepOffset:0, postfix:' km/t', _onChanging: function( obj ){ console.log( obj.value ); }
-                        },
-
-                        {
-                            id:'mySelection', type:'checkbox', text: 'Vælg mig'
-                        },
-                        {
-                            id:'formId2', validators: 'notEmpty _MYvalidatorName', type:'input',placeholder:'Placeholder (INPUT)', label: 'Label (NIELS)', after : {type:'button', text:{da:'kr.', en:'£'}}, before: {type:'button', icon:'fa-calculator'}
-                        },
-                        {
-                            id:'formId1', type: 'select', validators: 'notEmpty', _selectedId: 'formSelect4', placeholder:"Placeholder", label:'Label',
-                            items:[
-                                {id:'formSelect1', icon:'fa-home', text: 'Davs'},
-                                {id:'formSelect2', text:'Item 2'},
-                                {id:'formSelect3', text:'Item 3 SKIDE GODT'},
-                                {id:'formSelect4', text:'Item 4'},
-                                {id:'formSelect5', text:'Item 5'}
-                            ],
-                            showWhen: {'mySelection': false }
-                         },
-                        {
-                            id:'formId2-1', type: 'select', _selectedId: 'formSelect4', placeholder:"Placeholder", label:'Label',
-                            items:[
-                                {id:'formSelect1', icon:'fa-home', text: 'Davs'},
-                                {id:'formSelect2', text:'Item 2'},
-                                {id:'formSelect3', text:'Item 3 SKIDE GODT'},
-                                {id:'formSelect4', text:'Item 4'},
-                                {id:'formSelect5', text:'Item 5'}
-                            ]
-                        },
-                        {
-                            id:'formId3', type:'input',placeholder:'Placeholder (INPUT)', label: 'Label (NIELS)', after : {type:'button', text:{da:'kr.', en:'£'}}, before: {type:'button', icon:'fa-calculator'}
-                        },
-                        {
-                            id:'formId4', type:'input',placeholder:'Placeholder (INPUT)', label: 'Label (NIELS)', after : {type:'button', text:{da:'kr.', en:'£'}}, before: {type:'button', icon:'fa-calculator'}
-                        },
-                    ]
-                    },
+    //************************************************************
+    var formControl = L.control.bsModalForm({
+            id: 'formId',
+            _show: true,
+            header: 'Davs',
+            buttons: [
+                {text:'Reset', onClick: function(){ testModalForm.setValue('formId1', -1);}      },
+                {text:'Set=2', onClick: function(){ testModalForm.setValue('formId1', 'formSelect1');} }
+            ],
+            onSubmit: function( data ){ console.log( 'SUBMIT=', data ); myData = data; },
+            onCancel: function( data ){ console.log( 'CANCEL=', data ); myData = data; },
+            width: 321,
+            content: {
+                type: 'accordion',
+                list: [
                     {
                         icon: 'fa-globe',
-                        title:{da:'En anden test', en:'Another test'},
-                    }
-                    ]}
-            });
-
-        map.addControl( formControl );
-        var myData = { mySlider: 33 };
-        map.addControl( L.control.bsButton({
-            icon:'fa-edit',
-            onClick: function(){
-                formControl.bsModalForm.edit( myData );
-            }
-        }) );
-
-
-//************************************************************
-        map.addControl( L.control.bsButton({
-            icon:['fa-edit', 'fa-home'],
-        }) );
-
-
-
-
-//************************************************************
-		map.on('contextmenu', function( mouseEvent ){
-            var longContent = function(){
-    	            var content = '';
-                     lines = 15;
-                    for (var i=0; i<lines; i++ ){
-                        content += 'line '+i+'<br>';
-                    }
-                    return $('<div>' + content + 'This is a random<br>number '+Math.floor(Math.random()*1000000) +'</div>');
-		        }(),
-                shortContent = 'Det er bare mig';
-
-/*
-            var popup = L.popup({
-                    width: 200,
-                });
-            popup.setContent({
-*/
-
-            var popup = L.popup().setContent({
-
-                scroll      : true,
-                fixable     : true,
-                header      : {text:'setContent: This is a very long header and it should be to long'},
-                closeButton : true,
-                buttons     : [{
-                    icon:'fas fa-map-marker-alt',
-                    text:'Marker',
-                    closeOnClick: true,
-                    onClick: function(){addMarker(mouseEvent.latlng);}
-                }],
-
-                //verticalButtons : true,
-                width: 234,
-                content: shortContent,
-
-                isExtended: true,
-                extended: {
-                    width  : 345,
-                    content: longContent,
-                    scroll : true
+                        title:{da:'En test', en:'A test'},
+                        content: [
+                {
+                    id: 'mySlider', type:'slider', label:'Label (NIELS)',
+                    _handle: 'round',
+                    _showFromTo: false,
+                    grid: true,
+                    min:0, max:100, majorTicksOffset:0, _step:5, stepOffset:0, postfix:' km/t', _onChanging: function( obj ){ console.log( obj.value ); }
                 },
-            });
 
-			popup.setLatLng(mouseEvent.latlng).openOn(map);
-		});
-
-
+                {
+                    id:'mySelection', type:'checkbox', text: 'Vælg mig'
+                },
+                {
+                    id:'formId2', validators: 'notEmpty _MYvalidatorName', type:'input',placeholder:'Placeholder (INPUT)', label: 'Label (NIELS)', after : {type:'button', text:{da:'kr.', en:'£'}}, before: {type:'button', icon:'fa-calculator'}
+                },
+                {
+                    id:'formId1', type: 'select', validators: 'notEmpty', _selectedId: 'formSelect4', placeholder:"Placeholder", label:'Label',
+                    items:[
+                        {id:'formSelect1', icon:'fa-home', text: 'Davs'},
+                        {id:'formSelect2', text:'Item 2'},
+                        {id:'formSelect3', text:'Item 3 SKIDE GODT'},
+                        {id:'formSelect4', text:'Item 4'},
+                        {id:'formSelect5', text:'Item 5'}
+                    ],
+                    showWhen: {'mySelection': false }
+                 },
+                {
+                    id:'formId2-1', type: 'select', _selectedId: 'formSelect4', placeholder:"Placeholder", label:'Label',
+                    items:[
+                        {id:'formSelect1', icon:'fa-home', text: 'Davs'},
+                        {id:'formSelect2', text:'Item 2'},
+                        {id:'formSelect3', text:'Item 3 SKIDE GODT'},
+                        {id:'formSelect4', text:'Item 4'},
+                        {id:'formSelect5', text:'Item 5'}
+                    ]
+                },
+                {
+                    id:'formId3', type:'input',placeholder:'Placeholder (INPUT)', label: 'Label (NIELS)', after : {type:'button', text:{da:'kr.', en:'£'}}, before: {type:'button', icon:'fa-calculator'}
+                },
+                {
+                    id:'formId4', type:'input',placeholder:'Placeholder (INPUT)', label: 'Label (NIELS)', after : {type:'button', text:{da:'kr.', en:'£'}}, before: {type:'button', icon:'fa-calculator'}
+                },
+            ]
+            },
+            {
+                icon: 'fa-globe',
+                title:{da:'En anden test', en:'Another test'},
+            }
+            ]}
     });
 
-	</script>
+    map.addControl( formControl );
+    var myData = { mySlider: 33 };
+    map.addControl( L.control.bsButton({
+        icon:'fa-edit',
+        onClick: function(){
+            formControl.bsModalForm.edit( myData );
+        }
+    }) );
+
+
+    //************************************************************
+    map.addControl( L.control.bsButton({
+        icon:['fa-edit', 'fa-home'],
+    }) );
+
+
+    //************************************************************
+    map.on('contextmenu', function( mouseEvent ){
+        var longContent = function(){
+                var content = '';
+                lines = 15;
+                for (var i=0; i<lines; i++ ){
+                    content += 'line '+i+'<br>';
+                }
+                return $('<div>' + content + 'This is a random<br>number '+Math.floor(Math.random()*1000000) +'</div>');
+            }(),
+            shortContent = 'Det er bare mig';
+
+        var popup = L.popup().setContent({
+            scroll      : true,
+            fixable     : true,
+            header      : {text:'setContent: This is a very long header and it should be to long'},
+            closeButton : true,
+            buttons     : [{
+               icon:'fas fa-map-marker-alt',
+                text:'Marker',
+                closeOnClick: true,
+                onClick: function(){addMarker(mouseEvent.latlng);}
+            }],
+
+            //verticalButtons : true,
+            width: 234,
+            content: shortContent,
+
+            isExtended: true,
+            extended: {
+                width  : 345,
+                content: longContent,
+                scroll : true
+            },
+        });
+
+        popup.setLatLng(mouseEvent.latlng).openOn(map);
+    });
+    </script>
 </body>
 </html>

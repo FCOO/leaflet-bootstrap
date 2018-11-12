@@ -27,31 +27,36 @@ http://FCOO.github.io/leaflet-bootstrap/demo/
         useBigIcon      : false,            //True to make the icon big
         bigIconWhenTouch: false,            //True to make big icon when window.bsIsTouch == true and options.draggable == true
         transparent     : false,            //True to make the marker semi-transparent
-        hover           : false,            //True to show big-shadow and 0.9 opacuity for lbm-transparent when hover
-        bigShadow       : false,            //true to add big shadow to the marker
+        hover           : false,            //True to show shadow and 0.9 opacuity for lbm-transparent when hover
+        shadow          : false,            //true to add a shadow to the marker
         puls            : false,            //true to have a pulsart icon
-        color           : '',    	        //Name of color
-        borderColor     : '',               //Name of border-color. Same as color
+        colorName       : '',    	        //Class-name to give the color of the marker
+        borderColorName : '',               //Class-name to give the border-color
         tooltip                 : null,     //Content of tooltip
         tooltipPermanent        : false,    //Whether to open the tooltip permanently or only on mouseover.
         tooltipHideWhenDragging : false,    //True and tooltipPermanent: false => the tooltip is hidden when dragged
         tooltipHideWhenPopupOpen: false     //True and tooltipPermanent: false => the tooltip is hidden when popup is displayed
-        bigShadowWhenPopupOpen  : true      //When true a big-sdhadow is shown when the popup for the marker is open
+        shadowWhenPopupOpen     : true      //When true a shadow is shown when the popup for the marker is open
     }
 
-    /*
+    
     color and border-color:
-    "blue"
-    "indigo"
-    "purple"
     "pink"
-    "green"
-    "teal"
-    "cyan"
-    "white"
-    "gray"
-    "darkgray"
+    "purple"
+    "red"
     "orange"
+    "yellow"
+    "green"
+    "cyan"
+    "blue"
+    "brown"
+    "white"
+    "grey"
+    "black"
+    "indigo"
+    "teal"
+    "darkgray"
+    "black"
     "primary"
     "secondary"
     "success"
@@ -61,7 +66,7 @@ http://FCOO.github.io/leaflet-bootstrap/demo/
     "light"
     "dark"
     "standard" = rgba(66, 133, 244) = google maps color for location icon
-    */
+
     
     //Methods
     .toggleOption(optionId)             //Toggle the state of options[optionId]
@@ -112,6 +117,10 @@ Create control a la `$.bsModal`
 
 ### L.control.bsModalForm
 Create control a la `$.bsModalForm`
+
+
+### leaflet-polyline
+Including [fcoo/leaflet-polyline](https://github.com/FCOO/leaflet-polyline) and create extra colors for line- and fill-color
 
 <!-- 
 ### options

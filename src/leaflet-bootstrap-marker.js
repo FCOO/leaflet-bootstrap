@@ -53,7 +53,7 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
     var classNames = {
             round        : 'lbm-round',
             transparent  : 'lbm-transparent',
-            bigShadow    : 'lbm-big-shadow',
+            shadow       : 'lbm-shadow',
             hover        : 'lbm-hover',
             puls         : 'lbm-puls'
         };
@@ -76,42 +76,17 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
             useBigIcon      : false,            //True to make the icon big
             bigIconWhenTouch: false,            //True to make big icon when window.bsIsTouch == true and options.draggable == true
             transparent     : false,            //True to make the marker semi-transparent
-            hover           : false,            //True to show big-shadow and 0.9 opacuity for lbm-transparent when hover
-            bigShadow       : false,            //true to add big shadow to the marker
+            hover           : false,            //True to show shadow and 0.9 opacuity for lbm-transparent when hover
+            shadow          : false,            //true to add a shadow to the marker
             puls            : false,            //true to have a pulsart icon
-            color           : '',    	        //Name of color
-            borderColor     : '',               //Name of border-color. Same as color
+            colorName       : '',    	        //Class-name to give the color of the marker
+            borderColorName : '',               //Class-name to give the border-color
             tooltip                 : null,     //Content of tooltip
             tooltipPermanent        : false,    //Whether to open the tooltip permanently or only on mouseover.
             tooltipHideWhenDragging : false,    //True and tooltipPermanent: false => the tooltip is hidden when dragged
             tooltipHideWhenPopupOpen: false,    //True and tooltipPermanent: false => the tooltip is hidden when popup is displayed
-            bigShadowWhenPopupOpen  : true      //When true a big-sdhadow is shown when the popup for the marker is open
+            shadowWhenPopupOpen     : true      //When true a big-sdhadow is shown when the popup for the marker is open
         },
-
-        /*
-        color and border-color:
-        "blue"
-        "indigo"
-        "purple"
-        "pink"
-        "green"
-        "teal"
-        "cyan"
-        "white"
-        "gray"
-        "darkgray"
-        "orange"
-        "primary"
-        "secondary"
-        "success"
-        "info"
-        "warning"
-        "danger"
-        "light"
-        "dark"
-        "standard" = rgba(66, 133, 244) = google maps color for location icon
-        */
-
 
         /*****************************************************
         initialize
@@ -132,14 +107,14 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
             this.$icon = $('<div/>');
 
             var _this = this;
-            $.each(['round', 'transparent', 'bigShadow', 'hover', 'puls'], function( index, id ){
+            $.each(['round', 'transparent', 'shadow', 'hover', 'puls'], function( index, id ){
                 _this.toggleOption(id, !!_this.options[id] );
             });
 
-            if (this.options.color)
-                this.setColor(this.options.color);
-            if (this.options.borderColor)
-                this.setBorderColor(this.options.borderColor);
+            if (this.options.colorName)
+                this.setColor(this.options.colorName);
+            if (this.options.borderColorName)
+                this.setBorderColor(this.options.borderColorName);
 
             //this.setSize(this.iconSizeIndex);
 
@@ -274,8 +249,8 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
             this._bringToFront();
             if (this.options.tooltipHideWhenPopupOpen && !this.options.tooltipPermanent)
                 this.hideTooltip();
-            if (this.options.bigShadowWhenPopupOpen && !this.options.bigShadow)
-                this.addClass( classNames['bigShadow'] );
+            if (this.options.shadowWhenPopupOpen && !this.options.shadow)
+                this.addClass( classNames['shadow'] );
             if (this.options.transparent)
                 this.removeClass( classNames['transparent'] );
             if (this.options.hover)
@@ -284,8 +259,8 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
         _popupclose: function(){
             if (this.options.tooltipHideWhenPopupOpen && !this.options.tooltipPermanent)
                 this.showTooltip();
-            if (this.options.bigShadowWhenPopupOpen && !this.options.bigShadow)
-                this.removeClass( classNames['bigShadow'] );
+            if (this.options.shadowWhenPopupOpen && !this.options.shadow)
+                this.removeClass( classNames['shadow'] );
             if (this.options.transparent)
                 this.addClass( classNames['transparent'] );
             if (this.options.hover)

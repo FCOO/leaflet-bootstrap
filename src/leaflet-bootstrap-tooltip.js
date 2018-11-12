@@ -1,5 +1,5 @@
 /****************************************************************************
-    leaflet-bootstrap.js,
+    leaflet-bootstrap-tooltip.js,
 
     (c) 2017, FCOO
 
