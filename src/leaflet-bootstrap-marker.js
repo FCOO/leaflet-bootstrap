@@ -101,7 +101,7 @@ Create L.bsMarker = a round marker with options for color, shadow and pulsart
                 if (this.options.bigIconWhenTouch && this.options.draggable && window.bsIsTouch)
                     this.iconSizeIndex = 2;
                 else
-                    this.iconSizeIndex = options.iconSize || 0;
+                    this.iconSizeIndex = this.options.iconSize || 0;
 
             //Create $icon to hold class-names
             this.$icon = $('<div/>');
