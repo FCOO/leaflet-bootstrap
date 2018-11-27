@@ -38,30 +38,3 @@
 //Style for modal-controls
 @import "leaflet-bootstrap-modal";
 
-//Style for bsMarker
-@import "leaflet-bootstrap-marker-mixin";
-@import "leaflet-bootstrap-marker";
-
-//Style for L.Polyline and L.Polygon - fcoo/leaflet-polyline
-@import "../bower_components/leaflet-polyline/src/leaflet-polyline-mixin";
-
-//Create extra colors for bsMarker and L.Polyline and L.Polygon
-@each $name, $color in (
-    "indigo"    : indigo,
-    "teal"      : teal,
-    "darkgray"  : darkgray,
-    primary     : $primary,
-    secondary   : $secondary,
-    success     : $success,
-    info        : $info,
-    warning     : $warning,
-    danger      : $danger,
-    light       : $light,
-    dark        : $dark,
-    standard    : #4285F4 //= rgba(66, 133, 244) = google maps color for location icon
-
-){
-    @include lbm-marker-and-icon-classes( $name, $color, $color );
-    @include polyline-classes( $name, $color, $color );
-}
-

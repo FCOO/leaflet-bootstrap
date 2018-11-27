@@ -11,7 +11,6 @@
 
     <link  href="bower_components.css" rel="stylesheet">
     <link  href="../src/leaflet-bootstrap.css" rel="stylesheet">
-    <!-- <link  href="test.css" rel="stylesheet"> -->
     <link  href="css/fontawesome-all.css" rel="stylesheet">
     <style>
         html, body, #map {
@@ -24,16 +23,11 @@
 <body>
     <div id="map" style="cursor: pointer; _width: 800px; _height: 600px"></div>
 
-
-
-
     <script src="bower_components.js"></script>
-    <script src="../src/leaflet-bootstrap-polyline.js"></script>
     <script src="../src/leaflet-bootstrap-control-modal.js"></script>
     <script src="../src/leaflet-bootstrap-control-button.js"></script>
     <script src="../src/leaflet-bootstrap-popup.js"></script>
     <script src="../src/leaflet-bootstrap.js"></script>
-    <script src="../src/leaflet-bootstrap-marker.js"></script>
     <script src="../src/leaflet-bootstrap-tooltip.js"></script>
     <script>
     window.bsIsTouch = false;
@@ -51,203 +45,9 @@
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors</a>'
     }).addTo(map);
 
-    //**************************************
-    var polyLine = L.polyline([[56.5, 10.5], [57,12], [55,12]], {
-            lineColorName: 'teal',
-            border: true,
-            _shadow: true,
-            hover: true,
-            transparent: true,
-            shadowWhenPopupOpen: true,
-            addInteractive: true,
-            interactive: true,
-        }).addTo(map);
-
-    polyLine.bindTooltip('Tooltip');
-    polyLine.bindPopup('Popup')
-
-    var polygon = L.polygon([[56.5, 1+10.5], [57,2+12], [55,2+12]], {
-
-            colorName: 'green',
-            borderColorName: 'black',
-            border: true,
-            _shadow: true,
-
-            fill: true,
-            hover: true,
-            transparent: true,
-            shadowWhenPopupOpen: true,
-
-            addInteractive: true,
-            interactive: true,
-        }).addTo(map);
 
 
-    polygon.bindTooltip('Tooltip2')
-    polygon.bindPopup('Popup2')
-
-
-    //map.on('click', function(){ polyLine.setInteractive(); polygon.setInteractive(); });
-
-
-    var data = {
-        "type": "FeatureCollection",
-        "features": [
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [9, 52]
-            }
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                    "coordinates": [
-                        [10, 56.0], [11, 57.0], [10, 58.0], [11, 57]
-                    ]
-            }
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Polygon",
-                "coordinates": [
-                    [[10, 54], [10, 55], [12, 55],[12, 54]]
-                ]
-            }
-        }
-        ]
-    }
-
-    L.geoJSON(data,{
-        onEachFeature: function (feature, layer) {
-            layer.bindTooltip('Tooltip geoJSON');
-            layer.bindPopup('popup geoJSON');
-            layer.on('mouseover', function () {
-                console.log(this.hideTooltip, 'mouseOVER');
-            });
-            layer.on('mouseout', function () {
-                console.log('mouseOUT');
-            });
-        },
-
-        polyline: {
-            borderColorName: "orange", width: 4,
-            addInteractive: true,
-            interactive: true,
-            _hover: true,
-            border: true,
-            shadow:false,
-            tooltipHideWhenPopupOpen: true,
-            shadowWhenPopupOpen: true,
-            transparent: true,
-        },
-        polygon: {
-            colorName: 'red',
-            borderColorName: "teal", width: 4,
-            addInteractive: true,
-            interactive: true,
-            hover: true,
-            border: true,
-            _shadow:true,
-            transparent: true,
-        }
-    }).addTo(map);
-
-    //**************************************
-    var tooltip = [
-            $('<div/>')._bsAddHtml({icon:'fa-home', text:{da:'Dansk', en:'Eng'}}),
-            $('<div/>')._bsAddHtml({icon:'fa-home', text:{da:'Lang Dansk', en:'LongEng'}})
-        ];
-    function addMarker( latlng){
-        var isRoundAndOrange = Math.random() >= 0.5;
-
-        var marker = L.bsMarker( latlng, {
-                    round: isRoundAndOrange,
-                    iconSize: 2, iconClass: 'fa-home',
-                    _shadow: true,
-                    draggable: true,
-                    colorName    : isRoundAndOrange ? 'orange' : 'danger',
-                    borderColorName: 'black',
-                    puls: true,
-                    transparent: true,
-                    hover: true,
-                    bigIconWhenTouch: true,
-                    tooltip: tooltip,
-                    _tooltipPermanent: true,
-                    tooltipHideWhenDragging: true,
-                    shadowWhenPopupOpen: true
-            }).addTo( map );
-
-            marker.on('click', function(){
-                this._tooltip.setContent('<p style="background-color:red">NY'+Math.round(Math.random()*10000)+'</p>');
-
-                //this.setColor('black');
-                //this.setBorderColor('orange');
-                this.toggleOption('puls');
-                //this.setIconClass('fa-home', 1);
-                //this.setSize(1);
-                this.setNumber('123456789', 1);
-
-                },
-                marker
-            );
-            marker.bindPopup(
-//                'Dette er 1. linie<br>Dette er 2. linie'
-            {
-                width: 234,
-                closeButton: false,
-                header: {
-                    icon: marker.asIcon(),
-                    text: 'Davs',
-                },
-                fixable: true,
-                _icons: {
-                    back: { onClick: function(){ console.log('BACK!'); } },
-                    forward: { onClick: function(){ console.log('FORWARD!'); } }
-                },
-                buttons: [
-                {
-                    icon: 'fa-map',
-                    text:'Inds.',
-                    onClick: function(){
-                        marker._popup.changeContent({
-                            content: 'NY'+Math.round(Math.random()*10000),
-                            extended: {
-                                content: 'NY EXTENDED'+Math.round(Math.random()*10000)
-                            }
-                        });
-                    }
-                },
-                {
-                    icon:'fa-home',
-                    text:{da:'Skift', en:'Change'},
-                    onClick: function(){
-                        marker._popup.setContent({
-                            closeButton: true,
-                            header:'Davs igen',
-                            fixable: true,
-                            content: 'NIELS:'+Math.round(Math.random()*10000),
-                            _extended: {
-                                content: 'Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>'
-                            }
-                        });
-                    }
-           }],
-                content: {icon: 'fa-home', text: 'Tekst_og_ikon_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord_ord'}, scroll: true,
-
-                extended: {
-                    content: ['<p>Dette er en p</p>', 'Jeg vil i span', 'Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>Skide godt<br>']
-                }
-            }
-            );
-    }
-
-
-    map.on('click', function( mouseEvent ){ addMarker( mouseEvent.latlng ); });
-
+    //************************
     var bGroup = L.control.bsButtonGroup({
             list: [
                 {icon:'fa-home'},
