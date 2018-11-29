@@ -534,7 +534,7 @@ Adjust standard Leaflet popup to display as Bootstrap modal
     https://github.com/FCOO
 
 ****************************************************************************/
-(function (/*$, L/*, window, document, undefined*/) {
+(function (/*$, L, window, document, undefined*/) {
     "use strict";
 
 }(jQuery, L, this, document));

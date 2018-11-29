@@ -24,10 +24,10 @@
     <div id="map" style="cursor: pointer; _width: 800px; _height: 600px"></div>
 
     <script src="bower_components.js"></script>
+    <script src="../src/leaflet-bootstrap.js"></script>
     <script src="../src/leaflet-bootstrap-control-modal.js"></script>
     <script src="../src/leaflet-bootstrap-control-button.js"></script>
     <script src="../src/leaflet-bootstrap-popup.js"></script>
-    <script src="../src/leaflet-bootstrap.js"></script>
     <script src="../src/leaflet-bootstrap-tooltip.js"></script>
     <script>
     window.bsIsTouch = false;
@@ -45,7 +45,7 @@
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors</a>'
     }).addTo(map);
 
-
+    L.marker([54,12], {draggable: true}).addTo(map);
 
     //************************
     var bGroup = L.control.bsButtonGroup({
