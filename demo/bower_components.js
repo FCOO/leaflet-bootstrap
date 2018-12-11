@@ -53380,7 +53380,7 @@ S2.define('jquery.select2',[
 
         new     : ['far fa-window-maximize fa-inside-circle2', 'far fa-circle'],
 
-        close   : ['fas fa-circle back', 'far fa-times-circle middle', 'fas fa-times-circle front']
+        close   : ['fas fa-circle back', 'far fa-times-circle middle', 'far fa-circle front']
     };
 
     //mandatoryHeaderIconClass = mandatory class-names and title for the different icons on the header
@@ -54497,7 +54497,9 @@ options
         $result.extend( bsModal_prototype );
 
         //Add close-icon and create modal content
-        options.icons = { close: { onClick: $.proxy( bsModal_prototype.close, $result) } };
+        options.icons = options.icons || {};
+        options.icons.close = { onClick: $.proxy( bsModal_prototype.close, $result) };
+
         $modalDialog._bsModalContent( options );
         $result.data('bsModalDialog', $modalDialog);
 

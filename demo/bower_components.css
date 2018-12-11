@@ -12022,7 +12022,7 @@ Icons for modal header inside a container
 ****************************************************/
 .header-icon-container {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   flex-shrink: 0;
   justify-content: center;
   margin-left: auto;
@@ -12051,22 +12051,20 @@ Icons for modal header inside a container
       opacity: .75; }
       .header-icon-container .header-icon:not(.disabled):hover:active {
         opacity: .9; }
+    .header-icon-container .header-icon.header-icon-close * {
+      text-shadow: none; }
     .header-icon-container .header-icon.header-icon-close .back {
-      opacity: 0;
-      color: white; }
-    .header-icon-container .header-icon.header-icon-close .front {
-      opacity: 0;
-      color: #dc3545; }
+      color: transparent; }
     .header-icon-container .header-icon.header-icon-close:not(.disabled):hover {
       opacity: .9; }
       .header-icon-container .header-icon.header-icon-close:not(.disabled):hover:active {
         opacity: 1; }
       .header-icon-container .header-icon.header-icon-close:not(.disabled):hover .back {
-        opacity: inherit; }
+        color: #dc3545; }
       .header-icon-container .header-icon.header-icon-close:not(.disabled):hover .middle {
-        opacity: 0; }
+        color: white; }
       .header-icon-container .header-icon.header-icon-close:not(.disabled):hover .front {
-        opacity: inherit; }
+        color: #dc3545; }
 
 /**************************************************
 CHECKBOX
