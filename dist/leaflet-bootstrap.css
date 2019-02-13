@@ -32,6 +32,9 @@ releative to container (rem -> em)
 $font-size-base         : 1rem !default;
 $spacer                 : 1rem !default;
 */
+/************************************************************
+Adjust dropdown-menu
+************************************************************/
 /***********************************************
 	leaflet-bootstrap-popup.scss,
 
