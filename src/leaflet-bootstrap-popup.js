@@ -8,9 +8,12 @@ Adjust standard Leaflet popup to display as Bootstrap modal
     "use strict";
 
     /*********************************************************
-    Overwrite default Popu-options: Remove default leaflet closeButton
+    Overwrite default Popu-options:
+    1: Remove default leaflet closeButton
+    2: Adjust offset to match new popup-tip
     *********************************************************/
     L.Popup.prototype.options.closeButton = false;
+    L.Popup.prototype.options.offset = [0, 11];
 
     //Add methods to pin or unpin popup
     L.Popup.prototype._setPinned = function(pinned) {
