@@ -25485,9 +25485,10 @@ if (typeof define === 'function' && define.amd) {
         if (!lngs) lngs = this.languages;
         if (!ns) ns = this.options.ns;
         if (!callback) callback = noop;
-        this.services.backendConnector.reload(lngs, ns, function () {
-          deferred.resolve();
-          callback(null);
+        this.services.backendConnector.reload(lngs, ns, function (err) {
+          deferred.resolve(); // not rejecting on err (as err is only a loading translation failed warning)
+
+          callback(err);
         });
         return deferred;
       }
@@ -50060,7 +50061,7 @@ options:
     window.TimeSlider = function (input, options, pluginCount) {
         var _this = this;
 
-        this.VERSION = "6.1.3";
+        this.VERSION = "6.1.4";
 
         //Setting default options
         this.options = $.extend( true, {}, defaultOptions, options );
@@ -50202,7 +50203,12 @@ options:
             //Setting tick at midnight
             value = o.min;
             while (value <= o.max){
-                if ( ((value - this.options.majorTicksOffset) % o.tickDistanceNum === 0) && (this._valueToTzMoment( value, this.options.format.timezone ).hour() === 0) ){
+                //Old version: Force midnights tag to be on minor-tick => error on shift to/from DST (Daylight Saving Time)
+                //if ( ((value - this.options.majorTicksOffset) % o.tickDistanceNum === 0) && (this._valueToTzMoment( value, this.options.format.timezone ).hour() === 0) ){
+
+                //New version: Allow midnights tags on every hour regardless if there are a tag
+                if (this._valueToTzMoment( value, this.options.format.timezone ).hour() === 0){
+
                     midnights++;
                     this.appendTick( valueP, tickOptions );
 
@@ -54506,15 +54512,24 @@ module.exports = g;
         if (options.allowZeroSelected)
             result.addClass( 'allow-zero-selected' );
 
-        if (options.fullWidth && !options.vertical)
+        if (options.fullWidth)
             result.addClass('btn-group-full-width');
+
+        if (options.border)
+            result.addClass('btn-group-border');
 
         if (options.attr)
             result.attr( options.attr );
 
         $.each( options.list, function(index, buttonOptions ){
-            $.bsButton( $.extend({}, options.buttonOptions, buttonOptions ) )
-                .appendTo( result );
+            if (buttonOptions.id)
+                $.bsButton( $.extend({}, options.buttonOptions, buttonOptions ) )
+                    .appendTo( result );
+            else
+                $('<div/>')
+                    .addClass('btn-group-header')
+                    ._bsAddHtml( buttonOptions )
+                    .appendTo( result );
         });
         return result;
     };
@@ -58169,7 +58184,7 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
 
     /*
 
-    Almost all elements comes in two sizes: normal and small set by options.small: ?lse/true
+    Almost all elements comes in two sizes: normal and small set by options.small: false/true
 
     In jquery-bootstrap.scss sizing class-postfix -xs is added (from Bootstrap 3)
 
