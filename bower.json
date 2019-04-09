@@ -1,6 +1,6 @@
 {
   "name": "leaflet-bootstrap",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "homepage": "https://github.com/FCOO/leaflet-bootstrap",
   "authors": [
     "Niels Holt"
@@ -17,7 +17,7 @@
   "dependencies": {
     "jquery": "latest",
     "leaflet": "latest",
-    "jquery-bootstrap": "fcoo/jquery-bootstrap#^1.35.0",
+    "jquery-bootstrap": "fcoo/jquery-bootstrap#^1.53.0",
     "leaflet-control-topcenter": "FCOO/leaflet-control-topcenter#^2.0.1",
     "javascript-utilities": "fcoo/javascript-utilities#^1.1.0"
   },
