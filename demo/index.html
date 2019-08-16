@@ -11,7 +11,7 @@
 
     <link  href="bower_components.css" rel="stylesheet">
     <link  href="../src/leaflet-bootstrap.css" rel="stylesheet">
-    <link  href="css/fontawesome-all.css" rel="stylesheet">
+    <link  href="css/all.css" rel="stylesheet">
     <style>
         html, body, #map {
             padding: 0; margin: 0; width:100%; height:100%;
@@ -30,6 +30,7 @@
     <script src="../src/leaflet-bootstrap-popup.js"></script>
     <script src="../src/leaflet-bootstrap-tooltip.js"></script>
     <script>
+
     window.bsIsTouch = false;
     window.bsIsTouch = (window.location.search =='?touch');
 
@@ -268,8 +269,8 @@
             buttons     : [{
                icon:'fas fa-map-marker-alt',
                 text:'Marker',
-                closeOnClick: true,
-                onClick: function(){addMarker(mouseEvent.latlng);}
+                //closeOnClick: true,
+                //onClick: function(){addMarker(mouseEvent.latlng);}
             }],
 
             //verticalButtons : true,
