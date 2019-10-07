@@ -42,24 +42,24 @@ Create leaflet-control for jquery-bootstrap button-classes:
             },
         });
 
-        L.control.BsButton = _bsButtons.extend({
-            _createContent: function(){ return $.bsButton(this.options); }
-        });
+    L.control.BsButton = _bsButtons.extend({
+        _createContent: function(){ return $.bsButton(this.options); }
+    });
 
-        L.control.BsButtonGroup = _bsButtons.extend({
-            options       : { vertical: true },
-            _createContent: function(){ return $.bsButtonGroup(this.options); }
-        });
+    L.control.BsButtonGroup = _bsButtons.extend({
+        options       : { vertical: true },
+        _createContent: function(){ return $.bsButtonGroup(this.options); }
+    });
 
-        L.control.BsRadioButtonGroup = L.control.BsButtonGroup.extend({
-//            options       : { vertical: true },
-            _createContent: function(){ return $.bsRadioButtonGroup(this.options); }
-        });
+    L.control.BsRadioButtonGroup = L.control.BsButtonGroup.extend({
+//        options       : { vertical: true },
+        _createContent: function(){ return $.bsRadioButtonGroup(this.options); }
+    });
 
+    L.control.bsButton           = function(options){ return new L.control.BsButton(options);           };
+    L.control.bsButtonGroup      = function(options){ return new L.control.BsButtonGroup(options);      };
+    L.control.bsRadioButtonGroup = function(options){ return new L.control.BsRadioButtonGroup(options); };
 
-        L.control.bsButton           = function(options){ return new  L.control.BsButton(options);           };
-        L.control.bsButtonGroup      = function(options){ return new  L.control.BsButtonGroup(options);      };
-        L.control.bsRadioButtonGroup = function(options){ return new  L.control.BsRadioButtonGroup(options); };
 
 }(jQuery, L, this, document));
 

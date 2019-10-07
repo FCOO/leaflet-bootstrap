@@ -18066,7 +18066,7 @@ return jQuery;
 }(jQuery, this, document));
 ;
 /*!
- * Bootstrap-select v1.13.10 (https://developer.snapappointments.com/bootstrap-select)
+ * Bootstrap-select v1.13.11 (https://developer.snapappointments.com/bootstrap-select)
  *
  * Copyright 2012-2019 SnapAppointments, LLC
  * Licensed under MIT (https://github.com/snapappointments/bootstrap-select/blob/master/LICENSE)
@@ -18926,7 +18926,7 @@ return jQuery;
     this.init();
   };
 
-  Selectpicker.VERSION = '1.13.10';
+  Selectpicker.VERSION = '1.13.11';
 
   // part of this is duplicated in i18n/defaults-en_US.js. Make sure to update both.
   Selectpicker.DEFAULTS = {
@@ -19279,15 +19279,6 @@ return jQuery;
 
         that.selectpicker.view.scrollTop = scrollTop;
 
-        if (isVirtual === true) {
-          // if an option that is encountered that is wider than the current menu width, update the menu width accordingly
-          if (that.sizeInfo.hasScrollBar && that.$menu[0].offsetWidth > that.sizeInfo.totalMenuWidth) {
-            that.sizeInfo.menuWidth = that.$menu[0].offsetWidth;
-            that.sizeInfo.totalMenuWidth = that.sizeInfo.menuWidth + that.sizeInfo.scrollBarWidth;
-            that.$menu.css('min-width', that.sizeInfo.menuWidth);
-          }
-        }
-
         chunkSize = Math.ceil(that.sizeInfo.menuInnerHeight / that.sizeInfo.liHeight * 1.5); // number of options in a chunk
         chunkCount = Math.round(size / chunkSize) || 1; // number of chunks
 
@@ -19305,7 +19296,7 @@ return jQuery;
 
           if (!size) break;
 
-          if (currentChunk === undefined && scrollTop <= that.selectpicker.current.data[endOfChunk - 1].position - that.sizeInfo.menuInnerHeight) {
+          if (currentChunk === undefined && scrollTop - 1 <= that.selectpicker.current.data[endOfChunk - 1].position - that.sizeInfo.menuInnerHeight) {
             currentChunk = i;
           }
         }
@@ -19410,6 +19401,29 @@ return jQuery;
             }
 
             menuInner.firstChild.appendChild(menuFragment);
+
+            // if an option is encountered that is wider than the current menu width, update the menu width accordingly
+            // switch to ResizeObserver with increased browser support
+            if (isVirtual === true && that.sizeInfo.hasScrollBar) {
+              var menuInnerInnerWidth = menuInner.firstChild.offsetWidth;
+
+              if (init && menuInnerInnerWidth < that.sizeInfo.menuInnerInnerWidth && that.sizeInfo.totalMenuWidth > that.sizeInfo.selectWidth) {
+                menuInner.firstChild.style.minWidth = that.sizeInfo.menuInnerInnerWidth + 'px';
+              } else if (menuInnerInnerWidth > that.sizeInfo.menuInnerInnerWidth) {
+                // set to 0 to get actual width of menu
+                that.$menu[0].style.minWidth = 0;
+
+                var actualMenuWidth = menuInner.firstChild.offsetWidth;
+
+                if (actualMenuWidth > that.sizeInfo.menuInnerInnerWidth) {
+                  that.sizeInfo.menuInnerInnerWidth = actualMenuWidth;
+                  menuInner.firstChild.style.minWidth = that.sizeInfo.menuInnerInnerWidth + 'px';
+                }
+
+                // reset to default CSS styling
+                that.$menu[0].style.minWidth = '';
+              }
+            }
           }
         }
 
@@ -19892,7 +19906,6 @@ return jQuery;
       text.className = 'text';
       a.className = 'dropdown-item ' + (firstOption ? firstOption.className : '');
       newElement.className = this.$menu[0].parentNode.className + ' ' + classNames.SHOW;
-      newElement.style.width = this.sizeInfo.selectWidth + 'px';
       if (this.options.width === 'auto') menu.style.minWidth = 0;
       menu.className = classNames.MENU + ' ' + classNames.SHOW;
       menuInner.className = 'inner ' + classNames.SHOW;
@@ -19975,6 +19988,7 @@ return jQuery;
       this.sizeInfo.menuPadding = menuPadding;
       this.sizeInfo.menuExtras = menuExtras;
       this.sizeInfo.menuWidth = menuWidth;
+      this.sizeInfo.menuInnerInnerWidth = menuWidth - menuPadding.horiz;
       this.sizeInfo.totalMenuWidth = this.sizeInfo.menuWidth;
       this.sizeInfo.scrollBarWidth = scrollBarWidth;
       this.sizeInfo.selectHeight = this.$newElement[0].offsetHeight;
@@ -20059,10 +20073,6 @@ return jQuery;
         minHeight = menuInnerMinHeight = '';
       }
 
-      if (this.options.dropdownAlignRight === 'auto') {
-        this.$menu.toggleClass(classNames.MENURIGHT, this.sizeInfo.selectOffsetLeft > this.sizeInfo.selectOffsetRight && this.sizeInfo.selectOffsetRight < (this.sizeInfo.totalMenuWidth - selectWidth));
-      }
-
       this.$menu.css({
         'max-height': maxHeight + 'px',
         'overflow': 'hidden',
@@ -20081,8 +20091,10 @@ return jQuery;
       if (this.selectpicker.current.data.length && this.selectpicker.current.data[this.selectpicker.current.data.length - 1].position > this.sizeInfo.menuInnerHeight) {
         this.sizeInfo.hasScrollBar = true;
         this.sizeInfo.totalMenuWidth = this.sizeInfo.menuWidth + this.sizeInfo.scrollBarWidth;
+      }
 
-        this.$menu.css('min-width', this.sizeInfo.totalMenuWidth);
+      if (this.options.dropdownAlignRight === 'auto') {
+        this.$menu.toggleClass(classNames.MENURIGHT, this.sizeInfo.selectOffsetLeft > this.sizeInfo.selectOffsetRight && this.sizeInfo.selectOffsetRight < (this.sizeInfo.totalMenuWidth - selectWidth));
       }
 
       if (this.dropdown && this.dropdown._popper) this.dropdown._popper.update();
@@ -20462,8 +20474,7 @@ return jQuery;
 
         // Don't run if the select is disabled
         if (!that.isDisabled() && !$this.parent().hasClass(classNames.DISABLED)) {
-          var $options = that.$element.find('option'),
-              option = clickedData.option,
+          var option = clickedData.option,
               $option = $(option),
               state = option.selected,
               $optgroup = $option.parent('optgroup'),
@@ -20479,7 +20490,7 @@ return jQuery;
           }
 
           if (!that.multiple) { // Deselect all others if not multi select box
-            prevOption.selected = false;
+            if (prevOption) prevOption.selected = false;
             option.selected = true;
             that.setSelected(clickedIndex, true);
           } else { // Toggle the one we have chosen if we are multi select.
@@ -20489,28 +20500,22 @@ return jQuery;
             $this.trigger('blur');
 
             if (maxOptions !== false || maxOptionsGrp !== false) {
-              var maxReached = maxOptions < $options.filter(':selected').length,
+              var maxReached = maxOptions < getSelectedOptions(element).length,
                   maxReachedGrp = maxOptionsGrp < $optgroup.find('option:selected').length;
 
               if ((maxOptions && maxReached) || (maxOptionsGrp && maxReachedGrp)) {
                 if (maxOptions && maxOptions == 1) {
-                  $options.prop('selected', false);
-                  $option.prop('selected', true);
-
-                  for (var i = 0; i < $options.length; i++) {
-                    that.setSelected(i, false);
-                  }
-
-                  that.setSelected(clickedIndex, true);
+                  element.selectedIndex = -1;
+                  option.selected = true;
+                  that.setOptionStatus(true);
                 } else if (maxOptionsGrp && maxOptionsGrp == 1) {
-                  $optgroup.find('option:selected').prop('selected', false);
-                  $option.prop('selected', true);
-
                   for (var i = 0; i < $optgroupOptions.length; i++) {
-                    var option = $optgroupOptions[i];
-                    that.setSelected($options.index(option), false);
+                    var _option = $optgroupOptions[i];
+                    _option.selected = false;
+                    that.setSelected(_option.liIndex, false);
                   }
 
+                  option.selected = true;
                   that.setSelected(clickedIndex, true);
                 } else {
                   var maxOptionsText = typeof that.options.maxOptionsText === 'string' ? [that.options.maxOptionsText, that.options.maxOptionsText] : that.options.maxOptionsText,
@@ -20525,7 +20530,7 @@ return jQuery;
                     maxTxtGrp = maxTxtGrp.replace('{var}', maxOptionsArr[2][maxOptionsGrp > 1 ? 0 : 1]);
                   }
 
-                  $option.prop('selected', false);
+                  option.selected = false;
 
                   that.$menu.append($notify);
 
@@ -20545,9 +20550,11 @@ return jQuery;
                     that.setSelected(clickedIndex, false);
                   }, 10);
 
-                  $notify.delay(750).fadeOut(300, function () {
-                    $(this).remove();
-                  });
+                  $notify[0].classList.add('fadeOut');
+
+                  setTimeout(function () {
+                    $notify.remove();
+                  }, 1050);
                 }
               }
             }
@@ -24122,22 +24129,15 @@ if (typeof define === 'function' && define.amd) {
     }, {
       key: "off",
       value: function off(event, listener) {
-        var _this2 = this;
+        if (!this.observers[event]) return;
 
-        if (!this.observers[event]) {
+        if (!listener) {
+          delete this.observers[event];
           return;
         }
 
-        this.observers[event].forEach(function () {
-          if (!listener) {
-            delete _this2.observers[event];
-          } else {
-            var index = _this2.observers[event].indexOf(listener);
-
-            if (index > -1) {
-              _this2.observers[event].splice(index, 1);
-            }
-          }
+        this.observers[event] = this.observers[event].filter(function (l) {
+          return l !== listener;
         });
       }
     }, {
@@ -25201,7 +25201,13 @@ if (typeof define === 'function' && define.amd) {
       _classCallCheck(this, Interpolator);
 
       this.logger = baseLogger.create('interpolator');
-      this.init(options, true);
+      this.options = options;
+
+      this.format = options.interpolation && options.interpolation.format || function (value) {
+        return value;
+      };
+
+      this.init(options);
     }
     /* eslint no-param-reassign: 0 */
 
@@ -25210,16 +25216,6 @@ if (typeof define === 'function' && define.amd) {
       key: "init",
       value: function init() {
         var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-        var reset = arguments.length > 1 ? arguments[1] : undefined;
-
-        if (reset) {
-          this.options = options;
-
-          this.format = options.interpolation && options.interpolation.format || function (value) {
-            return value;
-          };
-        }
-
         if (!options.interpolation) options.interpolation = {
           escapeValue: true
         };
@@ -25262,17 +25258,20 @@ if (typeof define === 'function' && define.amd) {
         var match;
         var value;
         var replaces;
+        var defaultData = this.options && this.options.interpolation && this.options.interpolation.defaultVariables || {};
+
+        var combindedData = _objectSpread({}, defaultData, data);
 
         function regexSafe(val) {
           return val.replace(/\$/g, '$$$$');
         }
 
         var handleFormat = function handleFormat(key) {
-          if (key.indexOf(_this.formatSeparator) < 0) return getPath(data, key);
+          if (key.indexOf(_this.formatSeparator) < 0) return getPath(combindedData, key);
           var p = key.split(_this.formatSeparator);
           var k = p.shift().trim();
           var f = p.join(_this.formatSeparator).trim();
-          return _this.format(getPath(data, k), f, lng);
+          return _this.format(getPath(combindedData, k), f, lng);
         };
 
         this.resetRegExp();
@@ -25283,6 +25282,19 @@ if (typeof define === 'function' && define.amd) {
 
         while (match = this.regexpUnescape.exec(str)) {
           value = handleFormat(match[1].trim());
+
+          if (value === undefined) {
+            if (typeof missingInterpolationHandler === 'function') {
+              var temp = missingInterpolationHandler(str, match, options);
+              value = typeof temp === 'string' ? temp : '';
+            } else {
+              this.logger.warn("missed to pass in variable ".concat(match[1], " for interpolating ").concat(str));
+              value = '';
+            }
+          } else if (typeof value !== 'string' && !this.useRawValueToEscape) {
+            value = makeString(value);
+          }
+
           str = str.replace(match[0], regexSafe(value));
           this.regexpUnescape.lastIndex = 0;
           replaces++;
@@ -25299,8 +25311,9 @@ if (typeof define === 'function' && define.amd) {
 
           if (value === undefined) {
             if (typeof missingInterpolationHandler === 'function') {
-              var temp = missingInterpolationHandler(str, match, options);
-              value = typeof temp === 'string' ? temp : '';
+              var _temp = missingInterpolationHandler(str, match, options);
+
+              value = typeof _temp === 'string' ? _temp : '';
             } else {
               this.logger.warn("missed to pass in variable ".concat(match[1], " for interpolating ").concat(str));
               value = '';
@@ -25331,6 +25344,8 @@ if (typeof define === 'function' && define.amd) {
         var clonedOptions = _objectSpread({}, options);
 
         clonedOptions.applyPostProcessor = false; // avoid post processing on nested lookup
+
+        delete clonedOptions.defaultValue; // assert we do not get a endless loop on interpolating defaultValue again and again
         // if value is something like "myKey": "lorem $(anotherKey, { "count": {{aValueInOptions}} })"
 
         function handleHasOptions(key, inheritedOptions) {
@@ -25346,8 +25361,10 @@ if (typeof define === 'function' && define.amd) {
             if (inheritedOptions) clonedOptions = _objectSpread({}, inheritedOptions, clonedOptions);
           } catch (e) {
             this.logger.error("failed parsing options string in nesting for key ".concat(key), e);
-          }
+          } // assert we do not get a endless loop on interpolating defaultValue again and again
 
+
+          delete clonedOptions.defaultValue;
           return key;
         } // regular escape on demand
 
@@ -26054,7 +26071,7 @@ if (typeof define === 'function' && define.amd) {
         var _this5 = this;
 
         var fixedT = function fixedT(key, opts) {
-          var options = _objectSpread({}, opts);
+          var options;
 
           if (_typeof(opts) !== 'object') {
             for (var _len3 = arguments.length, rest = new Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
@@ -26062,6 +26079,8 @@ if (typeof define === 'function' && define.amd) {
             }
 
             options = _this5.options.overloadTranslationOptionHandler([key, opts].concat(rest));
+          } else {
+            options = _objectSpread({}, opts);
           }
 
           options.lng = options.lng || fixedT.lng;
@@ -26206,7 +26225,7 @@ if (typeof define === 'function' && define.amd) {
 * https://github.com/RobinHerbots/Inputmask
 * Copyright (c) 2010 - 2019 Robin Herbots
 * Licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php)
-* Version: 4.0.7
+* Version: 4.0.9
 */
 
 (function(modules) {
@@ -26505,6 +26524,7 @@ if (typeof define === 'function' && define.amd) {
                 var that = this;
                 function importAttributeOptions(npt, opts, userOptions, dataAttribute) {
                     if (opts.importDataAttributes === true) {
+                        var attrOptions = npt.getAttribute(dataAttribute), option, dataoptions, optionData, p;
                         var importOption = function importOption(option, optionData) {
                             optionData = optionData !== undefined ? optionData : npt.getAttribute(dataAttribute + "-" + option);
                             if (optionData !== null) {
@@ -26514,7 +26534,6 @@ if (typeof define === 'function' && define.amd) {
                                 userOptions[option] = optionData;
                             }
                         };
-                        var attrOptions = npt.getAttribute(dataAttribute), option, dataoptions, optionData, p;
                         if (attrOptions && attrOptions !== "") {
                             attrOptions = attrOptions.replace(/'/g, '"');
                             dataoptions = JSON.parse("{" + attrOptions + "}");
@@ -27119,7 +27138,7 @@ if (typeof define === 'function' && define.amd) {
             maskset = maskset || this.maskset;
             opts = opts || this.opts;
             var inputmask = this, el = this.el, isRTL = this.isRTL, undoValue, $el, skipKeyPressEvent = false, skipInputEvent = false, ignorable = false, maxLength, mouseEnter = false, colorMask, originalPlaceholder;
-            function getMaskTemplate(baseOnInput, minimalPos, includeMode, noJit, clearOptionalTail) {
+            var getMaskTemplate = function getMaskTemplate(baseOnInput, minimalPos, includeMode, noJit, clearOptionalTail) {
                 var greedy = opts.greedy;
                 if (clearOptionalTail) opts.greedy = false;
                 minimalPos = minimalPos || 0;
@@ -27152,7 +27171,7 @@ if (typeof define === 'function' && define.amd) {
                 if (includeMode !== false || getMaskSet().maskLength === undefined) getMaskSet().maskLength = pos - 1;
                 opts.greedy = greedy;
                 return maskTemplate;
-            }
+            };
             function getMaskSet() {
                 return maskset;
             }
@@ -28970,7 +28989,7 @@ if (typeof define === 'function' && define.amd) {
                         initializeColorMask(el);
                     }
                     if (mobile) {
-                        if ("inputmode" in el) {
+                        if ("inputMode" in el) {
                             el.inputmode = opts.inputmode;
                             el.setAttribute("inputmode", opts.inputmode);
                         }
@@ -33553,7 +33572,7 @@ if (typeof define === 'function' && define.amd) {
  * 
  */
 /**
- * bluebird build version 3.5.5
+ * bluebird build version 3.7.0
  * Features enabled: core, race, call_get, generators, map, nodeify, promisify, props, reduce, settle, some, using, timers, filter, any, each
 */
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Promise=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof _dereq_=="function"&&_dereq_;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof _dereq_=="function"&&_dereq_;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
@@ -33585,7 +33604,6 @@ var firstLineError;
 try {throw new Error(); } catch (e) {firstLineError = e;}
 var schedule = _dereq_("./schedule");
 var Queue = _dereq_("./queue");
-var util = _dereq_("./util");
 
 function Async() {
     this._customScheduler = false;
@@ -33593,7 +33611,6 @@ function Async() {
     this._lateQueue = new Queue(16);
     this._normalQueue = new Queue(16);
     this._haveDrainedQueues = false;
-    this._trampolineEnabled = true;
     var self = this;
     this.drainQueues = function () {
         self._drainQueues();
@@ -33610,16 +33627,6 @@ Async.prototype.setScheduler = function(fn) {
 
 Async.prototype.hasCustomScheduler = function() {
     return this._customScheduler;
-};
-
-Async.prototype.enableTrampoline = function() {
-    this._trampolineEnabled = true;
-};
-
-Async.prototype.disableTrampolineIfNecessary = function() {
-    if (util.hasDevTools) {
-        this._trampolineEnabled = false;
-    }
 };
 
 Async.prototype.haveItemsQueued = function () {
@@ -33670,43 +33677,10 @@ function AsyncSettlePromises(promise) {
     this._queueTick();
 }
 
-if (!util.hasDevTools) {
-    Async.prototype.invokeLater = AsyncInvokeLater;
-    Async.prototype.invoke = AsyncInvoke;
-    Async.prototype.settlePromises = AsyncSettlePromises;
-} else {
-    Async.prototype.invokeLater = function (fn, receiver, arg) {
-        if (this._trampolineEnabled) {
-            AsyncInvokeLater.call(this, fn, receiver, arg);
-        } else {
-            this._schedule(function() {
-                setTimeout(function() {
-                    fn.call(receiver, arg);
-                }, 100);
-            });
-        }
-    };
+Async.prototype.invokeLater = AsyncInvokeLater;
+Async.prototype.invoke = AsyncInvoke;
+Async.prototype.settlePromises = AsyncSettlePromises;
 
-    Async.prototype.invoke = function (fn, receiver, arg) {
-        if (this._trampolineEnabled) {
-            AsyncInvoke.call(this, fn, receiver, arg);
-        } else {
-            this._schedule(function() {
-                fn.call(receiver, arg);
-            });
-        }
-    };
-
-    Async.prototype.settlePromises = function(promise) {
-        if (this._trampolineEnabled) {
-            AsyncSettlePromises.call(this, promise);
-        } else {
-            this._schedule(function() {
-                promise._settlePromises();
-            });
-        }
-    };
-}
 
 function _drainQueue(queue) {
     while (queue.length() > 0) {
@@ -33746,7 +33720,7 @@ Async.prototype._reset = function () {
 module.exports = Async;
 module.exports.firstLineError = firstLineError;
 
-},{"./queue":26,"./schedule":29,"./util":36}],3:[function(_dereq_,module,exports){
+},{"./queue":26,"./schedule":29}],3:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, INTERNAL, tryConvertToPromise, debug) {
 var calledBind = false;
@@ -34201,8 +34175,8 @@ return Context;
 
 },{}],9:[function(_dereq_,module,exports){
 "use strict";
-module.exports = function(Promise, Context) {
-var getDomain = Promise._getDomain;
+module.exports = function(Promise, Context,
+    enableAsyncHooks, disableAsyncHooks) {
 var async = Promise._async;
 var Warning = _dereq_("./errors").Warning;
 var util = _dereq_("./util");
@@ -34232,6 +34206,77 @@ var longStackTraces = !!(util.env("BLUEBIRD_LONG_STACK_TRACES") != 0 &&
 var wForgottenReturn = util.env("BLUEBIRD_W_FORGOTTEN_RETURN") != 0 &&
     (warnings || !!util.env("BLUEBIRD_W_FORGOTTEN_RETURN"));
 
+var deferUnhandledRejectionCheck;
+(function() {
+    var promises = [];
+
+    function unhandledRejectionCheck() {
+        for (var i = 0; i < promises.length; ++i) {
+            promises[i]._notifyUnhandledRejection();
+        }
+        unhandledRejectionClear();
+    }
+
+    function unhandledRejectionClear() {
+        promises.length = 0;
+    }
+
+    if (util.isNode) {
+        deferUnhandledRejectionCheck = (function() {
+            var timers = _dereq_("timers");
+            var timerSetTimeout = timers.setTimeout;
+            var timer = timerSetTimeout(unhandledRejectionCheck, 1);
+            timer.unref();
+
+            return function(promise) {
+                promises.push(promise);
+                if (typeof timer.refresh === "function") {
+                    timer.refresh();
+                } else {
+                    timerSetTimeout(unhandledRejectionCheck, 1).unref();
+                }
+            };
+        })();
+    } else if (typeof document === "object" && document.createElement) {
+        deferUnhandledRejectionCheck = (function() {
+            var iframeSetTimeout;
+
+            function checkIframe() {
+                if (document.body) {
+                    var iframe = document.createElement("iframe");
+                    document.body.appendChild(iframe);
+                    if (iframe.contentWindow &&
+                        iframe.contentWindow.setTimeout) {
+                        iframeSetTimeout = iframe.contentWindow.setTimeout;
+                    }
+                    document.body.removeChild(iframe);
+                }
+            }
+            checkIframe();
+            return function(promise) {
+                promises.push(promise);
+                if (iframeSetTimeout) {
+                    iframeSetTimeout(unhandledRejectionCheck, 1);
+                } else {
+                    checkIframe();
+                }
+            };
+        })();
+    } else {
+        deferUnhandledRejectionCheck = function(promise) {
+            promises.push(promise);
+            setTimeout(unhandledRejectionCheck, 1);
+        };
+    }
+
+    es5.defineProperty(Promise, "_unhandledRejectionCheck", {
+        value: unhandledRejectionCheck
+    });
+    es5.defineProperty(Promise, "_unhandledRejectionClear", {
+        value: unhandledRejectionClear
+    });
+})();
+
 Promise.prototype.suppressUnhandledRejections = function() {
     var target = this._target();
     target._bitField = ((target._bitField & (~1048576)) |
@@ -34241,10 +34286,7 @@ Promise.prototype.suppressUnhandledRejections = function() {
 Promise.prototype._ensurePossibleRejectionHandled = function () {
     if ((this._bitField & 524288) !== 0) return;
     this._setRejectionIsUnhandled();
-    var self = this;
-    setTimeout(function() {
-        self._notifyUnhandledRejection();
-    }, 1);
+    deferUnhandledRejectionCheck(this);
 };
 
 Promise.prototype._notifyUnhandledRejectionIsHandled = function () {
@@ -34302,19 +34344,13 @@ Promise.prototype._warn = function(message, shouldUseOwnTrace, promise) {
 };
 
 Promise.onPossiblyUnhandledRejection = function (fn) {
-    var domain = getDomain();
-    possiblyUnhandledRejection =
-        typeof fn === "function" ? (domain === null ?
-                                            fn : util.domainBind(domain, fn))
-                                 : undefined;
+    var context = Promise._getContext();
+    possiblyUnhandledRejection = util.contextBind(context, fn);
 };
 
 Promise.onUnhandledRejectionHandled = function (fn) {
-    var domain = getDomain();
-    unhandledRejectionHandled =
-        typeof fn === "function" ? (domain === null ?
-                                            fn : util.domainBind(domain, fn))
-                                 : undefined;
+    var context = Promise._getContext();
+    unhandledRejectionHandled = util.contextBind(context, fn);
 };
 
 var disableLongStackTraces = function() {};
@@ -34335,14 +34371,12 @@ Promise.longStackTraces = function () {
             Promise.prototype._attachExtraTrace = Promise_attachExtraTrace;
             Promise.prototype._dereferenceTrace = Promise_dereferenceTrace;
             Context.deactivateLongStackTraces();
-            async.enableTrampoline();
             config.longStackTraces = false;
         };
         Promise.prototype._captureStackTrace = longStackTracesCaptureStackTrace;
         Promise.prototype._attachExtraTrace = longStackTracesAttachExtraTrace;
         Promise.prototype._dereferenceTrace = longStackTracesDereferenceTrace;
         Context.activateLongStackTraces();
-        async.disableTrampolineIfNecessary();
     }
 };
 
@@ -34350,43 +34384,85 @@ Promise.hasLongStackTraces = function () {
     return config.longStackTraces && longStackTracesIsSupported();
 };
 
+
+var legacyHandlers = {
+    unhandledrejection: {
+        before: function() {
+            var ret = util.global.onunhandledrejection;
+            util.global.onunhandledrejection = null;
+            return ret;
+        },
+        after: function(fn) {
+            util.global.onunhandledrejection = fn;
+        }
+    },
+    rejectionhandled: {
+        before: function() {
+            var ret = util.global.onrejectionhandled;
+            util.global.onrejectionhandled = null;
+            return ret;
+        },
+        after: function(fn) {
+            util.global.onrejectionhandled = fn;
+        }
+    }
+};
+
 var fireDomEvent = (function() {
+    var dispatch = function(legacy, e) {
+        if (legacy) {
+            var fn;
+            try {
+                fn = legacy.before();
+                return !util.global.dispatchEvent(e);
+            } finally {
+                legacy.after(fn);
+            }
+        } else {
+            return !util.global.dispatchEvent(e);
+        }
+    };
     try {
         if (typeof CustomEvent === "function") {
             var event = new CustomEvent("CustomEvent");
             util.global.dispatchEvent(event);
             return function(name, event) {
+                name = name.toLowerCase();
                 var eventData = {
                     detail: event,
                     cancelable: true
                 };
+                var domEvent = new CustomEvent(name, eventData);
                 es5.defineProperty(
-                    eventData, "promise", {value: event.promise});
-                es5.defineProperty(eventData, "reason", {value: event.reason});
-                var domEvent = new CustomEvent(name.toLowerCase(), eventData);
-                return !util.global.dispatchEvent(domEvent);
+                    domEvent, "promise", {value: event.promise});
+                es5.defineProperty(
+                    domEvent, "reason", {value: event.reason});
+
+                return dispatch(legacyHandlers[name], domEvent);
             };
         } else if (typeof Event === "function") {
             var event = new Event("CustomEvent");
             util.global.dispatchEvent(event);
             return function(name, event) {
-                var domEvent = new Event(name.toLowerCase(), {
+                name = name.toLowerCase();
+                var domEvent = new Event(name, {
                     cancelable: true
                 });
                 domEvent.detail = event;
                 es5.defineProperty(domEvent, "promise", {value: event.promise});
                 es5.defineProperty(domEvent, "reason", {value: event.reason});
-                return !util.global.dispatchEvent(domEvent);
+                return dispatch(legacyHandlers[name], domEvent);
             };
         } else {
             var event = document.createEvent("CustomEvent");
             event.initCustomEvent("testingtheevent", false, true, {});
             util.global.dispatchEvent(event);
             return function(name, event) {
+                name = name.toLowerCase();
                 var domEvent = document.createEvent("CustomEvent");
-                domEvent.initCustomEvent(name.toLowerCase(), false, true,
+                domEvent.initCustomEvent(name, false, true,
                     event);
-                return !util.global.dispatchEvent(domEvent);
+                return dispatch(legacyHandlers[name], domEvent);
             };
         }
     } catch (e) {}
@@ -34502,6 +34578,18 @@ Promise.config = function(opts) {
         } else if (!opts.monitoring && config.monitoring) {
             config.monitoring = false;
             Promise.prototype._fireEvent = defaultFireEvent;
+        }
+    }
+    if ("asyncHooks" in opts && util.nodeSupportsAsyncResource) {
+        var prev = config.asyncHooks;
+        var cur = !!opts.asyncHooks;
+        if (prev !== cur) {
+            config.asyncHooks = cur;
+            if (cur) {
+                enableAsyncHooks();
+            } else {
+                disableAsyncHooks();
+            }
         }
     }
     return Promise;
@@ -35101,12 +35189,16 @@ var config = {
     warnings: warnings,
     longStackTraces: false,
     cancellation: false,
-    monitoring: false
+    monitoring: false,
+    asyncHooks: false
 };
 
 if (longStackTraces) Promise.longStackTraces();
 
 return {
+    asyncHooks: function() {
+        return config.asyncHooks;
+    },
     longStackTraces: function() {
         return config.longStackTraces;
     },
@@ -35135,7 +35227,7 @@ return {
 };
 };
 
-},{"./errors":12,"./es5":13,"./util":36}],10:[function(_dereq_,module,exports){
+},{"./errors":12,"./es5":13,"./util":36,"timers":undefined}],10:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise) {
 function returner() {
@@ -35805,8 +35897,7 @@ Promise.spawn = function (generatorFunction) {
 },{"./errors":12,"./util":36}],17:[function(_dereq_,module,exports){
 "use strict";
 module.exports =
-function(Promise, PromiseArray, tryConvertToPromise, INTERNAL, async,
-         getDomain) {
+function(Promise, PromiseArray, tryConvertToPromise, INTERNAL, async) {
 var util = _dereq_("./util");
 var canEvaluate = util.canEvaluate;
 var tryCatch = util.tryCatch;
@@ -35952,10 +36043,8 @@ Promise.join = function () {
 
                 if (!ret._isFateSealed()) {
                     if (holder.asyncNeeded) {
-                        var domain = getDomain();
-                        if (domain !== null) {
-                            holder.fn = util.domainBind(domain, holder.fn);
-                        }
+                        var context = Promise._getContext();
+                        holder.fn = util.contextBind(context, holder.fn);
                     }
                     ret._setAsyncGuaranteed();
                     ret._setOnCancel(holder);
@@ -35980,7 +36069,6 @@ module.exports = function(Promise,
                           tryConvertToPromise,
                           INTERNAL,
                           debug) {
-var getDomain = Promise._getDomain;
 var util = _dereq_("./util");
 var tryCatch = util.tryCatch;
 var errorObj = util.errorObj;
@@ -35989,8 +36077,8 @@ var async = Promise._async;
 function MappingPromiseArray(promises, fn, limit, _filter) {
     this.constructor$(promises);
     this._promise._captureStackTrace();
-    var domain = getDomain();
-    this._callback = domain === null ? fn : util.domainBind(domain, fn);
+    var context = Promise._getContext();
+    this._callback = util.contextBind(context, fn);
     this._preservedValues = _filter === INTERNAL
         ? new Array(this.length())
         : null;
@@ -35998,6 +36086,14 @@ function MappingPromiseArray(promises, fn, limit, _filter) {
     this._inFlight = 0;
     this._queue = [];
     async.invoke(this._asyncInit, this, undefined);
+    if (util.isArray(promises)) {
+        for (var i = 0; i < promises.length; ++i) {
+            var maybePromise = promises[i];
+            if (maybePromise instanceof Promise) {
+                maybePromise.suppressUnhandledRejections();
+            }
+        }
+    }
 }
 util.inherits(MappingPromiseArray, PromiseArray);
 
@@ -36327,20 +36423,42 @@ var apiRejection = function(msg) {
 function Proxyable() {}
 var UNDEFINED_BINDING = {};
 var util = _dereq_("./util");
+util.setReflectHandler(reflectHandler);
 
-var getDomain;
-if (util.isNode) {
-    getDomain = function() {
-        var ret = process.domain;
-        if (ret === undefined) ret = null;
-        return ret;
-    };
-} else {
-    getDomain = function() {
+var getDomain = function() {
+    var domain = process.domain;
+    if (domain === undefined) {
         return null;
+    }
+    return domain;
+};
+var getContextDefault = function() {
+    return null;
+};
+var getContextDomain = function() {
+    return {
+        domain: getDomain(),
+        async: null
     };
-}
-util.notEnumerableProp(Promise, "_getDomain", getDomain);
+};
+var AsyncResource = util.isNode && util.nodeSupportsAsyncResource ?
+    _dereq_("async_hooks").AsyncResource : null;
+var getContextAsyncHooks = function() {
+    return {
+        domain: getDomain(),
+        async: new AsyncResource("Bluebird::Promise")
+    };
+};
+var getContext = util.isNode ? getContextDomain : getContextDefault;
+util.notEnumerableProp(Promise, "_getContext", getContext);
+var enableAsyncHooks = function() {
+    getContext = getContextAsyncHooks;
+    util.notEnumerableProp(Promise, "_getContext", getContextAsyncHooks);
+};
+var disableAsyncHooks = function() {
+    getContext = getContextDomain;
+    util.notEnumerableProp(Promise, "_getContext", getContextDomain);
+};
 
 var es5 = _dereq_("./es5");
 var Async = _dereq_("./async");
@@ -36364,7 +36482,9 @@ var PromiseArray =
 var Context = _dereq_("./context")(Promise);
  /*jshint unused:false*/
 var createContext = Context.create;
-var debug = _dereq_("./debuggability")(Promise, Context);
+
+var debug = _dereq_("./debuggability")(Promise, Context,
+    enableAsyncHooks, disableAsyncHooks);
 var CapturedTrace = debug.CapturedTrace;
 var PassThroughHandlerContext =
     _dereq_("./finally")(Promise, tryConvertToPromise, NEXT_FILTER);
@@ -36561,7 +36681,7 @@ Promise.prototype._then = function (
         this._fireEvent("promiseChained", this, promise);
     }
 
-    var domain = getDomain();
+    var context = getContext();
     if (!((bitField & 50397184) === 0)) {
         var handler, value, settler = target._settlePromiseCtx;
         if (((bitField & 33554432) !== 0)) {
@@ -36579,15 +36699,14 @@ Promise.prototype._then = function (
         }
 
         async.invoke(settler, target, {
-            handler: domain === null ? handler
-                : (typeof handler === "function" &&
-                    util.domainBind(domain, handler)),
+            handler: util.contextBind(context, handler),
             promise: promise,
             receiver: receiver,
             value: value
         });
     } else {
-        target._addCallbacks(didFulfill, didReject, promise, receiver, domain);
+        target._addCallbacks(didFulfill, didReject, promise,
+                receiver, context);
     }
 
     return promise;
@@ -36648,7 +36767,15 @@ Promise.prototype._setWillBeCancelled = function() {
 
 Promise.prototype._setAsyncGuaranteed = function() {
     if (async.hasCustomScheduler()) return;
-    this._bitField = this._bitField | 134217728;
+    var bitField = this._bitField;
+    this._bitField = bitField |
+        (((bitField & 536870912) >> 2) ^
+        134217728);
+};
+
+Promise.prototype._setNoAsyncGuarantee = function() {
+    this._bitField = (this._bitField | 536870912) &
+        (~134217728);
 };
 
 Promise.prototype._receiverAt = function (index) {
@@ -36703,7 +36830,7 @@ Promise.prototype._addCallbacks = function (
     reject,
     promise,
     receiver,
-    domain
+    context
 ) {
     var index = this._length();
 
@@ -36716,12 +36843,10 @@ Promise.prototype._addCallbacks = function (
         this._promise0 = promise;
         this._receiver0 = receiver;
         if (typeof fulfill === "function") {
-            this._fulfillmentHandler0 =
-                domain === null ? fulfill : util.domainBind(domain, fulfill);
+            this._fulfillmentHandler0 = util.contextBind(context, fulfill);
         }
         if (typeof reject === "function") {
-            this._rejectionHandler0 =
-                domain === null ? reject : util.domainBind(domain, reject);
+            this._rejectionHandler0 = util.contextBind(context, reject);
         }
     } else {
         var base = index * 4 - 4;
@@ -36729,11 +36854,11 @@ Promise.prototype._addCallbacks = function (
         this[base + 3] = receiver;
         if (typeof fulfill === "function") {
             this[base + 0] =
-                domain === null ? fulfill : util.domainBind(domain, fulfill);
+                util.contextBind(context, fulfill);
         }
         if (typeof reject === "function") {
             this[base + 1] =
-                domain === null ? reject : util.domainBind(domain, reject);
+                util.contextBind(context, reject);
         }
     }
     this._setLength(index + 1);
@@ -36753,6 +36878,7 @@ Promise.prototype._resolveCallback = function(value, shouldBind) {
 
     if (shouldBind) this._propagateFrom(maybePromise, 2);
 
+
     var promise = maybePromise._target();
 
     if (promise === this) {
@@ -36769,7 +36895,7 @@ Promise.prototype._resolveCallback = function(value, shouldBind) {
         }
         this._setFollowing();
         this._setLength(0);
-        this._setFollowee(promise);
+        this._setFollowee(maybePromise);
     } else if (((bitField & 33554432) !== 0)) {
         this._fulfill(promise._value());
     } else if (((bitField & 16777216) !== 0)) {
@@ -37060,9 +37186,9 @@ _dereq_("./cancel")(Promise, PromiseArray, apiRejection, debug);
 _dereq_("./direct_resolve")(Promise);
 _dereq_("./synchronous_inspection")(Promise);
 _dereq_("./join")(
-    Promise, PromiseArray, tryConvertToPromise, INTERNAL, async, getDomain);
+    Promise, PromiseArray, tryConvertToPromise, INTERNAL, async);
 Promise.Promise = Promise;
-Promise.version = "3.5.5";
+Promise.version = "3.7.0";
 _dereq_('./call_get.js')(Promise);
 _dereq_('./generators.js')(Promise, apiRejection, INTERNAL, tryConvertToPromise, Proxyable, debug);
 _dereq_('./map.js')(Promise, PromiseArray, apiRejection, tryConvertToPromise, INTERNAL, debug);
@@ -37103,7 +37229,7 @@ _dereq_('./filter.js')(Promise, INTERNAL);
 
 };
 
-},{"./any.js":1,"./async":2,"./bind":3,"./call_get.js":5,"./cancel":6,"./catch_filter":7,"./context":8,"./debuggability":9,"./direct_resolve":10,"./each.js":11,"./errors":12,"./es5":13,"./filter.js":14,"./finally":15,"./generators.js":16,"./join":17,"./map.js":18,"./method":19,"./nodeback":20,"./nodeify.js":21,"./promise_array":23,"./promisify.js":24,"./props.js":25,"./race.js":27,"./reduce.js":28,"./settle.js":30,"./some.js":31,"./synchronous_inspection":32,"./thenables":33,"./timers.js":34,"./using.js":35,"./util":36}],23:[function(_dereq_,module,exports){
+},{"./any.js":1,"./async":2,"./bind":3,"./call_get.js":5,"./cancel":6,"./catch_filter":7,"./context":8,"./debuggability":9,"./direct_resolve":10,"./each.js":11,"./errors":12,"./es5":13,"./filter.js":14,"./finally":15,"./generators.js":16,"./join":17,"./map.js":18,"./method":19,"./nodeback":20,"./nodeify.js":21,"./promise_array":23,"./promisify.js":24,"./props.js":25,"./race.js":27,"./reduce.js":28,"./settle.js":30,"./some.js":31,"./synchronous_inspection":32,"./thenables":33,"./timers.js":34,"./using.js":35,"./util":36,"async_hooks":undefined}],23:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(Promise, INTERNAL, tryConvertToPromise,
     apiRejection, Proxyable) {
@@ -37122,6 +37248,7 @@ function PromiseArray(values) {
     var promise = this._promise = new Promise(INTERNAL);
     if (values instanceof Promise) {
         promise._propagateFrom(values, 3);
+        values.suppressUnhandledRejections();
     }
     promise._setOnCancel(this);
     this._values = values;
@@ -37860,14 +37987,13 @@ module.exports = function(Promise,
                           tryConvertToPromise,
                           INTERNAL,
                           debug) {
-var getDomain = Promise._getDomain;
 var util = _dereq_("./util");
 var tryCatch = util.tryCatch;
 
 function ReductionPromiseArray(promises, fn, initialValue, _each) {
     this.constructor$(promises);
-    var domain = getDomain();
-    this._fn = domain === null ? fn : util.domainBind(domain, fn);
+    var context = Promise._getContext();
+    this._fn = util.contextBind(context, fn);
     if (initialValue !== undefined) {
         initialValue = Promise.resolve(initialValue);
         initialValue._attachCancellationCallback(this);
@@ -37887,8 +38013,8 @@ function ReductionPromiseArray(promises, fn, initialValue, _each) {
 util.inherits(ReductionPromiseArray, PromiseArray);
 
 ReductionPromiseArray.prototype._gotAccum = function(accum) {
-    if (this._eachValues !== undefined && 
-        this._eachValues !== null && 
+    if (this._eachValues !== undefined &&
+        this._eachValues !== null &&
         accum !== INTERNAL) {
         this._eachValues.push(accum);
     }
@@ -37944,6 +38070,13 @@ ReductionPromiseArray.prototype._iterate = function (values) {
 
     this._currentCancellable = value;
 
+    for (var j = i; j < length; ++j) {
+        var maybePromise = values[j];
+        if (maybePromise instanceof Promise) {
+            maybePromise.suppressUnhandledRejections();
+        }
+    }
+
     if (!value.isRejected()) {
         for (; i < length; ++i) {
             var ctx = {
@@ -37953,7 +38086,12 @@ ReductionPromiseArray.prototype._iterate = function (values) {
                 length: length,
                 array: this
             };
+
             value = value._then(gotAccum, undefined, undefined, ctx, undefined);
+
+            if ((i & 127) === 0) {
+                value._setNoAsyncGuarantee();
+            }
         }
     }
 
@@ -38127,6 +38265,10 @@ SettledPromiseArray.prototype._promiseRejected = function (reason, index) {
 
 Promise.settle = function (promises) {
     debug.deprecated(".settle()", ".reflect()");
+    return new SettledPromiseArray(promises).promise();
+};
+
+Promise.allSettled = function (promises) {
     return new SettledPromiseArray(promises).promise();
 };
 
@@ -39130,18 +39272,42 @@ function getNativePromise() {
     if (typeof Promise === "function") {
         try {
             var promise = new Promise(function(){});
-            if ({}.toString.call(promise) === "[object Promise]") {
+            if (classString(promise) === "[object Promise]") {
                 return Promise;
             }
         } catch (e) {}
     }
 }
 
-function domainBind(self, cb) {
-    return self.bind(cb);
+var reflectHandler;
+function contextBind(ctx, cb) {
+    if (ctx === null ||
+        typeof cb !== "function" ||
+        cb === reflectHandler) {
+        return cb;
+    }
+
+    if (ctx.domain !== null) {
+        cb = ctx.domain.bind(cb);
+    }
+
+    var async = ctx.async;
+    if (async !== null) {
+        var old = cb;
+        cb = function() {
+            var args = (new Array(2)).concat([].slice.call(arguments));;
+            args[0] = old;
+            args[1] = this;
+            return async.runInAsyncScope.apply(async, args);
+        };
+    }
+    return cb;
 }
 
 var ret = {
+    setReflectHandler: function(fn) {
+        reflectHandler = fn;
+    },
     isClass: isClass,
     isIdentifier: isIdentifier,
     inheritedDataKeys: inheritedDataKeys,
@@ -39168,23 +39334,31 @@ var ret = {
     markAsOriginatingFromRejection: markAsOriginatingFromRejection,
     classString: classString,
     copyDescriptors: copyDescriptors,
-    hasDevTools: typeof chrome !== "undefined" && chrome &&
-                 typeof chrome.loadTimes === "function",
     isNode: isNode,
     hasEnvVariables: hasEnvVariables,
     env: env,
     global: globalObject,
     getNativePromise: getNativePromise,
-    domainBind: domainBind
+    contextBind: contextBind
 };
 ret.isRecentNode = ret.isNode && (function() {
     var version;
-    if (process.versions && process.versions.node) {    
+    if (process.versions && process.versions.node) {
         version = process.versions.node.split(".").map(Number);
     } else if (process.version) {
         version = process.version.split(".").map(Number);
     }
     return (version[0] === 0 && version[1] > 10) || (version[0] > 0);
+})();
+ret.nodeSupportsAsyncResource = ret.isNode && (function() {
+    var supportsAsync = false;
+    try {
+        var res = _dereq_("async_hooks").AsyncResource;
+        supportsAsync = typeof res.prototype.runInAsyncScope === "function";
+    } catch (e) {
+        supportsAsync = false;
+    }
+    return supportsAsync;
 })();
 
 if (ret.isNode) ret.toFastProperties(process);
@@ -39192,7 +39366,7 @@ if (ret.isNode) ret.toFastProperties(process);
 try {throw new Error(); } catch (e) {ret.lastLineError = e;}
 module.exports = ret;
 
-},{"./es5":13}]},{},[4])(4)
+},{"./es5":13,"async_hooks":undefined}]},{},[4])(4)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
 ;
 (function(self) {
@@ -41801,9 +41975,7 @@ return PerfectScrollbar;
         $('html').addClass('no-touchevents');
 
     //Create namespace
-
     var ns = window.JqueryScrollContainer = window.JqueryScrollContainer || {};
-
 
     //Get the width of default scrollbar
     var scrollbarWidth = null;
@@ -41825,6 +41997,46 @@ return PerfectScrollbar;
         }
         return scrollbarWidth;
     };
+
+
+    /**************************************************
+    Extend PerfectScrollbar.prototype with two methods
+    .lock(): Lock the scroll and prevents (allmost) all scroll
+    .unlock(): Unlock
+    Also overwrite onScroll to handle lock
+    **************************************************/
+    $.extend(window.PerfectScrollbar.prototype, {
+
+        lock: function(){
+            if (this.isLocked)
+                return;
+            this.isLocked = true;
+            this.lockedScrollTop = this.element.scrollTop;
+            this.lockedScrollLeft = this.element.scrollLeft;
+        },
+
+        unlock: function(){
+            if (!this.isLocked)
+                return;
+            this.element.scrollTop = this.lockedScrollTop;
+            this.element.scrollLeft = this.lockedScrollLeft;
+            this.update();
+            this.isLocked = false;
+        },
+    });
+
+    window.PerfectScrollbar.prototype.onScroll = function (onScroll) {
+		return function () {
+            if (this.isLocked){
+                this.element.scrollTop = this.lockedScrollTop;
+                this.element.scrollLeft = this.lockedScrollLeft;
+            }
+            //Original function/method
+            return onScroll.apply(this, arguments);
+		};
+	} (window.PerfectScrollbar.prototype.onScroll);
+
+
 
     //Extend $.fn with scrollIntoView
     $.fn.extend({
@@ -41861,13 +42073,14 @@ return PerfectScrollbar;
 
         defaultScrollbarOnTouch: false,       //If true and the browser support touchevents => use simple version using the browsers default scrollbar
         forceDefaultScrollbar  : false,      //If true => use simple version using the browsers default scrollbar (regardless of defaultScrollbarOnTouch and touchevents-support)
+
         adjustPadding          : 'scroll',   //['scroll', 'left', 'both', none']. Defines witch 'side(s)' that will have padding adjusted:
                                              //  'left'  : Only for direction: 'vertical': The paddingLeft of the container is set equal to the width of the scrollbar
                                              //  'scroll': Only when using browser default scrollbar: If the width of the default scrollbar > 0 => always have padding == scrollbar-width (also when no scrollbar is present)
                                              //  'both'  : As 'left' and 'scroll'
                                              //  'none'  : No adjustment beside the scrollbar when using perfect-scrollbar
         //hasTouchEvents: `true` if the browser supports touch-events and the scroll should use default scroll
-        hasTouchEvents: function(){ return window.modernizrOn('touchevents'); }
+        hasTouchEvents: function(){ return $('html').hasClass('touchevents'); }
     };
 
 
@@ -41895,8 +42108,14 @@ return PerfectScrollbar;
             .modernizrToggle('scroll-at-end', (position == 'end') || !hasScroll);
     };
 
+    /**************************************************
+    Extend jQuery-element with tree new methods
+    .addScrollbar( direction or options )
+    .lockScrollbar()
+    .unlockScrollbar()
+    **************************************************/
 
-    //addScrollBar( direction ) or addScrollBar( options )
+    //addScrollbar( direction ) or addScrollbar( options )
     $.fn.addScrollbar = function( options ){
         var _this = this;
         if ($.type( options ) == "string")
@@ -41939,7 +42158,7 @@ return PerfectScrollbar;
         //TODO: Not working for horizontal scroll
 //        if (!isBoth && !isIE11){
         if (isVertical && !isIE11){
-            this.addClass('jq-scroll-shadow');
+            this.addClass('jq-scroll-container-shadow');
             $('<div/>')
                 .addClass('jq-scroll-shadow top-left')
                 .appendTo(this);
@@ -41977,8 +42196,10 @@ return PerfectScrollbar;
             onResizeFunc = updateScrollClass;
         }
         else {
-            //no-touch browser => use perfect.scrollbar
-            this.toggleClass('jq-scroll-adjust-padding-left', adjustPaddingLeft);
+            //no-touch browser OR force using perfect-scroll => use perfect.scrollbar
+            this
+                .toggleClass('jq-scroll-adjust-padding-left', adjustPaddingLeft)
+                .modernizrToggle('touch', !!options.hasTouchEvents);
 
             //Create perfect.scrollbar
             this.perfectScrollbar = new window.PerfectScrollbar(this.get(0), options );
@@ -41996,6 +42217,10 @@ return PerfectScrollbar;
                 _this.perfectScrollbar.update();
                 updateScrollClass();
             };
+
+            //Save perfectScrollbar as data('perfectScrollbar') for both this and container
+            this.data('perfectScrollbar', this.perfectScrollbar );
+            this.scrollbarContainer.data('perfectScrollbar', this.perfectScrollbar );
         }
 
         //Update scroll-shadow when scrolling
@@ -42013,6 +42238,23 @@ return PerfectScrollbar;
 
         return this.scrollbarContainer;
     };
+
+    //$.fn.lockScrollbar
+    $.fn.lockScrollbar = function(){
+        var ps = this.data('perfectScrollbar');
+        if (ps)
+            ps.lock();
+        return this;
+    };
+
+    //$.fn.unlockScrollbar
+    $.fn.unlockScrollbar = function(){
+        var ps = this.data('perfectScrollbar');
+        if (ps)
+            ps.unlock();
+        return this;
+    };
+
 }(jQuery, this, document));
 ;
 // Stupid jQuery table plugin.
@@ -54694,11 +54936,15 @@ module.exports = g;
     **********************************************************/
     $.bsButton = function( options ){
         var optionToClassName = {
-                primary    : 'primary',
-                transparent: 'transparent',
-                square     : 'square',
-                bigIcon    : 'big-icon'
+                primary        : 'primary',
+                transparent    : 'transparent',
+                semiTransparent: 'semi-transparent',
+                square         : 'square',
+                bigIcon        : 'big-icon',
+                selected       : 'active',
+                focus          : 'init_focus'
             };
+
 
         options = options || {};
         options =
@@ -54733,12 +54979,6 @@ module.exports = g;
         result._bsAddBaseClassAndSize( options );
         if (!options.radioGroup)
             result._bsAddIdAndName( options );
-
-        if (options.selected)
-            result.addClass('active');
-
-        if (options.focus)
-            result.addClass('init_focus');
 
         if (options.attr)
             result.attr( options.attr );
@@ -56246,9 +56486,9 @@ options
 (function ($, window, document, undefined) {
 	"use strict";
 
-    //Adjusting default options and methods for jquery-scroll-contatiner
+    //Adjusting default options and methods for jquery-scroll-container
     $.extend(window.JqueryScrollContainer.scrollbarOptions, {
-        defaultScrollbarOnTouch: true,
+        defaultScrollbarOnTouch: false,
 
         //If touch-mode AND scrollbar-width > 0 => let jquery-scroll-container auto-adjust padding-right
         adjustPadding : function(){ return window.bsIsTouch && window.getScrollbarWidth() ? 'scroll' : 'none'; },
@@ -56278,8 +56518,10 @@ options
         noHorizontalPadding
         content
         scroll: boolean | 'vertical' | 'horizontal'
+        minimized,
         extended: {
             type
+            showHeaderOnClick (only minimized)
             fixedContent
             noVerticalPadding
             noHorizontalPadding
@@ -56298,7 +56540,13 @@ options
     **********************************************************/
     var modalId = 0,
         openModals = 0,
-        modalVerticalMargin = 10; //Top and bottom margin for modal windows
+        modalVerticalMargin = 10, //Top and bottom margin for modal windows
+
+        //Const to set different size of modal-window
+        MODAL_SIZE_NORMAL    = 1, //'normal',
+        MODAL_SIZE_MINIMIZED = 2, //'minimized',
+        MODAL_SIZE_EXTENDED  = 4; //'extended';
+
 
     /**********************************************************
     MAX-HEIGHT ISSUES ON SAFARI (AND OTHER BROWSER ON IOS)
@@ -56307,7 +56555,7 @@ options
     as expected/needed
     Instead a resize-event is added to update the max-height of
     elements with the current value of window.innerHeight
-    Sets both max-height and haight to allow always-max-heigth options
+    Sets both max-height and height to allow always-max-heigth options
     **********************************************************/
     function adjustModalMaxHeight( $modalContent ){
         $modalContent = $modalContent || $('.modal-content.modal-flex-height');
@@ -56344,11 +56592,10 @@ options
         return {
             flexWidth : !!options.flexWidth,
             extraWidth: !!options.extraWidth,
-            megaWidth: !!options.megaWidth,
+            megaWidth : !!options.megaWidth,
             width     : options.width ? options.width+'px' : null
         };
     }
-
 
     /******************************************************
     $._bsModal_closeMethods = [] of {selector[STRING], method[FUNCTION($this)]}
@@ -56455,6 +56702,7 @@ options
                     if (this.bsModal.onChange)
                         this.bsModal.onChange( this.bsModal );
                 },
+
         _close: function(){
             this.modal('hide');
         },
@@ -56500,7 +56748,7 @@ options
     Create the body and footer content (exc header and bottoms)
     of a modal inside this. Created elements are saved in parts
     ******************************************************/
-    $.fn._bsModalBodyAndFooter = function(options, parts, className, noClassNameForFixed, noClassNameForFooter){
+    $.fn._bsModalBodyAndFooter = function(size, options, parts, className, noClassNameForFixed, noClassNameForFooter){
 
         //Set variables used to set scroll-bar (if any)
         var hasScroll       = !!options.scroll,
@@ -56508,14 +56756,25 @@ options
             scrollDirection = options.scroll === true ? 'vertical' : options.scroll,
             scrollbarClass  = hasScroll ? 'scrollbar-'+scrollDirection : '';
 
+        className = (className || '') + ' show-for-modal-'+size;
+
         //Remove padding if the content is tabs and content isn't created from bsModal - not pretty :-)
-        if (isTabs)
-            className = className + ' no-vertical-padding no-horizontal-padding';
+        if (isTabs){
+            options.noVerticalPadding = true;
+            options.noHorizontalPadding = true;
+        }
 
         //Append fixed content (if any)
         var $modalFixedContent = parts.$fixedContent =
                 $('<div/>')
-                    .addClass('modal-body-fixed ' + (noClassNameForFixed ? '' : className) + ' ' + scrollbarClass /*(hasScroll ? ' scrollbar-'+scrollDirection : '')*/)
+                    .addClass('modal-body-fixed')
+                    .toggleClass(className, !noClassNameForFixed)
+                    .addClass(scrollbarClass )
+                    .toggleClass('no-vertical-padding', !!options.noVerticalPadding)
+                    .toggleClass('no-horizontal-padding', !!options.noHorizontalPadding)
+                    .toggleClass('modal-body-semi-transparent', !!options.semiTransparent)
+                    .toggleClass('modal-type-' + options.type, !!options.type)
+                    .addClass(options.fixedClassName || '')
                     .appendTo( this );
         if (options.fixedContent)
             $modalFixedContent._bsAddHtml( options.fixedContent, true );
@@ -56525,7 +56784,11 @@ options
                 $('<div/>')
                     .addClass('modal-body ' + className)
                     .toggleClass('modal-body-always-max-height', !!options.alwaysMaxHeight)
+                    .toggleClass('no-vertical-padding', !!options.noVerticalPadding)
+                    .toggleClass('no-horizontal-padding', !!options.noHorizontalPadding)
+                    .toggleClass('modal-body-semi-transparent', !!options.semiTransparent)
                     .toggleClass('modal-type-' + options.type, !!options.type)
+                    .addClass(options.className || '')
                     .appendTo( this );
 
         if (!options.content || (options.content === {}))
@@ -56558,7 +56821,38 @@ options
                     .addClass('modal-footer-header ' + (noClassNameForFooter ? '' : className))
                     .appendTo( this )
                     ._bsAddHtml( options.footer === true ? '' : options.footer );
+
+        //Add onClick to all elements - if nedded
+        if (options.onClick){
+            $modalContent.on('click', options.onClick);
+        }
+
         return this;
+    };
+
+
+    function get$modalContent( $elem ){
+        var bsModal = $elem.bsModal || $elem;
+        return bsModal.$modalContent || $elem;
+    }
+
+    /******************************************************
+    _bsModalSetSizeClass(size) - Set the class-name according to size
+    ******************************************************/
+    $.fn._bsModalSetSizeClass = function(size){
+        return get$modalContent(this)
+                   .modernizrToggle('modal-minimized', size == MODAL_SIZE_MINIMIZED )
+                   .modernizrToggle('modal-normal',    size == MODAL_SIZE_NORMAL)
+                   .modernizrToggle('modal-extended',  size == MODAL_SIZE_EXTENDED );
+    };
+
+    $.fn._bsModalGetSize = function(){
+        var $modalContent = get$modalContent(this);
+        return $modalContent.hasClass('modal-minimized') ?
+                   MODAL_SIZE_MINIMIZED :
+               $modalContent.hasClass('modal-normal') ?
+                   MODAL_SIZE_NORMAL :
+                   MODAL_SIZE_EXTENDED;
     };
 
     /******************************************************
@@ -56566,11 +56860,11 @@ options
     ******************************************************/
     $.fn._bsModalSetHeightAndWidth = function(){
         var bsModal = this.bsModal,
-            $modalContent = bsModal.$modalContent,
+            $modalContent = get$modalContent(this),
             $modalDialog = $modalContent.parent(),
-            isExtended = $modalContent.hasClass('modal-extended'),
-            cssHeight = isExtended ? bsModal.cssExtendedHeight : bsModal.cssHeight,
-            cssWidth = isExtended ? bsModal.cssExtendedWidth : bsModal.cssWidth;
+            size = $modalContent._bsModalGetSize(),
+            cssHeight = bsModal.cssHeight[size],
+            cssWidth = bsModal.cssWidth[size];
 
         //Set height
         $modalContent
@@ -56578,14 +56872,14 @@ options
             .toggleClass('modal-flex-height', !cssHeight)
             .css( cssHeight ? cssHeight : {height: 'auto', maxHeight: null});
         if (!cssHeight)
-            adjustModalMaxHeight( bsModal.$modalContent );
+            adjustModalMaxHeight( $modalContent );
 
         //Set width
         $modalDialog
             .toggleClass('modal-flex-width', cssWidth.flexWidth )
             .toggleClass('modal-extra-width', cssWidth.extraWidth )
             .toggleClass('modal-mega-width', cssWidth.megaWidth )
-            .css('width', cssWidth.width );
+            .css('width', cssWidth.width ? cssWidth.width : '' );
 
         //Call onChange (if any)
         if (bsModal.onChange)
@@ -56593,25 +56887,38 @@ options
     };
 
     /******************************************************
-    _bsModalExtend, _bsModalDiminish, _bsModalToggleHeight
+    _bsModalExtend, _bsModalDiminish, _bsModalToggleHeight,
+    _bsModalSetSize, _bsModalToggleMinimizedHeader
     Methods to change extended-mode
     ******************************************************/
-    $.fn._bsModalExtend = function( event ){
-        if (this.bsModal.$modalContent.hasClass('no-modal-extended'))
-            this._bsModalToggleHeight( event );
+    $.fn._bsModalExtend = function(){
+        return this._bsModalSetSize( this._bsModalGetSize() == MODAL_SIZE_MINIMIZED ? MODAL_SIZE_NORMAL : MODAL_SIZE_EXTENDED);
     };
-    $.fn._bsModalDiminish = function( event ){
-        if (this.bsModal.$modalContent.hasClass('modal-extended'))
-            this._bsModalToggleHeight( event );
-    };
-    $.fn._bsModalToggleHeight = function( event ){
-        this.bsModal.$modalContent.modernizrToggle('modal-extended');
 
+    $.fn._bsModalDiminish = function(){
+        return this._bsModalSetSize( this._bsModalGetSize() == MODAL_SIZE_EXTENDED ? MODAL_SIZE_NORMAL : MODAL_SIZE_MINIMIZED);
+    };
+
+    //Shift between normal and extended size
+    //minimized -> normal, extended -> normal, normal -> extended (if any) else -> minimized
+    $.fn._bsModalToggleHeight = function(){
+        var newSize = this._bsModalGetSize() == MODAL_SIZE_NORMAL ?
+                        (this.bsModal.sizes & MODAL_SIZE_EXTENDED ? MODAL_SIZE_EXTENDED : MODAL_SIZE_MINIMIZED) :
+                        MODAL_SIZE_NORMAL;
+        this._bsModalSetSize(newSize);
+    };
+
+    //Set new size of modal-window
+    $.fn._bsModalSetSize = function(size){
+        this._bsModalSetSizeClass(size);
         this._bsModalSetHeightAndWidth();
+        return false; //Prevent onclick-event on header
+    };
 
-        if (event && event.stopPropagation)
-            event.stopPropagation();
-        return false;
+    //hid/show header for size = minimized
+    $.fn._bsModalToggleMinimizedHeader = function(){
+        if (this._bsModalGetSize() == MODAL_SIZE_MINIMIZED)
+            get$modalContent(this).toggleClass('modal-minimized-hide-header');
     };
 
 /* TODO: animate changes in height and width
@@ -56631,25 +56938,19 @@ options
     _bsModalPin, _bsModalUnpin, _bsModalTogglePin
     Methods to change pinned-status
     ******************************************************/
-    $.fn._bsModalPin = function( event ){
-        if (!this.bsModal.isPinned)
-            this._bsModalTogglePin( event );
+    $.fn._bsModalPin = function(){
+        return this.bsModal.isPinned ? false : this._bsModalTogglePin();
     };
-    $.fn._bsModalUnpin = function( event ){
-        if (this.bsModal.isPinned)
-            this._bsModalTogglePin( event );
+    $.fn._bsModalUnpin = function( /*event*/ ){
+        return this.bsModal.isPinned ? this._bsModalTogglePin() : false;
     };
-    $.fn._bsModalTogglePin = function( event ){
+    $.fn._bsModalTogglePin = function( /*event*/ ){
         var $modalContent = this.bsModal.$modalContent;
         this.bsModal.isPinned = !this.bsModal.isPinned;
         $modalContent.modernizrToggle('modal-pinned', !!this.bsModal.isPinned);
-        this.bsModal.onPin( this.bsModal.isPinned );
 
-        if (event && event.stopPropagation)
-            event.stopPropagation();
-        return false;
+        return this.bsModal.onPin( this.bsModal.isPinned );
     };
-
 
 
     /******************************************************
@@ -56662,20 +56963,35 @@ options
 
         //this.bsModal contains all created elements
         this.bsModal = {};
-
         this.bsModal.onChange = options.onChange || null;
 
-        //Set bsModal.cssHeight and (optional) bsModal.cssExtendedHeight
-        this.bsModal.cssHeight = getHeightFromOptions( options );
-        if (options.extended){
-            if (options.extended.height == true)
-                this.bsModal.cssExtendedHeight = this.bsModal.cssHeight;
-            else
-                this.bsModal.cssExtendedHeight = getHeightFromOptions( options.extended );
+        //bsModal.cssHeight and bsModal.cssWidth = [size] of { width or height options}
+        this.bsModal.cssHeight = {};
+        this.bsModal.cssWidth  = {};
+        this.bsModal.sizes = MODAL_SIZE_NORMAL;
+
+        //Set bsModal.cssHeight
+        this.bsModal.cssHeight[MODAL_SIZE_NORMAL] = getHeightFromOptions( options );
+
+        if (options.minimized){
+            this.bsModal.sizes += MODAL_SIZE_MINIMIZED;
+            this.bsModal.cssHeight[MODAL_SIZE_MINIMIZED] = getHeightFromOptions(options.minimized);
         }
 
-        //Set bsModal.cssWidth and (optional) bsModal.cssExtendedWidth
-        this.bsModal.cssWidth = getWidthFromOptions( options );
+        if (options.extended){
+            this.bsModal.sizes += MODAL_SIZE_EXTENDED;
+            if (options.extended.height == true)
+                this.bsModal.cssHeight[MODAL_SIZE_EXTENDED] = this.bsModal.cssHeight[MODAL_SIZE_NORMAL];
+            else
+                this.bsModal.cssHeight[MODAL_SIZE_EXTENDED] = getHeightFromOptions( options.extended );
+        }
+
+        //Set bsModal.cssWidth
+        this.bsModal.cssWidth[MODAL_SIZE_NORMAL] = getWidthFromOptions( options );
+
+        if (options.minimized)
+            this.bsModal.cssWidth[MODAL_SIZE_MINIMIZED] = getWidthFromOptions(options.minimized);
+
         if (options.extended){
             //If options.extended.width == true or none width-options is set in extended => use same width as normal-mode
             if ( (options.extended.width == true) ||
@@ -56685,35 +57001,55 @@ options
                    (options.extended.width == undefined)
                  )
               )
-                this.bsModal.cssExtendedWidth = this.bsModal.cssWidth;
+                this.bsModal.cssWidth[MODAL_SIZE_EXTENDED] = this.bsModal.cssWidth[MODAL_SIZE_NORMAL];
             else
-                this.bsModal.cssExtendedWidth = getWidthFromOptions( options.extended );
+                this.bsModal.cssWidth[MODAL_SIZE_EXTENDED] = getWidthFromOptions( options.extended );
         }
-
 
         var $modalContent = this.bsModal.$modalContent =
                 $('<div/>')
                     .addClass('modal-content')
                     .addClass(options.modalContentClassName)
-                    .modernizrToggle('modal-extended', !!options.isExtended )
-
-                    .toggleClass('modal-content-always-max-height',          !!options.alwaysMaxHeight)
-                    .toggleClass('modal-extended-content-always-max-height', !!options.extended && !!options.extended.alwaysMaxHeight)
-
                     .modernizrOff('modal-pinned')
                     .appendTo( this );
 
+        //Set modal-[SIZE]-[STATE] class
+        function setStateClass(postClassName, optionId){
+            $modalContent
+                .toggleClass('modal-minimized-'+postClassName, !!options.minimized && !!options.minimized[optionId])
+                .toggleClass('modal-normal-'+postClassName,    !!options[optionId])
+                .toggleClass('modal-extended-'+postClassName,  !!options.extended && !!options.extended[optionId]);
+        }
+        //Add class to make content always max-height
+        setStateClass('always-max-height', 'alwaysMaxHeight');
+        //Add class to make content clickable
+        setStateClass('clickable', 'clickable');
+        //Add class to make content semi-transparent
+        setStateClass('semi-transparent', 'semiTransparent');
 
-
+        this._bsModalSetSizeClass(
+            options.minimized && options.isMinimized ?
+                MODAL_SIZE_MINIMIZED :
+            options.extended && options.isExtended ?
+                MODAL_SIZE_EXTENDED :
+                MODAL_SIZE_NORMAL
+        );
         this._bsModalSetHeightAndWidth();
 
         var modalExtend       = $.proxy( this._bsModalExtend,       this),
             modalDiminish     = $.proxy( this._bsModalDiminish,     this),
             modalToggleHeight = $.proxy( this._bsModalToggleHeight, this),
-
             modalPin          = $.proxy( this._bsModalPin,          this),
-            modalUnpin        = $.proxy( this._bsModalUnpin,        this);
+            modalUnpin        = $.proxy( this._bsModalUnpin,        this),
+            iconExtendClassName   = '',
+            iconDiminishClassName = '',
+            multiSize = this.bsModal.sizes > MODAL_SIZE_NORMAL;
 
+        //If multi size: Set the class-name for the extend and diminish icons.
+        if (multiSize){
+            iconExtendClassName   = this.bsModal.sizes & MODAL_SIZE_EXTENDED  ? 'hide-for-modal-extended'  : 'hide-for-modal-normal';
+            iconDiminishClassName = this.bsModal.sizes & MODAL_SIZE_MINIMIZED ? 'hide-for-modal-minimized' : 'hide-for-modal-normal';
+        }
 
         this.bsModal.onPin = options.onPin;
         this.bsModal.isPinned = false;
@@ -56729,11 +57065,11 @@ options
 
             //Icons
             icons    : {
-                pin     : { className: 'hide-for-modal-pinned',   onClick: options.onPin    ? modalPin      : null },
-                unpin   : { className: 'show-for-modal-pinned',   onClick: options.onPin    ? modalUnpin    : null },
-                extend  : { className: 'hide-for-modal-extended', onClick: options.extended ? modalExtend   : null, altEvents:'swipeup'   },
-                diminish: { className: 'show-for-modal-extended', onClick: options.extended ? modalDiminish : null, altEvents:'swipedown' },
-                new     : { className: '',                        onClick: options.onNew    ? $.proxy(options.onNew, this) : null },
+                pin     : { className: 'hide-for-modal-pinned', onClick: options.onPin ? modalPin      : null },
+                unpin   : { className: 'show-for-modal-pinned', onClick: options.onPin ? modalUnpin    : null },
+                extend  : { className: iconExtendClassName,     onClick: multiSize ? modalExtend   : null, altEvents:'swipeup'   },
+                diminish: { className: iconDiminishClassName,   onClick: multiSize ? modalDiminish : null, altEvents:'swipedown' },
+                new     : { className: '',                      onClick: options.onNew ? $.proxy(options.onNew, this) : null },
             }
         }, options );
 
@@ -56771,13 +57107,11 @@ options
                         .appendTo( $modalContent );
 
             //Add dbl-click on header to change to/from extended
-            if (options.extended)
+            if (options.minimized || options.extended)
                 $modalHeader
                     .addClass('clickable')
                     .on('doubletap', modalToggleHeight );
         }
-        else
-            $modalContent.addClass('no-modal-header');
 
         //If options.extended.fixedContent == true and/or options.extended.footer == true => normal and extended uses same fixed and/or footer content
         var noClassNameForFixed = false,
@@ -56798,19 +57132,56 @@ options
             }
         }
 
+        //Create minimized content
+        if (options.minimized){
+            this.bsModal.minimized = {};
+                $modalContent.addClass('modal-minimized-hide-header');
+                var bsModalToggleMinimizedHeader = $.proxy(this._bsModalToggleMinimizedHeader, this);
+                options.minimized.onClick =
+                    options.minimized.showHeaderOnClick ?
+                        bsModalToggleMinimizedHeader :
+                        modalExtend;
+
+            //Close header when a icon is clicked
+            if (options.minimized.showHeaderOnClick)
+                this.bsModal.$header.on('click', bsModalToggleMinimizedHeader);
+
+            $modalContent._bsModalBodyAndFooter( 'minimized', options.minimized, this.bsModal.minimized );
+
+            if (options.minimized.showHeaderOnClick){
+                //Using fixed-height as height of content
+                var cssHeight = this.bsModal.cssHeight[MODAL_SIZE_MINIMIZED];
+                if (cssHeight && cssHeight.height)
+                    this.bsModal.minimized.$content.height(cssHeight.height);
+
+                this.bsModal.cssHeight[MODAL_SIZE_MINIMIZED] = null;
+            }
+        }
+
         //Create normal content
-        $modalContent._bsModalBodyAndFooter(options, this.bsModal, 'hide-for-modal-extended', noClassNameForFixed, false );
+        if (options.clickable && !options.onClick)
+            //Set default on-click
+            options.onClick =
+                options.extended ?
+                    modalExtend :
+                options.minimized ?
+                    modalDiminish :
+                    null;
+
+        $modalContent._bsModalBodyAndFooter('normal', options, this.bsModal, noClassNameForFixed, false );
 
         //Create extended content (if any)
         if (options.extended){
             this.bsModal.extended = {};
-            $modalContent._bsModalBodyAndFooter( options.extended, this.bsModal.extended, 'show-for-modal-extended', false, noClassNameForFooter );
+            if (options.extended.clickable)
+                options.extended.onClick = options.extended.onClick || modalDiminish;
+            $modalContent._bsModalBodyAndFooter( 'extended', options.extended, this.bsModal.extended, false, noClassNameForFooter );
         }
 
-        //Add buttons (if any)
+        //Add buttons (if any). Allways hidden for minimized
         var $modalButtonContainer = this.bsModal.$buttonContainer =
                 $('<div/>')
-                    .addClass('modal-footer')
+                    .addClass('modal-footer hide-for-modal-minimized')
                     .toggleClass('modal-footer-vertical', !!options.verticalButtons)
                     .appendTo( $modalContent ),
             $modalButtons = this.bsModal.$buttons = [],
@@ -56861,8 +57232,6 @@ options
         options =
             $._bsAdjustOptions( options, {
                 baseClass: 'modal-dialog',
-                class    : (options.noVerticalPadding   ? 'no-vertical-padding'    : '') +
-                           (options.noHorizontalPadding ? ' no-horizontal-padding' : ''),
 
                 //Header
                 noHeader : false,
@@ -57707,12 +58076,14 @@ options
         },
 
         bsUpdateSelectedItem: function(){
+            this.$inner = this.$inner || this.$select.parent().find('.filter-option-inner-inner');
+            this.$inner.empty();
+
             var selectedIndex = this.$select[0].selectedIndex;
-            if (selectedIndex > 0) {
-                this.$inner = this.$inner || this.$select.parent().find('.filter-option-inner-inner');
-                this.$inner.empty();
+            if (selectedIndex > 0)
                 this.$inner._bsAddHtml(this.itemOptionsList[selectedIndex]);
-            }
+            else
+                this.$inner.html('&nbsp;');
         },
 
         bsUpdateLabel: function( showLabelAsPlaceholder ){

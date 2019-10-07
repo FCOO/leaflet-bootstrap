@@ -27,6 +27,7 @@
     <script src="../src/leaflet-bootstrap.js"></script>
     <script src="../src/leaflet-bootstrap-control-modal.js"></script>
     <script src="../src/leaflet-bootstrap-control-button.js"></script>
+    <script src="../src/leaflet-bootstrap-control-button-box.js"></script>
     <script src="../src/leaflet-bootstrap-popup.js"></script>
     <script src="../src/leaflet-bootstrap-tooltip.js"></script>
     <script>
@@ -35,7 +36,7 @@
     window.bsIsTouch = (window.location.search =='?touch');
 
     i18next.init();
-    i18next.changeLanguage('en');
+    i18next.changeLanguage('da');
 
     var map = L.map('map', {
 
@@ -60,6 +61,32 @@
         map.addControl(bGroup);
 
 
+    //************************
+    var buttonBox = L.control.bsButtonBox({
+        position: 'bottomleft',
+        icon: 'fa-home',
+        square: true,
+
+        content: {
+            _noVerticalPadding: true,
+            noHorizontalPadding: true,
+            _noHeader: true,
+            header: {
+                text: 'The long header'
+            },
+            content: [
+                {type:'button', semiTransparent: true, text:'Davs', small: true},
+                {type:'button', text:'Davs2', small: true}
+            ],
+            width: 'auto',
+            clickable: false,
+            footer: { text: {da: 'Klik på signaturfork. for info', en:'Click on legend for info' }}
+
+
+        }
+    });
+
+    map.addControl(buttonBox);
     //************************
     var selectItems3 = [
             {id: 'item1', text:{da:'Emne#1', en: 'Item#1'} },
@@ -147,7 +174,7 @@
                                     {id: 'item7', text:{da:'Emne#7', en: 'Item#7'} },
                                     {id: 'item8', text:{da:'Emne#8', en: 'Item#8'} },
                                 ],
-                                onChange  : function(id, selected, $buttonGroup){console.log('bsSelectbox2', id, selected)},
+                                _onChange  : function(id, selected, $buttonGroup){console.log('bsSelectbox2', id, selected)},
                             }
                         }
                     ],
@@ -259,7 +286,7 @@
                 }
                 return $('<div>' + content + 'This is a random<br>number '+Math.floor(Math.random()*1000000) +'</div>');
             }(),
-            shortContent = 'Det er bare mig';
+            shortContent = 'shortContent: Det er bare mig';
 
         var popup = L.popup().setContent({
             scroll      : true,
@@ -275,9 +302,21 @@
 
             //verticalButtons : true,
             width: 234,
-            content: shortContent,
+            minimized: {
+                width  : 130,
+                content: 'MINI',
+                className: 'text-center',
+                clickable: true,
+                _noVerticalPadding  : true,
+                _noHorizontalPadding: true,
+                showHeaderOnClick: true,
+                _transparent: true
+            },
 
-            isExtended: true,
+            content: shortContent,
+            clickable: true,
+
+            isMinimized: true,
             extended: {
                 width  : 345,
                 content: longContent,

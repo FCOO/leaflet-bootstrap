@@ -139,6 +139,13 @@ Adjust standard Leaflet popup to display as Bootstrap modal
             modalOptions.onPin = $.proxy( this._setPinned, this);
         }
 
+        //If any of the posible contents are clickable => add hover effect to the tip
+        if ( modalOptions.clickable ||
+             (modalOptions.minimized && modalOptions.minimized.clickable) ||
+             (modalOptions.extended && modalOptions.extended.clickable)
+           )
+            $(this._wrapper).addClass('clickable');
+
         //Adjust options for bsModal
         if (modalOptions.extended){
             modalOptions.extended.scroll = true;
@@ -183,6 +190,15 @@ Adjust standard Leaflet popup to display as Bootstrap modal
             this._content.contentContext
         );
 
+
+        if (this.bsModal.minimized){
+            //Update extended content
+            this.bsModal.minimized.$body.empty();
+            this.bsModal.minimized.$body._bsAppendContent(
+                this._content.minimized.content,
+                this._content.minimized.contentContext
+            );
+        }
 
         if (this.bsModal.extended){
             //Update extended content

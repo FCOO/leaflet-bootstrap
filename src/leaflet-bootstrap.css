@@ -37,9 +37,54 @@ $spacer                 : 1rem !default;
 /************************************************************
 Adjust dropdown-menu
 ************************************************************/
-/***********************************************
-	leaflet-bootstrap-popup.scss,
+/************************************************************
+COLOR
 
+background-color and text-color for
+headers modal, popover, tables, buttons, list-items etc.
+
+"$header-" is used for header to modal-windows and popover
+"$title-" is used for headers on content - table, accordion etc.
+"$control-" is used for buttons, list-items etc.
+************************************************************/
+/************************************************************
+VARIABLES
+************************************************************/
+/***********************************************
+DEFINE BOOTSTRAP BUTTON STYLE
+$btn-style-name MUST correspond with ns.bsButtonClass
+in src/jquery-bootstrap-button.js
+************************************************/
+/************************************************************
+Variables bassed on bootstrop variables
+************************************************************/
+/************************************************************
+HEADER
+Font-sizes for headers are one 'size' smaller than normal font
+$font-size-lg  : 1.25rem    20px
+$font-size-base: 1rem       16px
+$font-size-sm  : .8125rem   13px
+$font-size-xs  : .75rem     12px
+************************************************************/
+/************************************************************
+BUTTON AND MODAL
+Opacity for semi-transparent and transparent content
+************************************************************/
+/************************************************************
+LABEL
+Font-sizes for labels are same siae as header but incl a xxs-size
+************************************************************/
+/************************************************************
+CONTENT
+Unifies padding and font-size for content of modal, accordion, popup etc.
+Using same font-size and vertical/horizontal padding as buttons
+************************************************************/
+/************************************************************
+MARGIN-BOTTOM
+All elements in modal-windows get same margin-bottom
+************************************************************/
+/***********************************************
+leaflet-bootstrap-popup.scss,
 ************************************************/
 .leaflet-popup-content {
   width: 100px; }
@@ -59,10 +104,13 @@ Adjust dropdown-menu
       height: 13px;
       margin: -6px auto 0;
       border: 2px solid #868e96; }
+  .mouse-hover .modal-wrapper.leaflet-popup-content-wrapper.clickable:hover + .leaflet-popup-tip-container .leaflet-popup-tip,
+  .mouse-hover .modal-wrapper.leaflet-popup-content-wrapper.hover + .leaflet-popup-tip-container .leaflet-popup-tip {
+    cursor: default;
+    background: #e9ecef linear-gradient(180deg, #eceff2, #e9ecef) repeat-x; }
 
 /***********************************************
-	leaflet-bootstrap-tooltip.scss,
-
+leaflet-bootstrap-tooltip.scss,
 ************************************************/
 .leaflet-tooltip {
   padding: 0.25rem 0.5rem;
@@ -145,3 +193,12 @@ Adjust dropdown-menu
 ************************************************/
 .leaflet-control .modal-dialog {
   margin: 0; }
+
+/***********************************************
+leaflet-bootstrap-control-button.scss
+************************************************/
+.leaflet-control.leaflet-button-box.extended .hide-for-extended {
+  display: none !important; }
+
+.leaflet-control.leaflet-button-box.no-extended .show-for-extended {
+  display: none !important; }

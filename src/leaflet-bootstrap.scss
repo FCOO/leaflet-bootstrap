@@ -24,12 +24,16 @@
 //BOOTSTRAP
 @import "../bower_components/bootstrap/scss/functions";
 @import "../bower_components/bootstrap/scss/variables";
+@import "../bower_components/bootstrap/scss/mixins";
 
 //MODERNIZR-SCSS - https://github.com/fcoo/modernizr-scss
 @import "../bower_components/modernizr-scss/dist/modernizr-scss";
 
 //JQUERY-BOOTSTRAP - https://github.com/fcoo/jquery-bootstrap
 @import "../bower_components/jquery-bootstrap/src/bootstrap-variables";
+@import "../bower_components/jquery-bootstrap/src/color";
+@import "../bower_components/jquery-bootstrap/src/variables";
+
 
 //Style for popup
 @import "leaflet-bootstrap-popup";
@@ -40,4 +44,5 @@
 //Style for modal-controls
 @import "leaflet-bootstrap-modal";
 
-//class hide-
+//Style for control-button
+@import "leaflet-bootstrap-control-button";

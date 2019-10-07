@@ -21,6 +21,32 @@ Create leaflet control a la `$.bsButton`, `$.bsButtonGroup`, and `$.bsRadioButto
     L.control.bsButtonGroup( options )
     L.control.bsRadioButtonGroup( options )
 
+### L.Control.bsButtonBox(options)
+Create a `L.Control.bsButton`. When clicked it opens a box with content
+
+#### options 
+    {
+        //Default options for buton
+        icon: ...
+        text:.... 
+
+        content: ...
+    }
+
+
+`options.content` is either [bsModal-options](https://github.com/FCOO/jquery-bootstrap#modal) OR a `function($container, options, onToggle)` creating the content inside `$container` 
+
+    //Default bsModal-options
+    {
+        closeButton     : false,
+        clickable       : true,
+        semiTransparent : true,
+        extended        : null,
+        minimized       : null,
+        isExtended      : false,
+        isMinimized     : false,
+        width           : 100,
+    }
 
 ### L.popup
 Extended to take same options as bsModal (see details [here](https://github.com/FCOO/jquery-bootstrap#modal))

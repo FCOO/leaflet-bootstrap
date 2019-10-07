@@ -1,4 +1,112 @@
 /****************************************************************************
+leaflet-bootstrap-control-button-box.js
+
+Create a bsButton that opens a box with some content
+
+****************************************************************************/
+(function ($, L/*, window, document, undefined*/) {
+    "use strict";
+
+    /********************************************************************************
+    L.control.bsButtonBox
+    Create a bsButton that opens a box with bs-content given by options.content
+    ********************************************************************************/
+    L.control.BsButtonBox = L.control.BsButton.extend({
+        options: {
+
+        },
+        _createContent: function(){
+            //Create container
+            var $container =
+                    $('<div/>')
+                        .addClass('leaflet-button-box')
+                        .modernizrToggle('extended', !!this.options.extended),
+                onToggle = $.proxy(this.toggle, this);
+
+            //Adjust options for the button and create it
+            var buttonOptions = $.extend(true, {}, {
+                        onClick        : onToggle,
+                        semiTransparent: true
+                    },
+                    this.options
+                );
+
+            this.bsButton =
+                $.bsButton(buttonOptions)
+                .addClass('hide-for-extended')
+                .appendTo($container);
+
+            //Create container for extended content
+            var $contentContainer =
+                $('<div/>')
+                    ._bsAddBaseClassAndSize({
+                        baseClass   : 'modal-dialog',
+                        class       : 'modal-dialog-inline',
+                        useTouchSize: true,
+                        small       : true
+                    })
+                    .width('auto')
+                    .addClass('show-for-extended')
+                    .appendTo($container);
+
+            //this.options = bsModal-options OR function($container, options, onToggle)
+            if ($.isFunction(this.options.content))
+                this.options.content($contentContainer, this.options, onToggle);
+            else {
+                //Adjust options for the content (modal) and create the it
+                var modalOptions = $.extend(true, {},
+                    //Default options
+                    {
+                        closeButton     : false,
+                        clickable       : true,
+                        semiTransparent : true,
+                        extended        : null,
+                        minimized       : null,
+                        isExtended      : false,
+                        isMinimized     : false,
+                        width           : this.options.width || 100,
+                    },
+                    this.options.content,
+                    //Forced options
+                    {
+                        show: false,
+
+                    }
+                );
+
+                //Add close icon to header (if any)
+                if (!modalOptions.noHeader && modalOptions.header && !(modalOptions.icons && modalOptions.icons.close)){
+                    modalOptions.icons = modalOptions.icons || {};
+                    modalOptions.icons.close = { onClick: onToggle };
+                }
+
+                //Add default onClick
+                if (modalOptions.clickable && !modalOptions.onClick)
+                    modalOptions.onClick = onToggle;
+
+
+                $contentContainer._bsModalContent(modalOptions);
+            }
+            return $container;
+        },
+
+
+        //toggle : change between button-state and extended
+        toggle: function(){
+            $(this.getContainer()).modernizrToggle('extended');
+            return false;
+        }
+    });
+
+
+
+
+    L.control.bsButtonBox = function(options){ return new  L.control.BsButtonBox(options); };
+}(jQuery, L, this, document));
+
+
+;
+/****************************************************************************
 leaflet-bootstrap-control-button.js
 
 Create leaflet-control for jquery-bootstrap button-classes:
@@ -42,24 +150,24 @@ Create leaflet-control for jquery-bootstrap button-classes:
             },
         });
 
-        L.control.BsButton = _bsButtons.extend({
-            _createContent: function(){ return $.bsButton(this.options); }
-        });
+    L.control.BsButton = _bsButtons.extend({
+        _createContent: function(){ return $.bsButton(this.options); }
+    });
 
-        L.control.BsButtonGroup = _bsButtons.extend({
-            options       : { vertical: true },
-            _createContent: function(){ return $.bsButtonGroup(this.options); }
-        });
+    L.control.BsButtonGroup = _bsButtons.extend({
+        options       : { vertical: true },
+        _createContent: function(){ return $.bsButtonGroup(this.options); }
+    });
 
-        L.control.BsRadioButtonGroup = L.control.BsButtonGroup.extend({
-//            options       : { vertical: true },
-            _createContent: function(){ return $.bsRadioButtonGroup(this.options); }
-        });
+    L.control.BsRadioButtonGroup = L.control.BsButtonGroup.extend({
+//        options       : { vertical: true },
+        _createContent: function(){ return $.bsRadioButtonGroup(this.options); }
+    });
 
+    L.control.bsButton           = function(options){ return new L.control.BsButton(options);           };
+    L.control.bsButtonGroup      = function(options){ return new L.control.BsButtonGroup(options);      };
+    L.control.bsRadioButtonGroup = function(options){ return new L.control.BsRadioButtonGroup(options); };
 
-        L.control.bsButton           = function(options){ return new  L.control.BsButton(options);           };
-        L.control.bsButtonGroup      = function(options){ return new  L.control.BsButtonGroup(options);      };
-        L.control.bsRadioButtonGroup = function(options){ return new  L.control.BsRadioButtonGroup(options); };
 
 }(jQuery, L, this, document));
 
@@ -356,6 +464,13 @@ Adjust standard Leaflet popup to display as Bootstrap modal
             modalOptions.onPin = $.proxy( this._setPinned, this);
         }
 
+        //If any of the posible contents are clickable => add hover effect to the tip
+        if ( modalOptions.clickable ||
+             (modalOptions.minimized && modalOptions.minimized.clickable) ||
+             (modalOptions.extended && modalOptions.extended.clickable)
+           )
+            $(this._wrapper).addClass('clickable');
+
         //Adjust options for bsModal
         if (modalOptions.extended){
             modalOptions.extended.scroll = true;
@@ -400,6 +515,15 @@ Adjust standard Leaflet popup to display as Bootstrap modal
             this._content.contentContext
         );
 
+
+        if (this.bsModal.minimized){
+            //Update extended content
+            this.bsModal.minimized.$body.empty();
+            this.bsModal.minimized.$body._bsAppendContent(
+                this._content.minimized.content,
+                this._content.minimized.contentContext
+            );
+        }
 
         if (this.bsModal.extended){
             //Update extended content
