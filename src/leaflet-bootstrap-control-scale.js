@@ -11,10 +11,10 @@ https://github.com/nerik/leaflet-graphicscale
     "use strict";
 
     /********************************************************************************
-    L.control.bsScale
+    L.Control.BsScale
     Create a bsButtonBox with the scale
     ********************************************************************************/
-    L.control.BsScale = L.control.BsButtonBox.extend({
+    L.Control.BsScale = L.Control.BsButtonBox.extend({
         options: {
             icon                : 'fa-ruler-horizontal',//Icon for bsButton
             mode                : 'both',               //'metric', 'nautical', or 'both'
@@ -35,7 +35,7 @@ https://github.com/nerik/leaflet-graphicscale
 
 		onAdd: function (map) {
 			this._map = map;
-			var result = L.control.BsButtonBox.prototype.onAdd.call(this, map ),
+			var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map ),
                 $body = this.$contentContainer.bsModal.$body;
 
             $body.empty();
@@ -361,12 +361,12 @@ https://github.com/nerik/leaflet-graphicscale
 
     L.Map.addInitHook(function () {
         if (this.options.bsScaleControl) {
-            this.bsScaleControl = new L.Control.bsSScale();
+            this.bsScaleControl = new L.Control.BsScale();
             this.addControl(this.bsScaleControl);
         }
     });
 
-    L.control.bsScale = function(options){ return new L.control.BsScale(options); };
+    L.control.bsScale = function(options){ return new L.Control.BsScale(options); };
 
 }(jQuery, L, this, document));
 

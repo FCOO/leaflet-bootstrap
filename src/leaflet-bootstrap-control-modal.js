@@ -104,9 +104,9 @@ Create leaflet-control for jquery-bootstrap modal-content:
         });
 
         /***************************************************
-        L.control.BsModal
+        L.Control.BsModal
         ***************************************************/
-        L.control.BsModal = _bsModal.extend({
+        L.Control.BsModal = _bsModal.extend({
             _defaultOptions : {
                 show               : true,
                 closeButton        : false,
@@ -120,9 +120,9 @@ Create leaflet-control for jquery-bootstrap modal-content:
 
 
         /***************************************************
-        L.control.BsModalForm
+        L.Control.BsModalForm
         ***************************************************/
-        L.control.BsModalForm = _bsModal.extend({
+        L.Control.BsModalForm = _bsModal.extend({
             _defaultOptions : {
                 show               : false,
 //                noCloseIconOnHeader: true
@@ -141,8 +141,8 @@ Create leaflet-control for jquery-bootstrap modal-content:
         });
 
         //*************************************
-        L.control.bsModal     = function(options){ return new L.control.BsModal(options); };
-        L.control.bsModalForm = function(options){ return new L.control.BsModalForm(options); };
+        L.control.bsModal     = function(options){ return new L.Control.BsModal(options); };
+        L.control.bsModalForm = function(options){ return new L.Control.BsModalForm(options); };
 
 }(jQuery, L, this, document));
 

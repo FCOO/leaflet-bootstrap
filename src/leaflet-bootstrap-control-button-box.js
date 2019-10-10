@@ -8,10 +8,10 @@ Create a bsButton that opens a box with some content
     "use strict";
 
     /********************************************************************************
-    L.control.bsButtonBox
+    L.Control.BsButtonBox
     Create a bsButton that opens a box with bs-content given by options.content
     ********************************************************************************/
-    L.control.BsButtonBox = L.control.BsButton.extend({
+    L.Control.BsButtonBox = L.Control.BsButton.extend({
         options: {
 
         },
@@ -102,6 +102,6 @@ Create a bsButton that opens a box with some content
 
 
 
-    L.control.bsButtonBox = function(options){ return new  L.control.BsButtonBox(options); };
+    L.control.bsButtonBox = function(options){ return new  L.Control.BsButtonBox(options); };
 }(jQuery, L, this, document));
 
