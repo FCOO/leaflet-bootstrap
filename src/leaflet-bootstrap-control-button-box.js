@@ -20,13 +20,15 @@ Create a bsButton that opens a box with some content
             var $container =
                     $('<div/>')
                         .addClass('leaflet-button-box')
+                        .addClass(this.options.className)
                         .modernizrToggle('extended', !!this.options.extended),
                 onToggle = $.proxy(this.toggle, this);
 
             //Adjust options for the button and create it
             var buttonOptions = $.extend(true, {}, {
                         onClick        : onToggle,
-                        semiTransparent: true
+                        semiTransparent: true,
+                        square         : true
                     },
                     this.options
                 );
@@ -37,7 +39,7 @@ Create a bsButton that opens a box with some content
                 .appendTo($container);
 
             //Create container for extended content
-            var $contentContainer =
+            var $contentContainer = this.$contentContainer =
                 $('<div/>')
                     ._bsAddBaseClassAndSize({
                         baseClass   : 'modal-dialog',
@@ -83,7 +85,6 @@ Create a bsButton that opens a box with some content
                 //Add default onClick
                 if (modalOptions.clickable && !modalOptions.onClick)
                     modalOptions.onClick = onToggle;
-
 
                 $contentContainer._bsModalContent(modalOptions);
             }

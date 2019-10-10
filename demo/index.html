@@ -28,6 +28,7 @@
     <script src="../src/leaflet-bootstrap-control-modal.js"></script>
     <script src="../src/leaflet-bootstrap-control-button.js"></script>
     <script src="../src/leaflet-bootstrap-control-button-box.js"></script>
+    <script src="../src/leaflet-bootstrap-control-scale.js"></script>
     <script src="../src/leaflet-bootstrap-popup.js"></script>
     <script src="../src/leaflet-bootstrap-tooltip.js"></script>
     <script>
@@ -62,8 +63,30 @@
 
 
     //************************
+    var scale = L.control.bsScale({
+            position: 'bottomleft', extended: true,
+        });
+
+    map.addControl(scale);
+
+
+    map.addControl(
+        L.control.bsScale({
+            position: 'bottomleft', mode:'metric', extended: true, maxUnitsWidthPercent: 30, maxUnitsWidth: 1200,
+        })
+    );
+
+    map.addControl(
+        L.control.bsScale({
+            position: 'bottomleft', mode:'nautical', extended: true, maxUnitsWidthPercent: 60, maxUnitsWidth: 1200,
+        })
+    );
+
+
+
+    //************************
     var buttonBox = L.control.bsButtonBox({
-        position: 'bottomleft',
+        position: 'bottomright',
         icon: 'fa-home',
         square: true,
 

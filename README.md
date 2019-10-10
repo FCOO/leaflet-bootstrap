@@ -14,17 +14,17 @@ http://FCOO.github.io/leaflet-bootstrap/demo/
 
 ## Usage
 
-### L.Control.bsButton
+### L.control.bsButton
 Create leaflet control a la `$.bsButton`, `$.bsButtonGroup`, and `$.bsRadioButtonGroup`: See [FCOO/jquery-bootstrap](https://github.com/FCOO/jquery-bootstrap#button)
 
     L.control.bsButton( options )
     L.control.bsButtonGroup( options )
     L.control.bsRadioButtonGroup( options )
 
-### L.Control.bsButtonBox(options)
+### L.control.bsButtonBox(options)
 Create a `L.Control.bsButton`. When clicked it opens a box with content
 
-#### options 
+#### `options` 
     {
         //Default options for buton
         icon: ...
@@ -48,9 +48,25 @@ Create a `L.Control.bsButton`. When clicked it opens a box with content
         width           : 100,
     }
 
+
+### L.control.bsScale(options)
+Create a `bsButtonBox` with graphic scale with metric and/or nautical scale(s)
+Based on [leaflet-graphicscale](https://github.com/nerik/leaflet-graphicscale) by [Erik Escoffier](https://github.com/nerik) 
+
+#### `options` 
+    {
+        icon                : 'fa-ruler-horizontal',//Icon for bsButton
+        mode                : 'both',               //'metric', 'nautical', or 'both'
+        position            : 'bottomleft',
+        maxUnitsWidth       : 200,                  //Max width
+        maxUnitsWidthPercent: 90,                   //Max width as percent of map wisth
+    }
+
+
 ### L.popup
 Extended to take same options as bsModal (see details [here](https://github.com/FCOO/jquery-bootstrap#modal))
     
+#### `options` 
     options: {
         maxWidth,
         maxHeight,
@@ -67,6 +83,10 @@ Extended to take same options as bsModal (see details [here](https://github.com/
     //Methods
     .changeContent(content, contentContext) //Only changes the content of the "body" of the bsModal inside the popup
 
+#### Methods
+        setMode( mode )
+
+ 
 ### L.tooltip
 
 Accepts common content a la [FCOO/jquery-bootstrap](https://github.com/FCOO/jquery-bootstrap#common) 
