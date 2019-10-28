@@ -61,4 +61,9 @@ $markerSizeList: 14px, 20px, 24px; //MUST match markerSizeList in leaflet-bootst
 }
 
 
+//Set z-index for pane with tooltips for controls
+.leaflet-control-container .leaflet-pane {
+    z-index: 1000;
+}
+
 

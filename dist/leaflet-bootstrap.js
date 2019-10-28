@@ -1,17 +1,66 @@
 /****************************************************************************
-leaflet-bootstrap-control-button-box.js
+leaflet-bootstrap-control-button.js
 
-Create a bsButton that opens a box with some content
+Create leaflet-control for jquery-bootstrap button-classes:
+    L.control.bsButton( options )
+    L.control.bsButtonGroup( options )
+    L.control.bsRadioButtonGroup( options )
+
+
 
 ****************************************************************************/
 (function ($, L/*, window, document, undefined*/) {
     "use strict";
 
+    var defaultButtonOptions = {
+            center         : true,
+            square         : true,
+            returnFromClick: true
+        },
+
+        _bsButtons = L.BsControl.extend({
+            options: {
+                position: 'topleft'
+            },
+
+            _createContent: function(){},
+
+            onAdd: function() {
+                var _this = this;
+                this.options = $._bsAdjustOptions( this.options, defaultButtonOptions);
+                if (this.options.list)
+                    $.each(this.options.list, function(index, opt){
+                        _this.options.list[index] = $._bsAdjustOptions( opt, defaultButtonOptions);
+                });
+
+                return this._createContent().get(0);
+            },
+        });
+
+    L.Control.BsButton = _bsButtons.extend({
+        _createContent: function(){ return $.bsButton(this.options); }
+    });
+
+    L.Control.BsButtonGroup = _bsButtons.extend({
+        options       : { vertical: true },
+        _createContent: function(){ return $.bsButtonGroup(this.options); }
+    });
+
+    L.Control.BsRadioButtonGroup = L.Control.BsButtonGroup.extend({
+//        options       : { vertical: true },
+        _createContent: function(){ return $.bsRadioButtonGroup(this.options); }
+    });
+
+    L.control.bsButton           = function(options){ return new L.Control.BsButton(options);           };
+    L.control.bsButtonGroup      = function(options){ return new L.Control.BsButtonGroup(options);      };
+    L.control.bsRadioButtonGroup = function(options){ return new L.Control.BsRadioButtonGroup(options); };
+
+
     /********************************************************************************
-    L.control.bsButtonBox
+    L.Control.BsButtonBox
     Create a bsButton that opens a box with bs-content given by options.content
     ********************************************************************************/
-    L.control.BsButtonBox = L.control.BsButton.extend({
+    L.Control.BsButtonBox = L.Control.BsButton.extend({
         options: {
 
         },
@@ -41,134 +90,74 @@ Create a bsButton that opens a box with some content
             //Create container for extended content
             var $contentContainer = this.$contentContainer =
                 $('<div/>')
-                    ._bsAddBaseClassAndSize({
+                    .width('auto')
+                    .addClass('show-for-extended')
+//HER                    .on('contextmenu', function(ev){ return L.DomEvent.stop(ev); })
+                    .appendTo($container);
+
+            //this.options = null OR bsModal-options OR function($container, options, onToggle)
+            if (this.options.content){
+                if ($.isFunction(this.options.content))
+                    this.options.content($contentContainer, this.options, onToggle);
+                else {
+                    $contentContainer._bsAddBaseClassAndSize({
                         baseClass   : 'modal-dialog',
                         class       : 'modal-dialog-inline',
                         useTouchSize: true,
                         small       : true
-                    })
-                    .width('auto')
-                    .addClass('show-for-extended')
-                    .appendTo($container);
+                    });
 
-            //this.options = bsModal-options OR function($container, options, onToggle)
-            if ($.isFunction(this.options.content))
-                this.options.content($contentContainer, this.options, onToggle);
-            else {
-                //Adjust options for the content (modal) and create the it
-                var modalOptions = $.extend(true, {},
-                    //Default options
-                    {
-                        closeButton     : false,
-                        clickable       : true,
-                        semiTransparent : true,
-                        extended        : null,
-                        minimized       : null,
-                        isExtended      : false,
-                        isMinimized     : false,
-                        width           : this.options.width || 100,
-                    },
-                    this.options.content,
-                    //Forced options
-                    {
-                        show: false,
+                    //Adjust options for the content (modal) and create the it
+                    var modalOptions = $.extend(true, {},
+                        //Default options
+                        {
+                            closeButton     : false,
+                            clickable       : true,
+                            semiTransparent : true,
+                            extended        : null,
+                            minimized       : null,
+                            isExtended      : false,
+                            isMinimized     : false,
+                            width           : this.options.width || 100,
+                        },
+                        this.options.content,
+                        //Forced options
+                        {
+                            show: false,
+                        }
+                    );
 
+                    //Add close icon to header (if any)
+                    if (!modalOptions.noHeader && modalOptions.header && !(modalOptions.icons && modalOptions.icons.close)){
+                        modalOptions.icons = modalOptions.icons || {};
+                        modalOptions.icons.close = { onClick: onToggle };
                     }
-                );
 
-                //Add close icon to header (if any)
-                if (!modalOptions.noHeader && modalOptions.header && !(modalOptions.icons && modalOptions.icons.close)){
-                    modalOptions.icons = modalOptions.icons || {};
-                    modalOptions.icons.close = { onClick: onToggle };
+                    //Add default onClick
+                    if (modalOptions.clickable && !modalOptions.onClick)
+                        modalOptions.onClick = onToggle;
+
+                    $contentContainer._bsModalContent(modalOptions);
                 }
-
-                //Add default onClick
-                if (modalOptions.clickable && !modalOptions.onClick)
-                    modalOptions.onClick = onToggle;
-
-                $contentContainer._bsModalContent(modalOptions);
             }
             return $container;
+        },
+
+        _getTooltipElements: function( /*container*/ ){
+            return this.$contentContainer;
         },
 
 
         //toggle : change between button-state and extended
         toggle: function(){
+            this.hideTooltip();
             $(this.getContainer()).modernizrToggle('extended');
-            return false;
+            return true;
         }
     });
 
 
-
-
-    L.control.bsButtonBox = function(options){ return new  L.control.BsButtonBox(options); };
-}(jQuery, L, this, document));
-
-
-;
-/****************************************************************************
-leaflet-bootstrap-control-button.js
-
-Create leaflet-control for jquery-bootstrap button-classes:
-    L.control.bsButton( options )
-    L.control.bsButtonGroup( options )
-    L.control.bsRadioButtonGroup( options )
-
-
-
-****************************************************************************/
-(function ($, L/*, window, document, undefined*/) {
-    "use strict";
-
-    var defaultButtonOptions = {
-            center: true,
-            square: true
-        },
-
-        _bsButtons = L.Control.extend({
-            options: {
-                position: 'topleft',
-            },
-
-            _createContent: function(){},
-
-            onAdd: function() {
-                var _this = this;
-                this.options = $._bsAdjustOptions( this.options, defaultButtonOptions);
-                if (this.options.list)
-                    $.each(this.options.list, function(index, opt){
-                        _this.options.list[index] = $._bsAdjustOptions( opt, defaultButtonOptions);
-                });
-
-                var container = this._createContent().get(0);
-
-                L.DomEvent.disableClickPropagation( container );
-                L.DomEvent.on(container, 'click', L.DomEvent.stop);
-                L.DomEvent.on(container, 'click', this._refocusOnMap, this);
-
-                return container;
-            },
-        });
-
-    L.control.BsButton = _bsButtons.extend({
-        _createContent: function(){ return $.bsButton(this.options); }
-    });
-
-    L.control.BsButtonGroup = _bsButtons.extend({
-        options       : { vertical: true },
-        _createContent: function(){ return $.bsButtonGroup(this.options); }
-    });
-
-    L.control.BsRadioButtonGroup = L.control.BsButtonGroup.extend({
-//        options       : { vertical: true },
-        _createContent: function(){ return $.bsRadioButtonGroup(this.options); }
-    });
-
-    L.control.bsButton           = function(options){ return new L.control.BsButton(options);           };
-    L.control.bsButtonGroup      = function(options){ return new L.control.BsButtonGroup(options);      };
-    L.control.bsRadioButtonGroup = function(options){ return new L.control.BsRadioButtonGroup(options); };
-
+    L.control.bsButtonBox = function(options){ return new L.Control.BsButtonBox(options); };
 
 }(jQuery, L, this, document));
 
@@ -280,9 +269,9 @@ Create leaflet-control for jquery-bootstrap modal-content:
         });
 
         /***************************************************
-        L.control.BsModal
+        L.Control.BsModal
         ***************************************************/
-        L.control.BsModal = _bsModal.extend({
+        L.Control.BsModal = _bsModal.extend({
             _defaultOptions : {
                 show               : true,
                 closeButton        : false,
@@ -296,9 +285,9 @@ Create leaflet-control for jquery-bootstrap modal-content:
 
 
         /***************************************************
-        L.control.BsModalForm
+        L.Control.BsModalForm
         ***************************************************/
-        L.control.BsModalForm = _bsModal.extend({
+        L.Control.BsModalForm = _bsModal.extend({
             _defaultOptions : {
                 show               : false,
 //                noCloseIconOnHeader: true
@@ -317,8 +306,8 @@ Create leaflet-control for jquery-bootstrap modal-content:
         });
 
         //*************************************
-        L.control.bsModal     = function(options){ return new L.control.BsModal(options); };
-        L.control.bsModalForm = function(options){ return new L.control.BsModalForm(options); };
+        L.control.bsModal     = function(options){ return new L.Control.BsModal(options); };
+        L.control.bsModalForm = function(options){ return new L.Control.BsModalForm(options); };
 
 }(jQuery, L, this, document));
 
@@ -337,10 +326,10 @@ https://github.com/nerik/leaflet-graphicscale
     "use strict";
 
     /********************************************************************************
-    L.control.bsScale
+    L.Control.BsScale
     Create a bsButtonBox with the scale
     ********************************************************************************/
-    L.control.BsScale = L.control.BsButtonBox.extend({
+    L.Control.BsScale = L.Control.BsButtonBox.extend({
         options: {
             icon                : 'fa-ruler-horizontal',//Icon for bsButton
             mode                : 'both',               //'metric', 'nautical', or 'both'
@@ -359,9 +348,16 @@ https://github.com/nerik/leaflet-graphicscale
             numeralFormat: '0,0[.]0', //String or function
         },
 
+        initialize: function(options){
+            L.Util.setOptions(this, options);
+            if (!this.options.tooltipDirection)
+                this.options.tooltipDirection = (options.position.indexOf('top') !== -1) ? 'bottom' : 'top';
+        },
+
+
 		onAdd: function (map) {
 			this._map = map;
-			var result = L.control.BsButtonBox.prototype.onAdd.call(this, map ),
+			var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map ),
                 $body = this.$contentContainer.bsModal.$body;
 
             $body.empty();
@@ -687,12 +683,410 @@ https://github.com/nerik/leaflet-graphicscale
 
     L.Map.addInitHook(function () {
         if (this.options.bsScaleControl) {
-            this.bsScaleControl = new L.Control.bsSScale();
+            this.bsScaleControl = new L.Control.BsScale();
             this.addControl(this.bsScaleControl);
         }
     });
 
-    L.control.bsScale = function(options){ return new L.control.BsScale(options); };
+    L.control.bsScale = function(options){ return new L.Control.BsScale(options); };
+
+}(jQuery, L, this, document));
+
+
+;
+/****************************************************************************
+leaflet-bootstrap-control-zoom.js
+
+Create a zoom-control inside a bsButtonBox
+Can be used as leaflet standard zoom control with Bootstrap style
+
+****************************************************************************/
+(function ($, L/*, window, document, undefined*/) {
+    "use strict";
+
+    /********************************************************************************
+    L.Control.bsZoom
+    ********************************************************************************/
+    L.Control.BsZoom = L.Control.Zoom.extend({
+        options: {
+            text     : '&#177;', // = +/- char
+            bigIcon  : true,
+            position : 'bottomright',
+            width    : 'auto',
+            extended : true,
+            semiTransparent: false,
+
+popup: {
+    icon: 'fa-home'
+},
+            zoomInTitle : '',
+            zoomOutTitle: '',
+
+            content: null
+        },
+
+        onAdd: function (map) {
+            var zoomResult = L.Control.Zoom.prototype.onAdd.call(this, map ),
+                $zoomResult = $(zoomResult),
+                bsButtonBox = L.control.bsButtonBox(this.options),
+                result = bsButtonBox.onAdd( map ),
+                $contentContainer = bsButtonBox.$contentContainer;
+
+            this.bsButtonBox = bsButtonBox;
+            this.bsButtonBox._container = result;
+
+            //Adjust container to be a button-group container
+            var bsButtonGroupClassNames = $.bsButtonGroup({vertical:true, center:true}).attr('class');
+            $contentContainer.addClass( bsButtonGroupClassNames );
+
+            //Adjust buttons to bsButton and move to new container
+
+            var bsButtonClassNames = $.bsButton({square: true, bigIcon: true}).attr('class');
+            $zoomResult.children()
+                .removeClass()
+                .addClass(bsButtonClassNames)
+                .appendTo( $contentContainer );
+//HER$zoomResult
+/*
+            .bsButtonGroupPopover({
+                onClick: function(id, selected, $buttonGroup){
+                    console.log('bsButtonGroupPopover', id, selected)
+                },
+                trigger: 'hover',
+                delay: 1000,
+                vertical: true,
+                placement: "left",
+                small: true,
+//HER                header: {icon:'fa-home', text:'titles'},
+                close: false,
+                    closeOnClick: true,
+//HER                footer: {icon:'fa-home', text:'fotter'},
+                buttons: [
+//HER                    {             icon: 'fa-home',   text:'Åg Header'},
+                    {id:'slow',   text:{da:'Vis skyder', en:'Show slider'}},
+//HER                    {id:'medium', icon: 'fa-car', text:'Xx'},
+//HER                    {id:'fast',   icon: 'fa-fighter-jet',   text:'Xxx'}
+                ]
+            })
+*/
+
+//HER.bsPopover({
+//HER    trigger: 'hover',
+//HER    content: 'davs'
+//HER});
+
+
+            //Create zoom-slider between zoom-out and zoom-in buttons
+            this._slider = $('<input type="text"/>');
+            this._slider.insertAfter( $(this._zoomInButton) );
+
+            this._slider.bootstrapSlider({
+                orientation : 'vertical',
+                reversed    : true,
+                handle      : 'not-used',
+                tooltip     : 'hide'
+            });
+
+            //Set style for slider-handle as bsButton
+            $(this._slider.bootstrapSlider('getElement'))
+                .children('.slider-handle')
+                    .addClass( bsButtonClassNames )
+                    .html( '<hr/>');
+
+            this._slider.on('change', $.proxy(this._onSliderChange, this));
+            this._slider.on('slideStart', $.proxy(this._onSlideStart, this));
+            this._slider.on('slideStop', $.proxy(this._onSlideStop, this));
+            map.on('zoomlevelschange', this._setSliderRange, this);
+
+            return result;
+        },
+
+        onRemove: function (map) {
+            map.off('zoomlevelschange', this._setSliderRange, this);
+            this.bsButtonBox.onRemove(map);
+            return L.Control.Zoom.prototype.onRemove.call(this, map );
+        },
+
+        _onSlideStart: function(){
+            this.isSliding = true;
+        },
+        _onSlideStop: function(){
+            this.isSliding = false;
+        },
+
+        _onSliderChange: function(event){
+            this._map.setZoom(event.value.newValue, {
+                animate    : !this.isSliding,
+                noMoveStart: !this.isSliding
+            });
+        },
+
+        _setSliderRange: function(){
+            var map = this._map,
+                minZoom = map.getMinZoom(),
+                maxZoom = map.getMaxZoom();
+
+            //Update min and max
+            this._slider
+                .bootstrapSlider('setAttribute', 'min',   minZoom)
+                .bootstrapSlider('setAttribute', 'max',   maxZoom)
+                .bootstrapSlider('setAttribute', 'step',  map.options.zoomSnap);
+
+            this._updateSlider();
+        },
+
+        _updateSlider: function(){
+            var zoom = this._map.getZoom();
+            if (this._slider)
+                this._slider.bootstrapSlider('setValue', zoom);
+
+        },
+
+        _updateDisabled: function () {
+            var map      = this._map,
+                zoom     = map.getZoom(),
+                disabled = !!this._disabled;
+
+            this.$zoomInButton = this.$zoomInButton || $(this._zoomInButton);
+            this.$zoomInButton.toggleClass ( 'disabled', disabled || (zoom === map.getMaxZoom()) );
+
+            this.$zoomOutButton = this.$zoomOutButton || $(this._zoomOutButton);
+            this.$zoomOutButton.toggleClass( 'disabled', disabled || (zoom === map.getMinZoom()) );
+
+            this._updateSlider();
+
+        }
+
+   });//end of L.Control.BsZoom
+
+
+    //********************************************************************************
+    L.Map.mergeOptions({
+        bsZoomControl: false,
+        bsZoomOptions: {}
+    });
+
+    L.Map.addInitHook(function () {
+        if (this.options.bsZoomControl) {
+            this.bsZoomControl = L.control.bsZoom(this.options.bsZoomOptions);
+            this.addControl(this.bsZoomControl);
+        }
+    });
+
+    L.control.bsZoom = function(options){ return new L.Control.BsZoom(options); };
+
+}(jQuery, L, this, document));
+
+
+;
+/****************************************************************************
+leaflet-bootstrap-control.js
+
+L.BsControl = extention of L.Control with
+
+
+****************************************************************************/
+(function ($, L, window/*, document, undefined*/) {
+    "use strict";
+
+    var controlTooltipPane = 'controlTooltipPane';
+
+    L.BsControl = L.Control.extend({
+        options: {
+            settings        : null,     //Default settings
+          //onClick                     //function when click on element with tooltip = this._getTooltipElements()
+            tooltip         : null,     //Individuel tooltip
+            tooltipDirection: null,     //Default = auto detection from control's position
+        },
+
+        initialize: function ( options ) {
+            L.Util.setOptions(this, options);
+            this.hasSettings = !!this.options.settings;
+        },
+
+        //getSettings - return the current settings. Can be overwriten to get settings from some storages
+        getSettings: function(){
+            return this.options.settings;
+        },
+
+        //setSettings - To be overwriten - save the settings after change
+        setSettings: function(/*settings*/){
+            return true;
+        },
+
+        _getTooltipElements: function( container ){
+            return $(container);
+        },
+
+        addTo: function(map) {
+            var result = L.Control.prototype.addTo.apply(this, arguments);
+
+            //Create pane to contain tooltip for control inside the map's control-container
+            if (!map.getPane(controlTooltipPane))
+                map.createPane(controlTooltipPane, map._controlContainer);
+
+            //Create common tooltip for all controls on the map
+            if (!map._controlTooltip){
+                map._controlTooltip = L.tooltip({
+                    pane        : controlTooltipPane,   //Map pane where the tooltip will be added.
+                    offset	    : L.point(1, 1),        //Optional offset of the tooltip position.
+                    direction   : 'auto',               //Direction where to open the tooltip. Possible values are: right, left, top, bottom, center, auto. auto will dynamically switch between right and left according to the tooltip position on the map.
+                    permanent   : true,                //Whether to open the tooltip permanently or only on mouseover.
+                    sticky      : true,                 //If true, the tooltip will follow the mouse instead of being fixed at the feature center.
+                    interactive	: false,                //If true, the tooltip will listen to the feature events.
+                    //opacity     : 	Number	0.9	Tooltip container opacity.
+                    noWrap   : true
+                })
+                .setLatLng([0,0])
+                .addTo(map);
+
+                map.openTooltip(map._controlTooltip);
+                map._controlTooltip.options.saveOpacity = map._controlTooltip.options.opacity;
+                map._controlTooltip.setOpacity(0);
+
+                //Prevent all event on control-container from map
+                var controlContainer = map._controlContainer;
+                L.DomEvent.disableClickPropagation( controlContainer );
+                L.DomEvent.on(controlContainer, 'contextmenu', L.DomEvent.stop);
+                L.DomEvent.on(controlContainer, 'click', this._refocusOnMap, this);
+
+
+//HER                console.log(map._controlContainer);
+/*
+                $(map._controlContainer)
+                    .on('click', function(event){
+                        console.log('Click '+Math.random(), event);
+                    })
+                    .on('contextmenu', function(event){
+                        console.log('contextmenu '+Math.random(), event);
+                    })
+*/
+            }
+
+            var $elements = this._getTooltipElements(this.getContainer());
+            function includes(substring){
+                return pos.indexOf(substring) !== -1;
+            }
+
+            if ($elements.length && !window.bsIsTouch){
+
+                if (!this.options.tooltipDirection){
+                    var pos = this.options.position.toUpperCase(),
+                        dir = '';
+
+                     if (pos == "TOPCENTER") dir = 'bottom';
+                     else if (pos == "BOTTOMCENTER") dir = 'top';
+                     else if (includes('LEFT')) dir = 'right';
+                     else if (includes('RIGHT')) dir = 'left';
+
+                    this.options.tooltipDirection = dir;
+                }
+
+                this._controlTooltip = this._map._controlTooltip;
+                $elements
+                    .on( 'mouseenter',                  $.proxy(this.tooltip_mouseenter, this))
+                    .on( 'mousemove',                   $.proxy(this.tooltip_mousemove,  this))
+                    .on( 'mouseleave show.bs.popover',  $.proxy(this.tooltip_mouseleave, this))
+                    .on( 'hidden.bs.popover',           $.proxy(this.tooltip_popover_hide, this));
+            }
+
+
+    var list = [
+            {type:'content', content: $('<div class="w-100">Davs</div>'), closeOnClick: false },
+            {text:{da:'En overskrift', en:'A header'}},
+            {id: 'button1', icon: 'fa-home', text:{da:'En knap', en:'A button'}, onClick: function(){
+//HER                console.log('onClick button1', arguments)
+            }},
+            {id: 'checkbox1', type:'checkbox', selected: true,  _icon: ['far fa-square', 'far fa-check-square'], text:{da:'En checkbox#1', en:'A checkbox#1'}},
+            {id: 'checkbox2', type:'checkbox', selected: false, _icon: ['far fa-square', 'far fa-check-square'], text:{da:'En checkbox#2', en:'A checkbox#2'}},
+            {radioGroupId: 'radio1', type:'radio', lineBefore: true, lineAfter: true, _hidden: true, list: [
+                    {id:'slow',   icon: 'fa-bicycle',   text:'Cykel', closeOnClick: false},
+                    {id:'medium', icon: 'fa-car', text:'Bil', selected: true},
+                    {id:'fast',   icon: 'fa-fighter-jet',   text:'Jetjaver'}
+            ]}
+        ];
+
+if ($elements)
+    $elements
+    .bsMenuPopover({
+        trigger: 'contextmenu',
+        delay: 1000,
+        closeOnClick: false,
+        small: true,
+        placement: 'top',
+        list: list
+    })
+    .on('show.bs.popover', function(event){
+        $elements.parent().trigger('contextmenu', event);
+        return true;
+    });
+
+
+
+
+            return result;
+        },
+
+        tooltip_mouseenter: function(event){
+            if (this._controlTooltipOff)
+                return;
+            this._controlTooltip.setContent({icon:'fa-home', text: Math.random()}/*MANGLER*/);
+            this._controlTooltip.options.direction = this.options.tooltipDirection;
+            this._setTooltipTimeOut(event, 400);
+        },
+
+        _setTooltipTimeOut: function(event, delay){
+            if (this._tooltipTimeout)
+                window.clearTimeout(this._tooltipTimeout);
+            this._tooltipTimeout = window.setTimeout( $.proxy(this._showTooltip, this, event), delay || 200);
+        },
+
+        tooltip_mousemove: function(event){
+            if (this._controlTooltipOff)
+                return;
+            if (this._controlTooltipVisible)
+                this.hideTooltip();
+            this._setTooltipTimeOut(event);
+        },
+
+        tooltip_mouseleave: function(event){
+            this.hideTooltip();
+            if (this._tooltipTimeout){
+                window.clearTimeout(this._tooltipTimeout);
+                this._tooltipTimeout = null;
+            }
+            if (event.type == 'show')
+                //popover.show
+                this._controlTooltipOff = true;
+        },
+
+        tooltip_popover_hide: function(){
+            this._controlTooltipOff = false;
+        },
+
+        _showTooltip: function(event){
+            if (event){
+                this._tooltipTimeout = null;
+                this._controlTooltipVisible = true;
+
+                this._controlTooltip._setPosition( this._map.mouseEventToContainerPoint(event) );
+
+                this._controlTooltip.setOpacity(this._controlTooltip.options.saveOpacity);
+            }
+        },
+
+        hideTooltip: function(){
+            if (this._controlTooltipVisible){
+                this._controlTooltip.setOpacity(0);
+                this._controlTooltipVisible = false;
+            }
+        },
+
+
+
+    });
+
+//HER    L.extend(L.BsControl.prototype, L.Evented.prototype);
 
 }(jQuery, L, this, document));
 
@@ -803,8 +1197,6 @@ Adjust standard Leaflet popup to display as Bootstrap modal
             _updatePosition.apply(this, arguments);
         };
     } (L.Popup.prototype._updatePosition);
-
-
 
     /*********************************************************
     Overwrite L.Popup._updateContent to update inside bsModal-body
@@ -967,8 +1359,6 @@ Adjust standard Leaflet popup to display as Bootstrap modal
 		this.fire('contentupdate');
     };
 
-
-
     /*********************************************************
     Extend L.Layer with methods to show and hide tooltip
     *********************************************************/
@@ -1000,7 +1390,7 @@ Adjust standard Leaflet popup to display as Bootstrap modal
                     $.extend({
                         sticky          : !this.options.tooltipPermanent,       //If true, the tooltip will follow the mouse instead of being fixed at the feature center.
                         interactive     : false,                                //If true, the tooltip will listen to the feature events.
-                        permanent       : this.options.tooltipPermanent,        //Whether to open the tooltip permanently or only on mouseover.
+                        permanent       : true,//this.options.tooltipPermanent,        //Whether to open the tooltip permanently or only on mouseover.
                         hideWhenDragging: this.options.tooltipHideWhenDragging  //True and tooltipPermanent: false => the tooltip is hidden when dragged
                     }, options);
 

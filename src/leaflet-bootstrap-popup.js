@@ -104,8 +104,6 @@ Adjust standard Leaflet popup to display as Bootstrap modal
         };
     } (L.Popup.prototype._updatePosition);
 
-
-
     /*********************************************************
     Overwrite L.Popup._updateContent to update inside bsModal-body
     *********************************************************/

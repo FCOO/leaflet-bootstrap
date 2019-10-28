@@ -188,6 +188,9 @@ leaflet-bootstrap-tooltip.scss,
 .leaflet-dragging .leaflet-tooltip.leaflet-tooltip-hide-when-dragging:not(.leaflet-tooltip-permanent) {
   display: none; }
 
+.leaflet-control-container .leaflet-pane {
+  z-index: 1000; }
+
 /***********************************************
 	leaflet-bootstrap-modal.scss
 ************************************************/
@@ -204,7 +207,7 @@ leaflet-bootstrap-control-button.scss
   display: none !important; }
 
 /***********************************************
-leaflet-bootstrap-scale.scss
+leaflet-bootstrap-control-scale.scss
 ************************************************/
 /*
 <div class="leaflet-bootstrap-control-scale">
@@ -289,3 +292,35 @@ leaflet-bootstrap-scale.scss
       border-width: 0; }
     .leaflet-control-singlescale .leaflet-control-singlescale-inner .division.hidden .label {
       opacity: 0; }
+
+/***********************************************
+leaflet-bootstrap-control-zoom.scss
+************************************************/
+/*
+Overwrite style for bootstrap-slider
+*/
+.slider.slider-vertical {
+  width: 100%;
+  height: 120px;
+  margin-top: 10px;
+  margin-bottom: 10px; }
+  .slider.slider-vertical .slider-track {
+    width: 6px;
+    height: calc(100% + 20px);
+    top: -10px;
+    left: calc(50% - 3px);
+    border-left: 1px solid #ced4da;
+    border-right: 1px solid #ced4da;
+    border-radius: 0 !important; }
+    .slider.slider-vertical .slider-track * {
+      border-radius: 0 !important; }
+  .slider.slider-vertical .slider-handle {
+    position: absolute !important;
+    margin-top: -10px;
+    width: 100%;
+    height: 20px !important; }
+    .slider.slider-vertical .slider-handle hr {
+      border: none;
+      border-bottom: 6px double #515961;
+      height: 25%;
+      width: 50%; }

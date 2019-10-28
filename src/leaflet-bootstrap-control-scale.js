@@ -33,6 +33,13 @@ https://github.com/nerik/leaflet-graphicscale
             numeralFormat: '0,0[.]0', //String or function
         },
 
+        initialize: function(options){
+            L.Util.setOptions(this, options);
+            if (!this.options.tooltipDirection)
+                this.options.tooltipDirection = (options.position.indexOf('top') !== -1) ? 'bottom' : 'top';
+        },
+
+
 		onAdd: function (map) {
 			this._map = map;
 			var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map ),
