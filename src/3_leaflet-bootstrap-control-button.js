@@ -23,6 +23,10 @@ Create leaflet-control for jquery-bootstrap button-classes:
                 position: 'topleft'
             },
 
+            initialize: function(options){
+                L.Util.setOptions(this, options);
+            },
+
             _createContent: function(){},
 
             onAdd: function() {
@@ -62,8 +66,12 @@ Create leaflet-control for jquery-bootstrap button-classes:
     ********************************************************************************/
     L.Control.BsButtonBox = L.Control.BsButton.extend({
         options: {
-
         },
+
+        initialize: function(options){
+            L.Util.setOptions(this, options);
+        },
+
         _createContent: function(){
             //Create container
             var $container =
@@ -92,7 +100,6 @@ Create leaflet-control for jquery-bootstrap button-classes:
                 $('<div/>')
                     .width('auto')
                     .addClass('show-for-extended')
-//HER                    .on('contextmenu', function(ev){ return L.DomEvent.stop(ev); })
                     .appendTo($container);
 
             //this.options = null OR bsModal-options OR function($container, options, onToggle)

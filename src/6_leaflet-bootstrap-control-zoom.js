@@ -19,13 +19,12 @@ Can be used as leaflet standard zoom control with Bootstrap style
             width    : 'auto',
             extended : true,
             semiTransparent: false,
+            returnFromClick: true,
 
-popup: {
-    icon: 'fa-home'
-},
             zoomInTitle : '',
             zoomOutTitle: '',
 
+popupList: [{type:'check', text:'Davs'}],
             content: null
         },
 
@@ -44,41 +43,15 @@ popup: {
             $contentContainer.addClass( bsButtonGroupClassNames );
 
             //Adjust buttons to bsButton and move to new container
-
             var bsButtonClassNames = $.bsButton({square: true, bigIcon: true}).attr('class');
             $zoomResult.children()
                 .removeClass()
                 .addClass(bsButtonClassNames)
+                //Fire event on control-container because Leaflet prevent propergation
+                .on('touchstart mousedown contextmenu', function(event){
+                    $(map._controlContainer).trigger(event.type+".jbs.popover");
+                })
                 .appendTo( $contentContainer );
-//HER$zoomResult
-/*
-            .bsButtonGroupPopover({
-                onClick: function(id, selected, $buttonGroup){
-                    console.log('bsButtonGroupPopover', id, selected)
-                },
-                trigger: 'hover',
-                delay: 1000,
-                vertical: true,
-                placement: "left",
-                small: true,
-//HER                header: {icon:'fa-home', text:'titles'},
-                close: false,
-                    closeOnClick: true,
-//HER                footer: {icon:'fa-home', text:'fotter'},
-                buttons: [
-//HER                    {             icon: 'fa-home',   text:'Åg Header'},
-                    {id:'slow',   text:{da:'Vis skyder', en:'Show slider'}},
-//HER                    {id:'medium', icon: 'fa-car', text:'Xx'},
-//HER                    {id:'fast',   icon: 'fa-fighter-jet',   text:'Xxx'}
-                ]
-            })
-*/
-
-//HER.bsPopover({
-//HER    trigger: 'hover',
-//HER    content: 'davs'
-//HER});
-
 
             //Create zoom-slider between zoom-out and zoom-in buttons
             this._slider = $('<input type="text"/>');

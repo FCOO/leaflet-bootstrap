@@ -35,13 +35,33 @@ https://github.com/nerik/leaflet-graphicscale
 
         initialize: function(options){
             L.Util.setOptions(this, options);
+            //Set default tooltip-diretion
             if (!this.options.tooltipDirection)
                 this.options.tooltipDirection = (options.position.indexOf('top') !== -1) ? 'bottom' : 'top';
+
+            //Set popup-items
+            this.options.popupList = [
+                {
+                    icon: this.options.icon,
+                    text: {da:'Vis', en:'Show'}
+                },
+                {
+                    radioGroupId: 'bsScale',
+                    type:'radio',
+                    closeOnClick: true,
+                    onChange: $.proxy(this.setMode, this),
+                    list: [
+                        {id:'metric',   text: {da:'Kilometer', en:'Metric'},     selected: this.options.mode == 'metric'  },
+                        {id:'nautical', text: {da:'Sømil', en:'Nautical miles'}, selected: this.options.mode == 'nautical'},
+                        {id:'both',     text: {da:'Begge', en:'Both'},           selected: this.options.mode == 'both'    }
+                    ]
+                }
+           ];
+
         },
 
-
 		onAdd: function (map) {
-			this._map = map;
+            this._map = map;
 			var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map ),
                 $body = this.$contentContainer.bsModal.$body;
 
@@ -77,6 +97,10 @@ https://github.com/nerik/leaflet-graphicscale
 
             //metricScale
             this.$metricScaleContainer.toggleClass('hidden', mode == 'nautical');
+
+
+            this.naticalScale._update();
+            this.metricScale._update();
         }
     });
 

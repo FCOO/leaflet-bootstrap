@@ -67,6 +67,9 @@ Adjust standard Leaflet popup to display as Bootstrap modal
             //Original function/method
             _initLayout.apply(this, arguments);
 
+            //Save ref to popup in DOM-eleemnt
+            $(this._container).data('popup', this);
+
             //Set class-name for wrapper to remove margin, bg-color etc.
             $(this._wrapper).addClass('modal-wrapper');
 
@@ -211,5 +214,13 @@ Adjust standard Leaflet popup to display as Bootstrap modal
 		return this;
 	};
 
+    /*********************************************************
+    NEW METHOD L.Map.closeAllPopup - close all popup on the map
+    *********************************************************/
+    L.Map.prototype.closeAllPopup = function() {
+        $(this.getPane('popupPane')).find('.leaflet-popup').each(function(){
+            $(this).data('popup')._close();
+        });
+    };
 
 }(jQuery, L, this, document));

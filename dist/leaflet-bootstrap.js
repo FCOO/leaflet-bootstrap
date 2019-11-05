@@ -26,6 +26,80 @@ L.BsControl = extention of L.Control with
 (function ($, L, window/*, document, undefined*/) {
     "use strict";
 
+/*
+
+
+    L.A = L.Control.extend({
+        options: {
+            a: 1
+        },
+
+        initialize: function(options){
+            L.Util.setOptions(this, options);
+            console.log('initialize A', options, this.options);
+        },
+    })
+
+    L.B = L.A.extend({
+        options: {
+            b: 2
+        },
+
+        initialize: function(options){
+            L.Util.setOptions(this, options);
+            console.log('initialize B', options, this.options);
+        },
+    })
+
+    var b = new L.B({c:3});
+    console.log('b.a',b.options.a, b.options);
+    console.log('b.b',b.options.b, b.options);
+b.options.a = 'NIELS';
+var b2 = new L.B({c:4});
+    console.log('b.a',b.options.a, b2.options);
+*/
+//******************************************************************************************
+/*
+var MyBoxClass = L.Class.extend({
+
+    options: {
+        width: 1,
+        height: 1
+    },
+
+    initialize: function(name, options) {
+        this.name = name;
+        L.setOptions(this, options);
+    }
+
+});
+
+var instance = new MyBoxClass('Red', {width: 10});
+
+console.log(instance.name); // Outputs "Red"
+console.log(instance.options.width); // Outputs "10"
+console.log(instance.options.height); // Outputs "1", the default
+
+var MyCubeClass = MyBoxClass.extend({
+    options: {
+        depth: 1
+    }
+});
+
+var instance = new MyCubeClass('Blue');
+
+console.log(instance.options.width); // Outputs "1", parent class default
+console.log(instance.options.height); // Outputs "1", parent class default
+console.log(instance.options.depth); // Outputs "1"
+console.log(instance.options);
+
+*/
+
+
+//******************************************************************************************
+
+
+
     var controlTooltipPane = 'controlTooltipPane';
 
     L.BsControl = L.Control.extend({
@@ -34,25 +108,25 @@ L.BsControl = extention of L.Control with
           //onClick                     //function when click on element with tooltip = this._getTooltipElements()
             tooltip         : null,     //Individuel tooltip
             tooltipDirection: null,     //Default = auto detection from control's position
+
+            leftClickIcon   : null, //Icon used for left-click
+            rightClickIcon  : null, //Icon used for right-click
+            closeText       : {da:'Luk', en:'Close'},
+            settingText     : {da:'Indstillinger', en:'Settings'},
+            popupTrigger    : null, //Default: contextmenu and click for touch, contextmenu for no-touch
+            popupList       : null, //[] of items for bsPopoverMenu
         },
 
         initialize: function ( options ) {
             L.Util.setOptions(this, options);
-            this.hasSettings = !!this.options.settings;
-        },
-
-        //getSettings - return the current settings. Can be overwriten to get settings from some storages
-        getSettings: function(){
-            return this.options.settings;
-        },
-
-        //setSettings - To be overwriten - save the settings after change
-        setSettings: function(/*settings*/){
-            return true;
         },
 
         _getTooltipElements: function( container ){
-            return $(container);
+            return this.options.getTooltipElements ? this.options.getTooltipElements(container) : $(container);
+        },
+
+        _getPopupElements: function( container ){
+            return this._getTooltipElements(container);
         },
 
         addTo: function(map) {
@@ -81,31 +155,55 @@ L.BsControl = extention of L.Control with
                 map._controlTooltip.options.saveOpacity = map._controlTooltip.options.opacity;
                 map._controlTooltip.setOpacity(0);
 
-                //Prevent all event on control-container from map
                 var controlContainer = map._controlContainer;
-                L.DomEvent.disableClickPropagation( controlContainer );
-                L.DomEvent.on(controlContainer, 'contextmenu', L.DomEvent.stop);
-                L.DomEvent.on(controlContainer, 'click', this._refocusOnMap, this);
 
+                //Prevent event on control-container from map
+                L.DomEvent.on(controlContainer, 'contextmenu dblclick', L.DomEvent.stop);
 
-//HER                console.log(map._controlContainer);
-/*
-                $(map._controlContainer)
-                    .on('click', function(event){
-                        console.log('Click '+Math.random(), event);
-                    })
-                    .on('contextmenu', function(event){
-                        console.log('contextmenu '+Math.random(), event);
-                    })
-*/
+                //Close all popup on the map when contextmenu on any control
+                $(controlContainer).on('touchstart mousedown', $.proxy(map.closeAllPopup, map));
+
+                $(controlContainer).on('touchstart mousedown', $.proxy(map.closeAllPopup, map));
             }
 
-            var $elements = this._getTooltipElements(this.getContainer());
+
+            //Create and add popup
+            var $popupElements = this._getPopupElements(this.getContainer()),
+                hasPopup = $popupElements && $popupElements.length && this.options.popupList,
+                $tooltipElements = this._getTooltipElements(this.getContainer()),
+                hasTooltip = hasPopup && $tooltipElements && $tooltipElements.length && !window.bsIsTouch;
+
+            if (hasPopup){
+                $popupElements.on( 'click', function(){ $popupElements.popover('hide'); });
+
+                if (hasTooltip)
+                    $popupElements
+                        .on( 'show.bs.popover',   $.proxy(this.tooltip_mouseleave, this))
+                        .on( 'hidden.bs.popover', $.proxy(this.tooltip_popover_hide, this));
+
+
+                var popupTrigger = this.options.popupTrigger ?
+                                   this.options.popupTrigger :
+                                   window.bsIsTouch ? 'click contextmenu' : 'contextmenu';
+//                                   'contextmenu';
+
+                $popupElements.bsMenuPopover({
+                    trigger     : popupTrigger,
+                    delay       : popupTrigger == 'hover' ? 1000 : 0,
+                    closeOnClick: true,
+                    small       : true,
+                    placement   : 'top',
+                    list        : this.options.popupList
+                });
+            }
+
+
             function includes(substring){
                 return pos.indexOf(substring) !== -1;
             }
 
-            if ($elements.length && !window.bsIsTouch){
+
+            if (hasTooltip){
 
                 if (!this.options.tooltipDirection){
                     var pos = this.options.position.toUpperCase(),
@@ -120,49 +218,25 @@ L.BsControl = extention of L.Control with
                 }
 
                 this._controlTooltip = this._map._controlTooltip;
-                $elements
-                    .on( 'mouseenter',                  $.proxy(this.tooltip_mouseenter, this))
-                    .on( 'mousemove',                   $.proxy(this.tooltip_mousemove,  this))
-                    .on( 'mouseleave show.bs.popover',  $.proxy(this.tooltip_mouseleave, this))
-                    .on( 'hidden.bs.popover',           $.proxy(this.tooltip_popover_hide, this));
+                $tooltipElements
+                    .on( 'mouseenter',  $.proxy(this.tooltip_mouseenter, this))
+                    .on( 'mousemove',   $.proxy(this.tooltip_mousemove,  this))
+                    .on( 'mouseleave',  $.proxy(this.tooltip_mouseleave, this));
+
+
+                //Set tooltip content
+                this._controlTooltipContent = [
+
+
+                ];
+
             }
-
-
-    var list = [
-            {type:'content', content: $('<div class="w-100">Davs</div>'), closeOnClick: false },
-            {text:{da:'En overskrift', en:'A header'}},
-            {id: 'button1', icon: 'fa-home', text:{da:'En knap', en:'A button'}, onClick: function(){
-//HER                console.log('onClick button1', arguments)
-            }},
-            {id: 'checkbox1', type:'checkbox', selected: true,  _icon: ['far fa-square', 'far fa-check-square'], text:{da:'En checkbox#1', en:'A checkbox#1'}},
-            {id: 'checkbox2', type:'checkbox', selected: false, _icon: ['far fa-square', 'far fa-check-square'], text:{da:'En checkbox#2', en:'A checkbox#2'}},
-            {radioGroupId: 'radio1', type:'radio', lineBefore: true, lineAfter: true, _hidden: true, list: [
-                    {id:'slow',   icon: 'fa-bicycle',   text:'Cykel', closeOnClick: false},
-                    {id:'medium', icon: 'fa-car', text:'Bil', selected: true},
-                    {id:'fast',   icon: 'fa-fighter-jet',   text:'Jetjaver'}
-            ]}
-        ];
-
-if ($elements)
-    $elements
-    .bsMenuPopover({
-        trigger: 'contextmenu',
-        delay: 1000,
-        closeOnClick: false,
-        small: true,
-        placement: 'top',
-        list: list
-    })
-    .on('show.bs.popover', function(event){
-        $elements.parent().trigger('contextmenu', event);
-        return true;
-    });
-
-
 
 
             return result;
         },
+
+
 
         tooltip_mouseenter: function(event){
             if (this._controlTooltipOff)
@@ -254,6 +328,10 @@ Create leaflet-control for jquery-bootstrap button-classes:
                 position: 'topleft'
             },
 
+            initialize: function(options){
+                L.Util.setOptions(this, options);
+            },
+
             _createContent: function(){},
 
             onAdd: function() {
@@ -293,8 +371,12 @@ Create leaflet-control for jquery-bootstrap button-classes:
     ********************************************************************************/
     L.Control.BsButtonBox = L.Control.BsButton.extend({
         options: {
-
         },
+
+        initialize: function(options){
+            L.Util.setOptions(this, options);
+        },
+
         _createContent: function(){
             //Create container
             var $container =
@@ -323,7 +405,6 @@ Create leaflet-control for jquery-bootstrap button-classes:
                 $('<div/>')
                     .width('auto')
                     .addClass('show-for-extended')
-//HER                    .on('contextmenu', function(ev){ return L.DomEvent.stop(ev); })
                     .appendTo($container);
 
             //this.options = null OR bsModal-options OR function($container, options, onToggle)
@@ -581,13 +662,33 @@ https://github.com/nerik/leaflet-graphicscale
 
         initialize: function(options){
             L.Util.setOptions(this, options);
+            //Set default tooltip-diretion
             if (!this.options.tooltipDirection)
                 this.options.tooltipDirection = (options.position.indexOf('top') !== -1) ? 'bottom' : 'top';
+
+            //Set popup-items
+            this.options.popupList = [
+                {
+                    icon: this.options.icon,
+                    text: {da:'Vis', en:'Show'}
+                },
+                {
+                    radioGroupId: 'bsScale',
+                    type:'radio',
+                    closeOnClick: true,
+                    onChange: $.proxy(this.setMode, this),
+                    list: [
+                        {id:'metric',   text: {da:'Kilometer', en:'Metric'},     selected: this.options.mode == 'metric'  },
+                        {id:'nautical', text: {da:'Sømil', en:'Nautical miles'}, selected: this.options.mode == 'nautical'},
+                        {id:'both',     text: {da:'Begge', en:'Both'},           selected: this.options.mode == 'both'    }
+                    ]
+                }
+           ];
+
         },
 
-
 		onAdd: function (map) {
-			this._map = map;
+            this._map = map;
 			var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map ),
                 $body = this.$contentContainer.bsModal.$body;
 
@@ -623,6 +724,10 @@ https://github.com/nerik/leaflet-graphicscale
 
             //metricScale
             this.$metricScaleContainer.toggleClass('hidden', mode == 'nautical');
+
+
+            this.naticalScale._update();
+            this.metricScale._update();
         }
     });
 
@@ -946,13 +1051,12 @@ Can be used as leaflet standard zoom control with Bootstrap style
             width    : 'auto',
             extended : true,
             semiTransparent: false,
+            returnFromClick: true,
 
-popup: {
-    icon: 'fa-home'
-},
             zoomInTitle : '',
             zoomOutTitle: '',
 
+popupList: [{type:'check', text:'Davs'}],
             content: null
         },
 
@@ -971,41 +1075,15 @@ popup: {
             $contentContainer.addClass( bsButtonGroupClassNames );
 
             //Adjust buttons to bsButton and move to new container
-
             var bsButtonClassNames = $.bsButton({square: true, bigIcon: true}).attr('class');
             $zoomResult.children()
                 .removeClass()
                 .addClass(bsButtonClassNames)
+                //Fire event on control-container because Leaflet prevent propergation
+                .on('touchstart mousedown contextmenu', function(event){
+                    $(map._controlContainer).trigger(event.type+".jbs.popover");
+                })
                 .appendTo( $contentContainer );
-//HER$zoomResult
-/*
-            .bsButtonGroupPopover({
-                onClick: function(id, selected, $buttonGroup){
-                    console.log('bsButtonGroupPopover', id, selected)
-                },
-                trigger: 'hover',
-                delay: 1000,
-                vertical: true,
-                placement: "left",
-                small: true,
-//HER                header: {icon:'fa-home', text:'titles'},
-                close: false,
-                    closeOnClick: true,
-//HER                footer: {icon:'fa-home', text:'fotter'},
-                buttons: [
-//HER                    {             icon: 'fa-home',   text:'Åg Header'},
-                    {id:'slow',   text:{da:'Vis skyder', en:'Show slider'}},
-//HER                    {id:'medium', icon: 'fa-car', text:'Xx'},
-//HER                    {id:'fast',   icon: 'fa-fighter-jet',   text:'Xxx'}
-                ]
-            })
-*/
-
-//HER.bsPopover({
-//HER    trigger: 'hover',
-//HER    content: 'davs'
-//HER});
-
 
             //Create zoom-slider between zoom-out and zoom-in buttons
             this._slider = $('<input type="text"/>');
@@ -1179,6 +1257,9 @@ Adjust standard Leaflet popup to display as Bootstrap modal
             //Original function/method
             _initLayout.apply(this, arguments);
 
+            //Save ref to popup in DOM-eleemnt
+            $(this._container).data('popup', this);
+
             //Set class-name for wrapper to remove margin, bg-color etc.
             $(this._wrapper).addClass('modal-wrapper');
 
@@ -1323,6 +1404,14 @@ Adjust standard Leaflet popup to display as Bootstrap modal
 		return this;
 	};
 
+    /*********************************************************
+    NEW METHOD L.Map.closeAllPopup - close all popup on the map
+    *********************************************************/
+    L.Map.prototype.closeAllPopup = function() {
+        $(this.getPane('popupPane')).find('.leaflet-popup').each(function(){
+            $(this).data('popup')._close();
+        });
+    };
 
 }(jQuery, L, this, document));
 
@@ -1408,7 +1497,7 @@ Adjust standard Leaflet popup to display as Bootstrap modal
                     $.extend({
                         sticky          : !this.options.tooltipPermanent,       //If true, the tooltip will follow the mouse instead of being fixed at the feature center.
                         interactive     : false,                                //If true, the tooltip will listen to the feature events.
-                        permanent       : true,//this.options.tooltipPermanent,        //Whether to open the tooltip permanently or only on mouseover.
+                        permanent       : this.options.tooltipPermanent,        //Whether to open the tooltip permanently or only on mouseover.
                         hideWhenDragging: this.options.tooltipHideWhenDragging  //True and tooltipPermanent: false => the tooltip is hidden when dragged
                     }, options);
 

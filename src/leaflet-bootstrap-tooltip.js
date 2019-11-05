@@ -79,7 +79,7 @@
                     $.extend({
                         sticky          : !this.options.tooltipPermanent,       //If true, the tooltip will follow the mouse instead of being fixed at the feature center.
                         interactive     : false,                                //If true, the tooltip will listen to the feature events.
-                        permanent       : true,//this.options.tooltipPermanent,        //Whether to open the tooltip permanently or only on mouseover.
+                        permanent       : this.options.tooltipPermanent,        //Whether to open the tooltip permanently or only on mouseover.
                         hideWhenDragging: this.options.tooltipHideWhenDragging  //True and tooltipPermanent: false => the tooltip is hidden when dragged
                     }, options);
 

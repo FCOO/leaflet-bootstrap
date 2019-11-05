@@ -38,7 +38,7 @@
     window.bsIsTouch = (window.location.search =='?touch');
 
     i18next.init();
-    i18next.changeLanguage('da');
+    i18next.changeLanguage('en');
 
     var map = L.map('map', {
         zoomControl: true,
@@ -82,7 +82,7 @@
 
     map.addControl(
         L.control.bsScale({
-            position: 'bottomleft', mode:'metric', extended: true, maxUnitsWidthPercent: 30, maxUnitsWidth: 1200,
+            position: 'topleft', mode:'metric', extended: true, maxUnitsWidthPercent: 30, maxUnitsWidth: 1200,
         })
     );
 
@@ -349,7 +349,7 @@
             content: shortContent,
             clickable: true,
 
-            isMinimized: true,
+            _isMinimized: true,
             extended: {
                 width  : 345,
                 content: longContent,
@@ -357,7 +357,10 @@
             },
         });
 
-        popup.setLatLng(mouseEvent.latlng).openOn(map);
+
+        var marker = L.marker(mouseEvent.latlng).addTo(map);
+        marker.bindPopup(popup).openPopup();
+
     });
     </script>
 </body>
