@@ -34,7 +34,12 @@ https://github.com/nerik/leaflet-graphicscale
         },
 
         initialize: function(options){
+            //Set default bsButtonBox-options
+            L.Control.BsButtonBox.prototype.initialize.call(this, options);
+
+            //Set own options
             L.Util.setOptions(this, options);
+
             //Set default tooltip-diretion
             if (!this.options.tooltipDirection)
                 this.options.tooltipDirection = (options.position.indexOf('top') !== -1) ? 'bottom' : 'top';
@@ -57,7 +62,6 @@ https://github.com/nerik/leaflet-graphicscale
                     ]
                 }
            ];
-
         },
 
 		onAdd: function (map) {

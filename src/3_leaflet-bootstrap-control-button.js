@@ -9,7 +9,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
 
 ****************************************************************************/
-(function ($, L/*, window, document, undefined*/) {
+(function ($, L, window/*, document, undefined*/) {
     "use strict";
 
     var defaultButtonOptions = {
@@ -24,6 +24,9 @@ Create leaflet-control for jquery-bootstrap button-classes:
             },
 
             initialize: function(options){
+                //Set default bsControl-options
+                L.BsControl.prototype.initialize.call(this, options);
+
                 L.Util.setOptions(this, options);
             },
 
@@ -32,6 +35,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
             onAdd: function() {
                 var _this = this;
                 this.options = $._bsAdjustOptions( this.options, defaultButtonOptions);
+
                 if (this.options.list)
                     $.each(this.options.list, function(index, opt){
                         _this.options.list[index] = $._bsAdjustOptions( opt, defaultButtonOptions);
@@ -42,23 +46,36 @@ Create leaflet-control for jquery-bootstrap button-classes:
         });
 
     L.Control.BsButton = _bsButtons.extend({
+        initialize: function(options){
+            //Set default _bsButtons-options
+            _bsButtons.prototype.initialize.call(this, options);
+
+            L.Util.setOptions(this, options);
+        },
+
         _createContent: function(){ return $.bsButton(this.options); }
     });
 
     L.Control.BsButtonGroup = _bsButtons.extend({
         options       : { vertical: true },
+
+        initialize: function(options){
+            //Set default _bsButtons-options
+            _bsButtons.prototype.initialize.call(this, options);
+
+            L.Util.setOptions(this, options);
+        },
+
         _createContent: function(){ return $.bsButtonGroup(this.options); }
     });
 
     L.Control.BsRadioButtonGroup = L.Control.BsButtonGroup.extend({
-//        options       : { vertical: true },
         _createContent: function(){ return $.bsRadioButtonGroup(this.options); }
     });
 
     L.control.bsButton           = function(options){ return new L.Control.BsButton(options);           };
     L.control.bsButtonGroup      = function(options){ return new L.Control.BsButtonGroup(options);      };
     L.control.bsRadioButtonGroup = function(options){ return new L.Control.BsRadioButtonGroup(options); };
-
 
     /********************************************************************************
     L.Control.BsButtonBox
@@ -69,7 +86,15 @@ Create leaflet-control for jquery-bootstrap button-classes:
         },
 
         initialize: function(options){
+            //Set default BsButtons-options
+            L.Control.BsButton.prototype.initialize.call(this, options);
+
             L.Util.setOptions(this, options);
+
+            //Set default onToggle-function
+            this.onToggle = $.proxy(this.toggle, this);
+//HER            if (window.bsIsTouch)
+                this.options.onClose = this.onToggle;
         },
 
         _createContent: function(){
@@ -78,12 +103,11 @@ Create leaflet-control for jquery-bootstrap button-classes:
                     $('<div/>')
                         .addClass('leaflet-button-box')
                         .addClass(this.options.className)
-                        .modernizrToggle('extended', !!this.options.extended),
-                onToggle = $.proxy(this.toggle, this);
+                        .modernizrToggle('extended', !!this.options.extended);
 
             //Adjust options for the button and create it
             var buttonOptions = $.extend(true, {}, {
-                        onClick        : onToggle,
+                        onClick        : this.onToggle,
                         semiTransparent: true,
                         square         : true
                     },
@@ -105,7 +129,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
             //this.options = null OR bsModal-options OR function($container, options, onToggle)
             if (this.options.content){
                 if ($.isFunction(this.options.content))
-                    this.options.content($contentContainer, this.options, onToggle);
+                    this.options.content($contentContainer, this.options, this.onToggle);
                 else {
                     $contentContainer._bsAddBaseClassAndSize({
                         baseClass   : 'modal-dialog',
@@ -137,12 +161,12 @@ Create leaflet-control for jquery-bootstrap button-classes:
                     //Add close icon to header (if any)
                     if (!modalOptions.noHeader && modalOptions.header && !(modalOptions.icons && modalOptions.icons.close)){
                         modalOptions.icons = modalOptions.icons || {};
-                        modalOptions.icons.close = { onClick: onToggle };
+                        modalOptions.icons.close = { onClick: this.onToggle };
                     }
 
-                    //Add default onClick
-                    if (modalOptions.clickable && !modalOptions.onClick)
-                        modalOptions.onClick = onToggle;
+                    //Add default onClick if clickable and bsControl will not add popup triggered by click
+                    if (modalOptions.clickable && !modalOptions.onClick && !(this.options.popupList && window.bsIsTouch))
+                        modalOptions.onClick = this.onToggle;
 
                     $contentContainer._bsModalContent(modalOptions);
                 }

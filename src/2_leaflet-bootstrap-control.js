@@ -8,95 +8,23 @@ L.BsControl = extention of L.Control with
 (function ($, L, window/*, document, undefined*/) {
     "use strict";
 
-/*
-
-
-    L.A = L.Control.extend({
-        options: {
-            a: 1
-        },
-
-        initialize: function(options){
-            L.Util.setOptions(this, options);
-            console.log('initialize A', options, this.options);
-        },
-    })
-
-    L.B = L.A.extend({
-        options: {
-            b: 2
-        },
-
-        initialize: function(options){
-            L.Util.setOptions(this, options);
-            console.log('initialize B', options, this.options);
-        },
-    })
-
-    var b = new L.B({c:3});
-    console.log('b.a',b.options.a, b.options);
-    console.log('b.b',b.options.b, b.options);
-b.options.a = 'NIELS';
-var b2 = new L.B({c:4});
-    console.log('b.a',b.options.a, b2.options);
-*/
-//******************************************************************************************
-/*
-var MyBoxClass = L.Class.extend({
-
-    options: {
-        width: 1,
-        height: 1
-    },
-
-    initialize: function(name, options) {
-        this.name = name;
-        L.setOptions(this, options);
-    }
-
-});
-
-var instance = new MyBoxClass('Red', {width: 10});
-
-console.log(instance.name); // Outputs "Red"
-console.log(instance.options.width); // Outputs "10"
-console.log(instance.options.height); // Outputs "1", the default
-
-var MyCubeClass = MyBoxClass.extend({
-    options: {
-        depth: 1
-    }
-});
-
-var instance = new MyCubeClass('Blue');
-
-console.log(instance.options.width); // Outputs "1", parent class default
-console.log(instance.options.height); // Outputs "1", parent class default
-console.log(instance.options.depth); // Outputs "1"
-console.log(instance.options);
-
-*/
-
-
-//******************************************************************************************
-
-
-
     var controlTooltipPane = 'controlTooltipPane';
 
     L.BsControl = L.Control.extend({
         options: {
-            settings        : null,     //Default settings
-          //onClick                     //function when click on element with tooltip = this._getTooltipElements()
-            tooltip         : null,     //Individuel tooltip
-            tooltipDirection: null,     //Default = auto detection from control's position
+            tooltip         : null, //Individuel tooltip
+            tooltipDirection: null, //Default = auto detection from control's position
 
             leftClickIcon   : null, //Icon used for left-click
             rightClickIcon  : null, //Icon used for right-click
-            closeText       : {da:'Luk', en:'Close'},
-            settingText     : {da:'Indstillinger', en:'Settings'},
+
+            popupText       : {da:'Indstillinger', en:'Settings'},
             popupTrigger    : null, //Default: contextmenu and click for touch, contextmenu for no-touch
             popupList       : null, //[] of items for bsPopoverMenu
+
+
+            closeText       : {da:'Skjul', en:'Hide'},
+            onClose         : null //function. If not null and popupList not null => add as extra button to popupList with text = options.closeText
         },
 
         initialize: function ( options ) {
@@ -144,8 +72,6 @@ console.log(instance.options);
 
                 //Close all popup on the map when contextmenu on any control
                 $(controlContainer).on('touchstart mousedown', $.proxy(map.closeAllPopup, map));
-
-                $(controlContainer).on('touchstart mousedown', $.proxy(map.closeAllPopup, map));
             }
 
 
@@ -166,8 +92,11 @@ console.log(instance.options);
 
                 var popupTrigger = this.options.popupTrigger ?
                                    this.options.popupTrigger :
-                                   window.bsIsTouch ? 'click contextmenu' : 'contextmenu';
-//                                   'contextmenu';
+                                   window.bsIsTouch ? 'click' : 'contextmenu',
+                    popupList = this.options.popupList.slice();
+
+                if (this.options.onClose && window.bsIsTouch)
+                    popupList.push({type:'button', lineBefore: true, closeOnClick: true, text: this.options.closeText, onClick: this.options.onClose});
 
                 $popupElements.bsMenuPopover({
                     trigger     : popupTrigger,
@@ -175,26 +104,25 @@ console.log(instance.options);
                     closeOnClick: true,
                     small       : true,
                     placement   : 'top',
-                    list        : this.options.popupList
+                    list        : popupList
                 });
             }
 
 
-            function includes(substring){
+            function includes(pos, substring){
                 return pos.indexOf(substring) !== -1;
             }
 
 
             if (hasTooltip){
-
                 if (!this.options.tooltipDirection){
                     var pos = this.options.position.toUpperCase(),
                         dir = '';
 
                      if (pos == "TOPCENTER") dir = 'bottom';
                      else if (pos == "BOTTOMCENTER") dir = 'top';
-                     else if (includes('LEFT')) dir = 'right';
-                     else if (includes('RIGHT')) dir = 'left';
+                     else if (includes(pos, 'LEFT')) dir = 'right';
+                     else if (includes(pos, 'RIGHT')) dir = 'left';
 
                     this.options.tooltipDirection = dir;
                 }
@@ -207,13 +135,12 @@ console.log(instance.options);
 
 
                 //Set tooltip content
-                this._controlTooltipContent = [
+                this._controlTooltipContent = [];
+                if (this.options.onClose)
+                    this._controlTooltipContent.push({icon: this.options.leftClickIcon, text: this.options.closeText}, '<br>' );
 
-
-                ];
-
+                this._controlTooltipContent.push({icon: this.options.rightClickIcon, text: this.options.popupText});
             }
-
 
             return result;
         },
@@ -221,9 +148,9 @@ console.log(instance.options);
 
 
         tooltip_mouseenter: function(event){
-            if (this._controlTooltipOff)
+            if (this._controlTooltipOff || !this._controlTooltipContent)
                 return;
-            this._controlTooltip.setContent({icon:'fa-home', text: Math.random()}/*MANGLER*/);
+            this._controlTooltip.setContent(this._controlTooltipContent);
             this._controlTooltip.options.direction = this.options.tooltipDirection;
             this._setTooltipTimeOut(event, 400);
         },
@@ -274,12 +201,6 @@ console.log(instance.options);
                 this._controlTooltipVisible = false;
             }
         },
-
-
-
     });
 
-//HER    L.extend(L.BsControl.prototype, L.Evented.prototype);
-
 }(jQuery, L, this, document));
-
