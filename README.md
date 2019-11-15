@@ -62,6 +62,20 @@ Based on [leaflet-graphicscale](https://github.com/nerik/leaflet-graphicscale) b
         maxUnitsWidthPercent: 90,                   //Max width as percent of map wisth
     }
 
+See `src/5_leaflet-bootstrap-control-scale.js` for more details
+
+
+### L.control.bsZoom(options)
+Create a extended zoom-control with history of previous {zoom,center} on the map
+	
+	L.control.bsZoom({position: 'topleft'}).addTo(map)
+	//OR
+	var map = L.map('map',{
+		          bsZoomControl: true,
+        	      bsZoomOptions: {position: 'topleft'}
+			  });
+
+See `src/6_leaflet-bootstrap-control-zoom.js` for more details
 
 ### L.popup
 Extended to take same options as bsModal (see details [here](https://github.com/FCOO/jquery-bootstrap#modal))

@@ -83,6 +83,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
     ********************************************************************************/
     L.Control.BsButtonBox = L.Control.BsButton.extend({
         options: {
+            addOnClose: true
         },
 
         initialize: function(options){
@@ -93,7 +94,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
             //Set default onToggle-function
             this.onToggle = $.proxy(this.toggle, this);
-//HER            if (window.bsIsTouch)
+            if (this.options.addOnClose)
                 this.options.onClose = this.onToggle;
         },
 

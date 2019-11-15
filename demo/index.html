@@ -38,14 +38,13 @@
     window.bsIsTouch = (window.location.search =='?touch');
 
     i18next.init();
-    i18next.changeLanguage('en');
+    i18next.changeLanguage('da');
 
     var map = L.map('map', {
         zoomControl: true,
         bsZoomControl: true,
         zoomSnap: .25,
-        bsZoomOptions: {
-        }
+        worldCopyJump: true,
     }).setView([56.2, 11.5], 6);
 
     L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -54,7 +53,7 @@
     }).addTo(map);
 
     L.marker([54,12], {draggable: true}).addTo(map).bindTooltip({icon:'fa-home', text:'Godt'}, {delay:2000});
-
+//*
     //************************
 //HER    new L.HistoryControl({
 //HER
@@ -73,11 +72,12 @@
 
 
     //************************
-    var scale = L.control.bsScale({
+    map.addControl(
+        L.control.bsScale({
             position: 'bottomleft', extended: true,
-        });
+        })
 
-    map.addControl(scale);
+    );
 
 
     map.addControl(
@@ -91,9 +91,9 @@
             position: 'bottomleft', mode:'nautical', extended: true, maxUnitsWidthPercent: 60, maxUnitsWidth: 1200,
         })
     );
+//*/
 
-
-
+//*
     //************************
     var buttonBox = L.control.bsButtonBox({
         position: 'bottomright',
@@ -362,6 +362,7 @@
         marker.bindPopup(popup).openPopup();
 
     });
+//*/
     </script>
 </body>
 </html>

@@ -38,33 +38,31 @@ Can be used as leaflet standard zoom control with Bootstrap style
             showSlider : false,
             showHistory: false,
             semiTransparent: false,
+            returnFromClick: true,
 
             popupTrigger: 'contextmenu',
-            content     :'',
+            content:'',
         },
 
         initialize: function ( options ) {
             //Adjust options
             if (window.bsIsTouch){
-                //Zoom- and history buttons are shown in a bsModal-box
                 options.showHistory = true;
                 options.content = {
-                    clickable: false,
-                    semiTransparent: true,
-
-                    header: {text: {da:'Zoom og center', en:'Zoom and centre'}},
-                    content: 'This is not empty'
+                    header : {text: 'Zoom and centre'},
+                    content: $.proxy(this.createContent, this)
                 }
             }
             else {
-                //The Button-Box is allways extended. The history-buttons are hiden/shown using popup
                 options.extended   = true;
                 options.addOnClose = false;
             }
 
+
             //Set default BsButtonBox-options
             L.Control.BsButtonBox.prototype.initialize.call(this, options);
             L.Util.setOptions(this, options);
+
 
             //Adjust popupPlacement to position
             function includes(pos, substring){
@@ -80,8 +78,14 @@ Can be used as leaflet standard zoom control with Bootstrap style
 
             this.options.popupPlacement = placement;
 
-            //Set popup-item(s)
-            if (!window.bsIsTouch){
+            //Set two different versions for touch-mode and no-touch-mode:
+            //Touch
+            //No-touch: Permanent extended with no close on click
+            if (window.bsIsTouch){
+
+            }
+            else {
+                //Set popup-item(s)
                 this.options.popupList = [
 //                    {text: 'Zoom'},
 //                    {type:'checkbox', text: {da:'Vis skylder', en:'Show slider'}, selected: this.options.showSlider, onChange: $.proxy(this._showSlider, this), closeOnClick: true},
@@ -89,6 +93,12 @@ Can be used as leaflet standard zoom control with Bootstrap style
 //                    {type:'content',  content: $historyContent,                   closeOnClick: false, lineBefore: true}
                 ];
             }
+        },
+
+
+        createContent: function( $contatiner ){
+            console.log(this.createContent );
+            $contatiner.append('<h1>davs</h1>');
         },
 
 
@@ -103,10 +113,9 @@ Can be used as leaflet standard zoom control with Bootstrap style
             this.zoom.addTo(map);
 
 			var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map ),
-                //If touch-mode => Create the content inside the bsModal-body else create it inside the control
-                $contentContainer = window.bsIsTouch ? this.$contentContainer.bsModal.$body : this.$contentContainer;
+                $contentContainer = this.$contentContainer;
 
-            $contentContainer.empty();
+//            $contentContainer.empty();
 
             //Adjust zoom-container to be a button-group container and move to new container and adjust zoom-buttons to bsButton
             var bsButtonGroupClassNames = $.bsButtonGroup({vertical:true, center:true}).attr('class'),
@@ -178,7 +187,13 @@ Can be used as leaflet standard zoom control with Bootstrap style
 
             $contentContainer.find('.btn-group-vertical').css('margin-top', 0);
 
-            this._showHistory( '', this.options.showHistory);
+
+            //If touch-mode => add a 'toll' toggle-button
+            if (window.bsIsTouch)
+                $.bsButton({icon:'fa-angle-right', onClick: this.onToggle})
+                    .css('line-height', 3.4)
+                    .prependTo($contentContainer);
+
 
 /* SLIDER REMOVED FOR NOW. Waits for better slider-zoom in leaflet
             //Create zoom-slider between zoom-out and zoom-in buttons
@@ -204,8 +219,11 @@ Can be used as leaflet standard zoom control with Bootstrap style
             this._slider.on('slideStop', $.proxy(this._onSlideStop, this));
             map.on('zoomlevelschange', this._setSliderRange, this);
 
-            this._showSlider('', this.options.showSlider);
 */
+
+            this._showHistory( '', this.options.showHistory);
+            //this._showSlider('', this.options.showSlider);
+
             map.on('load', this._onLoad, this);
 
             return result;
@@ -302,6 +320,10 @@ Can be used as leaflet standard zoom control with Bootstrap style
 
 //            this._updateSlider();
         },
+
+//        _showHistoryModal: function(){
+//            console.log('_showHistoryModal');
+//        }
 
     });//end of L.Control.BsZoom
 

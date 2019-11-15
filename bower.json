@@ -1,52 +1,45 @@
 {
-  "name": "leaflet-bootstrap",
-  "version": "2.3.4",
-  "homepage": "https://github.com/FCOO/leaflet-bootstrap",
-  "authors": [
-    "Niels Holt"
-  ],
-  "description": "",
-  "main": [
-    "dist/leaflet-bootstrap.js",
-    "dist/leaflet-bootstrap.css"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/FCOO/leaflet-bootstrap.git"
-  },
-  "dependencies": {
-    "jquery": "latest",
-    "leaflet": "leaflet#1.4.0",
-    "jquery-bootstrap": "fcoo/jquery-bootstrap#^1.53.0",
-    "leaflet-control-topcenter": "FCOO/leaflet-control-topcenter#^2.0.1",
-    "javascript-utilities": "fcoo/javascript-utilities#^1.1.0",
-    "numeral": "adamwdraper/Numeral-js#^2.0.6",
-    "seiyria-bootstrap-slider": "seiyria/bootstrap-slider#^10.6.2"
-  },
-  "overrides": {
-    "leaflet-history": {
-      "main": [
-        "dist/leaflet-history.js",
-        "dist/leaflet-history.css"
-      ]
-    }
-  },
-  "devDependencies": {
-    "bourbon": "latest",
-    "modernizr-mixin": "latest",
-    "mathsass": "latest",
-    "modernizr-scss": "FCOO/modernizr-scss#^2.1.2",
-    "sass-color-helpers": "^2.1.1"
-  },
-  "license": "MIT",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ],
-  "moduleType": [
-    "es6"
-  ]
+    "name": "leaflet-bootstrap",
+    "version": "2.3.4",
+    "homepage": "https://github.com/FCOO/leaflet-bootstrap",
+    "authors": [
+        "Niels Holt"
+    ],
+    "description": "",
+    "main": [
+        "dist/leaflet-bootstrap.js",
+        "dist/leaflet-bootstrap.css"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/FCOO/leaflet-bootstrap.git"
+    },
+    "dependencies": {
+        "jquery": "latest",
+        "leaflet": "leaflet#1.4.0",
+        "jquery-bootstrap": "fcoo/jquery-bootstrap#^1.53.0",
+        "leaflet-control-topcenter": "FCOO/leaflet-control-topcenter#^2.0.1",
+        "javascript-utilities": "fcoo/javascript-utilities#^1.1.0",
+        "numeral": "adamwdraper/Numeral-js#^2.0.6",
+        "seiyria-bootstrap-slider": "seiyria/bootstrap-slider#^10.6.2",
+        "history": "fcoo/history.js#^1.0.9"
+    },
+    "devDependencies": {
+        "bourbon": "latest",
+        "modernizr-mixin": "latest",
+        "mathsass": "latest",
+        "modernizr-scss": "FCOO/modernizr-scss#^2.1.2",
+        "sass-color-helpers": "^2.1.1"
+    },
+    "license": "MIT",
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests"
+    ],
+    "moduleType": [
+        "es6"
+    ]
 }

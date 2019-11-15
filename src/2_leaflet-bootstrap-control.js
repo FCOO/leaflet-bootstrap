@@ -103,7 +103,7 @@ L.BsControl = extention of L.Control with
                     delay       : popupTrigger == 'hover' ? 1000 : 0,
                     closeOnClick: true,
                     small       : true,
-                    placement   : 'top',
+                    placement   : this.options.popupPlacement || 'top',
                     list        : popupList
                 });
             }
