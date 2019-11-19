@@ -15,7 +15,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
     var defaultButtonOptions = {
             center         : true,
             square         : true,
-            returnFromClick: true
+            returnFromClick: false,
         },
 
         _bsButtons = L.BsControl.extend({
@@ -101,7 +101,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
         _createContent: function(){
             //Create container
-            var $container =
+            var $container = this.$container =
                     $('<div/>')
                         .addClass('leaflet-button-box')
                         .addClass(this.options.className)
@@ -111,7 +111,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
             var buttonOptions = $.extend(true, {}, {
                         onClick        : this.onToggle,
                         semiTransparent: true,
-                        square         : true
+                        square         : true,
                     },
                     this.options
                 );
@@ -173,6 +173,10 @@ Create leaflet-control for jquery-bootstrap button-classes:
                     $contentContainer._bsModalContent(modalOptions);
                 }
             }
+
+            if (this.isExtended)
+                this.toggle();
+
             return $container;
         },
 
@@ -183,13 +187,13 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
         //toggle : change between button-state and extended
         toggle: function(){
-            var $container = $(this.getContainer());
+            this.hidePopup();
             this.hideTooltip();
-            $container.modernizrToggle('extended');
-            this.isExtended = $container.hasClass('extended');
+            this.$container.modernizrToggle('extended');
+            this.isExtended = this.$container.hasClass('extended');
             if (this.options.onToggle)
                 this.options.onToggle( this.isExtended );
-            return false; //true;
+            return false;
         }
     });
 

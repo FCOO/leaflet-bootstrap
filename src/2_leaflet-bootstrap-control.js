@@ -41,6 +41,7 @@ L.BsControl = extention of L.Control with
 
         addTo: function(map) {
             var result = L.Control.prototype.addTo.apply(this, arguments);
+            L.DomEvent.disableClickPropagation(this._container);
 
             //Create pane to contain tooltip for control inside the map's control-container
             if (!map.getPane(controlTooltipPane))
@@ -56,7 +57,7 @@ L.BsControl = extention of L.Control with
                     sticky      : true,                 //If true, the tooltip will follow the mouse instead of being fixed at the feature center.
                     interactive	: false,                //If true, the tooltip will listen to the feature events.
                     //opacity     : 	Number	0.9	Tooltip container opacity.
-                    noWrap   : true
+                    noWrap      : true
                 })
                 .setLatLng([0,0])
                 .addTo(map);
@@ -74,7 +75,6 @@ L.BsControl = extention of L.Control with
                 $(controlContainer).on('touchstart mousedown', $.proxy(map.closeAllPopup, map));
             }
 
-
             //Create and add popup
             var $popupElements = this.$popupElements = this._getPopupElements(this.getContainer()),
                 hasPopup = $popupElements && $popupElements.length && this.options.popupList,
@@ -82,7 +82,6 @@ L.BsControl = extention of L.Control with
                 hasTooltip = hasPopup && $tooltipElements && $tooltipElements.length && !window.bsIsTouch;
 
             if (hasPopup){
-//                $popupElements.on( 'click', function(){ $popupElements.popover('hide'); });
                 $popupElements.on( 'click', $.proxy( this.hidePopup, this ));
 
                 if (hasTooltip)
@@ -147,7 +146,8 @@ L.BsControl = extention of L.Control with
         },
 
         hidePopup: function(){
-            this.$popupElements.popover('hide');
+            if (this.$popupElements)
+                this.$popupElements.popover('hide');
         },
 
         removeTooltip: function( $elements ){

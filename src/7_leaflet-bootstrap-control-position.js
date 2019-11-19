@@ -112,10 +112,7 @@ Options for selectiong position-format and to activate context-menu
                 }),
                 pane: controlPositionMarkerPane
             });
-
             this.centerMarker.addTo(map);
-            this.$centerMarker = $(this.centerMarker.getElement());
-
 
             this.$mapContainer = $(map.getContainer());
 
@@ -134,18 +131,18 @@ Options for selectiong position-format and to activate context-menu
                     noBorder       : true,
                     type           : 'text',
                     text           : function( $inner ){ $inner.addClass('cursor'); },
-                    class :'show-for-control-position-cursor',
+                    class          :'show-for-control-position-cursor',
                     before: {
-                        type:'button',
+                        type  : 'button',
                         square: true,
+                        icon  : iconCursorPosition,
                         semiTransparent: true,
-                        icon: iconCursorPosition
                     },
                     after: {
-                        type:'button',
+                        type  :'button',
                         square: true,
+                        icon  : L.BsControl.prototype.options.rightClickIcon,
                         semiTransparent: true,
-                        icon: L.BsControl.prototype.options.rightClickIcon,
                         onClick: function(){
                             window.notyInfo(
                                 { icon: L.BsControl.prototype.options.rightClickIcon,
@@ -169,7 +166,7 @@ Options for selectiong position-format and to activate context-menu
             mapCenterOptions.before.icon = iconMapCenter;
 
             mapCenterOptions.after.icon = 'fa-lb-contextmenu';
-            mapCenterOptions.after.onClick = function(){ alert('TODO: Show contentmenu in map center'); return false; };
+            mapCenterOptions.after.onClick = $.proxy(this._fireContentmenuOnMapCenter, this);
 
             $contentContainer
                 ._bsAppendContent( cursorOptions )
@@ -199,7 +196,7 @@ Options for selectiong position-format and to activate context-menu
         },
 
         onRemove: function (map) {
-            this.$centerMarker.remove();
+            this.centerMarker.remove();
 
             map.off('load', this._onLoad, this);
 //            map.off('zoomlevelschange', this._setSliderRange, this);
@@ -233,7 +230,8 @@ Options for selectiong position-format and to activate context-menu
         },
 
         setCenterMarker: function( show ){
-            show ? this.$centerMarker.show() : this.$centerMarker.hide();
+            var $icon = $(this.centerMarker._icon);
+            show ? $icon.show() : $icon.hide();
         },
 
 
@@ -303,6 +301,61 @@ Options for selectiong position-format and to activate context-menu
         _onMapMoveEnd: function(){
             this.centerMarker.setLatLng(this._map.getCenter());
             this.$centerPosition.html( this._formatLatLng( this._map.getCenter() ) );
+        },
+
+        _fireContentmenuOnMapCenter: function(){
+            /*
+            Find top element on the map center and fire contextmenu on it.
+            Using excellent methods found on https://stackoverflow.com/questions/8813051/determine-which-element-the-mouse-pointer-is-on-top-of-in-javascript
+            */
+            var theElement = null,
+                theLeafletElement = null,
+                elements = [],
+                visibility = [],
+                centerLatLng = this._map.getCenter(),
+                point = this._map.latLngToContainerPoint( centerLatLng ),
+                _true = true; //Due to eslint test no-constant-condition
+
+            while (_true) {
+                var element = document.elementFromPoint(point.x, point.y);
+                if (!element || element === document.documentElement)
+                    break;
+
+                elements.push(element);
+                visibility.push(element.style.visibility);
+                element.style.visibility = 'hidden'; // Temporarily hide the element (without changing the layout)
+            }
+
+
+            //Reset visibility
+            $.each( elements, function(index, elem){
+                elem.style.visibility = visibility[index];
+            });
+
+            //Find first element with contextmenu-options
+            $.each( elements, function(index, elem){
+                var leafletElem = $(elem).data('bsContentmenuOwner');
+                if (leafletElem){
+                    theElement        = elem;
+                    theLeafletElement = leafletElem;
+                    return false;
+                }
+            });
+
+            //Fallback to fire on map
+            if (!theLeafletElement){
+                theElement  = this._map.getContainer();
+                theLeafletElement = this._map;
+            }
+
+            //Fire contextmenu on founde elements
+            this._map.fire( 'contextmenu', {
+                latlng    : centerLatLng,
+                calledFrom: theLeafletElement,
+                originalEvent: {
+                    target: theElement
+                }
+            });
         }
 
     });//end of L.Control.BsPosition

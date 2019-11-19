@@ -30,10 +30,12 @@ https://github.com/nerik/leaflet-graphicscale
                 noHeader             : true,
                 content              : 'This is not empty'
             },
-            numeralFormat: '0,0[.]0', //String or function
+            numeralFormat: '0,0[.]0' //String or function
         },
 
         initialize: function(options){
+            this.options.onToggle = $.proxy(this._updateScales, this);
+
             //Set default bsButtonBox-options
             L.Control.BsButtonBox.prototype.initialize.call(this, options);
 
@@ -102,8 +104,13 @@ https://github.com/nerik/leaflet-graphicscale
             //metricScale
             this.$metricScaleContainer.toggleClass('hidden', mode == 'nautical');
 
+            this._updateScales();
+        },
 
-            this.naticalScale._update();
+        _updateScales: function(){
+            if (this.naticalScale)
+                this.naticalScale._update();
+            if (this.metricScale)
             this.metricScale._update();
         }
     });

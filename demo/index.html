@@ -41,7 +41,7 @@
     window.bsIsTouch = (window.location.search =='?touch');
 
     i18next.init();
-    i18next.changeLanguage('en');
+    i18next.changeLanguage('da');
 
     latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_UTM);
     //latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_MGRS);
@@ -70,7 +70,11 @@
         zoomControl: true,
         bsZoomControl: true,
         bsPositionControl: true,
-        bsPositionOptions: { selectFormat: setLatLngFormat },
+        bsPositionOptions: {
+            isExtended        : true,
+            showCursorPosition: false,
+            selectFormat: setLatLngFormat
+        },
         zoomSnap: .25,
         worldCopyJump: true,
     }).setView([56.2, 11.5], 6);
@@ -87,10 +91,12 @@
     Add contextmenu to the map
     **********************************************/
     var first = null;
-    map.setContextmenuHeader({icon:'fa-home', text:'MAP header'});
+//    map.setContextmenuHeader({icon:'fa-home', text:'MAP header'});
+    map.setContextmenuHeader('MAP');
+
     map.addContextmenuItems([
-        {icon:'fa-home', text:{da:'Map 1'}, onClick: function(latlng){ console.log('MAP 1',this, latlng); } },
-        {icon:'fa-map',  text:'Map 2', onClick: function(latlng){ console.log('MAP 2',this, latlng); } }
+        {icon:'fa-home', text:{da:'Map#1'}, onClick: function(latlng){ console.log('MAP 1',this, latlng); } },
+        {icon:'fa-map',  text:'Map#2 (dont close)',      onClick: function(latlng){ console.log('MAP 2',this, latlng); }, closeOnClick: false }
     ]);
 
     map.on('click', function( e ){
@@ -100,7 +106,7 @@
                 colorName: 'red',
                 shadow: false
             })
-//                .on('click', function(){ this.remove(); })
+                .on('click', function(){ this.remove(); })
             .bindPopup({
                 header: 'Overskrift',
                 content: 'Davslkjsssldkfjslkdjlaksjdflkasjdflaksjdflkasjdf',
@@ -109,27 +115,44 @@
             })
             .addTo(map);
         marker.addContextmenuItems([
-            {icon:'fa-home', text:{da:'Marker 1'}, onClick: function(latlng){ console.log('Marker 1',this, latlng); } },
-            {icon:'fa-map',  text:{da:'Marker 2'}, onClick: function(latlng){ console.log('Marker 2',this, latlng); } },
+            {icon:'fa-home', text:{da:first?'Blue#1':'RED#1'}, onClick: function(latlng){ console.log('Marker 1',this, latlng); }, closeOnClick: false },
+            {icon:'fa-map',  text:{da:first?'Blue#22':'RED#2'}, onClick: function(latlng){ console.log('Marker 2',this, latlng); } },
         ]);
-        marker.setContextmenuHeader('Marker Header');
+        if (first)
+            marker.setContextmenuOptions({width:800});
+        marker.setContextmenuHeader(first ? {text:'Blue markers'} : {text:{da:'RED Markers'}});
         marker.setContextmenuParent(first);
+        if (first)
+            marker.excludeMapContextmenu();
+
         first = first || marker;
     });
 
-    var states_polygon = L.polygon([[
-            [48.99,-104.05],
-            [48.98,-97.22],
-            [45.94,-96.58],
-            [45.94,-104.03],
-            [48.99,-104.05]
-        ]]).addTo(map);
+    L.polygon([[
+        [58.99,14.05],
+        [58.98,3.22],
+        [55.94,3.58],
+        [55.94,14.03],
+        [58.99,14.05]
+    ]], {color:'red'})
+        .addTo(map)
+        .addContextmenuItems([
+            {icon:'fa-home', text:{da:'RED Poly 1'}, onClick: function(latlng){ console.log('RED Poly 1',this, latlng); }},
+            {icon:'fa-map',  text:'RED Poly 2', onClick: function(latlng){ console.log('RED Poly 2',this, latlng); }},
+        ]);
 
-    states_polygon.addContextmenuItems([
-        {icon:'fa-home', text:{da:'Polygon 1'}},
-        {icon:'fa-map',  text:'Polygon 2'}
-    ]);
-
+    L.polygon([[
+        [57.99,14.05],
+        [57.98,13.22],
+        [56.94,13.58],
+        [56.94,15.03],
+        [57.99,15.05]
+    ]], {color:'green'})
+        .addTo(map)
+        .addContextmenuItems([
+            {icon:'fa-home', text:{da:'GREEN Poly 1'}, onClick: function(latlng){ console.log('GREEN Poly 1',this, latlng); }},
+            {icon:'fa-map',  text:'GREEN Poly 2', onClick: function(latlng){ console.log('GREEN Poly 2',this, latlng); }},
+        ]);
 
 
 
@@ -155,13 +178,13 @@
 
     map.addControl(
         L.control.bsScale({
-            position: 'topleft', mode:'metric', isExtended: true, maxUnitsWidthPercent: 30, maxUnitsWidth: 1200,
+            position: 'topleft', mode:'metric', isExtended: false, maxUnitsWidthPercent: 30, maxUnitsWidth: 1200,
         })
     );
 
     map.addControl(
         L.control.bsScale({
-            position: 'bottomleft', mode:'nautical', isExtended: true, maxUnitsWidthPercent: 60, maxUnitsWidth: 1200,
+            position: 'bottomleft', mode:'nautical', isExtended: false, maxUnitsWidthPercent: 60, maxUnitsWidth: 1200,
         })
     );
 //*/
