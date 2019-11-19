@@ -33,7 +33,11 @@
 @import "../bower_components/jquery-bootstrap/src/bootstrap-variables";
 @import "../bower_components/jquery-bootstrap/src/color";
 @import "../bower_components/jquery-bootstrap/src/variables";
+@import "../bower_components/jquery-bootstrap/src/mixins";
 
+
+//Style for fonts
+@import "leaflet-bootstrap-fonts";
 
 //Style for popup
 @import "leaflet-bootstrap-popup";
@@ -52,3 +56,10 @@
 
 //Style for control-zoom
 @import "leaflet-bootstrap-control-zoom";
+
+//Style for contextmenu
+@import "leaflet-bootstrap-contextmenu";
+
+//Style for control-posiiton
+@import "leaflet-bootstrap-control-position";
+

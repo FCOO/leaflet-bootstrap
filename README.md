@@ -25,13 +25,11 @@ Create leaflet control a la `$.bsButton`, `$.bsButtonGroup`, and `$.bsRadioButto
 Create a `L.Control.bsButton`. When clicked it opens a box with content
 
 #### `options` 
-    {
-        //Default options for buton
-        icon: ...
-        text:.... 
+    //Default options for buton
+    icon: ...
+    text:.... 
 
-        content: ...
-    }
+    content: ...
 
 
 `options.content` is either [bsModal-options](https://github.com/FCOO/jquery-bootstrap#modal) OR a `function($container, options, onToggle)` creating the content inside `$container` 
@@ -54,16 +52,29 @@ Create a `bsButtonBox` with graphic scale with metric and/or nautical scale(s)
 Based on [leaflet-graphicscale](https://github.com/nerik/leaflet-graphicscale) by [Erik Escoffier](https://github.com/nerik) 
 
 #### `options` 
-    {
-        icon                : 'fa-ruler-horizontal',//Icon for bsButton
-        mode                : 'both',               //'metric', 'nautical', or 'both'
-        position            : 'bottomleft',
-        maxUnitsWidth       : 200,                  //Max width
-        maxUnitsWidthPercent: 90,                   //Max width as percent of map wisth
-    }
+    icon                : 'fa-ruler-horizontal',//Icon for bsButton
+    mode                : 'both',               //'metric', 'nautical', or 'both'
+    position            : 'bottomleft',
+    maxUnitsWidth       : 200,                  //Max width
+    maxUnitsWidthPercent: 90,                   //Max width as percent of map wisth
 
 See `src/5_leaflet-bootstrap-control-scale.js` for more details
 
+
+### L.control.bsPosition(options)
+Create a control with cursor or map center position
+	
+	L.control.bsPosition({position: 'topleft'}).addTo(map)
+	//OR
+	var map = L.map('map',{
+		          bsPositionControl: true,
+        	      bsPositionOptions: {position: 'topleft'}
+			  });
+
+#### `options` 
+    selectFormat: null    //function() to select format for position using latlng-format (fcoo/latlng-format)
+
+See `src/7_leaflet-bootstrap-control-position.js` for more details
 
 ### L.control.bsZoom(options)
 Create a extended zoom-control with history of previous {zoom,center} on the map
@@ -75,7 +86,7 @@ Create a extended zoom-control with history of previous {zoom,center} on the map
         	      bsZoomOptions: {position: 'topleft'}
 			  });
 
-See `src/6_leaflet-bootstrap-control-zoom.js` for more details
+See `src/8_leaflet-bootstrap-control-zoom.js` for more details
 
 ### L.popup
 Extended to take same options as bsModal (see details [here](https://github.com/FCOO/jquery-bootstrap#modal))

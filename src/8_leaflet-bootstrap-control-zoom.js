@@ -9,13 +9,6 @@ Can be used as leaflet standard zoom control with Bootstrap style
     "use strict";
 
     /********************************************************************************
-    History
-    This is based on leaflet-history @ https://github.com/cscott530/leaflet-history
-    by Chris Scott https://github.com/cscott530
-    ********************************************************************************/
-
-
-    /********************************************************************************
     L.Control.bsZoom
     Extending default zoom control in a BsButtonBox with
     - Slider  - NOT INCLUDED Wait for leaflet to have "scale-zoom" a la Google maps or OpenLayer
@@ -37,9 +30,14 @@ Can be used as leaflet standard zoom control with Bootstrap style
             extended   : false,
             showSlider : false,
             showHistory: false,
+
             semiTransparent: false,
 
+            tooltipDirection: 'top',
+
             popupTrigger: 'contextmenu',
+            popupText   : {da:'Inds.', en:'Set.'},
+
             content     :'',
         },
 
@@ -49,12 +47,13 @@ Can be used as leaflet standard zoom control with Bootstrap style
                 //Zoom- and history buttons are shown in a bsModal-box
                 options.showHistory = true;
                 options.content = {
-                    clickable: false,
-                    semiTransparent: true,
-
-                    header: {text: {da:'Zoom og center', en:'Zoom and centre'}},
+                    clickable          : false,
+                    semiTransparent    : true,
+                    noVerticalPadding  : true,
+                    noHorizontalPadding: true,
+                    header: {text: {da:'Zoom/Center', en:'Zoom/Centre'}},
                     content: 'This is not empty'
-                }
+                };
             }
             else {
                 //The Button-Box is allways extended. The history-buttons are hiden/shown using popup
@@ -79,6 +78,9 @@ Can be used as leaflet standard zoom control with Bootstrap style
             else if (includes(pos, 'RIGHT')) placement = 'left';
 
             this.options.popupPlacement = placement;
+
+            if (includes(pos, 'TOP'))
+                this.options.tooltipDirection = 'bottom';
 
             //Set popup-item(s)
             if (!window.bsIsTouch){
@@ -221,7 +223,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
             return {
                 zoom  : this._map.getZoom(),
                 center: this._map.getCenter()
-            }
+            };
         },
         _setZoomCenter: function( zoomCenter ) {
             this._map.setView( zoomCenter.center, zoomCenter.zoom, {animate: false} );

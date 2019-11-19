@@ -28,9 +28,12 @@
     <script src="../src/3_leaflet-bootstrap-control-button.js"></script>
     <script src="../src/4_leaflet-bootstrap-control-modal.js"></script>
     <script src="../src/5_leaflet-bootstrap-control-scale.js"></script>
-    <script src="../src/6_leaflet-bootstrap-control-zoom.js"></script>
+    <script src="../src/6_leaflet-bootstrap-contextmenu.js"></script>
+    <script src="../src/7_leaflet-bootstrap-control-position.js"></script>
+    <script src="../src/8_leaflet-bootstrap-control-zoom.js"></script>
     <script src="../src/leaflet-bootstrap-popup.js"></script>
     <script src="../src/leaflet-bootstrap-tooltip.js"></script>
+
 
     <script>
 
@@ -38,14 +41,40 @@
     window.bsIsTouch = (window.location.search =='?touch');
 
     i18next.init();
-    i18next.changeLanguage('da');
+    i18next.changeLanguage('en');
+
+    latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_UTM);
+    //latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_MGRS);
+    //latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_NAC);
+
+
+    //latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_DMSS);
+    //latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_DMM);
+    //latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_DD);
+
+//    window.setTimeout(function(){ latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_DD) }, 5000 );
+//    window.setTimeout(function(){ latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_NAC) }, 10000 );
+
+
+    function setLatLngFormat(){
+        if (latLngFormat.options.formatId == latLngFormat.LATLNGFORMAT_LAST)
+            latLngFormat.setFormat(latLngFormat.LATLNGFORMAT_FIRST);
+        else
+            latLngFormat.setFormat(latLngFormat.options.formatId + 1);
+
+        window.notyInfo('Auto changed to format id = '+ latLngFormat.options.formatId, { layout: 'center', timeout: 1500 } );
+    }
+
 
     var map = L.map('map', {
         zoomControl: true,
         bsZoomControl: true,
+        bsPositionControl: true,
+        bsPositionOptions: { selectFormat: setLatLngFormat },
         zoomSnap: .25,
         worldCopyJump: true,
     }).setView([56.2, 11.5], 6);
+
 
     L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 18,
@@ -53,13 +82,57 @@
     }).addTo(map);
 
     L.marker([54,12], {draggable: true}).addTo(map).bindTooltip({icon:'fa-home', text:'Godt'}, {delay:2000});
-//*
-    //************************
-//HER    new L.HistoryControl({
-//HER
-//HER    }).addTo(map);
 
-    //************************
+    /**********************************************
+    Add contextmenu to the map
+    **********************************************/
+    var first = null;
+    map.setContextmenuHeader({icon:'fa-home', text:'MAP header'});
+    map.addContextmenuItems([
+        {icon:'fa-home', text:{da:'Map 1'}, onClick: function(latlng){ console.log('MAP 1',this, latlng); } },
+        {icon:'fa-map',  text:'Map 2', onClick: function(latlng){ console.log('MAP 2',this, latlng); } }
+    ]);
+
+    map.on('click', function( e ){
+        var marker =
+            (!first ? L.bsMarkerCircle : L.marker)( e.latlng, {
+                draggable: true,
+                colorName: 'red',
+                shadow: false
+            })
+//                .on('click', function(){ this.remove(); })
+            .bindPopup({
+                header: 'Overskrift',
+                content: 'Davslkjsssldkfjslkdjlaksjdflkasjdflaksjdflkasjdf',
+                fixable: true,
+                width: 200,
+            })
+            .addTo(map);
+        marker.addContextmenuItems([
+            {icon:'fa-home', text:{da:'Marker 1'}, onClick: function(latlng){ console.log('Marker 1',this, latlng); } },
+            {icon:'fa-map',  text:{da:'Marker 2'}, onClick: function(latlng){ console.log('Marker 2',this, latlng); } },
+        ]);
+        marker.setContextmenuHeader('Marker Header');
+        marker.setContextmenuParent(first);
+        first = first || marker;
+    });
+
+    var states_polygon = L.polygon([[
+            [48.99,-104.05],
+            [48.98,-97.22],
+            [45.94,-96.58],
+            [45.94,-104.03],
+            [48.99,-104.05]
+        ]]).addTo(map);
+
+    states_polygon.addContextmenuItems([
+        {icon:'fa-home', text:{da:'Polygon 1'}},
+        {icon:'fa-map',  text:'Polygon 2'}
+    ]);
+
+
+
+
     var bGroup = L.control.bsButtonGroup({
             list: [
                 {icon:'fa-home'},
@@ -74,7 +147,7 @@
     //************************
     map.addControl(
         L.control.bsScale({
-            position: 'bottomleft', extended: true,
+            position: 'bottomleft', isExtended: true,
         })
 
     );
@@ -82,13 +155,13 @@
 
     map.addControl(
         L.control.bsScale({
-            position: 'topleft', mode:'metric', extended: true, maxUnitsWidthPercent: 30, maxUnitsWidth: 1200,
+            position: 'topleft', mode:'metric', isExtended: true, maxUnitsWidthPercent: 30, maxUnitsWidth: 1200,
         })
     );
 
     map.addControl(
         L.control.bsScale({
-            position: 'bottomleft', mode:'nautical', extended: true, maxUnitsWidthPercent: 60, maxUnitsWidth: 1200,
+            position: 'bottomleft', mode:'nautical', isExtended: true, maxUnitsWidthPercent: 60, maxUnitsWidth: 1200,
         })
     );
 //*/
@@ -97,7 +170,7 @@
     //************************
     var buttonBox = L.control.bsButtonBox({
         position: 'bottomright',
-        icon: 'fa-home',
+        icon: 'icon-leaflet-position-marker',
         square: true,
 
         content: {
@@ -310,7 +383,7 @@
 
 
     //************************************************************
-    map.on('contextmenu', function( mouseEvent ){
+    function showPopup( mouseEvent ){
         var longContent = function(){
                 var content = '';
                 lines = 15;
@@ -361,7 +434,7 @@
         var marker = L.marker(mouseEvent.latlng).addTo(map);
         marker.bindPopup(popup).openPopup();
 
-    });
+    };
 //*/
     </script>
 </body>

@@ -1,0 +1,68 @@
+/***********************************************
+leaflet-bootstrap-fonts.scss,
+Font-family for four icons used in leaflet-bootstrap
+************************************************/
+
+@font-face {
+  font-family: 'leaflet-bootstrap';
+  src:  url('fonts/leaflet-bootstrap.eot?jxmi9r');
+  src:  url('fonts/leaflet-bootstrap.eot?jxmi9r#iefix') format('embedded-opentype'),
+    url('fonts/leaflet-bootstrap.ttf?jxmi9r') format('truetype'),
+    url('fonts/leaflet-bootstrap.woff?jxmi9r') format('woff'),
+    url('fonts/leaflet-bootstrap.svg?jxmi9r#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="fa-lb-"], [class*=" fa-lb-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'leaflet-bootstrap' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.fa-lb-center-marker{
+
+    &:before {
+        content: "\e900";
+    }
+}
+
+.fa-lb-mouse-left {
+
+    &:before {
+        content: "\ea6e";
+    }
+}
+.fa-lb-mouse-right {
+    &:before {
+        content: "\ea6f";
+    }
+}
+
+[class*=" fa-lb-mouse-"] {
+    //Adjust mouse-icons
+    $factor: 1.2;
+    font-size: $factor*1em;
+    line-height: 1/$factor * 1em !important;
+    vertical-align: -.0667em;
+    margin-right: 0 !important;
+}
+
+.fa-lb-contextmenu {
+
+    &:before {
+        content: "\ead6";
+    }
+}
+
+

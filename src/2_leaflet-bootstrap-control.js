@@ -15,8 +15,8 @@ L.BsControl = extention of L.Control with
             tooltip         : null, //Individuel tooltip
             tooltipDirection: null, //Default = auto detection from control's position
 
-            leftClickIcon   : null, //Icon used for left-click
-            rightClickIcon  : null, //Icon used for right-click
+            leftClickIcon   : 'fa-lb-mouse-left',   //Icon used for left-click
+            rightClickIcon  : 'fa-lb-mouse-right',  //Icon used for right-click
 
             popupText       : {da:'Indstillinger', en:'Settings'},
             popupTrigger    : null, //Default: contextmenu and click for touch, contextmenu for no-touch
@@ -36,7 +36,7 @@ L.BsControl = extention of L.Control with
         },
 
         _getPopupElements: function( container ){
-            return this._getTooltipElements(container);
+            return this._getTooltipElements(container) || $(container);
         },
 
         addTo: function(map) {
@@ -76,13 +76,14 @@ L.BsControl = extention of L.Control with
 
 
             //Create and add popup
-            var $popupElements = this._getPopupElements(this.getContainer()),
+            var $popupElements = this.$popupElements = this._getPopupElements(this.getContainer()),
                 hasPopup = $popupElements && $popupElements.length && this.options.popupList,
                 $tooltipElements = this._getTooltipElements(this.getContainer()),
                 hasTooltip = hasPopup && $tooltipElements && $tooltipElements.length && !window.bsIsTouch;
 
             if (hasPopup){
-                $popupElements.on( 'click', function(){ $popupElements.popover('hide'); });
+//                $popupElements.on( 'click', function(){ $popupElements.popover('hide'); });
+                $popupElements.on( 'click', $.proxy( this.hidePopup, this ));
 
                 if (hasTooltip)
                     $popupElements
@@ -145,12 +146,27 @@ L.BsControl = extention of L.Control with
             return result;
         },
 
+        hidePopup: function(){
+            this.$popupElements.popover('hide');
+        },
 
+        removeTooltip: function( $elements ){
+            $elements.on('mouseenter',                 $.proxy(this.disableTooltip, this));
+            $elements.on('mouseleave mousedown touch', $.proxy(this.enableTooltip,  this));
+        },
+
+        disableTooltip: function(){
+            this.hideTooltip();
+            this._controlTooltipOff = true;
+        },
+        enableTooltip: function(){
+            this._controlTooltipOff = false;
+        },
 
         tooltip_mouseenter: function(event){
-            if (this._controlTooltipOff || !this._controlTooltipContent)
-                return;
             this._controlTooltip.setContent(this._controlTooltipContent);
+            if (this._controlTooltipOff)
+                return;
             this._controlTooltip.options.direction = this.options.tooltipDirection;
             this._setTooltipTimeOut(event, 400);
         },
@@ -185,7 +201,7 @@ L.BsControl = extention of L.Control with
         },
 
         _showTooltip: function(event){
-            if (event){
+            if (event && !this._controlTooltipOff){
                 this._tooltipTimeout = null;
                 this._controlTooltipVisible = true;
 

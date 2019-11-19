@@ -92,7 +92,8 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
             L.Util.setOptions(this, options);
 
-            //Set default onToggle-function
+            //Set isExtended and default onToggle-function
+            this.isExtended = this.options.isExtended;
             this.onToggle = $.proxy(this.toggle, this);
             if (this.options.addOnClose)
                 this.options.onClose = this.onToggle;
@@ -148,7 +149,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
                             semiTransparent : true,
                             extended        : null,
                             minimized       : null,
-                            isExtended      : false,
+                            isExtended      : false, //Not the same as this.options.isExtended
                             isMinimized     : false,
                             width           : this.options.width || 100,
                         },
@@ -182,9 +183,13 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
         //toggle : change between button-state and extended
         toggle: function(){
+            var $container = $(this.getContainer());
             this.hideTooltip();
-            $(this.getContainer()).modernizrToggle('extended');
-            return true;
+            $container.modernizrToggle('extended');
+            this.isExtended = $container.hasClass('extended');
+            if (this.options.onToggle)
+                this.options.onToggle( this.isExtended );
+            return false; //true;
         }
     });
 

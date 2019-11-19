@@ -1,0 +1,65 @@
+/***********************************************
+leaflet-bootstrap-control-position.scss
+************************************************/
+
+//MARKER
+//Sets the control-pane with the map center marker behinde the other controls
+.leaflet-control-container .leaflet-pane.leaflet-controlPositionMarker-pane {
+    z-index: 900;
+}
+
+//Sets the pane with the map center marker between marker-pan and popup-pane
+.leaflet-pane .leaflet-pane.leaflet-controlPositionMarker-pane {
+    z-index: 900;
+}
+
+
+.leaflet-position-marker {
+    background: url(images/leaflet-position-marker.svg) 50% 50% no-repeat;
+    content: '';
+
+    .leaflet-zoom-anim & {
+        display: none;
+    }
+}
+
+
+
+
+//CONTROL
+
+//Adjust input-group inside a leaflet-control
+.leaflet-control-container {
+    .input-group {
+        width  : initial;
+        margin : 0;
+        padding: 0;
+
+        //Class for inner container with the position
+        .position {
+            @include control-border-color( $incl-error: false );
+            @include vertical-align-center();
+            text-align : right;
+            line-height: 1;
+            padding    : 0 $content-padding-y-sm;
+            padding-top: 1px; //Super adjustment :-)
+            font-size  : 12px;
+            font-family: "Lucida Console", Monaco, monospace;
+        }
+    }
+}
+
+//Create Moderinzr classes for show/hide for different modes
+//Mode = Show cursor position
+@include show-and-hide-for-modernizr-test(
+    $modernizr-test: 'control-position-cursor',
+    $parent-element-type: '.leaflet-container',
+    $incl-table-display: false
+);
+
+//Mode = Show map senter position
+@include show-and-hide-for-modernizr-test(
+    $modernizr-test: 'control-position-map-center',
+    $parent-element-type: '.leaflet-container',
+    $incl-table-display: false
+);

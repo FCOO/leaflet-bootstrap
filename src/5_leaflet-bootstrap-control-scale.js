@@ -28,7 +28,7 @@ https://github.com/nerik/leaflet-graphicscale
                 semiTransparent      : true,
                 clickable            : true,
                 noHeader             : true,
-                content              : '&nbsp;'
+                content              : 'This is not empty'
             },
             numeralFormat: '0,0[.]0', //String or function
         },
@@ -67,17 +67,17 @@ https://github.com/nerik/leaflet-graphicscale
 		onAdd: function (map) {
             this._map = map;
 			var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map ),
-                $body = this.$contentContainer.bsModal.$body;
+                $contentContainer = this.$contentContainer.bsModal.$body;
 
-            $body.empty();
+            $contentContainer.empty();
 
             //Create and add nautical-scale
             this.naticalScale = new L.Control.SingleScale( L.extend({type:'nautical', labelPlacement:'top', parent:this}, this.options ) );
-            this.$naticalScaleContainer = $(this.naticalScale.onAdd( this._map )).appendTo( $body );
+            this.$naticalScaleContainer = $(this.naticalScale.onAdd( this._map )).appendTo( $contentContainer );
 
             //Create and add metric-scale
             this.metricScale = new L.Control.SingleScale( L.extend({type:'metric', labelPlacement:'bottom', parent:this}, this.options ) );
-            this.$metricScaleContainer = $(this.metricScale.onAdd( this._map )).appendTo( $body );
+            this.$metricScaleContainer = $(this.metricScale.onAdd( this._map )).appendTo( $contentContainer );
 
             this.setMode( this.options.mode, result );
 
