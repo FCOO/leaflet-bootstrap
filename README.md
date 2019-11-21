@@ -60,9 +60,62 @@ Based on [leaflet-graphicscale](https://github.com/nerik/leaflet-graphicscale) b
 
 See `src/5_leaflet-bootstrap-control-scale.js` for more details
 
+### Contextmenu on the map and on elements
+
+It is possible to add contextmenu to the map and elements on the map (marker, polygon etc.) using the following methods on the map or element-object.
+
+All `items` are menu-items used by `$.bsMenu` . See [FCOO/jquery-bootstrap](https://github.com/FCOO/jquery-bootstrap#menu)  
+
+#### `setContextmenuHeader: function(header)`
+
+Set a header for the element. Used when the element is included in another elements contextmenu. See `setContextmenuParent` below
+
+
+#### `addContextmenuItems: function ( items, prepend )
+Append or prepend items to the contextmenu for the element
+
+#### `appendContextmenuItems : function( items )`
+Append items to the contextmenu for the element
+
+#### `prependContextmenuItems: function( items )`
+Prepend items to the contextmenu for the element
+
+
+#### `setContextmenuWidth: function(width)`
+Set the width of all the items
+
+#### `setContextmenuParent: function(parent)`
+Set another element as the "parent" of the element
+
+#### `excludeMapContextmenu: function()`
+Default include all contextmenu items from the map. 
+Call the method to exclude the map-items
+
+
+See `src/6_leaflet-bootstrap-contextmenu.js` for more details
+
+#### Example
+    var map = L.map('map', {...});
+    
+    map
+        .addContextmenuItems([
+            {icon:'fa-home', text:'1. map button', onClick: function(latlng){...} },
+            {icon:'fa-map',  text:'2. map button', onClick: function(latlng){...} }
+        ])
+        .setContextmenuHeader('The map!');
+
+    L.marker)( latLng, {...})
+        .addTp(map)
+        .addContextmenuItems([
+            {text:'1. marker button', onClick: function(latlng){...} },
+            {text:'2. marker button', onClick: function(latlng){...} },
+            {text:'3. marker button', onClick: function(latlng){...} },
+        ]);
+
+Right-click on the marker will show a contextmenu with five buttons (tree from the marker, a header, and two from the map)    
 
 ### L.control.bsPosition(options)
-Create a control with cursor or map center position
+Create a control with cursor or map center position. When map center is selected it is is possible to activate contextmenu for the center position
 	
 	L.control.bsPosition({position: 'topleft'}).addTo(map)
 	//OR

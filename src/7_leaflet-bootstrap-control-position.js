@@ -13,8 +13,6 @@ Options for selectiong position-format and to activate context-menu
         iconCursorPosition = 'fa-mouse-pointer',
         iconMapCenter      = 'fa-lb-center-marker';
 
-//    var HAS_CONTEXTMENU = false; //TO DO
-
     /********************************************************************************
     L.Control.bsPosition
     ********************************************************************************/

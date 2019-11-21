@@ -95,8 +95,8 @@
     map.setContextmenuHeader('MAP');
 
     map.addContextmenuItems([
-        {icon:'fa-home', text:{da:'Map#1'}, onClick: function(latlng){ console.log('MAP 1',this, latlng); } },
-        {icon:'fa-map',  text:'Map#2 (dont close)',      onClick: function(latlng){ console.log('MAP 2',this, latlng); }, closeOnClick: false }
+        {icon:'fa-home', text:{da:'Map#1 (w=180)'}, onClick: function(latlng){ console.log('MAP 1',this, latlng); }, width:180 },
+        {icon:'fa-map',  text:'Map#2 (dont close)', onClick: function(latlng){ console.log('MAP 2',this, latlng); }, closeOnClick: false }
     ]);
 
     map.on('click', function( e ){
@@ -106,20 +106,28 @@
                 colorName: 'red',
                 shadow: false
             })
-                .on('click', function(){ this.remove(); })
-            .bindPopup({
+            .addTo(map);
+
+        if (first)
+            marker.on('click', function(){ this.remove(); })
+        else
+            marker.bindPopup({
                 header: 'Overskrift',
+                semiTransparent: true,
+                //clickable: true,
                 content: 'Davslkjsssldkfjslkdjlaksjdflkasjdflaksjdflkasjdf',
                 fixable: true,
-                width: 200,
+                width: 321,
+                buttons: [{text:'klik'}]
+
             })
-            .addTo(map);
+
+
         marker.addContextmenuItems([
             {icon:'fa-home', text:{da:first?'Blue#1':'RED#1'}, onClick: function(latlng){ console.log('Marker 1',this, latlng); }, closeOnClick: false },
             {icon:'fa-map',  text:{da:first?'Blue#22':'RED#2'}, onClick: function(latlng){ console.log('Marker 2',this, latlng); } },
         ]);
-        if (first)
-            marker.setContextmenuOptions({width:800});
+
         marker.setContextmenuHeader(first ? {text:'Blue markers'} : {text:{da:'RED Markers'}});
         marker.setContextmenuParent(first);
         if (first)
@@ -209,6 +217,7 @@
             ],
             width: 'auto',
             clickable: false,
+            buttons:[{text:'klik'}],
             footer: { text: {da: 'Klik på signaturfork. for info', en:'Click on legend for info' }}
 
 

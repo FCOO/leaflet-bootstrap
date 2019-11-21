@@ -83,6 +83,115 @@ Using same font-size and vertical/horizontal padding as buttons
 MARGIN-BOTTOM
 All elements in modal-windows get same margin-bottom
 ************************************************************/
+/************************************************************
+MIXIN
+************************************************************/
+/************************************************************
+RIGHT-SIDE-ICON
+Add style to <i> to place it to the right and vertical center
+NOTE: Parent element MUST have @include vertical-align-center();
+************************************************************/
+/************************************************************
+FOCUS
+All elements get same outline when they have focus:
+No outline
+border-color = light blue
+************************************************************/
+/************************************************************
+CONTENT
+Unifies padding for modal, accordion, popup etc.
+************************************************************/
+/************************************************************
+CONTROL-CONTAINER
+Style for div with controls inside modal.
+Must have tabindex:"-1" to work with focus
+************************************************************/
+/************************************************************
+CONTROL BORDER-COLOR
+All control elements get same border-color when normal, hover, active and error
+************************************************************/
+/************************************************************
+CONTROL-COLORS
+Sets all color for text, background, border for normal, :hover, :focus,  :active and .active
+************************************************************/
+/************************************************************
+TYPE-COLOR
+Bg-color and color for different 'type' (warning, alert, info, error, success)
+Used in Noty and Modal
+************************************************************/
+/************************************************************
+HEADER AND TITLE BACKGROUND-COLOR AND COLOR
+Headers for modal, popover, popup etc.
+************************************************************/
+/************************************************************
+color-hover - Background-color and text-color for 'normal' and hover
+************************************************************/
+/************************************************************
+header-colors - Colors for headers
+************************************************************/
+/************************************************************
+title-color - create colors for headers for table and accordion etc.
+************************************************************/
+/************************************************************
+HEADER, TITLE, AND FOOTER PADDING AND FONT-SIZE
+Padding are set to button y-padding (moving text to the left)
+************************************************************/
+/************************************************************
+header-variant
+************************************************************/
+/************************************************************
+title-variant - as header but with same font-size as siblings
+************************************************************/
+/************************************************************
+footer-variant
+************************************************************/
+/************************************************************
+MARGIN-BOTTOM FOR ELEMENTS IN MODAL
+All elements in modal-windows get same margin-bottom
+************************************************************/
+/***********************************************
+leaflet-bootstrap-fonts.scss,
+Font-family for four icons used in leaflet-bootstrap
+************************************************/
+@font-face {
+  font-family: 'leaflet-bootstrap';
+  src: url("fonts/leaflet-bootstrap.eot?jxmi9r");
+  src: url("fonts/leaflet-bootstrap.eot?jxmi9r#iefix") format("embedded-opentype"), url("fonts/leaflet-bootstrap.ttf?jxmi9r") format("truetype"), url("fonts/leaflet-bootstrap.woff?jxmi9r") format("woff"), url("fonts/leaflet-bootstrap.svg?jxmi9r#icomoon") format("svg");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block; }
+
+[class^="fa-lb-"], [class*=" fa-lb-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'leaflet-bootstrap' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale; }
+
+.fa-lb-center-marker:before {
+  content: "\e900"; }
+
+.fa-lb-mouse-left:before {
+  content: "\ea6e"; }
+
+.fa-lb-mouse-right:before {
+  content: "\ea6f"; }
+
+[class*=" fa-lb-mouse-"] {
+  font-size: 1.2em;
+  line-height: 0.8333333333em !important;
+  vertical-align: -.0667em;
+  margin-right: 0 !important; }
+
+.fa-lb-contextmenu:before {
+  content: "\ead6"; }
+
 /***********************************************
 leaflet-bootstrap-popup.scss,
 ************************************************/
@@ -113,7 +222,7 @@ leaflet-bootstrap-popup.scss,
 leaflet-bootstrap-tooltip.scss,
 ************************************************/
 .leaflet-tooltip {
-  padding: 0.25rem 0.5rem;
+  padding: 0.125rem 0.125rem;
   background-color: #fff;
   border: 1px solid #868e96;
   border-radius: 0.25rem;
@@ -324,3 +433,80 @@ Overwrite style for bootstrap-slider
       border-bottom: 6px double #515961;
       height: 25%;
       width: 50%; }
+
+.history .hide-for-history {
+  display: none !important; }
+
+.no-history .show-for-history {
+  display: none !important; }
+
+/***********************************************
+leaflet-bootstrap-contextmenu.scss
+************************************************/
+.leaflet-popup-contextmenu .modal-content {
+  padding: 0 !important; }
+  .leaflet-popup-contextmenu .modal-content .modal-body {
+    padding: 1px !important; }
+  .leaflet-popup-contextmenu .modal-content .modal-footer:empty {
+    display: none !important; }
+
+/***********************************************
+leaflet-bootstrap-control-position.scss
+************************************************/
+.leaflet-position-marker {
+  background: url(images/leaflet-position-marker.svg) 50% 50% no-repeat;
+  content: ''; }
+  .leaflet-zoom-anim .leaflet-position-marker {
+    display: none; }
+
+.leaflet-control-container .input-group {
+  width: initial;
+  margin: 0;
+  padding: 0; }
+  .leaflet-control-container .input-group .position {
+    border: 1px solid #ced4da;
+    outline: none !important;
+    display: flex;
+    align-items: center;
+    text-align: right;
+    line-height: 1;
+    padding: 0 0.25rem;
+    padding-top: 1px;
+    font-size: 12px;
+    font-family: "Lucida Console", Monaco, monospace; }
+    .leaflet-control-container .input-group .position:active, .leaflet-control-container .input-group .position.active {
+      border-color: #b8c1ca; }
+    .leaflet-control-container .input-group .position:focus, .leaflet-control-container .input-group .position.focus {
+      border-color: #80bdff; }
+    .leaflet-control-container .input-group .position.disabled, .leaflet-control-container .input-group .position:disabled {
+      border-color: #ced4da; }
+    .leaflet-control-container .input-group .position.focus:not(:disabled):not(.disabled), .leaflet-control-container .input-group .position:focus:not(:disabled):not(.disabled),
+    .mouse-hover .leaflet-control-container .input-group .position:hover:not(:disabled):not(.disabled) {
+      position: relative;
+      z-index: 4; }
+    .mouse-hover .leaflet-control-container .input-group .position:hover:not(:focus):not(:disabled):not(.disabled) {
+      border-color: #8C959D; }
+
+.control-position-cursor .hide-for-control-position-cursor {
+  display: none !important; }
+
+.control-position-cursor .show-for-no-control-position-cursor {
+  display: none !important; }
+
+.no-control-position-cursor .show-for-control-position-cursor {
+  display: none !important; }
+
+.no-control-position-cursor .hide-for-no-control-position-cursor {
+  display: none !important; }
+
+.control-position-map-center .hide-for-control-position-map-center {
+  display: none !important; }
+
+.control-position-map-center .show-for-no-control-position-map-center {
+  display: none !important; }
+
+.no-control-position-map-center .show-for-control-position-map-center {
+  display: none !important; }
+
+.no-control-position-map-center .hide-for-no-control-position-map-center {
+  display: none !important; }

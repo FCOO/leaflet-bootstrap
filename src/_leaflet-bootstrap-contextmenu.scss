@@ -1,0 +1,22 @@
+/***********************************************
+leaflet-bootstrap-contextmenu.scss
+************************************************/
+
+//Adjust content wwhen insida a popup used as contextmenu
+.leaflet-popup-contextmenu {
+    .modal-content {
+        padding: 0 !important;
+        .modal-body {
+            padding: 1px !important;
+        }
+        .modal-footer:empty {
+            display: none !important;
+        }
+    }
+}
+
+
+
+//'Dummy' class to force red cross on contetxmenu
+.contextmenu-with-red-cross {
+}
