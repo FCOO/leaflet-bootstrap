@@ -472,8 +472,7 @@ leaflet-bootstrap-control-position.scss
     line-height: 1;
     padding: 0 0.25rem;
     padding-top: 1px;
-    font-size: 12px;
-    font-family: "Lucida Console", Monaco, monospace; }
+    font-size: 13px; }
     .leaflet-control-container .input-group .position:active, .leaflet-control-container .input-group .position.active {
       border-color: #b8c1ca; }
     .leaflet-control-container .input-group .position:focus, .leaflet-control-container .input-group .position.focus {

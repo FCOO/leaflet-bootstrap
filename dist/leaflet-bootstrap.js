@@ -1460,8 +1460,8 @@ Options for selectiong position-format and to activate context-menu
                 ._bsAppendContent( mapCenterOptions );
 
             //Use the added class name to find the two containers for cursor- and map center position
-            this.$cursorPosition = $contentContainer.find('.cursor').parent().empty().addClass('position').text('12345');
-            this.$centerPosition = $contentContainer.find('.center').parent().empty().addClass('position').text('654321');
+            this.$cursorPosition = $contentContainer.find('.cursor').parent().empty().addClass('position text-monospace').text('12345');
+            this.$centerPosition = $contentContainer.find('.center').parent().empty().addClass('position text-monospace').text('654321');
 
             //Remove tooltips from the two buttons to the right
             var $rightButtons = $contentContainer.find('.input-group-append .btn');
