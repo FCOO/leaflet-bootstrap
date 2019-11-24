@@ -1023,6 +1023,10 @@ https://github.com/nerik/leaflet-graphicscale
 (function ($, L, window, document/*, undefined*/) {
     "use strict";
 
+    //Create namespace
+    L.BsContextmenu = L.BsContextmenu || {};
+	var ns = L.BsContextmenu;
+
     /***********************************************************
     Extend base leaflet Layer
 
@@ -1040,79 +1044,81 @@ https://github.com/nerik/leaflet-graphicscale
             header: '',
             excludeMapContextmenu: false, //If true the mapss contxtmenu-items isn't shown
             parent: null, //Object witches contextmenu-items are also shown
+        };
+
+    ns.contextmenuInclude = {
+        setContextmenuOptions: function(options){
+            this.contextmenuOptions = this.contextmenuOptions || $.extend({}, contextmenuOptions);
+            $.extend(this.contextmenuOptions, options );
+            return this;
         },
-        contextmenuInclude = {
-            setContextmenuOptions: function(options){
-                this.contextmenuOptions = this.contextmenuOptions || $.extend({}, contextmenuOptions);
-                $.extend(this.contextmenuOptions, options );
+
+        setContextmenuHeader: function(header){
+            this.setContextmenuOptions( {header: header} );
+            return this;
+        },
+
+        setContextmenuWidth: function(width){
+            this.setContextmenuOptions({width: width});
+            return this;
+        },
+
+        setContextmenuParent: function(parent){
+            this.setContextmenuOptions({parent: parent});
+            return this;
+        },
+
+        excludeMapContextmenu: function(){
+            this.contextmenuOptions.excludeMapContextmenu = true;
+            return this;
+        },
+
+        addContextmenuItems: function ( items, prepend ) {
+            this.setContextmenuOptions({});
+            this.contextmenuOptions = this.contextmenuOptions || $.extend({}, contextmenuOptions);
+
+            items = $.isArray(items) ? items : [items];
+            if (prepend)
+                this.contextmenuOptions.items = items.concat(this.contextmenuOptions.items);
+            else
+                this.contextmenuOptions.items = this.contextmenuOptions.items.concat(items);
+
+             this._addContextmenuEventsAndRef();
+
+            return this;
+        },
+
+        _addContextmenuEventsAndRef: function(){
+            if (this.hasContextmenuEvent)
                 return this;
-            },
 
-            setContextmenuHeader: function(header){
-                this.setContextmenuOptions( {header: header} );
-                return this;
-            },
-
-            setContextmenuWidth: function(width){
-                this.setContextmenuOptions({width: width});
-                return this;
-            },
-
-            setContextmenuParent: function(parent){
-                this.setContextmenuOptions({parent: parent});
-                return this;
-            },
-
-            excludeMapContextmenu: function(){
-                this.contextmenuOptions.excludeMapContextmenu = true;
-                return this;
-            },
-
-            addContextmenuItems: function ( items, prepend ) {
-                this.setContextmenuOptions({});
-                this.contextmenuOptions = this.contextmenuOptions || $.extend({}, contextmenuOptions);
-
-                items = $.isArray(items) ? items : [items];
-                if (prepend)
-                    this.contextmenuOptions.items = items.concat(this.contextmenuOptions.items);
-                else
-                    this.contextmenuOptions.items = this.contextmenuOptions.items.concat(items);
-
-                 this._addContextmenuEventsAndRef();
-
-                return this;
-            },
-
-            _addContextmenuEventsAndRef: function(){
-                if (this.hasContextmenuEvent)
-                    return this;
-
+            if (this instanceof L.Layer){
                 if (this._map)
                     this._addContextmenuEvent();
                 else
                     this.on('add', this._addContextmenuEvent, this);
+            }
+            this.hasContextmenuEvent = true;
 
-                this.hasContextmenuEvent = true;
+            //Create ref from dom-element to to this
+            var getElemFunc = this.getElement || this.getContainer,
+                element     = getElemFunc ? $.proxy(getElemFunc, this)() : null;
+            if (element)
+                $(element).data('bsContentmenuOwner', this);
+        },
+        _addContextmenuEvent: function(){
+            this.on('contextmenu', this.onContextmenu, this);
+        },
 
-                //Create ref from dom-element to to this
-                var getElemFunc = this.getElement || this.getContainer,
-                    element     = getElemFunc ? $.proxy(getElemFunc, this)() : null;
-                if (element)
-                    $(element).data('bsContentmenuOwner', this);
-            },
-            _addContextmenuEvent: function(){
-                this.on('contextmenu', this.onContextmenu, this);
-            },
-
-            appendContextmenuItems : function( items ){ return this.addContextmenuItems( items, false ); },
-            prependContextmenuItems: function( items ){ return this.addContextmenuItems( items, true  ); },
-        };
+        appendContextmenuItems : function( items ){ return this.addContextmenuItems( items, false ); },
+        prependContextmenuItems: function( items ){ return this.addContextmenuItems( items, true  ); },
+    };
 
 
     /***********************************************************
     Extend L.Layer
     ***********************************************************/
-    L.Layer.include(contextmenuInclude);
+    L.Layer.include(ns.contextmenuInclude);
     L.Layer.include({
         hasContextmenuEvent: false,
 
@@ -1148,7 +1154,7 @@ https://github.com/nerik/leaflet-graphicscale
     /***********************************************************
     Extend L.Map
     ***********************************************************/
-    L.Map.include(contextmenuInclude);
+    L.Map.include(ns.contextmenuInclude);
 
     /***********************************************************
     L.Map.ContextMenu
