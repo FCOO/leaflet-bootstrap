@@ -12645,7 +12645,7 @@ POPOVER
     overflow: visible;
     word-break: keep-all; }
   .popover .popover-footer:empty {
-    display: none; }
+    display: none !important; }
 
 .popover.popover-sm .popover-header-content {
   font-weight: 400;
@@ -12690,7 +12690,7 @@ POPOVER
     overflow: visible;
     word-break: keep-all; }
   .popover.popover-sm .popover-footer:empty {
-    display: none; }
+    display: none !important; }
 
 /************************************************************
 HEADER
@@ -13217,6 +13217,14 @@ body.modal-open .modal {
     display: none !important; }
   .modal-dialog .modal-content.no-modal-minimized .hide-for-no-modal-minimized {
     display: none !important; }
+  .modal-dialog .modal-content.modal-minimized > .show-for-modal-minimized {
+    display: initial !important; }
+  .modal-dialog .modal-content.modal-minimized > .hide-for-modal-minimized {
+    display: none !important; }
+  .modal-dialog .modal-content.no-modal-minimized > .hide-for-modal-minimized {
+    display: initial !important; }
+  .modal-dialog .modal-content.no-modal-minimized > .show-for-modal-minimized {
+    display: none !important; }
   .modal-dialog .modal-content.modal-normal .hide-for-modal-normal {
     display: none !important; }
   .modal-dialog .modal-content.modal-normal .show-for-no-modal-normal {
@@ -13225,6 +13233,14 @@ body.modal-open .modal {
     display: none !important; }
   .modal-dialog .modal-content.no-modal-normal .hide-for-no-modal-normal {
     display: none !important; }
+  .modal-dialog .modal-content.modal-normal > .show-for-modal-normal {
+    display: initial !important; }
+  .modal-dialog .modal-content.modal-normal > .hide-for-modal-normal {
+    display: none !important; }
+  .modal-dialog .modal-content.no-modal-normal > .hide-for-modal-normal {
+    display: initial !important; }
+  .modal-dialog .modal-content.no-modal-normal > .show-for-modal-normal {
+    display: none !important; }
   .modal-dialog .modal-content.modal-extended .hide-for-modal-extended {
     display: none !important; }
   .modal-dialog .modal-content.modal-extended .show-for-no-modal-extended {
@@ -13232,6 +13248,14 @@ body.modal-open .modal {
   .modal-dialog .modal-content.no-modal-extended .show-for-modal-extended {
     display: none !important; }
   .modal-dialog .modal-content.no-modal-extended .hide-for-no-modal-extended {
+    display: none !important; }
+  .modal-dialog .modal-content.modal-extended > .show-for-modal-extended {
+    display: initial !important; }
+  .modal-dialog .modal-content.modal-extended > .hide-for-modal-extended {
+    display: none !important; }
+  .modal-dialog .modal-content.no-modal-extended > .hide-for-modal-extended {
+    display: initial !important; }
+  .modal-dialog .modal-content.no-modal-extended > .show-for-modal-extended {
     display: none !important; }
   .modal-dialog .modal-content.modal-pinned .hide-for-modal-pinned {
     display: none !important; }
@@ -13245,7 +13269,7 @@ body.modal-open .modal {
     margin: 0;
     padding-left: 2em; }
   .modal-dialog .modal-content .modal-body.modal-body-no-content {
-    display: none; }
+    display: none !important; }
   .modal-dialog .modal-content .modal-body.modal-body-always-max-height {
     display: flex;
     flex-direction: column;
@@ -13299,7 +13323,7 @@ body.modal-open .modal {
     padding: 0.3125rem 0.3125rem;
     font-size: 1rem; }
     .modal-dialog .modal-content .modal-body-fixed:empty {
-      display: none; }
+      display: none !important; }
   .modal-dialog .modal-content .modal-body {
     flex-shrink: 1;
     flex-grow: 1;
@@ -13349,7 +13373,7 @@ body.modal-open .modal {
       overflow: visible;
       word-break: keep-all; }
     .modal-dialog .modal-content .modal-footer-header:empty {
-      display: none; }
+      display: none !important; }
     .modal-dialog .modal-content .modal-footer-header:not(:empty) + .modal-footer {
       border-top: none; }
   .modal-dialog .modal-content .modal-footer {
@@ -13357,7 +13381,7 @@ body.modal-open .modal {
     flex-grow: 0;
     padding: 0.3125rem; }
     .modal-dialog .modal-content .modal-footer:empty, .modal-dialog .modal-content .modal-footer.modal-footer-vertical:empty {
-      display: none; }
+      display: none !important; }
     .modal-dialog .modal-content .modal-footer.modal-footer-vertical {
       display: flex;
       flex-direction: column;
@@ -13422,7 +13446,7 @@ body.modal-open .modal {
       overflow: visible;
       word-break: keep-all; }
     .modal-dialog.modal-dialog-sm .modal-content .modal-footer-header:empty {
-      display: none; }
+      display: none !important; }
   .modal-dialog.modal-dialog-xs .modal-content .modal-header {
     font-weight: 400;
     display: flex;
@@ -13469,7 +13493,7 @@ body.modal-open .modal {
       overflow: visible;
       word-break: keep-all; }
     .modal-dialog.modal-dialog-xs .modal-content .modal-footer-header:empty {
-      display: none; }
+      display: none !important; }
   .modal-dialog.modal-dialog-xs .modal-content .modal-footer {
     padding-top: 0.25rem;
     padding-bottom: 0.25rem; }
@@ -14183,7 +14207,7 @@ Using Bootstrap Collapse to create accordion
       overflow: visible;
       word-break: keep-all; }
     .accordion .card-footer:empty {
-      display: none; }
+      display: none !important; }
   .accordion.no-transition .collapsing,
   .accordion.no-transition .collapse {
     transition: none !important; }
@@ -14263,7 +14287,7 @@ Using Bootstrap Collapse to create accordion
   .modal-dialog-sm .accordion .card-footer:empty,
   .modal-dialog-xs .accordion .card-footer:empty,
   .accordion-sm .card-footer:empty {
-    display: none; }
+    display: none !important; }
 
 /************************************************************
 NOTY
@@ -14449,7 +14473,7 @@ for noty is copyed and modified
       overflow: visible;
       word-break: keep-all; }
     .noty_bar .noty-footer:empty {
-      display: none; }
+      display: none !important; }
   .noty_bar .noty-buttons {
     padding: 0.3125rem 0.3125rem;
     font-size: 1rem;
@@ -14747,7 +14771,7 @@ Adjustment to Bootstrap tabs
       overflow: visible;
       word-break: keep-all; }
     .tab-content .tab-pane.active .tab-footer:empty {
-      display: none; }
+      display: none !important; }
     .tab-content .tab-pane.active .tab-footer:empty {
       display: none; }
 

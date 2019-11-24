@@ -57585,7 +57585,7 @@ options
         //Add buttons (if any). Allways hidden for minimized
         var $modalButtonContainer = this.bsModal.$buttonContainer =
                 $('<div/>')
-                    .addClass('modal-footer hide-for-modal-minimized')
+                    .addClass('modal-footer show-for-no-modal-minimized')
                     .toggleClass('modal-footer-vertical', !!options.verticalButtons)
                     .appendTo( $modalContent ),
             $modalButtons = this.bsModal.$buttons = [],

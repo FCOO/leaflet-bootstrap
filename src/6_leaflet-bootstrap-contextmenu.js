@@ -65,8 +65,7 @@
                 else
                     this.contextmenuOptions.items = this.contextmenuOptions.items.concat(items);
 
-                if (this._map)
-                    this._addContextmenuEventsAndRef();
+                 this._addContextmenuEventsAndRef();
 
                 return this;
             },
@@ -75,7 +74,11 @@
                 if (this.hasContextmenuEvent)
                     return this;
 
-                this.on('contextmenu', this.onContextmenu, this);
+                if (this._map)
+                    this._addContextmenuEvent();
+                else
+                    this.on('add', this._addContextmenuEvent, this);
+
                 this.hasContextmenuEvent = true;
 
                 //Create ref from dom-element to to this
@@ -83,6 +86,9 @@
                     element     = getElemFunc ? $.proxy(getElemFunc, this)() : null;
                 if (element)
                     $(element).data('bsContentmenuOwner', this);
+            },
+            _addContextmenuEvent: function(){
+                this.on('contextmenu', this.onContextmenu, this);
             },
 
             appendContextmenuItems : function( items ){ return this.addContextmenuItems( items, false ); },
