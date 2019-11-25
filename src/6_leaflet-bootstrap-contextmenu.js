@@ -74,6 +74,8 @@
 
             return this;
         },
+        appendContextmenuItems : function( items ){ return this.addContextmenuItems( items, false ); },
+        prependContextmenuItems: function( items ){ return this.addContextmenuItems( items, true  ); },
 
         _addContextmenuEventsAndRef: function(){
             if (this.hasContextmenuEvent)
@@ -85,20 +87,22 @@
                 else
                     this.on('add', this._addContextmenuEvent, this);
             }
+            else
+                this._addContextmenuRef();
             this.hasContextmenuEvent = true;
 
+        },
+        _addContextmenuEvent: function(){
+            this.on('contextmenu', this.onContextmenu, this);
+            this._addContextmenuRef();
+        },
+        _addContextmenuRef: function(){
             //Create ref from dom-element to to this
             var getElemFunc = this.getElement || this.getContainer,
                 element     = getElemFunc ? $.proxy(getElemFunc, this)() : null;
             if (element)
                 $(element).data('bsContentmenuOwner', this);
         },
-        _addContextmenuEvent: function(){
-            this.on('contextmenu', this.onContextmenu, this);
-        },
-
-        appendContextmenuItems : function( items ){ return this.addContextmenuItems( items, false ); },
-        prependContextmenuItems: function( items ){ return this.addContextmenuItems( items, true  ); },
     };
 
 
