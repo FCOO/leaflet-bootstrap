@@ -12217,6 +12217,7 @@ Bootstrap allready have the following classes
 
 */
 .container-icon-and-text:not(.fa-stack) > span:not(:last-child),
+.container-icon-and-text:not(.fa-stack) > a:not(:last-child),
 .container-icon-and-text:not(.fa-stack) > .container-stacked-icons:not(:last-child):not(.fa-no-margin),
 .container-icon-and-text:not(.fa-stack) > i:not(:last-child):not(.fa-no-margin) {
   margin-right: .4em; }

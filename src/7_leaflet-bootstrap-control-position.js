@@ -40,6 +40,7 @@ Options for selectiong position-format and to activate context-menu
 
             isExtended        : false,
             showCursorPosition: true,
+            inclContextmenu   : true,   //If true a button is added to the right with info for cursor and contextmenu for map center
             selectFormat      : null    //function() to select format for position using latlng-format (fcoo/latlng-format)
         },
 
@@ -136,7 +137,7 @@ Options for selectiong position-format and to activate context-menu
                         icon  : iconCursorPosition,
                         semiTransparent: true,
                     },
-                    after: {
+                    after: !this.options.inclContextmenu ? null : {
                         type  :'button',
                         square: true,
                         icon  : L.BsControl.prototype.options.rightClickIcon,
@@ -163,8 +164,10 @@ Options for selectiong position-format and to activate context-menu
 
             mapCenterOptions.before.icon = iconMapCenter;
 
-            mapCenterOptions.after.icon = 'fa-lb-contextmenu';
-            mapCenterOptions.after.onClick = $.proxy(this._fireContentmenuOnMapCenter, this);
+            if (this.options.inclContextmenu){
+                mapCenterOptions.after.icon = 'fa-lb-contextmenu';
+                mapCenterOptions.after.onClick = $.proxy(this._fireContentmenuOnMapCenter, this);
+            }
 
             $contentContainer
                 ._bsAppendContent( cursorOptions )
@@ -174,10 +177,12 @@ Options for selectiong position-format and to activate context-menu
             this.$cursorPosition = $contentContainer.find('.cursor').parent().empty().addClass('position text-monospace').text('12345');
             this.$centerPosition = $contentContainer.find('.center').parent().empty().addClass('position text-monospace').text('654321');
 
-            //Remove tooltips from the two buttons to the right
-            var $rightButtons = $contentContainer.find('.input-group-append .btn');
-            $rightButtons.on('click', $.proxy(this.hidePopup, this ));
-            this.removeTooltip( $rightButtons );
+            if (this.options.inclContextmenu){
+                //Remove tooltips from the two buttons to the right
+                var $rightButtons = $contentContainer.find('.input-group-append .btn');
+                $rightButtons.on('click', $.proxy(this.hidePopup, this ));
+                this.removeTooltip( $rightButtons );
+            }
 
             //Add events to update position
              map.on('mouseposition', this._onMousePosition, this);

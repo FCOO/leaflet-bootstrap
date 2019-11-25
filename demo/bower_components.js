@@ -57174,10 +57174,10 @@ options
                     .addClass('modal-body-fixed')
                     .toggleClass(className, !noClassNameForFixed)
                     .addClass(scrollbarClass )
-                    .toggleClass('no-vertical-padding', !!options.noVerticalPadding)
-                    .toggleClass('no-horizontal-padding', !!options.noHorizontalPadding)
+                    .toggleClass('no-vertical-padding',         !!options.noVerticalPadding)
+                    .toggleClass('no-horizontal-padding',       !!options.noHorizontalPadding)
                     .toggleClass('modal-body-semi-transparent', !!options.semiTransparent)
-                    .toggleClass('modal-type-' + options.type, !!options.type)
+                    .toggleClass('modal-type-' + options.type,  !!options.type)
                     .addClass(options.fixedClassName || '')
                     .appendTo( this );
         if (options.fixedContent)
@@ -57188,10 +57188,10 @@ options
                 $('<div/>')
                     .addClass('modal-body ' + className)
                     .toggleClass('modal-body-always-max-height', !!options.alwaysMaxHeight)
-                    .toggleClass('no-vertical-padding', !!options.noVerticalPadding)
-                    .toggleClass('no-horizontal-padding', !!options.noHorizontalPadding)
-                    .toggleClass('modal-body-semi-transparent', !!options.semiTransparent)
-                    .toggleClass('modal-type-' + options.type, !!options.type)
+                    .toggleClass('no-vertical-padding',          !!options.noVerticalPadding)
+                    .toggleClass('no-horizontal-padding',        !!options.noHorizontalPadding)
+                    .toggleClass('modal-body-semi-transparent',  !!options.semiTransparent)
+                    .toggleClass('modal-type-' + options.type,   !!options.type)
                     .addClass(options.className || '')
                     .appendTo( this );
 
@@ -57572,14 +57572,14 @@ options
                     modalDiminish :
                     null;
 
-        $modalContent._bsModalBodyAndFooter('normal', options, this.bsModal, noClassNameForFixed, false );
+        $modalContent._bsModalBodyAndFooter('normal', options, this.bsModal, '', noClassNameForFixed, false );
 
         //Create extended content (if any)
         if (options.extended){
             this.bsModal.extended = {};
             if (options.extended.clickable)
                 options.extended.onClick = options.extended.onClick || modalDiminish;
-            $modalContent._bsModalBodyAndFooter( 'extended', options.extended, this.bsModal.extended, false, noClassNameForFooter );
+            $modalContent._bsModalBodyAndFooter( 'extended', options.extended, this.bsModal.extended, '', false, noClassNameForFooter );
         }
 
         //Add buttons (if any). Allways hidden for minimized
