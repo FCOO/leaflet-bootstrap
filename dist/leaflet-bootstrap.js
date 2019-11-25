@@ -1197,14 +1197,18 @@ https://github.com/nerik/leaflet-graphicscale
                 latlng = source.getLatLng ? source.getLatLng() : latlng;
 
 
-            var objectList = [source], //List of objects with iterms for the contextmenu
-                parent = source.contextmenuOptions.parent;
-            while (parent){
-                objectList.push(parent);
-                parent = parent.contextmenuOptions.parent;
+            var objectList = [], //List of objects with iterms for the contextmenu
+                nextObj = source;
+            while (nextObj){
+                if (nextObj.contextmenuOptions){
+                    objectList.push(nextObj);
+                    nextObj = nextObj.contextmenuOptions.parent;
+                }
+                else
+                    nextObj = null;
             }
 
-            if (!firedOnMap && !source.contextmenuOptions.excludeMapContextmenu)
+            if (!firedOnMap && !source.contextmenuOptions.excludeMapContextmenu && this._map.contextmenuOptions)
                 objectList.push(this._map);
 
             //Create the list of items from the objects in objectList

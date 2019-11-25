@@ -92,8 +92,7 @@
     Add contextmenu to the map
     **********************************************/
     var first = null;
-//    map.setContextmenuHeader({icon:'fa-home', text:'MAP header'});
-    map.setContextmenuHeader('MAP');
+    map.setContextmenuHeader({icon:'fa-map', text:'MAP header'});
 
     map.addContextmenuItems([
         {icon:'fa-home', text:{da:'Map#1 (w=180)'}, onClick: function(latlng){ console.log('MAP 1',this, latlng); }, width:180 },
