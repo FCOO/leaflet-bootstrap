@@ -633,15 +633,13 @@ https://github.com/nerik/leaflet-graphicscale
         initialize: function(options){
             this.options.onToggle = $.proxy(this._updateScales, this);
 
-            //Set default bsButtonBox-options
+            //Set default BsButtonBox-options and own options
             L.Control.BsButtonBox.prototype.initialize.call(this, options);
-
-            //Set own options
             L.Util.setOptions(this, options);
 
             //Set default tooltip-diretion
             if (!this.options.tooltipDirection)
-                this.options.tooltipDirection = (options.position.indexOf('top') !== -1) ? 'bottom' : 'top';
+                this.options.tooltipDirection = (this.options.position.indexOf('top') !== -1) ? 'bottom' : 'top';
 
             //Set popup-items
             this.options.popupList = [
@@ -651,7 +649,7 @@ https://github.com/nerik/leaflet-graphicscale
                 },
                 {
                     radioGroupId: 'bsScale',
-                    type:'radio',
+                    type        :'radio',
                     closeOnClick: true,
                     onChange: $.proxy(this.setMode, this),
                     list: [
@@ -807,6 +805,8 @@ https://github.com/nerik/leaflet-graphicscale
         },
 
         _update: function () {
+            if (!this._map._loaded) return;
+
             var bounds = this._map.getBounds(),
                 centerLat = bounds.getCenter().lat,
                 //length of an half world arc at current lat
@@ -995,12 +995,13 @@ https://github.com/nerik/leaflet-graphicscale
 
     //********************************************************************************
     L.Map.mergeOptions({
-        bsScaleControl: false
+        bsScaleControl: false,
+        bsScaleOptions: {}
     });
 
     L.Map.addInitHook(function () {
         if (this.options.bsScaleControl) {
-            this.bsScaleControl = new L.Control.BsScale();
+            this.bsScaleControl = new L.Control.BsScale(this.options.bsScaleOptions);
             this.addControl(this.bsScaleControl);
         }
     });
@@ -1338,6 +1339,7 @@ Options for selectiong position-format and to activate context-menu
             popupPlacement  : 'top',
             tooltipDirection: 'top',
 
+NIELS: 'DAV do',
             content     : {
                 semiTransparent    : true,
                 clickable          : true,
@@ -1354,9 +1356,10 @@ Options for selectiong position-format and to activate context-menu
         },
 
         initialize: function ( options ) {
-            //Set default BsButtonBox-options
+            //Set default BsButtonBox-options and own options
             L.Control.BsButtonBox.prototype.initialize.call(this, options);
             L.Util.setOptions(this, options);
+
 
             this.options.onToggle = $.proxy( this.setCenterMarker, this );
 
@@ -1754,7 +1757,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
                 options.addOnClose = false;
             }
 
-            //Set default BsButtonBox-options
+            //Set default BsButtonBox-options and own options
             L.Control.BsButtonBox.prototype.initialize.call(this, options);
             L.Util.setOptions(this, options);
 

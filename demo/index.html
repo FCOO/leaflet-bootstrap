@@ -72,10 +72,11 @@
         bsPositionControl: true,
         bsPositionOptions: {
             isExtended        : true,
-            showCursorPosition: false,
+            showCursorPosition: true,//false,
             inclContextmenu   : true,
             selectFormat: setLatLngFormat
         },
+        bsScaleControl: true,
         zoomSnap: .25,
         worldCopyJump: true,
     }).setView([56.2, 11.5], 6);
@@ -176,25 +177,26 @@
 
 
     //************************
-    map.addControl(
-        L.control.bsScale({
-            position: 'bottomleft', isExtended: true,
-        })
+//HER    map.addControl(
+//HER        L.control.bsScale(/*{
+//HER            position: 'bottomleft', isExtended: true,
+//HER        }*/)
+//HER
+//HER    );
 
-    );
 
+//HER    map.addControl(
+//HER        L.control.bsScale({
+//HER            position: 'topleft', mode:'metric', isExtended: false, maxUnitsWidthPercent: 30, maxUnitsWidth: 1200,
+//HER        })
+//HER    );
 
-    map.addControl(
-        L.control.bsScale({
-            position: 'topleft', mode:'metric', isExtended: false, maxUnitsWidthPercent: 30, maxUnitsWidth: 1200,
-        })
-    );
+//HER    map.addControl(
+//HER        L.control.bsScale({
+//HER            position: 'bottomleft', mode:'nautical', isExtended: false, maxUnitsWidthPercent: 60, maxUnitsWidth: 1200,
+//HER        })
+//HER    );
 
-    map.addControl(
-        L.control.bsScale({
-            position: 'bottomleft', mode:'nautical', isExtended: false, maxUnitsWidthPercent: 60, maxUnitsWidth: 1200,
-        })
-    );
 //*/
 
 //*

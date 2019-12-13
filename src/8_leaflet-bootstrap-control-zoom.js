@@ -61,7 +61,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
                 options.addOnClose = false;
             }
 
-            //Set default BsButtonBox-options
+            //Set default BsButtonBox-options and own options
             L.Control.BsButtonBox.prototype.initialize.call(this, options);
             L.Util.setOptions(this, options);
 

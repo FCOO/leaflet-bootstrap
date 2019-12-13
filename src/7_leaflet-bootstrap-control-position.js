@@ -29,6 +29,7 @@ Options for selectiong position-format and to activate context-menu
             popupPlacement  : 'top',
             tooltipDirection: 'top',
 
+NIELS: 'DAV do',
             content     : {
                 semiTransparent    : true,
                 clickable          : true,
@@ -45,9 +46,10 @@ Options for selectiong position-format and to activate context-menu
         },
 
         initialize: function ( options ) {
-            //Set default BsButtonBox-options
+            //Set default BsButtonBox-options and own options
             L.Control.BsButtonBox.prototype.initialize.call(this, options);
             L.Util.setOptions(this, options);
+
 
             this.options.onToggle = $.proxy( this.setCenterMarker, this );
 

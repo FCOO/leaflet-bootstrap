@@ -51,14 +51,51 @@ Create a `L.Control.bsButton`. When clicked it opens a box with content
 Create a `bsButtonBox` with graphic scale with metric and/or nautical scale(s)
 Based on [leaflet-graphicscale](https://github.com/nerik/leaflet-graphicscale) by [Erik Escoffier](https://github.com/nerik) 
 
+	L.control.bsScale({position: 'topleft'}).addTo(map)
+	//OR
+	var map = L.map('map',{
+		          bsScaleControl: true,
+        	      bsScaleOptions: {position: 'topleft'}
+			  });
+
+
 #### `options` 
     icon                : 'fa-ruler-horizontal',//Icon for bsButton
     mode                : 'both',               //'metric', 'nautical', or 'both'
     position            : 'bottomleft',
     maxUnitsWidth       : 200,                  //Max width
-    maxUnitsWidthPercent: 90,                   //Max width as percent of map wisth
+    maxUnitsWidthPercent: 90,                   //Max width as percent of map width
 
 See `src/5_leaflet-bootstrap-control-scale.js` for more details
+
+
+
+### L.control.bsPosition(options)
+Create a control with cursor or map center position. When map center is selected it is is possible to activate contextmenu for the center position
+	
+	L.control.bsPosition({position: 'topleft'}).addTo(map)
+	//OR
+	var map = L.map('map',{
+		          bsPositionControl: true,
+        	      bsPositionOptions: {position: 'topleft'}
+			  });
+
+#### `options` 
+    selectFormat: null    //function() to select format for position using latlng-format (fcoo/latlng-format)
+
+See `src/7_leaflet-bootstrap-control-position.js` for more details
+
+### L.control.bsZoom(options)
+Create a extended zoom-control with history of previous {zoom,center} on the map
+	
+	L.control.bsZoom({position: 'topleft'}).addTo(map)
+	//OR
+	var map = L.map('map',{
+		          bsZoomControl: true,
+        	      bsZoomOptions: {position: 'topleft'}
+			  });
+
+See `src/8_leaflet-bootstrap-control-zoom.js` for more details
 
 ### Contextmenu on the map and on elements
 
@@ -113,33 +150,6 @@ See `src/6_leaflet-bootstrap-contextmenu.js` for more details
         ]);
 
 Right-click on the marker will show a contextmenu with five buttons (tree from the marker, a header, and two from the map)    
-
-### L.control.bsPosition(options)
-Create a control with cursor or map center position. When map center is selected it is is possible to activate contextmenu for the center position
-	
-	L.control.bsPosition({position: 'topleft'}).addTo(map)
-	//OR
-	var map = L.map('map',{
-		          bsPositionControl: true,
-        	      bsPositionOptions: {position: 'topleft'}
-			  });
-
-#### `options` 
-    selectFormat: null    //function() to select format for position using latlng-format (fcoo/latlng-format)
-
-See `src/7_leaflet-bootstrap-control-position.js` for more details
-
-### L.control.bsZoom(options)
-Create a extended zoom-control with history of previous {zoom,center} on the map
-	
-	L.control.bsZoom({position: 'topleft'}).addTo(map)
-	//OR
-	var map = L.map('map',{
-		          bsZoomControl: true,
-        	      bsZoomOptions: {position: 'topleft'}
-			  });
-
-See `src/8_leaflet-bootstrap-control-zoom.js` for more details
 
 ### L.popup
 Extended to take same options as bsModal (see details [here](https://github.com/FCOO/jquery-bootstrap#modal))
