@@ -176,8 +176,8 @@ NIELS: 'DAV do',
                 ._bsAppendContent( mapCenterOptions );
 
             //Use the added class name to find the two containers for cursor- and map center position
-            this.$cursorPosition = $contentContainer.find('.cursor').parent().empty().addClass('position text-monospace').text('12345');
-            this.$centerPosition = $contentContainer.find('.center').parent().empty().addClass('position text-monospace').text('654321');
+            this.$cursorPosition = $contentContainer.find('.cursor').parent().empty().addClass('position text-monospace').html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
+            this.$centerPosition = $contentContainer.find('.center').parent().empty().addClass('position text-monospace').html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
 
             if (this.options.inclContextmenu){
                 //Remove tooltips from the two buttons to the right
