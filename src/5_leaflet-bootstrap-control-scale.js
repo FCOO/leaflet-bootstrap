@@ -269,7 +269,7 @@ https://github.com/nerik/leaflet-graphicscale
 
                     //TODO: move score calculation  to a testable method
                     var totalWidthPxScore = 1-(maxUnitsWidthPx - totalWidthPx) / maxUnitsWidthPx;
-                    totalWidthPxScore *= 3;
+                    totalWidthPxScore *= 10;
 
                     //Never allow scale to be wider that maxUnitsWidthPx
                     var score = totalWidthPx > maxUnitsWidthPx ? 0 : unit.unitScore + numUnitsScore + totalWidthPxScore;
@@ -280,7 +280,7 @@ https://github.com/nerik/leaflet-graphicscale
                         unit.unitDivision === 0.5 && numUnits === 3 ||
                         unit.unitDivision === 0.25 && numUnits === 5
                     ) {
-                        score -= 2;
+                        score -= 10;
                     }
 
                     scale.score = score;

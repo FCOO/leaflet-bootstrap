@@ -97,11 +97,13 @@ NIELS: 'DAV do',
         onAdd: function(map){
             //Create pane to contain marker for map center. Is placed just below popup-pane
             if (!map.getPane(controlPositionMarkerPane)){
-                var zIndex = $(map.getPanes().popupPane).css('z-index');
-
                 map.createPane(controlPositionMarkerPane);
-                map[controlPositionMarkerPane] = map.getPane(controlPositionMarkerPane);
-                $(map[controlPositionMarkerPane]).css('z-index', zIndex-1 );
+
+                map.on('load', function(){
+                    var zIndex = $(map.getPanes().popupPane).css('z-index');
+                    map[controlPositionMarkerPane] = map.getPane(controlPositionMarkerPane);
+                    $(map[controlPositionMarkerPane]).css('z-index', zIndex-1 );
+                });
             }
 
             //Append the cross in the center of the map

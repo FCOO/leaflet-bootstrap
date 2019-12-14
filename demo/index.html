@@ -72,7 +72,7 @@
         bsPositionControl: true,
         bsPositionOptions: {
             isExtended        : true,
-            showCursorPosition: true,//false,
+            showCursorPosition: false,
             inclContextmenu   : true,
             selectFormat: setLatLngFormat
         },
@@ -176,30 +176,6 @@
         map.addControl(bGroup);
 
 
-    //************************
-//HER    map.addControl(
-//HER        L.control.bsScale(/*{
-//HER            position: 'bottomleft', isExtended: true,
-//HER        }*/)
-//HER
-//HER    );
-
-
-//HER    map.addControl(
-//HER        L.control.bsScale({
-//HER            position: 'topleft', mode:'metric', isExtended: false, maxUnitsWidthPercent: 30, maxUnitsWidth: 1200,
-//HER        })
-//HER    );
-
-//HER    map.addControl(
-//HER        L.control.bsScale({
-//HER            position: 'bottomleft', mode:'nautical', isExtended: false, maxUnitsWidthPercent: 60, maxUnitsWidth: 1200,
-//HER        })
-//HER    );
-
-//*/
-
-//*
     //************************
     var buttonBox = L.control.bsButtonBox({
         position: 'bottomright',

@@ -866,7 +866,7 @@ https://github.com/nerik/leaflet-graphicscale
 
                     //TODO: move score calculation  to a testable method
                     var totalWidthPxScore = 1-(maxUnitsWidthPx - totalWidthPx) / maxUnitsWidthPx;
-                    totalWidthPxScore *= 3;
+                    totalWidthPxScore *= 10;
 
                     //Never allow scale to be wider that maxUnitsWidthPx
                     var score = totalWidthPx > maxUnitsWidthPx ? 0 : unit.unitScore + numUnitsScore + totalWidthPxScore;
@@ -877,7 +877,7 @@ https://github.com/nerik/leaflet-graphicscale
                         unit.unitDivision === 0.5 && numUnits === 3 ||
                         unit.unitDivision === 0.25 && numUnits === 5
                     ) {
-                        score -= 2;
+                        score -= 10;
                     }
 
                     scale.score = score;
@@ -1408,11 +1408,13 @@ NIELS: 'DAV do',
         onAdd: function(map){
             //Create pane to contain marker for map center. Is placed just below popup-pane
             if (!map.getPane(controlPositionMarkerPane)){
-                var zIndex = $(map.getPanes().popupPane).css('z-index');
-
                 map.createPane(controlPositionMarkerPane);
-                map[controlPositionMarkerPane] = map.getPane(controlPositionMarkerPane);
-                $(map[controlPositionMarkerPane]).css('z-index', zIndex-1 );
+
+                map.on('load', function(){
+                    var zIndex = $(map.getPanes().popupPane).css('z-index');
+                    map[controlPositionMarkerPane] = map.getPane(controlPositionMarkerPane);
+                    $(map[controlPositionMarkerPane]).css('z-index', zIndex-1 );
+                });
             }
 
             //Append the cross in the center of the map
