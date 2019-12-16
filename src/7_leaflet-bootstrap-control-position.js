@@ -223,7 +223,7 @@ NIELS: 'DAV do',
             this.setMode( id == 'cursor' );
         },
 
-        setMode( showCursorPosition ){
+        setMode: function( showCursorPosition ){
             this.options.showCursorPosition = showCursorPosition;
 
             var isCursor = !!this.options.showCursorPosition;
