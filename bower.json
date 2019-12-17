@@ -1,6 +1,6 @@
 {
   "name": "leaflet-bootstrap",
-  "version": "2.7.5",
+  "version": "2.7.6",
   "homepage": "https://github.com/FCOO/leaflet-bootstrap",
   "authors": [
     "Niels Holt"
@@ -25,7 +25,7 @@
     "history": "fcoo/history.js#^1.0.9",
     "leaflet-latlng-format": "fcoo/leaflet-latlng-format#^2.0.0",
     "leaflet-mouseposition": "fcoo/leaflet-mouseposition#latest",
-    "leaflet-bootstrap-marker": "fcoo/leaflet-bootstrap-marker#^2.3.1"
+    "leaflet-bootstrap-marker": "fcoo/leaflet-bootstrap-marker#^2.3.2"
   },
   "devDependencies": {
     "bourbon": "latest",
