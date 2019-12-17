@@ -1410,11 +1410,11 @@ NIELS: 'DAV do',
             if (!map.getPane(controlPositionMarkerPane)){
                 map.createPane(controlPositionMarkerPane);
 
-                map.on('load', function(){
-                    var zIndex = $(map.getPanes().popupPane).css('z-index');
-                    map[controlPositionMarkerPane] = map.getPane(controlPositionMarkerPane);
-                    $(map[controlPositionMarkerPane]).css('z-index', zIndex-1 );
-                });
+                map.whenReady( function(){
+                    var zIndex = $(this.getPanes().popupPane).css('z-index');
+                    this[controlPositionMarkerPane] = this.getPane(controlPositionMarkerPane);
+                    $(this[controlPositionMarkerPane]).css('z-index', zIndex-1 );
+                }, map );
             }
 
             //Append the cross in the center of the map
@@ -1505,7 +1505,7 @@ NIELS: 'DAV do',
             map.on('move', this._onMapMove, this);
             map.on('moveend', this._onMapMoveEnd, this);
 
-            map.on('load', this._onLoad, this);
+            map.whenReady(this._onLoad, this);
 
             //Set/update latlng-format
             this._onLatLngFormatChanged(window.latLngFormat.options.formatId);
@@ -1515,10 +1515,6 @@ NIELS: 'DAV do',
 
         onRemove: function (map) {
             this.centerMarker.remove();
-
-            map.off('load', this._onLoad, this);
-//            map.off('zoomlevelschange', this._setSliderRange, this);
-
             map.off('mouseposition', this._onMousePosition, this);
             map.off('move', this._onMapMove, this);
             map.off('moveend', this._onMapMoveEnd, this);
@@ -1907,14 +1903,12 @@ Can be used as leaflet standard zoom control with Bootstrap style
 
             this._showSlider('', this.options.showSlider);
 */
-            map.on('load', this._onLoad, this);
+            map.whenReady(this._onLoad, this);
 
             return result;
         },
 
         onRemove: function (map) {
-            map.off('load', this._onLoad, this);
-//            map.off('zoomlevelschange', this._setSliderRange, this);
             map.off('moveend', this._onMoveEnd, this);
         },
 

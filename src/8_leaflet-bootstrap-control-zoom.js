@@ -208,14 +208,12 @@ Can be used as leaflet standard zoom control with Bootstrap style
 
             this._showSlider('', this.options.showSlider);
 */
-            map.on('load', this._onLoad, this);
+            map.whenReady(this._onLoad, this);
 
             return result;
         },
 
         onRemove: function (map) {
-            map.off('load', this._onLoad, this);
-//            map.off('zoomlevelschange', this._setSliderRange, this);
             map.off('moveend', this._onMoveEnd, this);
         },
 
