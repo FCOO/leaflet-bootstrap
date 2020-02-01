@@ -29,7 +29,6 @@ Options for selectiong position-format and to activate context-menu
             popupPlacement  : 'top',
             tooltipDirection: 'top',
 
-NIELS: 'DAV do',
             content     : {
                 semiTransparent    : true,
                 clickable          : true,
