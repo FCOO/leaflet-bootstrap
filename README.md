@@ -15,9 +15,10 @@ http://FCOO.github.io/leaflet-bootstrap/demo/
 ## Usage
 
 ### L.control.bsButton
-Create leaflet control a la `$.bsButton`, `$.bsButtonGroup`, and `$.bsRadioButtonGroup`: See [FCOO/jquery-bootstrap](https://github.com/FCOO/jquery-bootstrap#button)
+Create leaflet control a la `$.bsButton`, `$.bsCheckboxButton`, `$.bsButtonGroup`, and `$.bsRadioButtonGroup`: See [FCOO/jquery-bootstrap](https://github.com/FCOO/jquery-bootstrap#button)
 
     L.control.bsButton( options )
+    L.control.bsCheckboxButton( options )
     L.control.bsButtonGroup( options )
     L.control.bsRadioButtonGroup( options )
 

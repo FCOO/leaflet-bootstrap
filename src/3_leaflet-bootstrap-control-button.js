@@ -56,6 +56,19 @@ Create leaflet-control for jquery-bootstrap button-classes:
         _createContent: function(){ return $.bsButton(this.options); }
     });
 
+
+    L.Control.BsCheckboxButton = _bsButtons.extend({
+        initialize: function(options){
+            //Set default _bsButtons-options
+            _bsButtons.prototype.initialize.call(this, options);
+
+            L.Util.setOptions(this, options);
+        },
+
+        _createContent: function(){ return $.bsCheckboxButton(this.options); }
+    });
+
+
     L.Control.BsButtonGroup = _bsButtons.extend({
         options       : { vertical: true },
 
@@ -74,6 +87,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
     });
 
     L.control.bsButton           = function(options){ return new L.Control.BsButton(options);           };
+    L.control.bsCheckboxButton   = function(options){ return new L.Control.BsCheckboxButton(options);   };
     L.control.bsButtonGroup      = function(options){ return new L.Control.BsButtonGroup(options);      };
     L.control.bsRadioButtonGroup = function(options){ return new L.Control.BsRadioButtonGroup(options); };
 

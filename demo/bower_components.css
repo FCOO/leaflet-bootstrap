@@ -12337,6 +12337,15 @@ Bootstrap allready have the following classes
 .font-italic
 
 */
+.opacity-0 {
+  opacity: 0; }
+
+.opacity-50 {
+  opacity: 50; }
+
+.opacity-100 {
+  opacity: 100; }
+
 .container-icon-and-text:not(.fa-stack) > span:not(:last-child),
 .container-icon-and-text:not(.fa-stack) > a:not(:last-child),
 .container-icon-and-text:not(.fa-stack) > .container-stacked-icons:not(:last-child):not(.fa-no-margin),
@@ -12579,6 +12588,13 @@ div.btn, div.list-group-item {
     font-size: 1.625rem; }
     .btn.btn-standard.big-icon.btn-sm, .btn-group-sm > .btn.btn-standard.big-icon {
       font-size: 1.21875rem; }
+  .btn.btn-standard.extra-large-icon {
+    line-height: 1;
+    padding: 0.25rem !important;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem; }
 
 /************************************************************
 Modernizr-test for elements with class="active" when selected
@@ -12614,6 +12630,11 @@ BUTTON-GROUP
   .input-group .btn-group .btn,
   .btn-group:not(.btn-group-vertical).btn-group-full-width .btn {
     flex: 1 0 10px; }
+
+.btn-group:not(.btn-group-vertical).btn-group-center-in-parent {
+  width: auto;
+  margin: auto;
+  display: block; }
 
 .btn-group.btn-group-border, .btn-group-vertical.btn-group-border {
   border: 1px solid #afb4ba;
@@ -13347,6 +13368,14 @@ body.modal-open .modal {
     display: initial !important; }
   .modal-dialog .modal-content.no-modal-minimized > .show-for-modal-minimized {
     display: none !important; }
+  .modal-dialog .modal-content.modal-minimized-always-max-height.modal-minimized > .show-for-modal-minimized {
+    display: flex !important; }
+  .modal-dialog .modal-content.modal-minimized-always-max-height.modal-minimized > .hide-for-modal-minimized {
+    display: none !important; }
+  .modal-dialog .modal-content.modal-minimized-always-max-height.no-modal-minimized > .hide-for-modal-minimized {
+    display: flex !important; }
+  .modal-dialog .modal-content.modal-minimized-always-max-height.no-modal-minimized > .show-for-modal-minimized {
+    display: none !important; }
   .modal-dialog .modal-content.modal-normal .hide-for-modal-normal {
     display: none !important; }
   .modal-dialog .modal-content.modal-normal .show-for-no-modal-normal {
@@ -13363,6 +13392,14 @@ body.modal-open .modal {
     display: initial !important; }
   .modal-dialog .modal-content.no-modal-normal > .show-for-modal-normal {
     display: none !important; }
+  .modal-dialog .modal-content.modal-normal-always-max-height.modal-normal > .show-for-modal-normal {
+    display: flex !important; }
+  .modal-dialog .modal-content.modal-normal-always-max-height.modal-normal > .hide-for-modal-normal {
+    display: none !important; }
+  .modal-dialog .modal-content.modal-normal-always-max-height.no-modal-normal > .hide-for-modal-normal {
+    display: flex !important; }
+  .modal-dialog .modal-content.modal-normal-always-max-height.no-modal-normal > .show-for-modal-normal {
+    display: none !important; }
   .modal-dialog .modal-content.modal-extended .hide-for-modal-extended {
     display: none !important; }
   .modal-dialog .modal-content.modal-extended .show-for-no-modal-extended {
@@ -13378,6 +13415,14 @@ body.modal-open .modal {
   .modal-dialog .modal-content.no-modal-extended > .hide-for-modal-extended {
     display: initial !important; }
   .modal-dialog .modal-content.no-modal-extended > .show-for-modal-extended {
+    display: none !important; }
+  .modal-dialog .modal-content.modal-extended-always-max-height.modal-extended > .show-for-modal-extended {
+    display: flex !important; }
+  .modal-dialog .modal-content.modal-extended-always-max-height.modal-extended > .hide-for-modal-extended {
+    display: none !important; }
+  .modal-dialog .modal-content.modal-extended-always-max-height.no-modal-extended > .hide-for-modal-extended {
+    display: flex !important; }
+  .modal-dialog .modal-content.modal-extended-always-max-height.no-modal-extended > .show-for-modal-extended {
     display: none !important; }
   .modal-dialog .modal-content.modal-pinned .hide-for-modal-pinned {
     display: none !important; }
@@ -13803,14 +13848,24 @@ The default bootstrap structure used for elements in a form is
   margin-bottom: 0;
   padding-top: 0.3125rem;
   padding-bottom: 0.625rem; }
+  .form-group hr {
+    margin-top: 0;
+    margin-bottom: 0.3125rem;
+    border-color: #afb4ba; }
+    .form-group hr.above-label {
+      margin-bottom: 0.9375rem; }
 
 .form-group.form-group-sm {
   padding-top: 0.25rem;
   padding-bottom: 0.5rem; }
+  .form-group.form-group-sm hr.above-label {
+    margin-bottom: 0.75rem; }
 
 .form-group.form-group-xs {
   padding-top: 0.125rem;
   padding-bottom: 0.25rem; }
+  .form-group.form-group-xs hr.above-label {
+    margin-bottom: 0.375rem; }
 
 /************************************************************
 Style for formValidation (via fcoo-form-validation)
@@ -15788,6 +15843,10 @@ to create fa-icon looking like the marker
     font-size: 10px; }
   .lbm-base.lbm-base.lbm-size-xs.lbm-scale-150 {
     font-size: 12px; }
+  .lbm-base.lbm-base.lbm-size-xs.lbm-scale-180 {
+    font-size: 14px; }
+  .lbm-base.lbm-base.lbm-size-xs.lbm-scale-200 {
+    font-size: 16px; }
 
 .lbm-base.lbm-base.lbm-size-sm {
   font-size: 14px; }
@@ -15809,6 +15868,10 @@ to create fa-icon looking like the marker
     font-size: 18px; }
   .lbm-base.lbm-base.lbm-size-sm.lbm-scale-150 {
     font-size: 21px; }
+  .lbm-base.lbm-base.lbm-size-sm.lbm-scale-180 {
+    font-size: 25px; }
+  .lbm-base.lbm-base.lbm-size-sm.lbm-scale-200 {
+    font-size: 28px; }
 
 .lbm-base.lbm-base.lbm-size-nl {
   font-size: 24px; }
@@ -15830,6 +15893,10 @@ to create fa-icon looking like the marker
     font-size: 31px; }
   .lbm-base.lbm-base.lbm-size-nl.lbm-scale-150 {
     font-size: 36px; }
+  .lbm-base.lbm-base.lbm-size-nl.lbm-scale-180 {
+    font-size: 43px; }
+  .lbm-base.lbm-base.lbm-size-nl.lbm-scale-200 {
+    font-size: 48px; }
 
 .lbm-base.lbm-base.lbm-size-lg {
   font-size: 32px; }
@@ -15851,6 +15918,10 @@ to create fa-icon looking like the marker
     font-size: 42px; }
   .lbm-base.lbm-base.lbm-size-lg.lbm-scale-150 {
     font-size: 48px; }
+  .lbm-base.lbm-base.lbm-size-lg.lbm-scale-180 {
+    font-size: 58px; }
+  .lbm-base.lbm-base.lbm-size-lg.lbm-scale-200 {
+    font-size: 64px; }
 
 .lbm-base.lbm-base.lbm-size-xl {
   font-size: 42px; }
@@ -15872,6 +15943,10 @@ to create fa-icon looking like the marker
     font-size: 55px; }
   .lbm-base.lbm-base.lbm-size-xl.lbm-scale-150 {
     font-size: 63px; }
+  .lbm-base.lbm-base.lbm-size-xl.lbm-scale-180 {
+    font-size: 76px; }
+  .lbm-base.lbm-base.lbm-size-xl.lbm-scale-200 {
+    font-size: 84px; }
 
 .lbm-base.lbm-scale-inner-40 .inner * {
   font-size: 0.4em; }
@@ -15899,6 +15974,12 @@ to create fa-icon looking like the marker
 
 .lbm-base.lbm-scale-inner-150 .inner * {
   font-size: 1.5em; }
+
+.lbm-base.lbm-scale-inner-180 .inner * {
+  font-size: 1.8em; }
+
+.lbm-base.lbm-scale-inner-200 .inner * {
+  font-size: 2em; }
 
 .leaflet-tooltip-icon-xs.leaflet-tooltip-bottom {
   margin-top: 7px; }
@@ -16546,6 +16627,28 @@ _leaflet-bootstrap-marker-icon.scss,
     top: -3em; }
   .lbm-type-icon.lbm-scale-y-150 .lbm-content.lbm-content-border {
     top: -4.5em; }
+
+.lbm-type-icon.lbm-scale-y-180 .lbm-content {
+  line-height: 1.8; }
+  .lbm-type-icon.lbm-scale-y-180 .lbm-content.lbm-content-puls {
+    top: 0; }
+  .lbm-type-icon.lbm-scale-y-180 .lbm-content.lbm-content-shadow {
+    top: -1.8em; }
+  .lbm-type-icon.lbm-scale-y-180 .lbm-content.lbm-content-background {
+    top: -3.6em; }
+  .lbm-type-icon.lbm-scale-y-180 .lbm-content.lbm-content-border {
+    top: -5.4em; }
+
+.lbm-type-icon.lbm-scale-y-200 .lbm-content {
+  line-height: 2; }
+  .lbm-type-icon.lbm-scale-y-200 .lbm-content.lbm-content-puls {
+    top: 0; }
+  .lbm-type-icon.lbm-scale-y-200 .lbm-content.lbm-content-shadow {
+    top: -2em; }
+  .lbm-type-icon.lbm-scale-y-200 .lbm-content.lbm-content-background {
+    top: -4em; }
+  .lbm-type-icon.lbm-scale-y-200 .lbm-content.lbm-content-border {
+    top: -6em; }
 
 .lbm-type-icon.lbm-color-pink.lbm-shadow .lbm-content-shadow, .lbm-type-icon.lbm-color-pink.leaflet-drag-target .lbm-content-shadow, .lbm-type-icon.lbm-color-pink.lbm-hover:hover .lbm-content-shadow {
   -webkit-text-stroke-color: rgba(255, 192, 203, 0.28);
