@@ -411,26 +411,29 @@ Options for selectiong position-format and to activate context-menu
         add and remove other maps
         *****************************************************/
         addOther: function(map){
-            map.bsPositionControl = this;
-            map.on('mouseposition', map.bsPositionControl._onMousePosition, map.bsPositionControl);
-            map.bsPositionControl.addCenterMarker(map, true);
+            if (!map.bsPositionControl){
+                map.bsPositionControl = this;
+                map.on('mouseposition', map.bsPositionControl._onMousePosition, map.bsPositionControl);
+                map.bsPositionControl.addCenterMarker(map, true);
 
-            this.setMode( this.options.showCursorPosition );
-
+                this.setMode( this.options.showCursorPosition );
+            }
             return map;
         },
 
 
         removeOther: function(map){
-            var mapId = L.Util.stamp(map);
+            if (map.bsPositionControl){
+                var mapId = L.Util.stamp(map);
 
-            map.off('mouseposition', map.bsPositionControl._onMousePosition, map.bsPositionControl);
-            this.centerMarkers[mapId].remove();
-            delete this.centerMarkers[mapId];
+                map.off('mouseposition', map.bsPositionControl._onMousePosition, map.bsPositionControl);
+                this.centerMarkers[mapId].remove();
+                delete this.centerMarkers[mapId];
 
-            delete this.$mapContainers[mapId];
+                delete this.$mapContainers[mapId];
 
-            map.bsPositionControl = null;
+                map.bsPositionControl = null;
+            }
             return map;
         }
 

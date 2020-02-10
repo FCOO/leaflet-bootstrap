@@ -103,8 +103,12 @@
         test = !test;
         if (test)
             map.bsPositionControl.addOther(map2);
-        else
+        else {
             map.bsPositionControl.removeOther(map2);
+            map.bsPositionControl.removeOther(map2);
+            map.bsPositionControl.removeOther(map2);
+        }
+
     });
 
 
