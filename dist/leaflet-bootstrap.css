@@ -459,6 +459,8 @@ leaflet-bootstrap-control-position.scss
 .leaflet-position-marker {
   background: url(images/leaflet-position-marker.svg) 50% 50% no-repeat;
   content: ''; }
+  .leaflet-position-marker.inside-other-map {
+    opacity: .5; }
   .leaflet-zoom-anim .leaflet-position-marker {
     display: none !important; }
 

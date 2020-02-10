@@ -47,14 +47,14 @@
     i18next.init();
     i18next.changeLanguage('da');
 
-    latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_UTM);
+    //latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_UTM);
     //latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_MGRS);
     //latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_NAC);
 
 
     //latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_DMSS);
     //latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_DMM);
-    //latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_DD);
+    latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_DD);
 
 //    window.setTimeout(function(){ latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_DD) }, 5000 );
 //    window.setTimeout(function(){ latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_NAC) }, 10000 );
@@ -67,7 +67,7 @@
 
         window.notyInfo('Auto changed to format id = '+ latLngFormat.options.formatId, { layout: 'center', timeout: 1500 } );
     }
-    var map, first = true;
+    var map, map2, first = true;
     $.each(['map', 'map2'], function(index, id){
         var nextMap = L.map(id, {
             zoomControl: first,
@@ -75,7 +75,7 @@
             bsPositionControl: first,
             bsPositionOptions: {
                 isExtended        : true,
-                showCursorPosition: false,
+                showCursorPosition: true,
                 inclContextmenu   : true,
                 selectFormat: setLatLngFormat
             },
@@ -92,8 +92,21 @@
 
         L.marker([54,12], {draggable: true}).addTo(nextMap).bindTooltip({icon:'fa-home', text:'Godt'}, {delay:2000});
         map = map || nextMap;
+        map2 = nextMap;
         first = false;
     });
+
+//HERconsole.log(map);
+    var test = false;
+
+    map.on('click', function(){
+        test = !test;
+        if (test)
+            map.bsPositionControl.addOther(map2);
+        else
+            map.bsPositionControl.removeOther(map2);
+    });
+
 
     /**********************************************
     Add contextmenu to the map

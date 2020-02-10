@@ -1418,7 +1418,41 @@ Options for selectiong position-format and to activate context-menu
             window.latLngFormat.onChange( $.proxy( this._onLatLngFormatChanged, this ));
         },
 
+
+        addCenterMarker: function(map, isInOtherMap){
+            //Create pane to contain marker for map center. Is placed just below popup-pane
+            var mapId = L.Util.stamp(map);
+            this.centerMarkers = this.centerMarkers || {};
+            this.$mapContainers = this.$mapContainers || {};
+
+            if (!map.getPane(controlPositionMarkerPane)){
+                map.createPane(controlPositionMarkerPane);
+
+                map.whenReady( function(){
+                    var zIndex = $(this.getPanes().popupPane).css('z-index');
+                    this[controlPositionMarkerPane] = this.getPane(controlPositionMarkerPane);
+                    $(this[controlPositionMarkerPane]).css('z-index', zIndex-1 );
+                }, map );
+            }
+
+            //Append the cross in the center of the map
+            var centerMarker = L.marker([0,0], {
+                icon: L.divIcon({
+                    className : 'leaflet-position-marker show-for-control-position-map-center' + (isInOtherMap ? ' inside-other-map' : ''),
+                    iconSize  : [36, 36],
+                    iconAnchor: [18, 18],
+                }),
+                pane: controlPositionMarkerPane
+            });
+            centerMarker.addTo(map);
+            this.centerMarkers[ mapId ] = centerMarker;
+
+            this.$mapContainers[ mapId ] = $(map.getContainer());
+        },
+
         onAdd: function(map){
+
+/*
             //Create pane to contain marker for map center. Is placed just below popup-pane
             if (!map.getPane(controlPositionMarkerPane)){
                 map.createPane(controlPositionMarkerPane);
@@ -1440,8 +1474,10 @@ Options for selectiong position-format and to activate context-menu
                 pane: controlPositionMarkerPane
             });
             this.centerMarker.addTo(map);
+*/
+            this.addCenterMarker(map);
 
-            this.$mapContainer = $(map.getContainer());
+//HER            this.$mapContainer = $(map.getContainer());
 
             //Create the content for the control
             var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map ),
@@ -1527,7 +1563,9 @@ Options for selectiong position-format and to activate context-menu
         },
 
         onRemove: function (map) {
-            this.centerMarker.remove();
+//            this.centerMarker.remove();
+            this.centerMarkers[L.Util(map)].remove();
+            delete this.centerMarkers[L.Util(map)];
             map.off('mouseposition', this._onMousePosition, this);
             map.off('move', this._onMapMove, this);
             map.off('moveend', this._onMapMoveEnd, this);
@@ -1551,14 +1589,19 @@ Options for selectiong position-format and to activate context-menu
             this._updatePositions();
 
             this.bsButton.modernizrToggle( 'checked', isCursor );
-            this.$mapContainer
-                .modernizrToggle( 'control-position-cursor', isCursor )
-                .modernizrToggle( 'control-position-map-center',  !isCursor );
+
+            $.each(this.$mapContainers, function(id, $container){
+                $container
+                    .modernizrToggle( 'control-position-cursor',       isCursor )
+                    .modernizrToggle( 'control-position-map-center',  !isCursor );
+            });
         },
 
         setCenterMarker: function( show ){
-            var $icon = $(this.centerMarker._icon);
-            show ? $icon.show() : $icon.hide();
+            $.each(this.centerMarkers, function(id, marker){
+                var $icon = $(marker._icon);
+                show ? $icon.show() : $icon.hide();
+            });
         },
 
 
@@ -1626,8 +1669,12 @@ Options for selectiong position-format and to activate context-menu
         },
 
         _onMapMoveEnd: function(){
-            this.centerMarker.setLatLng(this._map.getCenter());
-            this.$centerPosition.html( this._formatLatLng( this._map.getCenter() ) );
+            var position = this._map.getCenter();
+            $.each( this.centerMarkers, function(id, marker){
+                marker.setLatLng(position);
+            });
+
+            this.$centerPosition.html( this._formatLatLng( position ) );
         },
 
         _fireContentmenuOnMapCenter: function(){
@@ -1683,7 +1730,35 @@ Options for selectiong position-format and to activate context-menu
                     target: theElement
                 }
             });
+        },
+
+        /*****************************************************
+        add and remove other maps
+        *****************************************************/
+        addOther: function(map){
+            map.bsPositionControl = this;
+            map.on('mouseposition', map.bsPositionControl._onMousePosition, map.bsPositionControl);
+            map.bsPositionControl.addCenterMarker(map, true);
+
+            this.setMode( this.options.showCursorPosition );
+
+            return map;
+        },
+
+
+        removeOther: function(map){
+            var mapId = L.Util.stamp(map);
+
+            map.off('mouseposition', map.bsPositionControl._onMousePosition, map.bsPositionControl);
+            this.centerMarkers[mapId].remove();
+            delete this.centerMarkers[mapId];
+
+            delete this.$mapContainers[mapId];
+
+            map.bsPositionControl = null;
+            return map;
         }
+
 
     });//end of L.Control.BsPosition
 

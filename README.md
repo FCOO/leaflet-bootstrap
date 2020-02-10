@@ -72,7 +72,8 @@ See `src/5_leaflet-bootstrap-control-scale.js` for more details
 
 
 ### L.control.bsPosition(options)
-Create a control with cursor or map center position. When map center is selected it is is possible to activate contextmenu for the center position
+Create a control with cursor or map center position. When map center is selected it is is possible to activate contextmenu for the center position.
+Also possible to include/exclude other maps to show cursor-position from the other map or to show center position of original map in the other map(s)
 	
 	L.control.bsPosition({position: 'topleft'}).addTo(map)
 	//OR
@@ -80,6 +81,13 @@ Create a control with cursor or map center position. When map center is selected
 		          bsPositionControl: true,
         	      bsPositionOptions: {position: 'topleft'}
 			  });
+
+    var map2 = L.map('map2', {bsPositionControl: false });
+
+    map.bsPositionControl.addOther(map2);
+    //OR
+    map.bsPositionControl.removeOther(map2);
+
 
 #### `options` 
     selectFormat: null    //function() to select format for position using latlng-format (fcoo/latlng-format)

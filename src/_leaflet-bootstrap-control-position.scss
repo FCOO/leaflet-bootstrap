@@ -7,6 +7,10 @@ leaflet-bootstrap-control-position.scss
     background: url(images/leaflet-position-marker.svg) 50% 50% no-repeat;
     content   : '';
 
+    &.inside-other-map {
+        opacity: .5;
+    }
+
     .leaflet-zoom-anim & {
         display: none !important;
     }
