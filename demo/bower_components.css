@@ -12548,6 +12548,21 @@ div.btn, div.list-group-item {
       z-index: 4; }
     .mouse-hover .btn.btn-standard.transparent:hover:not(:focus):not(:disabled):not(.disabled) {
       border-color: rgba(0, 0, 0, 0.15); }
+    .btn.btn-standard.transparent.active {
+      color: #fff;
+      background: #007bff linear-gradient(180deg, #268fff, #007bff) repeat-x; }
+      .mouse-hover .hover .btn.btn-standard.transparent.active:not(:active):not(:disabled):not(.disabled),
+      .mouse-hover .btn.btn-standard.transparent.active.hover:not(:active):not(:disabled):not(.disabled),
+      .mouse-hover .btn.btn-standard.transparent.active:hover:not(:active):not(:disabled):not(.disabled) {
+        color: #f2f2f2;
+        background: #006fe6 linear-gradient(180deg, #2684e9, #006fe6) repeat-x; }
+      .btn.btn-standard.transparent.active:active {
+        color: #ececec;
+        background: #0069d9 linear-gradient(180deg, #267fde, #0069d9) repeat-x; }
+      .btn.btn-standard.transparent.active.disabled, .btn.btn-standard.transparent.active:disabled {
+        opacity: 1 !important;
+        color: rgba(255, 255, 255, 0.65);
+        background: #007bff linear-gradient(180deg, #268fff, #007bff) repeat-x; }
     .btn.btn-standard.transparent.disabled, .btn.btn-standard.transparent:disabled {
       opacity: 1 !important;
       color: rgba(212, 212, 212, 0.65);
@@ -12564,6 +12579,21 @@ div.btn, div.list-group-item {
     .btn.btn-standard.semi-transparent:active {
       color: #40464c;
       background: rgba(226, 230, 234, 0.75); }
+    .btn.btn-standard.semi-transparent.active {
+      color: #fff;
+      background: #007bff linear-gradient(180deg, #268fff, #007bff) repeat-x; }
+      .mouse-hover .hover .btn.btn-standard.semi-transparent.active:not(:active):not(:disabled):not(.disabled),
+      .mouse-hover .btn.btn-standard.semi-transparent.active.hover:not(:active):not(:disabled):not(.disabled),
+      .mouse-hover .btn.btn-standard.semi-transparent.active:hover:not(:active):not(:disabled):not(.disabled) {
+        color: #f2f2f2;
+        background: #006fe6 linear-gradient(180deg, #2684e9, #006fe6) repeat-x; }
+      .btn.btn-standard.semi-transparent.active:active {
+        color: #ececec;
+        background: #0069d9 linear-gradient(180deg, #267fde, #0069d9) repeat-x; }
+      .btn.btn-standard.semi-transparent.active.disabled, .btn.btn-standard.semi-transparent.active:disabled {
+        opacity: 1 !important;
+        color: rgba(255, 255, 255, 0.65);
+        background: #007bff linear-gradient(180deg, #268fff, #007bff) repeat-x; }
     .btn.btn-standard.semi-transparent.disabled, .btn.btn-standard.semi-transparent:disabled {
       opacity: 1 !important;
       color: rgba(81, 89, 97, 0.65);

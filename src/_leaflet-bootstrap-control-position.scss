@@ -8,7 +8,7 @@ leaflet-bootstrap-control-position.scss
     content   : '';
 
     .leaflet-zoom-anim & {
-        display: none;
+        display: none !important;
     }
 }
 

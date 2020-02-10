@@ -460,7 +460,7 @@ leaflet-bootstrap-control-position.scss
   background: url(images/leaflet-position-marker.svg) 50% 50% no-repeat;
   content: ''; }
   .leaflet-zoom-anim .leaflet-position-marker {
-    display: none; }
+    display: none !important; }
 
 .leaflet-control-container .input-group {
   width: initial;
