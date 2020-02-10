@@ -59,7 +59,6 @@
 //    window.setTimeout(function(){ latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_DD) }, 5000 );
 //    window.setTimeout(function(){ latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_NAC) }, 10000 );
 
-
     function setLatLngFormat(){
         if (latLngFormat.options.formatId == latLngFormat.LATLNGFORMAT_LAST)
             latLngFormat.setFormat(latLngFormat.LATLNGFORMAT_FIRST);
@@ -68,7 +67,7 @@
 
         window.notyInfo('Auto changed to format id = '+ latLngFormat.options.formatId, { layout: 'center', timeout: 1500 } );
     }
-    var map, first: true;
+    var map, first = true;
     $.each(['map', 'map2'], function(index, id){
         var nextMap = L.map(id, {
             zoomControl: first,
