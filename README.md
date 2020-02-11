@@ -84,7 +84,7 @@ Also possible to include/exclude other maps to show cursor-position from the oth
 
     var map2 = L.map('map2', {bsPositionControl: false });
 
-    map.bsPositionControl.addOther(map2);
+    map.bsPositionControl.addOther(map2, true/false); //true: Only show cursor-position from the other map. false: Also show map-venter in the other map
     //OR
     map.bsPositionControl.removeOther(map2);
 

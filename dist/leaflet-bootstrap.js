@@ -1418,12 +1418,15 @@ Options for selectiong position-format and to activate context-menu
             window.latLngFormat.onChange( $.proxy( this._onLatLngFormatChanged, this ));
         },
 
+        addMapContainer: function(map){
+            this.$mapContainers = this.$mapContainers || {};
+            this.$mapContainers[ L.Util.stamp(map) ] = $(map.getContainer());
+        },
 
         addCenterMarker: function(map, isInOtherMap){
             //Create pane to contain marker for map center. Is placed just below popup-pane
             var mapId = L.Util.stamp(map);
             this.centerMarkers = this.centerMarkers || {};
-            this.$mapContainers = this.$mapContainers || {};
 
             if (!map.getPane(controlPositionMarkerPane)){
                 map.createPane(controlPositionMarkerPane);
@@ -1446,38 +1449,11 @@ Options for selectiong position-format and to activate context-menu
             });
             centerMarker.addTo(map);
             this.centerMarkers[ mapId ] = centerMarker;
-
-            this.$mapContainers[ mapId ] = $(map.getContainer());
         },
 
         onAdd: function(map){
-
-/*
-            //Create pane to contain marker for map center. Is placed just below popup-pane
-            if (!map.getPane(controlPositionMarkerPane)){
-                map.createPane(controlPositionMarkerPane);
-
-                map.whenReady( function(){
-                    var zIndex = $(this.getPanes().popupPane).css('z-index');
-                    this[controlPositionMarkerPane] = this.getPane(controlPositionMarkerPane);
-                    $(this[controlPositionMarkerPane]).css('z-index', zIndex-1 );
-                }, map );
-            }
-
-            //Append the cross in the center of the map
-            this.centerMarker = L.marker([0,0], {
-                icon: L.divIcon({
-                    className : 'leaflet-position-marker show-for-control-position-map-center',
-                    iconSize  : [36, 36],
-                    iconAnchor: [18, 18],
-                }),
-                pane: controlPositionMarkerPane
-            });
-            this.centerMarker.addTo(map);
-*/
+            this.addMapContainer(map);
             this.addCenterMarker(map);
-
-//HER            this.$mapContainer = $(map.getContainer());
 
             //Create the content for the control
             var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map ),
@@ -1563,7 +1539,6 @@ Options for selectiong position-format and to activate context-menu
         },
 
         onRemove: function (map) {
-//            this.centerMarker.remove();
             this.centerMarkers[L.Util(map)].remove();
             delete this.centerMarkers[L.Util(map)];
             map.off('mouseposition', this._onMousePosition, this);
@@ -1700,7 +1675,6 @@ Options for selectiong position-format and to activate context-menu
                 element.style.visibility = 'hidden'; // Temporarily hide the element (without changing the layout)
             }
 
-
             //Reset visibility
             $.each( elements, function(index, elem){
                 elem.style.visibility = visibility[index];
@@ -1735,25 +1709,30 @@ Options for selectiong position-format and to activate context-menu
         /*****************************************************
         add and remove other maps
         *****************************************************/
-        addOther: function(map){
+        addOther: function(map, onlyCursorPosition){
             if (!map.bsPositionControl){
                 map.bsPositionControl = this;
                 map.on('mouseposition', map.bsPositionControl._onMousePosition, map.bsPositionControl);
-                map.bsPositionControl.addCenterMarker(map, true);
+                if (onlyCursorPosition)
+                    this.addMapContainer(map);
+                else
+                    map.bsPositionControl.addCenterMarker(map, true);
 
                 this.setMode( this.options.showCursorPosition );
             }
             return map;
         },
 
-
         removeOther: function(map){
             if (map.bsPositionControl){
                 var mapId = L.Util.stamp(map);
 
                 map.off('mouseposition', map.bsPositionControl._onMousePosition, map.bsPositionControl);
-                this.centerMarkers[mapId].remove();
-                delete this.centerMarkers[mapId];
+
+                if (this.centerMarkers[mapId]){
+                    this.centerMarkers[mapId].remove();
+                    delete this.centerMarkers[mapId];
+                }
 
                 delete this.$mapContainers[mapId];
 
@@ -1761,7 +1740,6 @@ Options for selectiong position-format and to activate context-menu
             }
             return map;
         }
-
 
     });//end of L.Control.BsPosition
 
