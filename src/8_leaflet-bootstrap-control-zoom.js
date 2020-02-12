@@ -39,6 +39,8 @@ Can be used as leaflet standard zoom control with Bootstrap style
             popupText   : {da:'Inds.', en:'Set.'},
 
             content     :'',
+
+            map_setView_options: {animate: false} //options for map.setView(center, zoom, options). Can beoverwriten
         },
 
         initialize: function ( options ) {
@@ -51,8 +53,8 @@ Can be used as leaflet standard zoom control with Bootstrap style
                     semiTransparent    : true,
                     noVerticalPadding  : true,
                     noHorizontalPadding: true,
-                    header: {text: {da:'Zoom/Center', en:'Zoom/Centre'}},
-                    content: 'This is not empty'
+                    header             : {text: {da:'Zoom/Center', en:'Zoom/Centre'}},
+                    content            : 'This is not empty'
                 };
             }
             else {
@@ -228,7 +230,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
             };
         },
         _setZoomCenter: function( zoomCenter ) {
-            this._map.setView( zoomCenter.center, zoomCenter.zoom, {animate: false} );
+            this._map.setView( zoomCenter.center, zoomCenter.zoom, this.options.map_setView_options );
         },
 
         _onLoad: function(){
