@@ -134,7 +134,11 @@ Can be used as leaflet standard zoom control with Bootstrap style
                     if (!$backButtons) return;
                     $backButtons.toggleClass('disabled', !backAvail );
                     $forwardButtons.toggleClass('disabled', !forwardAvail );
+                },
+                compare: function(zoomCenter1, zoomCenter2){
+                    return (zoomCenter1.zoom == zoomCenter2.zoom) && zoomCenter1.center.equals(zoomCenter2.center);
                 }
+
             });
 
             //Append history-buttons as two vertical bsButtonGroup
