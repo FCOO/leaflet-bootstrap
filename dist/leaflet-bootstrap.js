@@ -1769,7 +1769,7 @@ Create a zoom-control inside a bsButtonBox
 Can be used as leaflet standard zoom control with Bootstrap style
 
 ****************************************************************************/
-(function ($, L, window/*, document, undefined*/) {
+(function ($, L, window, document, undefined) {
     "use strict";
 
     /********************************************************************************
@@ -1794,7 +1794,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
             extended   : false,
             showSlider : false,
             showHistory: false,
-
+            historyDisabled: false,
             semiTransparent: false,
 
             tooltipDirection: 'top',
@@ -1830,6 +1830,9 @@ Can be used as leaflet standard zoom control with Bootstrap style
             //Set default BsButtonBox-options and own options
             L.Control.BsButtonBox.prototype.initialize.call(this, options);
             L.Util.setOptions(this, options);
+
+
+            this.historyListEnabled = !this.options.historyDisabled;
 
             //Adjust popupPlacement to position
             function includes(pos, substring){
@@ -1904,7 +1907,6 @@ Can be used as leaflet standard zoom control with Bootstrap style
                 compare: function(zoomCenter1, zoomCenter2){
                     return (zoomCenter1.zoom == zoomCenter2.zoom) && zoomCenter1.center.equals(zoomCenter2.center);
                 }
-
             });
 
             //Append history-buttons as two vertical bsButtonGroup
@@ -1987,6 +1989,16 @@ Can be used as leaflet standard zoom control with Bootstrap style
             map.off('moveend', this._onMoveEnd, this);
         },
 
+
+        enableHistory: function(on){
+            this.historyListEnabled = (on === undefined) ? true : !!on;
+            return this;
+        },
+
+        disableHistory: function(){
+            return this.enableHistory(false);
+        },
+
         _getZoomCenter: function() {
             return {
                 zoom  : this._map.getZoom(),
@@ -2003,9 +2015,11 @@ Can be used as leaflet standard zoom control with Bootstrap style
         },
 
         _onMoveEnd: function(){
-            this.historyList.callAction = false;
-            this.historyList.add( this._getZoomCenter() );
-            this.historyList._callOnUpdate();
+            if (this.historyListEnabled){
+                this.historyList.callAction = false;
+                this.historyList.add( this._getZoomCenter() );
+                this.historyList._callOnUpdate();
+            }
         },
 
         _showHistory: function(id, show){

@@ -72,6 +72,9 @@
         var nextMap = L.map(id, {
             zoomControl: first,
             bsZoomControl: first,
+            bsZoomOptions: {
+                historyDisabled: true
+            },
             bsPositionControl: first,
             bsPositionOptions: {
                 isExtended        : true,
