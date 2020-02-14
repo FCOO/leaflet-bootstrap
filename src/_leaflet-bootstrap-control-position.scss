@@ -11,7 +11,7 @@ leaflet-bootstrap-control-position.scss
         opacity: .5;
     }
 
-    .leaflet-zoom-anim & {
+    .leaflet-zoom-anim &, .hide-control-position-map-center & {
         display: none !important;
     }
 }

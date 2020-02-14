@@ -461,7 +461,7 @@ leaflet-bootstrap-control-position.scss
   content: ''; }
   .leaflet-position-marker.inside-other-map {
     opacity: .5; }
-  .leaflet-zoom-anim .leaflet-position-marker {
+  .leaflet-zoom-anim .leaflet-position-marker, .hide-control-position-map-center .leaflet-position-marker {
     display: none !important; }
 
 .leaflet-control-container .input-group {
