@@ -83,6 +83,9 @@
                 selectFormat: setLatLngFormat
             },
             bsScaleControl: first,
+            bsScaleOptions: {
+                selectFormat: function(){ this.setMode(confirm('Use nautical?') ? 'nautical' : 'metric'); }
+            },
             zoomSnap: .25,
             worldCopyJump: true,
         }).setView([56.2, 11.5], 6);

@@ -78,7 +78,7 @@ Options for selectiong position-format and to activate context-menu
 
             if (this.options.selectFormat)
                 popupList.push(
-                    {type:'button', closeOnClick: true, lineBefore: true, text: {da:'Format...', en:'Format...'}, onClick: this.options.selectFormat}
+                    {type:'button', closeOnClick: true, lineBefore: true, text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this)}
                 );
             this.options.popupList = popupList.length ? popupList : null;
 

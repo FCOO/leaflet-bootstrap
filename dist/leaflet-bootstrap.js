@@ -628,7 +628,8 @@ https://github.com/nerik/leaflet-graphicscale
     L.Control.BsScale = L.Control.BsButtonBox.extend({
         options: {
             icon                : 'fa-ruler-horizontal',//Icon for bsButton
-            mode                : 'both',               //'metric', 'nautical', or 'both'
+            mode                : 'metric',             //'metric', 'nautical', or 'both'
+            showBoth            : false,
             position            : 'bottomleft',
             minUnitWidth        : 40,
             maxUnitsWidth       : 200,                  //Max width
@@ -655,24 +656,32 @@ https://github.com/nerik/leaflet-graphicscale
             if (!this.options.tooltipDirection)
                 this.options.tooltipDirection = (this.options.position.indexOf('top') !== -1) ? 'bottom' : 'top';
 
-            //Set popup-items
-            this.options.popupList = [
-                {
-                    icon: this.options.icon,
-                    text: {da:'Vis', en:'Show'}
-                },
-                {
-                    radioGroupId: 'bsScale',
-                    type        :'radio',
-                    closeOnClick: true,
-                    onChange: $.proxy(this.setMode, this),
-                    list: [
-                        {id:'metric',   text: {da:'Kilometer', en:'Metric'},     selected: this.options.mode == 'metric'  },
-                        {id:'nautical', text: {da:'Sømil', en:'Nautical miles'}, selected: this.options.mode == 'nautical'},
-                        {id:'both',     text: {da:'Begge', en:'Both'},           selected: this.options.mode == 'both'    }
-                    ]
-                }
-           ];
+            //Set popup-items - two different modes: With and without options.selectFormat
+            this.options.popupList = [];
+            if (options.selectFormat)
+                this.options.popupList.push(
+                    {icon: this.options.icon,         text: {da:'Skala', en:'Scale'} },
+                    {type:'checkbox',                 text: {da:'Vis km og nm', en:'Show km and nm'}, selected: this.options.showBoth, onChange: $.proxy(this._setBoth, this), closeOnClick: true},
+                    {type:'button', lineBefore: true, text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this), closeOnClick: true, }
+                );
+                else
+                    this.options.popupList.push(
+                        {
+                            icon: this.options.icon,
+                            text: {da:'Vis', en:'Show'}
+                        },
+                        {
+                            radioGroupId: 'bsScale',
+                            type        :'radio',
+                            closeOnClick: true,
+                            onChange: $.proxy(this.setMode, this),
+                            list: [
+                                {id:'metric',   text: {da:'Kilometer', en:'Metric'},     selected: this.options.mode == 'metric'  },
+                                {id:'nautical', text: {da:'Sømil', en:'Nautical miles'}, selected: this.options.mode == 'nautical'},
+                                {id:'both',     text: {da:'Begge', en:'Both'},           selected: this.options.mode == 'both'    }
+                            ]
+                        }
+                    );
         },
 
 		onAdd: function (map) {
@@ -700,9 +709,18 @@ https://github.com/nerik/leaflet-graphicscale
             this.nauticalScale.onRemove(map);
         },
 
-        setMode: function( mode, container ){
-            this.options.mode = mode;
+        _setBoth: function(id, selected){
+            this.setBoth(selected);
+        },
 
+        setBoth: function(selected){
+            this.options.showBoth = selected;
+            this.setMode( this.options.mode );
+        },
+
+        setMode: function(mode, container){
+            this.options.mode = mode;
+            mode = this.options.showBoth ? 'both' : mode;
             $(this.getContainer() || container).toggleClass('both', mode == 'both');
 
             //naticalScale
@@ -1403,7 +1421,7 @@ Options for selectiong position-format and to activate context-menu
 
             if (this.options.selectFormat)
                 popupList.push(
-                    {type:'button', closeOnClick: true, lineBefore: true, text: {da:'Format...', en:'Format...'}, onClick: this.options.selectFormat}
+                    {type:'button', closeOnClick: true, lineBefore: true, text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this)}
                 );
             this.options.popupList = popupList.length ? popupList : null;
 
