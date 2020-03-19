@@ -23,13 +23,15 @@ L.BsControl = extention of L.Control with
 
 
 ****************************************************************************/
-(function ($, L, window/*, document, undefined*/) {
+(function ($, L, window, document, undefined) {
     "use strict";
 
     var controlTooltipPane = 'controlTooltipPane';
 
     L.BsControl = L.Control.extend({
         options: {
+            show            : true,
+
             tooltip         : null, //Individuel tooltip
             tooltipDirection: null, //Default = auto detection from control's position
 
@@ -41,7 +43,7 @@ L.BsControl = extention of L.Control with
             popupList       : null, //[] of items for bsPopoverMenu
 
 
-            closeText       : {da:'Skjul', en:'Hide'},
+            closeText       : {da:'Minimer', en:'Minimize'},//{da:'Skjul', en:'Hide'},
             onClose         : null //function. If not null and popupList not null => add as extra button to popupList with text = options.closeText
         },
 
@@ -124,6 +126,7 @@ L.BsControl = extention of L.Control with
                     placement   : this.options.popupPlacement || 'top',
                     list        : popupList
                 });
+
             }
 
 
@@ -160,7 +163,28 @@ L.BsControl = extention of L.Control with
                 this._controlTooltipContent.push({icon: this.options.rightClickIcon, text: this.options.popupText});
             }
 
+            this.isShow = this.options.show;
+            this.isShow ? this.show() : this.hide();
             return result;
+        },
+
+        show: function(){
+            return this.toggleShowHide(true);
+        },
+
+        hide: function(){
+            return this.toggleShowHide(false);
+        },
+
+        toggleShowHide: function( on ){
+		if ( on === undefined )
+            return this.toggleShowHide( !this.isShow );
+
+            this.$container = this.$container || $(this._container);
+            this.isShow = !!on;
+
+            this.isShow ? this.$container.show() : this.$container.hide();
+            return this;
         },
 
         hidePopup: function(){
