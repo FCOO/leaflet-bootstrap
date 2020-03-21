@@ -17,7 +17,8 @@
             padding: 0; margin: 0; width:100%; height:100%;
         }
         #map, #map2 {
-            padding: 0; margin: 0; width:50%; height:100%;
+        margin: 2px !important;
+            padding: 0; margin: 0; width:49%; height:99%;
         }
     </style>
 
@@ -417,9 +418,14 @@
 
     //************************************************************
     map.addControl( L.control.bsButton({
-        icon:['fa-edit', 'fa-home'],
+        icon:['fa-edit', 'fa-pencil-alt'],
     }) );
 
+    //************************************************************
+    map.addControl( L.control.bsButton({
+        icon:'fa-pencil-alt',
+        onClick: function(){ map.bsPositionControl.toggleShowHide(); }
+    }) );
 
     //************************************************************
     function showPopup( mouseEvent ){

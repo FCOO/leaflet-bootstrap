@@ -165,7 +165,7 @@ L.BsControl = extention of L.Control with
             this.$container = this.$container || $(this._container);
             this.isShow = !!on;
 
-            this.isShow ? this.$container.show() : this.$container.hide();
+            this.$container.css('visibility', this.isShow ? 'inherit' : 'hidden');
             return this;
         },
 
