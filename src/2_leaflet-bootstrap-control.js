@@ -100,7 +100,7 @@ L.BsControl = extention of L.Control with
                 if (this.options.onClose && window.bsIsTouch)
                     popupList.push({type:'button', lineBefore: true, closeOnClick: true, text: this.options.closeText, onClick: this.options.onClose});
 
-                $popupElements.bsMenuPopover({
+                this.menuPopover = $popupElements.bsMenuPopover({
                     trigger     : popupTrigger,
                     delay       : popupTrigger == 'hover' ? 1000 : 0,
                     closeOnClick: true,
@@ -108,7 +108,6 @@ L.BsControl = extention of L.Control with
                     placement   : this.options.popupPlacement || 'top',
                     list        : popupList
                 });
-
             }
 
 
@@ -145,10 +144,11 @@ L.BsControl = extention of L.Control with
                 this._controlTooltipContent.push({icon: this.options.rightClickIcon, text: this.options.popupText});
             }
 
-            this.isShow = this.options.show;
-            this.isShow ? this.show() : this.hide();
+            this.options.show ? this.show() : this.hide();
             return result;
         },
+
+
 
         show: function(){
             return this.toggleShowHide(true);
@@ -160,12 +160,37 @@ L.BsControl = extention of L.Control with
 
         toggleShowHide: function( on ){
 		if ( on === undefined )
-            return this.toggleShowHide( !this.isShow );
+            return this.toggleShowHide( !this.options.show );
 
             this.$container = this.$container || $(this._container);
-            this.isShow = !!on;
+            this.options.show = !!on;
 
-            this.$container.css('visibility', this.isShow ? 'inherit' : 'hidden');
+            this.$container.css('visibility', this.options.show ? 'inherit' : 'hidden');
+            this._onChange();
+            return this;
+        },
+
+        onChange: function(/*options*/){
+            //Nothing - overwriten by ancestors
+        },
+
+        _onChange: function(){
+            var state = this.getState();
+            this.onChange(state);
+            if (this.options.onChange)
+                this.options.onChange(state, this);
+        },
+
+        //getState: Return an object with the settings/state of the object -to be overwritten be inherits
+        getState: function(){
+            return {show: this.options.show };
+        },
+
+        setState: function(options){
+            $.extend(this.options, options);
+            if (this.menuPopover)
+                this.$popupElements.bsMenuPopover_setValues(this.options);
+            this.toggleShowHide(this.options.show);
             return this;
         },
 

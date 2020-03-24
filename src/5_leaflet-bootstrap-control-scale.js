@@ -35,8 +35,6 @@ https://github.com/nerik/leaflet-graphicscale
         },
 
         initialize: function(options){
-            this.options.onToggle = $.proxy(this._updateScales, this);
-
             //Set default BsButtonBox-options and own options
             L.Control.BsButtonBox.prototype.initialize.call(this, options);
             L.Util.setOptions(this, options);
@@ -49,9 +47,9 @@ https://github.com/nerik/leaflet-graphicscale
             this.options.popupList = [];
             if (options.selectFormat)
                 this.options.popupList.push(
-                    {icon: this.options.icon,         text: {da:'Skala', en:'Scale'} },
-                    {type:'checkbox',                 text: {da:'Vis km og nm', en:'Show km and nm'}, selected: this.options.showBoth, onChange: $.proxy(this._setBoth, this), closeOnClick: true},
-                    {type:'button', lineBefore: true, text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this), closeOnClick: true, }
+                    {                 icon: this.options.icon, text: {da:'Skala', en:'Scale'} },
+                    {type:'checkbox', id:'showBoth',           text: {da:'Vis km og nm', en:'Show km and nm'}, selected: this.options.showBoth, onChange: $.proxy(this._setBoth, this), closeOnClick: true},
+                    {type:'button',   lineBefore: true,        text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this), closeOnClick: true, }
                 );
                 else
                     this.options.popupList.push(
@@ -60,10 +58,10 @@ https://github.com/nerik/leaflet-graphicscale
                             text: {da:'Vis', en:'Show'}
                         },
                         {
-                            radioGroupId: 'bsScale',
+                            radioGroupId: 'mode',
                             type        :'radio',
                             closeOnClick: true,
-                            onChange: $.proxy(this.setMode, this),
+                            onChange    : $.proxy(this.setMode, this),
                             list: [
                                 {id:'metric',   text: {da:'Kilometer', en:'Metric'},     selected: this.options.mode == 'metric'  },
                                 {id:'nautical', text: {da:'Sømil', en:'Nautical miles'}, selected: this.options.mode == 'nautical'},
@@ -73,9 +71,9 @@ https://github.com/nerik/leaflet-graphicscale
                     );
         },
 
-		onAdd: function (map) {
+        onAdd: function (map) {
             this._map = map;
-			var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map ),
+            var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map ),
                 $contentContainer = this.$contentContainer.bsModal.$body;
 
             $contentContainer.empty();
@@ -89,9 +87,8 @@ https://github.com/nerik/leaflet-graphicscale
             this.$metricScaleContainer = $(this.metricScale.onAdd( this._map )).appendTo( $contentContainer );
 
             this.setMode( this.options.mode, result );
-
-			return result;
-		},
+            return result;
+        },
 
         onRemove: function (map) {
             this.metricScale.onRemove(map);
@@ -105,11 +102,14 @@ https://github.com/nerik/leaflet-graphicscale
         setBoth: function(selected){
             this.options.showBoth = selected;
             this.setMode( this.options.mode );
+            this._onChange();
         },
 
         setMode: function(mode, container){
             this.options.mode = mode;
-            mode = this.options.showBoth ? 'both' : mode;
+
+            if (this.options.selectFormat)
+                mode = this.options.showBoth ? 'both' : mode;
             $(this.getContainer() || container).toggleClass('both', mode == 'both');
 
             //naticalScale
@@ -121,6 +121,7 @@ https://github.com/nerik/leaflet-graphicscale
             this.$metricScaleContainer.toggleClass('hidden', mode == 'nautical');
 
             this._updateScales();
+            this._onChange();
         },
 
         _updateScales: function(){
@@ -128,7 +129,35 @@ https://github.com/nerik/leaflet-graphicscale
                 this.naticalScale._update();
             if (this.metricScale)
             this.metricScale._update();
-        }
+        },
+
+        onChange: function(/*state*/){
+            this._updateScales();
+        },
+
+        getState: function(BsButtonBox_getState){
+            return function () {
+                return $.extend(
+                    {
+                        mode    : this.options.mode,
+                        showBoth: this.options.showBoth
+                    },
+                    BsButtonBox_getState.call(this)
+                );
+            };
+        }(L.Control.BsButtonBox.prototype.getState),
+
+        setState: function(BsButtonBox_setState){
+            return function (options) {
+                BsButtonBox_setState.call(this, options);
+                if (this.options.selectFormat)
+                    this.setBoth(this.options.showBoth);
+                else
+                    this.setMode(this.options.mode);
+                return this;
+            };
+        }(L.Control.BsButtonBox.prototype.setState),
+
     });
 
 

@@ -20,7 +20,8 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
         _bsButtons = L.BsControl.extend({
             options: {
-                position: 'topleft'
+                position  : 'topleft',
+                isExtended: false,
             },
 
             initialize: function(options){
@@ -106,8 +107,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
             L.Util.setOptions(this, options);
 
-            //Set isExtended and default onToggle-function
-            this.isExtended = this.options.isExtended;
+            //Set default onToggle-function
             this.onToggle = $.proxy(this.toggle, this);
             if (this.options.addOnClose)
                 this.options.onClose = this.onToggle;
@@ -188,7 +188,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
                 }
             }
 
-            if (this.isExtended)
+            if (this.options.isExtended)
                 this.toggle();
 
             return $container;
@@ -198,17 +198,33 @@ Create leaflet-control for jquery-bootstrap button-classes:
             return this.$contentContainer;
         },
 
-
         //toggle : change between button-state and extended
         toggle: function(){
             this.hidePopup();
             this.hideTooltip();
             this.$container.modernizrToggle('extended');
-            this.isExtended = this.$container.hasClass('extended');
-            if (this.options.onToggle)
-                this.options.onToggle( this.isExtended );
+            this.options.isExtended = this.$container.hasClass('extended');
+            this._onChange();
             return false;
-        }
+        },
+
+        getState: function(BsControl_getState){
+            return function () {
+                return $.extend(
+                    {isExtended: !!this.options.isExtended},
+                    BsControl_getState.call(this)
+                );
+            };
+        }(L.BsControl.prototype.getState),
+
+        setState: function(BsControl_setState){
+            return function (options) {
+                BsControl_setState.call(this, options);
+                this.$container.modernizrToggle('extended', this.options.isExtended);
+                return this;
+            };
+        }(L.BsControl.prototype.setState),
+
     });
 
 

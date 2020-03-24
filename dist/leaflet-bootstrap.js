@@ -118,7 +118,7 @@ L.BsControl = extention of L.Control with
                 if (this.options.onClose && window.bsIsTouch)
                     popupList.push({type:'button', lineBefore: true, closeOnClick: true, text: this.options.closeText, onClick: this.options.onClose});
 
-                $popupElements.bsMenuPopover({
+                this.menuPopover = $popupElements.bsMenuPopover({
                     trigger     : popupTrigger,
                     delay       : popupTrigger == 'hover' ? 1000 : 0,
                     closeOnClick: true,
@@ -126,7 +126,6 @@ L.BsControl = extention of L.Control with
                     placement   : this.options.popupPlacement || 'top',
                     list        : popupList
                 });
-
             }
 
 
@@ -163,10 +162,11 @@ L.BsControl = extention of L.Control with
                 this._controlTooltipContent.push({icon: this.options.rightClickIcon, text: this.options.popupText});
             }
 
-            this.isShow = this.options.show;
-            this.isShow ? this.show() : this.hide();
+            this.options.show ? this.show() : this.hide();
             return result;
         },
+
+
 
         show: function(){
             return this.toggleShowHide(true);
@@ -178,12 +178,37 @@ L.BsControl = extention of L.Control with
 
         toggleShowHide: function( on ){
 		if ( on === undefined )
-            return this.toggleShowHide( !this.isShow );
+            return this.toggleShowHide( !this.options.show );
 
             this.$container = this.$container || $(this._container);
-            this.isShow = !!on;
+            this.options.show = !!on;
 
-            this.isShow ? this.$container.show() : this.$container.hide();
+            this.$container.css('visibility', this.options.show ? 'inherit' : 'hidden');
+            this._onChange();
+            return this;
+        },
+
+        onChange: function(/*options*/){
+            //Nothing - overwriten by ancestors
+        },
+
+        _onChange: function(){
+            var state = this.getState();
+            this.onChange(state);
+            if (this.options.onChange)
+                this.options.onChange(state, this);
+        },
+
+        //getState: Return an object with the settings/state of the object -to be overwritten be inherits
+        getState: function(){
+            return {show: this.options.show };
+        },
+
+        setState: function(options){
+            $.extend(this.options, options);
+            if (this.menuPopover)
+                this.$popupElements.bsMenuPopover_setValues(this.options);
+            this.toggleShowHide(this.options.show);
             return this;
         },
 
@@ -285,7 +310,8 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
         _bsButtons = L.BsControl.extend({
             options: {
-                position: 'topleft'
+                position  : 'topleft',
+                isExtended: false,
             },
 
             initialize: function(options){
@@ -371,8 +397,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
             L.Util.setOptions(this, options);
 
-            //Set isExtended and default onToggle-function
-            this.isExtended = this.options.isExtended;
+            //Set default onToggle-function
             this.onToggle = $.proxy(this.toggle, this);
             if (this.options.addOnClose)
                 this.options.onClose = this.onToggle;
@@ -453,7 +478,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
                 }
             }
 
-            if (this.isExtended)
+            if (this.options.isExtended)
                 this.toggle();
 
             return $container;
@@ -463,17 +488,33 @@ Create leaflet-control for jquery-bootstrap button-classes:
             return this.$contentContainer;
         },
 
-
         //toggle : change between button-state and extended
         toggle: function(){
             this.hidePopup();
             this.hideTooltip();
             this.$container.modernizrToggle('extended');
-            this.isExtended = this.$container.hasClass('extended');
-            if (this.options.onToggle)
-                this.options.onToggle( this.isExtended );
+            this.options.isExtended = this.$container.hasClass('extended');
+            this._onChange();
             return false;
-        }
+        },
+
+        getState: function(BsControl_getState){
+            return function () {
+                return $.extend(
+                    {isExtended: !!this.options.isExtended},
+                    BsControl_getState.call(this)
+                );
+            };
+        }(L.BsControl.prototype.getState),
+
+        setState: function(BsControl_setState){
+            return function (options) {
+                BsControl_setState.call(this, options);
+                this.$container.modernizrToggle('extended', this.options.isExtended);
+                return this;
+            };
+        }(L.BsControl.prototype.setState),
+
     });
 
 
@@ -670,8 +711,6 @@ https://github.com/nerik/leaflet-graphicscale
         },
 
         initialize: function(options){
-            this.options.onToggle = $.proxy(this._updateScales, this);
-
             //Set default BsButtonBox-options and own options
             L.Control.BsButtonBox.prototype.initialize.call(this, options);
             L.Util.setOptions(this, options);
@@ -684,9 +723,9 @@ https://github.com/nerik/leaflet-graphicscale
             this.options.popupList = [];
             if (options.selectFormat)
                 this.options.popupList.push(
-                    {icon: this.options.icon,         text: {da:'Skala', en:'Scale'} },
-                    {type:'checkbox',                 text: {da:'Vis km og nm', en:'Show km and nm'}, selected: this.options.showBoth, onChange: $.proxy(this._setBoth, this), closeOnClick: true},
-                    {type:'button', lineBefore: true, text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this), closeOnClick: true, }
+                    {                 icon: this.options.icon, text: {da:'Skala', en:'Scale'} },
+                    {type:'checkbox', id:'showBoth',           text: {da:'Vis km og nm', en:'Show km and nm'}, selected: this.options.showBoth, onChange: $.proxy(this._setBoth, this), closeOnClick: true},
+                    {type:'button',   lineBefore: true,        text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this), closeOnClick: true, }
                 );
                 else
                     this.options.popupList.push(
@@ -695,10 +734,10 @@ https://github.com/nerik/leaflet-graphicscale
                             text: {da:'Vis', en:'Show'}
                         },
                         {
-                            radioGroupId: 'bsScale',
+                            radioGroupId: 'mode',
                             type        :'radio',
                             closeOnClick: true,
-                            onChange: $.proxy(this.setMode, this),
+                            onChange    : $.proxy(this.setMode, this),
                             list: [
                                 {id:'metric',   text: {da:'Kilometer', en:'Metric'},     selected: this.options.mode == 'metric'  },
                                 {id:'nautical', text: {da:'Sømil', en:'Nautical miles'}, selected: this.options.mode == 'nautical'},
@@ -708,9 +747,9 @@ https://github.com/nerik/leaflet-graphicscale
                     );
         },
 
-		onAdd: function (map) {
+        onAdd: function (map) {
             this._map = map;
-			var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map ),
+            var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map ),
                 $contentContainer = this.$contentContainer.bsModal.$body;
 
             $contentContainer.empty();
@@ -724,9 +763,8 @@ https://github.com/nerik/leaflet-graphicscale
             this.$metricScaleContainer = $(this.metricScale.onAdd( this._map )).appendTo( $contentContainer );
 
             this.setMode( this.options.mode, result );
-
-			return result;
-		},
+            return result;
+        },
 
         onRemove: function (map) {
             this.metricScale.onRemove(map);
@@ -740,11 +778,14 @@ https://github.com/nerik/leaflet-graphicscale
         setBoth: function(selected){
             this.options.showBoth = selected;
             this.setMode( this.options.mode );
+            this._onChange();
         },
 
         setMode: function(mode, container){
             this.options.mode = mode;
-            mode = this.options.showBoth ? 'both' : mode;
+
+            if (this.options.selectFormat)
+                mode = this.options.showBoth ? 'both' : mode;
             $(this.getContainer() || container).toggleClass('both', mode == 'both');
 
             //naticalScale
@@ -756,6 +797,7 @@ https://github.com/nerik/leaflet-graphicscale
             this.$metricScaleContainer.toggleClass('hidden', mode == 'nautical');
 
             this._updateScales();
+            this._onChange();
         },
 
         _updateScales: function(){
@@ -763,7 +805,35 @@ https://github.com/nerik/leaflet-graphicscale
                 this.naticalScale._update();
             if (this.metricScale)
             this.metricScale._update();
-        }
+        },
+
+        onChange: function(/*state*/){
+            this._updateScales();
+        },
+
+        getState: function(BsButtonBox_getState){
+            return function () {
+                return $.extend(
+                    {
+                        mode    : this.options.mode,
+                        showBoth: this.options.showBoth
+                    },
+                    BsButtonBox_getState.call(this)
+                );
+            };
+        }(L.Control.BsButtonBox.prototype.getState),
+
+        setState: function(BsButtonBox_setState){
+            return function (options) {
+                BsButtonBox_setState.call(this, options);
+                if (this.options.selectFormat)
+                    this.setBoth(this.options.showBoth);
+                else
+                    this.setMode(this.options.mode);
+                return this;
+            };
+        }(L.Control.BsButtonBox.prototype.setState),
+
     });
 
 
@@ -1406,7 +1476,7 @@ Options for selectiong position-format and to activate context-menu
             },
 
             isExtended        : false,
-            showCursorPosition: true,
+            mode              : 'CURSOR',
             inclContextmenu   : true,   //If true a button is added to the right with info for cursor and contextmenu for map center
             selectFormat      : null    //function() to select format for position using latlng-format (fcoo/latlng-format)
         },
@@ -1416,11 +1486,8 @@ Options for selectiong position-format and to activate context-menu
             L.Control.BsButtonBox.prototype.initialize.call(this, options);
             L.Util.setOptions(this, options);
 
-
-            this.options.onToggle = $.proxy( this.setCenterMarker, this );
-
             if (window.bsIsTouch)
-                this.options.showCursorPosition = false;
+                this.options.mode = 'MAPCENTER';
 
             //Adjust tooltipDirection and popupPlacement to position
             if (this.options.position.toUpperCase().indexOf('TOP') !== -1)
@@ -1432,13 +1499,14 @@ Options for selectiong position-format and to activate context-menu
                 popupList = [
                     {text: {da:'Position ved', en:'Position at'} },
                     {
-                        radioGroupId: 'bsPosition',
+                        radioGroupId: 'mode',
                         type        : 'radio',
+                        selectedId  : this.options.mode,
                         closeOnClick: true,
-                        onChange: $.proxy(this._setModeFromRadio, this),
+                        onChange: $.proxy(this.setMode, this),
                         list: [
-                            {id:'cursor',     icon: iconCursorPosition, text: {da:'Cursor', en:'Cursor'},          selected: this.options.showCursorPosition },
-                            {id:'map-center', icon: iconMapCenter,      text: {da:'Kortcentrum', en:'Map Center'}, selected: !this.options.showCursorPosition },
+                            {id:'CURSOR',    icon: iconCursorPosition, text: {da:'Cursor', en:'Cursor'},        },
+                            {id:'MAPCENTER', icon: iconMapCenter,      text: {da:'Kortcentrum', en:'Map Center'}},
                         ]
                     }
                 ];
@@ -1590,18 +1658,13 @@ Options for selectiong position-format and to activate context-menu
         },
 
         _onLoad: function(){
-            this.setMode( this.options.showCursorPosition );
-            this.setCenterMarker( this.isExtended );
+            this.setMode( this.options.mode );
         },
 
-        _setModeFromRadio: function( id ){
-            this.setMode( id == 'cursor' );
-        },
+        setMode: function( mode ){
+            this.options.mode = mode;
 
-        setMode: function( showCursorPosition ){
-            this.options.showCursorPosition = showCursorPosition;
-
-            var isCursor = !!this.options.showCursorPosition;
+            var isCursor = (this.options.mode == 'CURSOR');
 
             this._updatePositions();
 
@@ -1612,14 +1675,34 @@ Options for selectiong position-format and to activate context-menu
                     .modernizrToggle( 'control-position-cursor',       isCursor )
                     .modernizrToggle( 'control-position-map-center',  !isCursor );
             });
+
+            this._onChange();
+
         },
 
-        setCenterMarker: function( show ){
+
+        onChange: function(/*state*/){
+            var showCenterMarker = this.options.show && this.options.isExtended && (this.options.mode == 'MAPCENTER');
             $.each(this.centerMarkers, function(id, marker){
                 var $icon = $(marker._icon);
-                show ? $icon.show() : $icon.hide();
+                showCenterMarker ? $icon.show() : $icon.hide();
             });
         },
+
+        getState: function(BsButtonBox_getState){
+            return function () {
+                return $.extend({mode: this.options.mode}, BsButtonBox_getState.call(this) );
+            };
+        }(L.Control.BsButtonBox.prototype.getState),
+
+        setState: function(BsButtonBox_setState){
+            return function (options) {
+                BsButtonBox_setState.call(this, options);
+                this.setMode(this.options.mode);
+                return this;
+            };
+        }(L.Control.BsButtonBox.prototype.setState),
+
 
 
         _onLatLngFormatChanged: function( newFormatId ){
@@ -1649,12 +1732,12 @@ Options for selectiong position-format and to activate context-menu
         },
 
         _saveAndSetMinWidth: function(){
-            if (!this.isExtended) return;
+            if (!this.options.isExtended) return;
 
             var minWidth = this.latLngFormatWidth[this.latLngFormatId] =
                     Math.max(
                         this.latLngFormatWidth[this.latLngFormatId] || 0,
-                        this.options.showCursorPosition ?
+                        this.options.mode == 'CURSOR' ?
                             this.$cursorPosition.outerWidth() :
                             this.$centerPosition.outerWidth()
                     );
@@ -1681,7 +1764,7 @@ Options for selectiong position-format and to activate context-menu
         },
 
         _onMapMove: function(){
-            if (this.isExtended && !this.options.showCursorPosition)
+            if (this.options.isExtended && (this.options.mode == 'MAPCENTER'))
                 this._onMapMoveEnd();
         },
 
@@ -1760,7 +1843,7 @@ Options for selectiong position-format and to activate context-menu
                 else
                     map.bsPositionControl.addCenterMarker(map, true);
 
-                this.setMode( this.options.showCursorPosition );
+                this.setMode( this.options.mode );
             }
             return map;
         },
@@ -1836,7 +1919,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
             extended   : false,
             showSlider : false,
             showHistory: false,
-            historyDisabled: false,
+            historyEnabled: true,
             semiTransparent: false,
 
             tooltipDirection: 'top',
@@ -1873,8 +1956,8 @@ Can be used as leaflet standard zoom control with Bootstrap style
             L.Control.BsButtonBox.prototype.initialize.call(this, options);
             L.Util.setOptions(this, options);
 
-
-            this.historyListEnabled = !this.options.historyDisabled;
+            if (!this.options.historyEnabled)
+                this.options.showHistory = false;
 
             //Adjust popupPlacement to position
             function includes(pos, substring){
@@ -1894,11 +1977,11 @@ Can be used as leaflet standard zoom control with Bootstrap style
                 this.options.tooltipDirection = 'bottom';
 
             //Set popup-item(s)
-            if (!window.bsIsTouch){
+            if (!window.bsIsTouch && this.options.historyEnabled){
                 this.options.popupList = [
 //                    {text: 'Zoom'},
 //                    {type:'checkbox', text: {da:'Vis skylder', en:'Show slider'}, selected: this.options.showSlider, onChange: $.proxy(this._showSlider, this), closeOnClick: true},
-                    {type:'checkbox', text: {da:'Vis historik-knapper', en:'Show History Buttons'}, selected: this.options.showHistory, onChange: $.proxy(this._showHistory, this), closeOnClick: true},
+                    {id: 'showHistory', type:'checkbox', text: {da:'Vis historik-knapper', en:'Show History Buttons'}, selected: this.options.showHistory, onChange: $.proxy(this._showHistory, this), closeOnClick: true},
 //                    {type:'content',  content: $historyContent,                   closeOnClick: false, lineBefore: true}
                 ];
             }
@@ -1915,7 +1998,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
             //Add zoom-control to map
             this.zoom.addTo(map);
 
-			var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map ),
+            var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map ),
                 //If touch-mode => Create the content inside the bsModal-body else create it inside the control
                 $contentContainer = window.bsIsTouch ? this.$contentContainer.bsModal.$body : this.$contentContainer;
 
@@ -1938,63 +2021,66 @@ Can be used as leaflet standard zoom control with Bootstrap style
             //$-elements with popup buttons to go back/to first and go forward/to last. Will be set later
             var $backButtons, $forwardButtons;
 
-            //Create historyList to save a list of center,zoom from the map
-            this.historyList = new window.HistoryList({
-                action  : $.proxy(this._setZoomCenter, this ),
-                onUpdate: function( backAvail, forwardAvail ){
-                    if (!$backButtons) return;
-                    $backButtons.toggleClass('disabled', !backAvail );
-                    $forwardButtons.toggleClass('disabled', !forwardAvail );
-                },
-                compare: function(zoomCenter1, zoomCenter2){
-                    return (zoomCenter1.zoom == zoomCenter2.zoom) && zoomCenter1.center.equals(zoomCenter2.center);
-                }
-            });
+            if (this.options.historyEnabled){
+                //Create historyList to save a list of center,zoom from the map
+                this.historyList = new window.HistoryList({
+                    action  : $.proxy(this._setZoomCenter, this ),
+                    onUpdate: function( backAvail, forwardAvail ){
+                        if (!$backButtons) return;
+                        $backButtons.toggleClass('disabled', !backAvail );
+                        $forwardButtons.toggleClass('disabled', !forwardAvail );
+                    },
+                    compare: function(zoomCenter1, zoomCenter2){
+                        return (zoomCenter1.zoom == zoomCenter2.zoom) && zoomCenter1.center.equals(zoomCenter2.center);
+                    }
+                });
 
-            //Append history-buttons as two vertical bsButtonGroup
-            var buttonGroupOptions = {
-                class   : 'show-for-history',
-                vertical: true,
-                center  : true,
-                buttonOptions: {
-                    square: true
-                },
-            };
+                //Append history-buttons as two vertical bsButtonGroup
+                var buttonGroupOptions = {
+                    class   : 'show-for-history',
+                    vertical: true,
+                    center  : true,
+                    buttonOptions: {
+                        square: true
+                    },
+                };
 
-            $forwardButtons =
-                $.bsButtonGroup( $.extend(buttonGroupOptions, {
-                    list: [
-                        {id:'history_last',    icon: 'fa-arrow-to-right' , onClick: $.proxy(this.historyList.goLast,    this.historyList) },
-                        {id:'history_forward', icon: 'fa-arrow-right'    , onClick: $.proxy(this.historyList.goForward, this.historyList) },
-                    ]} )
-                )
-                    .css('margin-right', '2px')
-                    .prependTo($contentContainer)
-                    .find('.btn')
-                        .addClass('disabled')
-                        .css({
-                            'border-top-left-radius': '0px',
-                            'border-bottom-left-radius': '0px'
-                        });
+                $forwardButtons =
+                    $.bsButtonGroup( $.extend(buttonGroupOptions, {
+                        list: [
+                            {id:'history_last',    icon: 'fa-arrow-to-right' , onClick: $.proxy(this.historyList.goLast,    this.historyList) },
+                            {id:'history_forward', icon: 'fa-arrow-right'    , onClick: $.proxy(this.historyList.goForward, this.historyList) },
+                        ]} )
+                    )
+                        .css('margin-right', '2px')
+                        .prependTo($contentContainer)
+                        .find('.btn')
+                            .addClass('disabled')
+                            .css({
+                                'border-top-left-radius': '0px',
+                                'border-bottom-left-radius': '0px'
+                            });
 
-            $backButtons =
-                $.bsButtonGroup( $.extend(buttonGroupOptions, {
-                    list: [
-                        {id:'history_first', icon: 'fa-arrow-to-left', onClick: $.proxy(this.historyList.goFirst, this.historyList) },
-                        {id:'history_back',  icon: 'fa-arrow-left'   , onClick: $.proxy(this.historyList.goBack,  this.historyList) },
-                    ]} )
-                )
-                    .prependTo($contentContainer)
-                    .find('.btn')
-                        .addClass('disabled')
-                        .css({
-                            'border-top-right-radius': '0px',
-                            'border-bottom-right-radius': '0px'
-                        });
+                $backButtons =
+                    $.bsButtonGroup( $.extend(buttonGroupOptions, {
+                        list: [
+                            {id:'history_first', icon: 'fa-arrow-to-left', onClick: $.proxy(this.historyList.goFirst, this.historyList) },
+                            {id:'history_back',  icon: 'fa-arrow-left'   , onClick: $.proxy(this.historyList.goBack,  this.historyList) },
+                        ]} )
+                    )
+                        .prependTo($contentContainer)
+                        .find('.btn')
+                            .addClass('disabled')
+                            .css({
+                                'border-top-right-radius': '0px',
+                                'border-bottom-right-radius': '0px'
+                            });
 
-            $contentContainer.find('.btn-group-vertical').css('margin-top', 0);
+                $contentContainer.find('.btn-group-vertical').css('margin-top', 0);
 
-            this._showHistory( '', this.options.showHistory);
+                this.showHistory(this.options.showHistory);
+
+            }   //end of if (this.options.historyEnabled){...
 
 /* SLIDER REMOVED FOR NOW. Waits for better slider-zoom in leaflet
             //Create zoom-slider between zoom-out and zoom-in buttons
@@ -2033,7 +2119,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
 
 
         enableHistory: function(on){
-            this.historyListEnabled = (on === undefined) ? true : !!on;
+            this.options.historyEnabled = (on === undefined) ? true : !!on;
             return this;
         },
 
@@ -2057,7 +2143,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
         },
 
         _onMoveEnd: function(){
-            if (this.historyListEnabled){
+            if (this.options.historyEnabled){
                 this.historyList.callAction = false;
                 this.historyList.add( this._getZoomCenter() );
                 this.historyList._callOnUpdate();
@@ -2065,6 +2151,10 @@ Can be used as leaflet standard zoom control with Bootstrap style
         },
 
         _showHistory: function(id, show){
+            this.showHistory(show);
+        },
+
+        showHistory: function(show){
             this.options.showHistory = show;
             this.$contentContainer.modernizrToggle('history', !!this.options.showHistory);
         },
@@ -2128,6 +2218,23 @@ Can be used as leaflet standard zoom control with Bootstrap style
 
 //            this._updateSlider();
         },
+
+
+        getState: function(BsButtonBox_getState){
+            return function () {
+                return $.extend({showHistory: this.options.showHistory}, BsButtonBox_getState.call(this) );
+            };
+        }(L.Control.BsButtonBox.prototype.getState),
+
+        setState: function(BsButtonBox_setState){
+            return function (options) {
+                BsButtonBox_setState.call(this, options);
+                this.showHistory(this.options.showHistory);
+                return this;
+            };
+        }(L.Control.BsButtonBox.prototype.setState),
+
+
 
     });//end of L.Control.BsZoom
 

@@ -25875,7 +25875,7 @@ if (typeof define === 'function' && define.amd) {
         var _this3 = this;
 
         var tried = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
-        var wait = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 250;
+        var wait = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 350;
         var callback = arguments.length > 5 ? arguments[5] : undefined;
         if (!lng.length) return callback(null, {}); // noting to load
 
@@ -55569,7 +55569,13 @@ module.exports = g;
                 'far fa-square'                                          //Border
             ]]
         });
-        return $.bsButton( options ).checkbox( $.extend(options, {className: 'checked'}) );
+
+        //Bug fix: To avoid bsButton to add class 'active', selected is set to false in options for bsButton
+        var bsButtonOptions = $.extend({}, options);
+        bsButtonOptions.selected = false;
+        var $result = $.bsButton( bsButtonOptions ).checkbox( $.extend(options, {className: 'checked'}) );
+
+        return $result;
     };
 
     /**********************************************************
@@ -55594,6 +55600,7 @@ module.exports = g;
             });
 
         options.baseClassPostfix = options.vertical ? options.verticalClassPostfix : options.horizontalClassPostfix;
+
         var result = $('<'+ options.tagName + '/>')
                         ._bsAddIdAndName( options )
                         ._bsAddBaseClassAndSize( options );
@@ -55970,14 +55977,6 @@ module.exports = g;
         },
 
         /*******************************************************
-        getFormGroup
-        *******************************************************/
-        getFormGroup: function(){
-            this.$formGroup = this.$formGroup || this.getElement().parents('.form-group').first();
-            return this.$formGroup;
-        },
-
-        /*******************************************************
         setValue
         *******************************************************/
         setValue: function(value, validate){
@@ -56107,12 +56106,19 @@ module.exports = g;
                     this.resetValue( true );
                 }
 
+                if (!this.$outerElement){
+                    //Find the element to show/hide
+                    this.$outerElement = this.getElement().parents('.form-group').first();
+                    if (!this.$outerElement.length)
+                        this.$outerElement = this.getElement();
+                }
+
                 if (this.options.freeSpaceWhenHidden)
                     //When the element is invisible: Use display:none
-                    this.getFormGroup().toggleClass('d-none', !show);
+                    this.$outerElement.toggleClass('d-none', !show);
                 else
                     //When the element is invisible: Use visibility:hidden to keep structure of form and it elements
-                    this.getFormGroup().css('visibility', show ? 'visible' : 'hidden');
+                    this.$outerElement.css('visibility', show ? 'visible' : 'hidden');
 
                 this.getElement().prop('disabled', !show);
 
@@ -56262,6 +56268,7 @@ module.exports = g;
 
             this.showOrHide( null );
             this.isCreated = true;
+            this.onChanging();
         },
 
         /*******************************************************
@@ -56907,7 +56914,7 @@ options
 
         //Append the items
         $.each(list, function(index, itemOptions){
-            var $item = null;
+            var $item = null, radioGroup = null;
             switch (itemOptions.type){
                 case 'button':
                     $item = $.bsButton($.extend(itemOptions, {returnFromClick: true}));
@@ -56918,7 +56925,8 @@ options
                     break;
 
                 case 'radio':
-                    $item = $.bsRadioButtonGroup(itemOptions).children();
+                    $item = $.bsRadioButtonGroup( $.extend({vertical: true}, itemOptions));
+                    radioGroup = $item.data('radioGroup');
                     break;
 
                 case 'content':
@@ -56945,6 +56953,7 @@ options
                 );
 
             options.list[index].$item = $item;
+            options.list[index].radioGroup = radioGroup;
         });
         $result.data('bsMenu_options', options);
         var update = $.proxy(updateBsMenu, $result);
@@ -56955,8 +56964,55 @@ options
         return $result;
     };
 
+    function eachBsMenuListItem( itemFunc, values, $this ){
+        $.each($this.data('bsMenu_options').list, function(index, item){
+            if (item.id && ( (item.type == 'checkbox') || (item.type == 'radio') ) )
+                itemFunc(item, values, $this );
+        });
+        return values;
+    }
 
+    $.fn._bsMenu_getValues = function(){
+        var values = {};
+        eachBsMenuListItem(
+            function( item, values ){
+                switch (item.type){
+                    case 'checkbox':
+                        values[item.id] = item.$item._cbxGet();
+                        break;
+                    case 'radio':
+                        values[item.id] = item.radioGroup.getSelected();
+                        break;
+                }
+            },
+            values,
+            this
+        );
+        return values;
+    };
 
+    $.fn._bsMenu_setValues = function(values){
+        eachBsMenuListItem(
+            function( item, values ){
+                var newValue = values[item.id];
+                if (newValue !== undefined){
+                    switch (item.type){
+                        case 'checkbox':
+                            if (item.$item._cbxGet() != newValue)
+                                item.$item._cbxSet( newValue );
+                            break;
+                        case 'radio':
+                            if (item.radioGroup.getSelected() != newValue)
+                                item.radioGroup.setSelected( newValue );
+                            break;
+                    }
+                }
+            },
+            values,
+            this
+        );
+        return values;
+    };
 }(jQuery, this, document));
 ;
 /****************************************************************************
@@ -58930,10 +58986,22 @@ options
     **********************************************************/
     $.fn.bsMenuPopover = function( options ){
         options = adjustItemOptionsForPopover(options, 'list');
-        return this.bsPopover( $.extend(options, {content: $.bsMenu(options)}) );
+
+        options.content = $.bsMenu(options);
+        this.data('popover_menu', options.content);
+
+        return this.bsPopover( options );
     };
 
 
+
+    $.fn.bsMenuPopover_getValues = function(){
+        return this.data('popover_menu')._bsMenu_getValues();
+    };
+
+    $.fn.bsMenuPopover_setValues = function( values ){
+        this.data('popover_menu')._bsMenu_setValues(values);
+    };
 
 
 }(jQuery, this, document));

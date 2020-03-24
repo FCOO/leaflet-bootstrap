@@ -39,7 +39,7 @@ Options for selectiong position-format and to activate context-menu
             },
 
             isExtended        : false,
-            showCursorPosition: true,
+            mode              : 'CURSOR',
             inclContextmenu   : true,   //If true a button is added to the right with info for cursor and contextmenu for map center
             selectFormat      : null    //function() to select format for position using latlng-format (fcoo/latlng-format)
         },
@@ -49,11 +49,8 @@ Options for selectiong position-format and to activate context-menu
             L.Control.BsButtonBox.prototype.initialize.call(this, options);
             L.Util.setOptions(this, options);
 
-
-            this.options.onToggle = $.proxy( this.setCenterMarker, this );
-
             if (window.bsIsTouch)
-                this.options.showCursorPosition = false;
+                this.options.mode = 'MAPCENTER';
 
             //Adjust tooltipDirection and popupPlacement to position
             if (this.options.position.toUpperCase().indexOf('TOP') !== -1)
@@ -65,13 +62,14 @@ Options for selectiong position-format and to activate context-menu
                 popupList = [
                     {text: {da:'Position ved', en:'Position at'} },
                     {
-                        radioGroupId: 'bsPosition',
+                        radioGroupId: 'mode',
                         type        : 'radio',
+                        selectedId  : this.options.mode,
                         closeOnClick: true,
-                        onChange: $.proxy(this._setModeFromRadio, this),
+                        onChange: $.proxy(this.setMode, this),
                         list: [
-                            {id:'cursor',     icon: iconCursorPosition, text: {da:'Cursor', en:'Cursor'},          selected: this.options.showCursorPosition },
-                            {id:'map-center', icon: iconMapCenter,      text: {da:'Kortcentrum', en:'Map Center'}, selected: !this.options.showCursorPosition },
+                            {id:'CURSOR',    icon: iconCursorPosition, text: {da:'Cursor', en:'Cursor'},        },
+                            {id:'MAPCENTER', icon: iconMapCenter,      text: {da:'Kortcentrum', en:'Map Center'}},
                         ]
                     }
                 ];
@@ -223,18 +221,13 @@ Options for selectiong position-format and to activate context-menu
         },
 
         _onLoad: function(){
-            this.setMode( this.options.showCursorPosition );
-            this.setCenterMarker( this.isExtended );
+            this.setMode( this.options.mode );
         },
 
-        _setModeFromRadio: function( id ){
-            this.setMode( id == 'cursor' );
-        },
+        setMode: function( mode ){
+            this.options.mode = mode;
 
-        setMode: function( showCursorPosition ){
-            this.options.showCursorPosition = showCursorPosition;
-
-            var isCursor = !!this.options.showCursorPosition;
+            var isCursor = (this.options.mode == 'CURSOR');
 
             this._updatePositions();
 
@@ -245,14 +238,34 @@ Options for selectiong position-format and to activate context-menu
                     .modernizrToggle( 'control-position-cursor',       isCursor )
                     .modernizrToggle( 'control-position-map-center',  !isCursor );
             });
+
+            this._onChange();
+
         },
 
-        setCenterMarker: function( show ){
+
+        onChange: function(/*state*/){
+            var showCenterMarker = this.options.show && this.options.isExtended && (this.options.mode == 'MAPCENTER');
             $.each(this.centerMarkers, function(id, marker){
                 var $icon = $(marker._icon);
-                show ? $icon.show() : $icon.hide();
+                showCenterMarker ? $icon.show() : $icon.hide();
             });
         },
+
+        getState: function(BsButtonBox_getState){
+            return function () {
+                return $.extend({mode: this.options.mode}, BsButtonBox_getState.call(this) );
+            };
+        }(L.Control.BsButtonBox.prototype.getState),
+
+        setState: function(BsButtonBox_setState){
+            return function (options) {
+                BsButtonBox_setState.call(this, options);
+                this.setMode(this.options.mode);
+                return this;
+            };
+        }(L.Control.BsButtonBox.prototype.setState),
+
 
 
         _onLatLngFormatChanged: function( newFormatId ){
@@ -282,12 +295,12 @@ Options for selectiong position-format and to activate context-menu
         },
 
         _saveAndSetMinWidth: function(){
-            if (!this.isExtended) return;
+            if (!this.options.isExtended) return;
 
             var minWidth = this.latLngFormatWidth[this.latLngFormatId] =
                     Math.max(
                         this.latLngFormatWidth[this.latLngFormatId] || 0,
-                        this.options.showCursorPosition ?
+                        this.options.mode == 'CURSOR' ?
                             this.$cursorPosition.outerWidth() :
                             this.$centerPosition.outerWidth()
                     );
@@ -314,7 +327,7 @@ Options for selectiong position-format and to activate context-menu
         },
 
         _onMapMove: function(){
-            if (this.isExtended && !this.options.showCursorPosition)
+            if (this.options.isExtended && (this.options.mode == 'MAPCENTER'))
                 this._onMapMoveEnd();
         },
 
@@ -393,7 +406,7 @@ Options for selectiong position-format and to activate context-menu
                 else
                     map.bsPositionControl.addCenterMarker(map, true);
 
-                this.setMode( this.options.showCursorPosition );
+                this.setMode( this.options.mode );
             }
             return map;
         },

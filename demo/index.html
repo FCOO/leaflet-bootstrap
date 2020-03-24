@@ -72,20 +72,21 @@
     $.each(['map', 'map2'], function(index, id){
         var nextMap = L.map(id, {
             zoomControl: first,
-            bsZoomControl: first,
+            bsZoomControl: true, //first,
             bsZoomOptions: {
-                historyDisabled: false
+                historyEnabled: first
             },
-            bsPositionControl: first,
+            bsPositionControl: true,
             bsPositionOptions: {
                 isExtended        : true,
                 showCursorPosition: true,
                 inclContextmenu   : true,
                 selectFormat: setLatLngFormat
             },
-            bsScaleControl: first,
+            bsScaleControl: true,
             bsScaleOptions: {
-                selectFormat: function(){ this.setMode(confirm('Use nautical?') ? 'nautical' : 'metric'); }
+                isExtended: true,
+                selectFormat: first ? function(){ this.setMode(confirm('Use nautical?') ? 'nautical' : 'metric'); } : null
             },
             zoomSnap: .25,
             worldCopyJump: true,
@@ -107,6 +108,8 @@
     var test = false;
 
     map.on('click', function(){
+        console.log(map.bsPositionControl.getState());
+
         test = !test;
         if (test)
             map.bsPositionControl.addOther(map2, true);
@@ -422,9 +425,25 @@
     }) );
 
     //************************************************************
+    var state, state2;
     map.addControl( L.control.bsButton({
-        icon:'fa-pencil-alt',
-        onClick: function(){ map.bsPositionControl.toggleShowHide(); }
+        icon:'fa-save',
+        onClick: function(){
+//            map.bsPositionControl.toggleShowHide();
+            state = map.bsScaleControl.getState();
+            state2 = map2.bsScaleControl.getState();
+            console.log('save 1',state);
+            console.log('save 2',state2);
+        }
+    }) );
+    map.addControl( L.control.bsButton({
+        icon:'fa-folder-open',
+        onClick: function(){
+            console.log('load 1',state);
+            console.log('load 2',state2);
+            map.bsScaleControl.setState(state);
+            map2.bsScaleControl.setState(state2);
+        }
     }) );
 
     //************************************************************

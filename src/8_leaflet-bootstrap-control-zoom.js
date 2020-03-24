@@ -30,7 +30,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
             extended   : false,
             showSlider : false,
             showHistory: false,
-            historyDisabled: false,
+            historyEnabled: true,
             semiTransparent: false,
 
             tooltipDirection: 'top',
@@ -67,8 +67,8 @@ Can be used as leaflet standard zoom control with Bootstrap style
             L.Control.BsButtonBox.prototype.initialize.call(this, options);
             L.Util.setOptions(this, options);
 
-
-            this.historyListEnabled = !this.options.historyDisabled;
+            if (!this.options.historyEnabled)
+                this.options.showHistory = false;
 
             //Adjust popupPlacement to position
             function includes(pos, substring){
@@ -88,11 +88,11 @@ Can be used as leaflet standard zoom control with Bootstrap style
                 this.options.tooltipDirection = 'bottom';
 
             //Set popup-item(s)
-            if (!window.bsIsTouch){
+            if (!window.bsIsTouch && this.options.historyEnabled){
                 this.options.popupList = [
 //                    {text: 'Zoom'},
 //                    {type:'checkbox', text: {da:'Vis skylder', en:'Show slider'}, selected: this.options.showSlider, onChange: $.proxy(this._showSlider, this), closeOnClick: true},
-                    {type:'checkbox', text: {da:'Vis historik-knapper', en:'Show History Buttons'}, selected: this.options.showHistory, onChange: $.proxy(this._showHistory, this), closeOnClick: true},
+                    {id: 'showHistory', type:'checkbox', text: {da:'Vis historik-knapper', en:'Show History Buttons'}, selected: this.options.showHistory, onChange: $.proxy(this._showHistory, this), closeOnClick: true},
 //                    {type:'content',  content: $historyContent,                   closeOnClick: false, lineBefore: true}
                 ];
             }
@@ -109,7 +109,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
             //Add zoom-control to map
             this.zoom.addTo(map);
 
-			var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map ),
+            var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map ),
                 //If touch-mode => Create the content inside the bsModal-body else create it inside the control
                 $contentContainer = window.bsIsTouch ? this.$contentContainer.bsModal.$body : this.$contentContainer;
 
@@ -132,63 +132,66 @@ Can be used as leaflet standard zoom control with Bootstrap style
             //$-elements with popup buttons to go back/to first and go forward/to last. Will be set later
             var $backButtons, $forwardButtons;
 
-            //Create historyList to save a list of center,zoom from the map
-            this.historyList = new window.HistoryList({
-                action  : $.proxy(this._setZoomCenter, this ),
-                onUpdate: function( backAvail, forwardAvail ){
-                    if (!$backButtons) return;
-                    $backButtons.toggleClass('disabled', !backAvail );
-                    $forwardButtons.toggleClass('disabled', !forwardAvail );
-                },
-                compare: function(zoomCenter1, zoomCenter2){
-                    return (zoomCenter1.zoom == zoomCenter2.zoom) && zoomCenter1.center.equals(zoomCenter2.center);
-                }
-            });
+            if (this.options.historyEnabled){
+                //Create historyList to save a list of center,zoom from the map
+                this.historyList = new window.HistoryList({
+                    action  : $.proxy(this._setZoomCenter, this ),
+                    onUpdate: function( backAvail, forwardAvail ){
+                        if (!$backButtons) return;
+                        $backButtons.toggleClass('disabled', !backAvail );
+                        $forwardButtons.toggleClass('disabled', !forwardAvail );
+                    },
+                    compare: function(zoomCenter1, zoomCenter2){
+                        return (zoomCenter1.zoom == zoomCenter2.zoom) && zoomCenter1.center.equals(zoomCenter2.center);
+                    }
+                });
 
-            //Append history-buttons as two vertical bsButtonGroup
-            var buttonGroupOptions = {
-                class   : 'show-for-history',
-                vertical: true,
-                center  : true,
-                buttonOptions: {
-                    square: true
-                },
-            };
+                //Append history-buttons as two vertical bsButtonGroup
+                var buttonGroupOptions = {
+                    class   : 'show-for-history',
+                    vertical: true,
+                    center  : true,
+                    buttonOptions: {
+                        square: true
+                    },
+                };
 
-            $forwardButtons =
-                $.bsButtonGroup( $.extend(buttonGroupOptions, {
-                    list: [
-                        {id:'history_last',    icon: 'fa-arrow-to-right' , onClick: $.proxy(this.historyList.goLast,    this.historyList) },
-                        {id:'history_forward', icon: 'fa-arrow-right'    , onClick: $.proxy(this.historyList.goForward, this.historyList) },
-                    ]} )
-                )
-                    .css('margin-right', '2px')
-                    .prependTo($contentContainer)
-                    .find('.btn')
-                        .addClass('disabled')
-                        .css({
-                            'border-top-left-radius': '0px',
-                            'border-bottom-left-radius': '0px'
-                        });
+                $forwardButtons =
+                    $.bsButtonGroup( $.extend(buttonGroupOptions, {
+                        list: [
+                            {id:'history_last',    icon: 'fa-arrow-to-right' , onClick: $.proxy(this.historyList.goLast,    this.historyList) },
+                            {id:'history_forward', icon: 'fa-arrow-right'    , onClick: $.proxy(this.historyList.goForward, this.historyList) },
+                        ]} )
+                    )
+                        .css('margin-right', '2px')
+                        .prependTo($contentContainer)
+                        .find('.btn')
+                            .addClass('disabled')
+                            .css({
+                                'border-top-left-radius': '0px',
+                                'border-bottom-left-radius': '0px'
+                            });
 
-            $backButtons =
-                $.bsButtonGroup( $.extend(buttonGroupOptions, {
-                    list: [
-                        {id:'history_first', icon: 'fa-arrow-to-left', onClick: $.proxy(this.historyList.goFirst, this.historyList) },
-                        {id:'history_back',  icon: 'fa-arrow-left'   , onClick: $.proxy(this.historyList.goBack,  this.historyList) },
-                    ]} )
-                )
-                    .prependTo($contentContainer)
-                    .find('.btn')
-                        .addClass('disabled')
-                        .css({
-                            'border-top-right-radius': '0px',
-                            'border-bottom-right-radius': '0px'
-                        });
+                $backButtons =
+                    $.bsButtonGroup( $.extend(buttonGroupOptions, {
+                        list: [
+                            {id:'history_first', icon: 'fa-arrow-to-left', onClick: $.proxy(this.historyList.goFirst, this.historyList) },
+                            {id:'history_back',  icon: 'fa-arrow-left'   , onClick: $.proxy(this.historyList.goBack,  this.historyList) },
+                        ]} )
+                    )
+                        .prependTo($contentContainer)
+                        .find('.btn')
+                            .addClass('disabled')
+                            .css({
+                                'border-top-right-radius': '0px',
+                                'border-bottom-right-radius': '0px'
+                            });
 
-            $contentContainer.find('.btn-group-vertical').css('margin-top', 0);
+                $contentContainer.find('.btn-group-vertical').css('margin-top', 0);
 
-            this._showHistory( '', this.options.showHistory);
+                this.showHistory(this.options.showHistory);
+
+            }   //end of if (this.options.historyEnabled){...
 
 /* SLIDER REMOVED FOR NOW. Waits for better slider-zoom in leaflet
             //Create zoom-slider between zoom-out and zoom-in buttons
@@ -227,7 +230,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
 
 
         enableHistory: function(on){
-            this.historyListEnabled = (on === undefined) ? true : !!on;
+            this.options.historyEnabled = (on === undefined) ? true : !!on;
             return this;
         },
 
@@ -251,7 +254,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
         },
 
         _onMoveEnd: function(){
-            if (this.historyListEnabled){
+            if (this.options.historyEnabled){
                 this.historyList.callAction = false;
                 this.historyList.add( this._getZoomCenter() );
                 this.historyList._callOnUpdate();
@@ -259,6 +262,10 @@ Can be used as leaflet standard zoom control with Bootstrap style
         },
 
         _showHistory: function(id, show){
+            this.showHistory(show);
+        },
+
+        showHistory: function(show){
             this.options.showHistory = show;
             this.$contentContainer.modernizrToggle('history', !!this.options.showHistory);
         },
@@ -322,6 +329,23 @@ Can be used as leaflet standard zoom control with Bootstrap style
 
 //            this._updateSlider();
         },
+
+
+        getState: function(BsButtonBox_getState){
+            return function () {
+                return $.extend({showHistory: this.options.showHistory}, BsButtonBox_getState.call(this) );
+            };
+        }(L.Control.BsButtonBox.prototype.getState),
+
+        setState: function(BsButtonBox_setState){
+            return function (options) {
+                BsButtonBox_setState.call(this, options);
+                this.showHistory(this.options.showHistory);
+                return this;
+            };
+        }(L.Control.BsButtonBox.prototype.setState),
+
+
 
     });//end of L.Control.BsZoom
 
