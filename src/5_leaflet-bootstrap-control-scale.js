@@ -17,7 +17,7 @@ https://github.com/nerik/leaflet-graphicscale
     L.Control.BsScale = L.Control.BsButtonBox.extend({
         options: {
             icon                : 'fa-ruler-horizontal',//Icon for bsButton
-            mode                : 'metric',             //'metric', 'nautical', or 'both'
+            mode                : 'METRIC',             //'METRIC', 'NAUTICAL', or 'BOTH'
             showBoth            : false,
             position            : 'bottomleft',
             minUnitWidth        : 40,
@@ -63,9 +63,9 @@ https://github.com/nerik/leaflet-graphicscale
                             closeOnClick: true,
                             onChange    : $.proxy(this.setMode, this),
                             list: [
-                                {id:'metric',   text: {da:'Kilometer', en:'Metric'},     selected: this.options.mode == 'metric'  },
-                                {id:'nautical', text: {da:'Sømil', en:'Nautical miles'}, selected: this.options.mode == 'nautical'},
-                                {id:'both',     text: {da:'Begge', en:'Both'},           selected: this.options.mode == 'both'    }
+                                {id:'METRIC',   text: {da:'Kilometer', en:'Metric'},     selected: this.options.mode == 'METRIC'  },
+                                {id:'NAUTICAL', text: {da:'Sømil', en:'Nautical miles'}, selected: this.options.mode == 'NAUTICAL'},
+                                {id:'BOTH',     text: {da:'Begge', en:'Both'},           selected: this.options.mode == 'BOTH'    }
                             ]
                         }
                     );
@@ -79,11 +79,11 @@ https://github.com/nerik/leaflet-graphicscale
             $contentContainer.empty();
 
             //Create and add nautical-scale
-            this.naticalScale = new L.Control.SingleScale( L.extend({type:'nautical', labelPlacement:'top', parent:this}, this.options ) );
+            this.naticalScale = new L.Control.SingleScale( L.extend({type:'NAUTICAL', labelPlacement:'top', parent:this}, this.options ) );
             this.$naticalScaleContainer = $(this.naticalScale.onAdd( this._map )).appendTo( $contentContainer );
 
             //Create and add metric-scale
-            this.metricScale = new L.Control.SingleScale( L.extend({type:'metric', labelPlacement:'bottom', parent:this}, this.options ) );
+            this.metricScale = new L.Control.SingleScale( L.extend({type:'METRIC', labelPlacement:'bottom', parent:this}, this.options ) );
             this.$metricScaleContainer = $(this.metricScale.onAdd( this._map )).appendTo( $contentContainer );
 
             this.setMode( this.options.mode, result );
@@ -109,16 +109,16 @@ https://github.com/nerik/leaflet-graphicscale
             this.options.mode = mode;
 
             if (this.options.selectFormat)
-                mode = this.options.showBoth ? 'both' : mode;
-            $(this.getContainer() || container).toggleClass('both', mode == 'both');
+                mode = this.options.showBoth ? 'BOTH' : mode;
+            $(this.getContainer() || container).toggleClass('both', mode == 'BOTH');
 
             //naticalScale
-            this.$naticalScaleContainer.toggleClass('hidden', (mode == 'metric'));
-            if ((mode == 'both') || (mode == 'nautical'))
-                this.naticalScale._setLabelPlacement( mode == 'both' ? 'top' : 'bottom' );
+            this.$naticalScaleContainer.toggleClass('hidden', (mode == 'METRIC'));
+            if ((mode == 'BOTH') || (mode == 'NAUTICAL'))
+                this.naticalScale._setLabelPlacement( mode == 'BOTH' ? 'top' : 'bottom' );
 
             //metricScale
-            this.$metricScaleContainer.toggleClass('hidden', mode == 'nautical');
+            this.$metricScaleContainer.toggleClass('hidden', mode == 'NAUTICAL');
 
             this._updateScales();
             this._onChange();
@@ -169,7 +169,7 @@ https://github.com/nerik/leaflet-graphicscale
 
     L.Control.SingleScale = L.Control.extend({
         options: {
-            type: 'nautical',//'metric', or 'nautical'
+            type: 'NAUTICAL',//'METRIC', or 'NAUTICAL'
         },
 
         onAdd: function(map) {
@@ -265,7 +265,7 @@ https://github.com/nerik/leaflet-graphicscale
                 dist = halfWorldMeters * (bounds.getNorthEast().lng - bounds.getSouthWest().lng) / 180,
                 size = this._map.getSize();
 
-            if (this.options.type == 'nautical'){
+            if (this.options.type == 'NAUTICAL'){
                 dist = dist/1.852;
             }
 
@@ -428,7 +428,7 @@ https://github.com/nerik/leaflet-graphicscale
         },
 
         _getDisplayUnit: function(meters) {
-            if (this.options.type == 'metric'){
+            if (this.options.type == 'METRIC'){
                 var displayUnit = (meters<1000) ? 'm' : 'km';
                 return {
                     unit: displayUnit,
