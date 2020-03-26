@@ -736,12 +736,13 @@ https://github.com/nerik/leaflet-graphicscale
                         {
                             radioGroupId: 'mode',
                             type        :'radio',
+                            selectedId: this.options.mode,
                             closeOnClick: true,
                             onChange    : $.proxy(this.setMode, this),
                             list: [
-                                {id:'METRIC',   text: {da:'Kilometer', en:'Metric'},     selected: this.options.mode == 'METRIC'  },
-                                {id:'NAUTICAL', text: {da:'Sømil', en:'Nautical miles'}, selected: this.options.mode == 'NAUTICAL'},
-                                {id:'BOTH',     text: {da:'Begge', en:'Both'},           selected: this.options.mode == 'BOTH'    }
+                                {id:'METRIC',   text: {da:'Kilometer', en:'Metric'}     },
+                                {id:'NAUTICAL', text: {da:'Sømil', en:'Nautical miles'} },
+                                {id:'BOTH',     text: {da:'Begge', en:'Both'}           }
                             ]
                         }
                     );
@@ -814,10 +815,7 @@ https://github.com/nerik/leaflet-graphicscale
         getState: function(BsButtonBox_getState){
             return function () {
                 return $.extend(
-                    {
-                        mode    : this.options.mode,
-                        showBoth: this.options.showBoth
-                    },
+                    this.options.selectFormat ? {showBoth: this.options.showBoth} : {mode: this.options.mode},
                     BsButtonBox_getState.call(this)
                 );
             };
