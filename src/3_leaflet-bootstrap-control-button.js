@@ -98,11 +98,15 @@ Create leaflet-control for jquery-bootstrap button-classes:
     ********************************************************************************/
     L.Control.BsButtonBox = L.Control.BsButton.extend({
         options: {
-            addOnClose: true
+            addOnClose: true,
+            isExtended: false,
+            forceExtended: false
         },
 
         initialize: function(options){
             //Set default BsButtons-options
+            if (options.forceExtended)
+                options.isExtended = true;
             L.Control.BsButton.prototype.initialize.call(this, options);
 
             L.Util.setOptions(this, options);
@@ -211,7 +215,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
         getState: function(BsControl_getState){
             return function () {
                 return $.extend(
-                    {isExtended: !!this.options.isExtended},
+                    {isExtended: this.options.forceExtended ? true : !!this.options.isExtended},
                     BsControl_getState.call(this)
                 );
             };
@@ -220,6 +224,8 @@ Create leaflet-control for jquery-bootstrap button-classes:
         setState: function(BsControl_setState){
             return function (options) {
                 BsControl_setState.call(this, options);
+                if (this.options.forceExtended)
+                    this.options.isExtended = true;
                 this.$container.modernizrToggle('extended', this.options.isExtended);
                 return this;
             };

@@ -54,12 +54,13 @@ Can be used as leaflet standard zoom control with Bootstrap style
                     noVerticalPadding  : true,
                     noHorizontalPadding: true,
                     header             : {text: {da:'Zoom/Center', en:'Zoom/Centre'}},
+                    inclHeader         : options.historyEnabled,
                     content            : 'This is not empty'
                 };
             }
             else {
                 //The Button-Box is allways extended. The history-buttons are hiden/shown using popup
-                options.extended   = true;
+                options.forceExtended = true;
                 options.addOnClose = false;
             }
 
