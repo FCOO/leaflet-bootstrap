@@ -1753,13 +1753,27 @@ Options for selectiong position-format and to activate context-menu
             return latlng.format({separator: this.latLngFormatSeparator});
         },
 
-        _onMousePosition: function ( mouseEvent ) {
+        _onMousePosition: function ( mouseEvent, fromOtherMap ) {
+            if (this.dontUpdateMousePosition) return;
+
             if ((this.mouseEvent ? this.mouseEvent.latlng : null) != (mouseEvent ? mouseEvent.latlng : null)){
-                if (mouseEvent && mouseEvent.latlng)
+                if ( mouseEvent &&
+                     mouseEvent.latlng &&
+                    (!fromOtherMap || this._map.getBounds().contains(mouseEvent.latlng))
+                   )
                     this.$cursorPosition.html( this._formatLatLng( mouseEvent.latlng ) );
                 else {
                     this._saveAndSetMinWidth();
                     this.$cursorPosition.html('&nbsp;');
+                }
+
+                if (this.syncWithList && !this.dontUpdateMousePosition){
+                    this.dontUpdateMousePosition = true;
+
+                    $.each(this.syncWithList, function(id, map){
+                        map.bsPositionControl._onMousePosition( mouseEvent, true );
+                    });
+                    this.dontUpdateMousePosition = false;
                 }
             }
             this.mouseEvent = mouseEvent;
@@ -1868,6 +1882,29 @@ Options for selectiong position-format and to activate context-menu
                 map.bsPositionControl = null;
             }
             return map;
+        },
+
+        /*****************************************************
+        Sync with other BsPosition of other maps
+        *****************************************************/
+        sync: function( map, oneWay ){
+            if (map.bsPositionControl){
+                var mapId = L.Util.stamp(map);
+                this.syncWithList = this.syncWithList || {};
+                this.syncWithList[mapId] = map;
+                if (!oneWay)
+                    map.bsPositionControl.sync(this._map, true);
+            }
+        },
+
+        desync: function( map ){
+            var mapId = L.Util.stamp(map);
+            this.syncWithList = this.syncWithList || {};
+            if (this.syncWithList[mapId]){
+                var otherPositionControl = this.syncWithList[mapId].bsPositionControl;
+                delete this.syncWithList[mapId];
+                otherPositionControl.desync( this._map );
+            }
         }
 
     });//end of L.Control.BsPosition
