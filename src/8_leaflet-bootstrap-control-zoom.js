@@ -269,6 +269,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
         showHistory: function(show){
             this.options.showHistory = show;
             this.$contentContainer.modernizrToggle('history', !!this.options.showHistory);
+            this._onChange();
         },
 
 /* SLIDER REMOVED FOR NOW. Waits for better slider-zoom in leaflet
