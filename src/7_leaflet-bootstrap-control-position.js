@@ -45,11 +45,12 @@ Options for selectiong position-format and to activate context-menu
         },
 
         initialize: function ( options ) {
+            if (window.bsIsTouch)
+                //Zoom- and history buttons are shown in a bsModal-box
+                this.forceOptions = {mode: 'MAPCENTER'};
+
             //Set default BsButtonBox-options and own options
             L.Control.BsButtonBox.prototype.initialize.call(this, options);
-
-            if (window.bsIsTouch)
-                this.options.mode = 'MAPCENTER';
 
             //Adjust tooltipDirection and popupPlacement to position
             if (this.options.position.toUpperCase().indexOf('TOP') !== -1)
