@@ -18,7 +18,7 @@ Options for selectiong position-format and to activate context-menu
     ********************************************************************************/
     L.Control.BsPosition = L.Control.BsButtonBox.extend({
         options: {
-            position    : 'bottomright',
+            position    : 'bottomleft',
             text       : '',
             icon       : [[
                 iconCursorPosition + ' icon-show-for-checked',

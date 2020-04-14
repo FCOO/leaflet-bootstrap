@@ -160,8 +160,8 @@ Can be used as leaflet standard zoom control with Bootstrap style
                 $forwardButtons =
                     $.bsButtonGroup( $.extend(buttonGroupOptions, {
                         list: [
-                            {id:'history_last',    icon: 'fa-arrow-to-right' , onClick: $.proxy(this.historyList.goLast,    this.historyList) },
-                            {id:'history_forward', icon: 'fa-arrow-right'    , onClick: $.proxy(this.historyList.goForward, this.historyList) },
+                            {id:'history_last',    icon: 'fa-arrow-to-right', bigIcon: true, onClick: $.proxy(this.historyList.goLast,    this.historyList) },
+                            {id:'history_forward', icon: 'fa-angle-right'   , bigIcon: true, onClick: $.proxy(this.historyList.goForward, this.historyList) },
                         ]} )
                     )
                         .css('margin-right', '2px')
@@ -176,8 +176,8 @@ Can be used as leaflet standard zoom control with Bootstrap style
                 $backButtons =
                     $.bsButtonGroup( $.extend(buttonGroupOptions, {
                         list: [
-                            {id:'history_first', icon: 'fa-arrow-to-left', onClick: $.proxy(this.historyList.goFirst, this.historyList) },
-                            {id:'history_back',  icon: 'fa-arrow-left'   , onClick: $.proxy(this.historyList.goBack,  this.historyList) },
+                            {id:'history_first', icon: 'fa-arrow-to-left', bigIcon: true, onClick: $.proxy(this.historyList.goFirst, this.historyList) },
+                            {id:'history_back',  icon: 'fa-angle-left'   , bigIcon: true, onClick: $.proxy(this.historyList.goBack,  this.historyList) },
                         ]} )
                     )
                         .prependTo($contentContainer)

@@ -19,7 +19,7 @@ https://github.com/nerik/leaflet-graphicscale
             icon                : 'fa-ruler-horizontal',//Icon for bsButton
             mode                : 'METRIC',             //'METRIC', 'NAUTICAL', or 'BOTH'
             showBoth            : false,
-            position            : 'bottomleft',
+            position            : 'bottomright',
             minUnitWidth        : 40,
             maxUnitsWidth       : 200,                  //Max width
             maxUnitsWidthPercent: 90,                   //Max width as percent of map wisth
