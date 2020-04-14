@@ -37,7 +37,6 @@ https://github.com/nerik/leaflet-graphicscale
         initialize: function(options){
             //Set default BsButtonBox-options and own options
             L.Control.BsButtonBox.prototype.initialize.call(this, options);
-            L.Util.setOptions(this, options);
 
             //Set default tooltip-diretion
             if (!this.options.tooltipDirection)

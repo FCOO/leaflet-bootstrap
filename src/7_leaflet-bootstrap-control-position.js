@@ -47,7 +47,6 @@ Options for selectiong position-format and to activate context-menu
         initialize: function ( options ) {
             //Set default BsButtonBox-options and own options
             L.Control.BsButtonBox.prototype.initialize.call(this, options);
-            L.Util.setOptions(this, options);
 
             if (window.bsIsTouch)
                 this.options.mode = 'MAPCENTER';

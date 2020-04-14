@@ -29,7 +29,11 @@ L.BsControl = extention of L.Control with
             onClose         : null //function. If not null and popupList not null => add as extra button to popupList with text = options.closeText
         },
 
+        //forceOptions = options to be forced (e.q. when special conditions are given). Must be set in initialize of desending objects
+        forceOptions: {},
+
         initialize: function ( options ) {
+            $.extend(options, this.forceOptions || {});
             L.Util.setOptions(this, options);
         },
 
@@ -187,7 +191,7 @@ L.BsControl = extention of L.Control with
         },
 
         setState: function(options){
-            $.extend(this.options, options);
+            $.extend(this.options, options, this.forceOptions || {});
             if (this.menuPopover)
                 this.$popupElements.bsMenuPopover_setValues(this.options);
             this.toggleShowHide(this.options.show);

@@ -75,6 +75,8 @@
             zoomControl: first,
             bsZoomControl: true, //first,
             bsZoomOptions: {
+                isExtended: false,
+                showHistory: false,
                 historyEnabled: first
             },
             bsPositionControl: true,
@@ -109,7 +111,9 @@
     map.bsPositionControl.sync(map3);
     map2.bsPositionControl.sync(map3);
 
-
+setTimeout(function(){
+    map.bsZoomControl.setState({isExtended:false});
+}, 2000);
 
 
 //HERconsole.log(map);

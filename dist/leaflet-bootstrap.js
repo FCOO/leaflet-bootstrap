@@ -47,7 +47,11 @@ L.BsControl = extention of L.Control with
             onClose         : null //function. If not null and popupList not null => add as extra button to popupList with text = options.closeText
         },
 
+        //forceOptions = options to be forced (e.q. when special conditions are given). Must be set in initialize of desending objects
+        forceOptions: {},
+
         initialize: function ( options ) {
+            $.extend(options, this.forceOptions || {});
             L.Util.setOptions(this, options);
         },
 
@@ -205,7 +209,7 @@ L.BsControl = extention of L.Control with
         },
 
         setState: function(options){
-            $.extend(this.options, options);
+            $.extend(this.options, options, this.forceOptions || {});
             if (this.menuPopover)
                 this.$popupElements.bsMenuPopover_setValues(this.options);
             this.toggleShowHide(this.options.show);
@@ -317,8 +321,6 @@ Create leaflet-control for jquery-bootstrap button-classes:
             initialize: function(options){
                 //Set default bsControl-options
                 L.BsControl.prototype.initialize.call(this, options);
-
-                L.Util.setOptions(this, options);
             },
 
             _createContent: function(){},
@@ -340,8 +342,6 @@ Create leaflet-control for jquery-bootstrap button-classes:
         initialize: function(options){
             //Set default _bsButtons-options
             _bsButtons.prototype.initialize.call(this, options);
-
-            L.Util.setOptions(this, options);
         },
 
         _createContent: function(){ return $.bsButton(this.options); }
@@ -352,8 +352,6 @@ Create leaflet-control for jquery-bootstrap button-classes:
         initialize: function(options){
             //Set default _bsButtons-options
             _bsButtons.prototype.initialize.call(this, options);
-
-            L.Util.setOptions(this, options);
         },
 
         _createContent: function(){ return $.bsCheckboxButton(this.options); }
@@ -366,8 +364,6 @@ Create leaflet-control for jquery-bootstrap button-classes:
         initialize: function(options){
             //Set default _bsButtons-options
             _bsButtons.prototype.initialize.call(this, options);
-
-            L.Util.setOptions(this, options);
         },
 
         _createContent: function(){ return $.bsButtonGroup(this.options); }
@@ -389,17 +385,11 @@ Create leaflet-control for jquery-bootstrap button-classes:
     L.Control.BsButtonBox = L.Control.BsButton.extend({
         options: {
             addOnClose: true,
-            isExtended: false,
-            forceExtended: false
+            isExtended: false
         },
 
         initialize: function(options){
-            //Set default BsButtons-options
-            if (options.forceExtended)
-                options.isExtended = true;
             L.Control.BsButton.prototype.initialize.call(this, options);
-
-            L.Util.setOptions(this, options);
 
             //Set default onToggle-function
             this.onToggle = $.proxy(this.toggle, this);
@@ -505,7 +495,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
         getState: function(BsControl_getState){
             return function () {
                 return $.extend(
-                    {isExtended: this.options.forceExtended ? true : !!this.options.isExtended},
+                    {isExtended: this.options.isExtended},
                     BsControl_getState.call(this)
                 );
             };
@@ -514,8 +504,6 @@ Create leaflet-control for jquery-bootstrap button-classes:
         setState: function(BsControl_setState){
             return function (options) {
                 BsControl_setState.call(this, options);
-                if (this.options.forceExtended)
-                    this.options.isExtended = true;
                 this.$container.modernizrToggle('extended', this.options.isExtended);
                 return this;
             };
@@ -701,7 +689,7 @@ https://github.com/nerik/leaflet-graphicscale
             icon                : 'fa-ruler-horizontal',//Icon for bsButton
             mode                : 'METRIC',             //'METRIC', 'NAUTICAL', or 'BOTH'
             showBoth            : false,
-            position            : 'bottomleft',
+            position            : 'bottomright',
             minUnitWidth        : 40,
             maxUnitsWidth       : 200,                  //Max width
             maxUnitsWidthPercent: 90,                   //Max width as percent of map wisth
@@ -719,7 +707,6 @@ https://github.com/nerik/leaflet-graphicscale
         initialize: function(options){
             //Set default BsButtonBox-options and own options
             L.Control.BsButtonBox.prototype.initialize.call(this, options);
-            L.Util.setOptions(this, options);
 
             //Set default tooltip-diretion
             if (!this.options.tooltipDirection)
@@ -1459,7 +1446,7 @@ Options for selectiong position-format and to activate context-menu
     ********************************************************************************/
     L.Control.BsPosition = L.Control.BsButtonBox.extend({
         options: {
-            position    : 'bottomright',
+            position    : 'bottomleft',
             text       : '',
             icon       : [[
                 iconCursorPosition + ' icon-show-for-checked',
@@ -1488,7 +1475,6 @@ Options for selectiong position-format and to activate context-menu
         initialize: function ( options ) {
             //Set default BsButtonBox-options and own options
             L.Control.BsButtonBox.prototype.initialize.call(this, options);
-            L.Util.setOptions(this, options);
 
             if (window.bsIsTouch)
                 this.options.mode = 'MAPCENTER';
@@ -1974,10 +1960,16 @@ Can be used as leaflet standard zoom control with Bootstrap style
         },
 
         initialize: function ( options ) {
-            //Adjust options
-            if (window.bsIsTouch){
+            if (window.bsIsTouch)
                 //Zoom- and history buttons are shown in a bsModal-box
-                options.showHistory = true;
+                this.forceOptions = {showHistory: true};
+            else
+                //The Button-Box is allways extended. The history-buttons are hiden/shown using popup
+                this.forceOptions = {isExtended: true, addOnClose: false};
+
+
+            //Adjust options
+            if (window.bsIsTouch)
                 options.content = {
                     clickable          : false,
                     semiTransparent    : true,
@@ -1987,16 +1979,9 @@ Can be used as leaflet standard zoom control with Bootstrap style
                     inclHeader         : options.historyEnabled,
                     content            : 'This is not empty'
                 };
-            }
-            else {
-                //The Button-Box is allways extended. The history-buttons are hiden/shown using popup
-                options.forceExtended = true;
-                options.addOnClose = false;
-            }
 
             //Set default BsButtonBox-options and own options
             L.Control.BsButtonBox.prototype.initialize.call(this, options);
-            L.Util.setOptions(this, options);
 
             if (!this.options.historyEnabled)
                 this.options.showHistory = false;
@@ -2090,8 +2075,8 @@ Can be used as leaflet standard zoom control with Bootstrap style
                 $forwardButtons =
                     $.bsButtonGroup( $.extend(buttonGroupOptions, {
                         list: [
-                            {id:'history_last',    icon: 'fa-arrow-to-right' , onClick: $.proxy(this.historyList.goLast,    this.historyList) },
-                            {id:'history_forward', icon: 'fa-arrow-right'    , onClick: $.proxy(this.historyList.goForward, this.historyList) },
+                            {id:'history_last',    icon: 'fa-arrow-to-right', bigIcon: true, onClick: $.proxy(this.historyList.goLast,    this.historyList) },
+                            {id:'history_forward', icon: 'fa-angle-right'   , bigIcon: true, onClick: $.proxy(this.historyList.goForward, this.historyList) },
                         ]} )
                     )
                         .css('margin-right', '2px')
@@ -2106,8 +2091,8 @@ Can be used as leaflet standard zoom control with Bootstrap style
                 $backButtons =
                     $.bsButtonGroup( $.extend(buttonGroupOptions, {
                         list: [
-                            {id:'history_first', icon: 'fa-arrow-to-left', onClick: $.proxy(this.historyList.goFirst, this.historyList) },
-                            {id:'history_back',  icon: 'fa-arrow-left'   , onClick: $.proxy(this.historyList.goBack,  this.historyList) },
+                            {id:'history_first', icon: 'fa-arrow-to-left', bigIcon: true, onClick: $.proxy(this.historyList.goFirst, this.historyList) },
+                            {id:'history_back',  icon: 'fa-angle-left'   , bigIcon: true, onClick: $.proxy(this.historyList.goBack,  this.historyList) },
                         ]} )
                     )
                         .prependTo($contentContainer)

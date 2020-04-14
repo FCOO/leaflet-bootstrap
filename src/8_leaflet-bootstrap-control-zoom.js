@@ -44,10 +44,16 @@ Can be used as leaflet standard zoom control with Bootstrap style
         },
 
         initialize: function ( options ) {
-            //Adjust options
-            if (window.bsIsTouch){
+            if (window.bsIsTouch)
                 //Zoom- and history buttons are shown in a bsModal-box
-                options.showHistory = true;
+                this.forceOptions = {showHistory: true};
+            else
+                //The Button-Box is allways extended. The history-buttons are hiden/shown using popup
+                this.forceOptions = {isExtended: true, addOnClose: false};
+
+
+            //Adjust options
+            if (window.bsIsTouch)
                 options.content = {
                     clickable          : false,
                     semiTransparent    : true,
@@ -57,16 +63,9 @@ Can be used as leaflet standard zoom control with Bootstrap style
                     inclHeader         : options.historyEnabled,
                     content            : 'This is not empty'
                 };
-            }
-            else {
-                //The Button-Box is allways extended. The history-buttons are hiden/shown using popup
-                options.forceExtended = true;
-                options.addOnClose = false;
-            }
 
             //Set default BsButtonBox-options and own options
             L.Control.BsButtonBox.prototype.initialize.call(this, options);
-            L.Util.setOptions(this, options);
 
             if (!this.options.historyEnabled)
                 this.options.showHistory = false;
