@@ -24834,6 +24834,7 @@ if (typeof define === 'function' && define.amd) {
 
     return data;
   }
+  var isIE10 = typeof window !== 'undefined' && window.navigator && window.navigator.userAgent && window.navigator.userAgent.indexOf('MSIE') > -1;
 
   var ResourceStore =
   /*#__PURE__*/
@@ -24851,7 +24852,10 @@ if (typeof define === 'function' && define.amd) {
       _classCallCheck(this, ResourceStore);
 
       _this = _possibleConstructorReturn(this, _getPrototypeOf(ResourceStore).call(this));
-      EventEmitter.call(_assertThisInitialized(_this)); // <=IE10 fix (unable to call parent constructor)
+
+      if (isIE10) {
+        EventEmitter.call(_assertThisInitialized(_this)); // <=IE10 fix (unable to call parent constructor)
+      }
 
       _this.data = data || {};
       _this.options = options;
@@ -25026,7 +25030,10 @@ if (typeof define === 'function' && define.amd) {
       _classCallCheck(this, Translator);
 
       _this = _possibleConstructorReturn(this, _getPrototypeOf(Translator).call(this));
-      EventEmitter.call(_assertThisInitialized(_this)); // <=IE10 fix (unable to call parent constructor)
+
+      if (isIE10) {
+        EventEmitter.call(_assertThisInitialized(_this)); // <=IE10 fix (unable to call parent constructor)
+      }
 
       copy(['resourceStore', 'languageUtils', 'pluralResolver', 'interpolator', 'backendConnector', 'i18nFormat', 'utils'], services, _assertThisInitialized(_this));
       _this.options = options;
@@ -26057,7 +26064,10 @@ if (typeof define === 'function' && define.amd) {
       _classCallCheck(this, Connector);
 
       _this = _possibleConstructorReturn(this, _getPrototypeOf(Connector).call(this));
-      EventEmitter.call(_assertThisInitialized(_this)); // <=IE10 fix (unable to call parent constructor)
+
+      if (isIE10) {
+        EventEmitter.call(_assertThisInitialized(_this)); // <=IE10 fix (unable to call parent constructor)
+      }
 
       _this.backend = backend;
       _this.store = store;
@@ -26409,7 +26419,10 @@ if (typeof define === 'function' && define.amd) {
       _classCallCheck(this, I18n);
 
       _this = _possibleConstructorReturn(this, _getPrototypeOf(I18n).call(this));
-      EventEmitter.call(_assertThisInitialized(_this)); // <=IE10 fix (unable to call parent constructor)
+
+      if (isIE10) {
+        EventEmitter.call(_assertThisInitialized(_this)); // <=IE10 fix (unable to call parent constructor)
+      }
 
       _this.options = transformOptions(options);
       _this.services = {};
@@ -40533,6 +40546,11 @@ module.exports = ret;
         return Promise.defaultErrorHandler( createErrorObject( reason, url ) );
     }
 
+    //Promise.defaultPrefetch = function(url, options): To be called before ALL fetch
+    Promise.defaultPrefetch = null;
+
+    //Promise.defaultFinally = function(): To be called as finally for ALL Promise.get
+    Promise.defaultFinally = null;
 
     /**************************************************************
     Promise.fetch( url, options )
@@ -40555,6 +40573,9 @@ module.exports = ret;
         //Adding parame dummy=12345678 if options.noCache: true to force no-cache. TODO: Replaced with correct header
         if (options.noCache)
             url = url + (url.indexOf('?') > 0 ? '&' : '?') + 'dummy='+Math.random().toString(36).substr(2, 9);
+
+        if (Promise.defaultPrefetch)
+            Promise.defaultPrefetch(url, options);
 
         return new Promise(function(resolve, reject) {
             var wrappedFetch = function(n) {
@@ -40696,8 +40717,15 @@ module.exports = ret;
                 result = result.catch( function(){} );
 
         //Adding finally (if any)
-        if (fin)
-            result = result.finally( fin );
+        if (fin || Promise.defaultFinally){
+            var finFunc =   fin && Promise.defaultFinally ?
+                            function(){
+                                fin.apply(null, arguments);
+                                Promise.defaultFinally.apply(null, arguments);
+                            } : fin || Promise.defaultFinally;
+
+            result = result.finally( finFunc );
+        }
 
         result.promiseOptions = options;
         return result;
@@ -51612,7 +51640,7 @@ options:
     window.TimeSlider = function (input, options, pluginCount) {
         var _this = this;
 
-        this.VERSION = "6.1.4";
+        this.VERSION = "6.1.5";
 
         //Setting default options
         this.options = $.extend( true, {}, defaultOptions, options );
@@ -51930,6 +51958,9 @@ options:
         setFormat
         ***************************************************************/
         setFormat: function( format ){
+            //Reset label-width in case time-format is changed (12h <-> 24h)
+            this.options.maxLabelWidthRem = 0;
+
             this._updateOptionsFormat( format );
             this.update();
             this.updateDisplay();

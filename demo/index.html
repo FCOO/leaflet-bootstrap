@@ -93,11 +93,12 @@
             },
             zoomSnap: .25,
             worldCopyJump: true,
+            attributionControl: false,
         }).setView([56.2, 11.5], 6);
 
         L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 18,
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors</a>'
+            //attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors</a>'
         }).addTo(nextMap);
 
         L.marker([54,12], {draggable: true}).addTo(nextMap).bindTooltip({icon:'fa-home', text:'Godt'}, {delay:2000});
@@ -110,10 +111,6 @@
     map.bsPositionControl.sync(map2);
     map.bsPositionControl.sync(map3);
     map2.bsPositionControl.sync(map3);
-
-setTimeout(function(){
-    map.bsZoomControl.setState({isExtended:false});
-}, 2000);
 
 
 //HERconsole.log(map);

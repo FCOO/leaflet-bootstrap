@@ -76,9 +76,12 @@ https://github.com/nerik/leaflet-graphicscale
             var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map ),
                 $contentContainer = this.$contentContainer.bsModal.$body;
 
-            $contentContainer.empty();
+            this.$container
+                .addClass( 'leaflet-button-box-scale' )
+                .addClass( $._bsGetSizeClass({baseClass: 'leaflet-button-box-scale', useTouchSize: true}) );
 
             //Create and add nautical-scale
+            $contentContainer.empty();
             this.naticalScale = new L.Control.SingleScale( L.extend({type:'NAUTICAL', labelPlacement:'top', parent:this}, this.options ) );
             this.$naticalScaleContainer = $(this.naticalScale.onAdd( this._map )).appendTo( $contentContainer );
 

@@ -72,6 +72,10 @@ BUTTON AND MODAL
 Opacity for semi-transparent and transparent content
 ************************************************************/
 /************************************************************
+SQUARE BUTTONS
+Dimentions for square buttons with only icons
+************************************************************/
+/************************************************************
 LABEL
 Font-sizes for labels are same siae as header but incl a xxs-size
 ************************************************************/
@@ -330,10 +334,17 @@ leaflet-bootstrap-control-scale.scss
 </div>
 
 */
+.leaflet-button-box-scale {
+  margin-bottom: 0 !important;
+  min-height: calc(2.25rem + 10px); }
+
+.leaflet-button-box-scale-sm {
+  min-height: calc(1.84375rem + 10px); }
+
 .leaflet-bootstrap-control-scale {
   overflow: hidden; }
   .leaflet-bootstrap-control-scale .modal-body {
-    padding: 4px !important; }
+    padding: 2px !important; }
 
 .leaflet-control-singlescale {
   position: relative;

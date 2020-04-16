@@ -65,7 +65,9 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
 
     L.Control.BsButtonGroup = _bsButtons.extend({
-        options       : { vertical: true },
+        options: {
+            vertical: true
+        },
 
         initialize: function(options){
             //Set default _bsButtons-options

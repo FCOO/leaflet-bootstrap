@@ -22,11 +22,20 @@ $labelWidth    : 2 * $halfLabelWidth;
 </div>
 
 */
+//Remove margin-botton and set fixed height of container to hold diffent height of content
+.leaflet-button-box-scale {
+    margin-bottom: 0 !important;
+    min-height: calc(#{$button-square-dimension} + 10px );
+}
+
+.leaflet-button-box-scale-sm {
+    min-height: calc(#{$button-square-dimension-sm} + 10px );
+}
 
 .leaflet-bootstrap-control-scale {
     overflow: hidden;
     .modal-body {
-        padding: 4px !important; //Overwrite default padding //HER skal nok være 2px
+        padding: 2px !important; //Overwrite default padding
     }
 }
 
