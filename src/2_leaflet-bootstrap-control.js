@@ -102,7 +102,7 @@ L.BsControl = extention of L.Control with
                     popupList = this.options.popupList.slice();
 
                 if (this.options.onClose && window.bsIsTouch)
-                    popupList.push({type:'button', lineBefore: true, closeOnClick: true, text: this.options.closeText, onClick: this.options.onClose});
+                    popupList.push({type:'button', lineBefore: true, closeOnClick: true, icon: 'fa-window-minimize', text: this.options.closeText, onClick: this.options.onClose});
 
                 this.menuPopover = $popupElements.bsMenuPopover({
                     trigger     : popupTrigger,

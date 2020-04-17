@@ -175,7 +175,6 @@ Create leaflet-control for jquery-bootstrap button-classes:
                     //Add default onClick if clickable and bsControl will not add popup triggered by click
                     if (modalOptions.clickable && !modalOptions.onClick && !(this.options.popupList && window.bsIsTouch))
                         modalOptions.onClick = this.onToggle;
-
                     $contentContainer._bsModalContent(modalOptions);
                 }
             }

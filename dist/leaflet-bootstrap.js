@@ -120,7 +120,7 @@ L.BsControl = extention of L.Control with
                     popupList = this.options.popupList.slice();
 
                 if (this.options.onClose && window.bsIsTouch)
-                    popupList.push({type:'button', lineBefore: true, closeOnClick: true, text: this.options.closeText, onClick: this.options.onClose});
+                    popupList.push({type:'button', lineBefore: true, closeOnClick: true, icon: 'fa-window-minimize', text: this.options.closeText, onClick: this.options.onClose});
 
                 this.menuPopover = $popupElements.bsMenuPopover({
                     trigger     : popupTrigger,
@@ -469,7 +469,6 @@ Create leaflet-control for jquery-bootstrap button-classes:
                     //Add default onClick if clickable and bsControl will not add popup triggered by click
                     if (modalOptions.clickable && !modalOptions.onClick && !(this.options.popupList && window.bsIsTouch))
                         modalOptions.onClick = this.onToggle;
-
                     $contentContainer._bsModalContent(modalOptions);
                 }
             }
@@ -720,7 +719,7 @@ https://github.com/nerik/leaflet-graphicscale
                 this.options.popupList.push(
                     {                 icon: this.options.icon, text: {da:'Skala', en:'Scale'} },
                     {type:'checkbox', id:'showBoth',           text: {da:'Vis km og nm', en:'Show km and nm'}, selected: this.options.showBoth, onChange: $.proxy(this._setBoth, this), closeOnClick: true},
-                    {type:'button',   lineBefore: true,        text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this), closeOnClick: true, }
+                    {type:'button',   icon:'fa-cog',           text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this), closeOnClick: true, }
                 );
                 else
                     this.options.popupList.push(
@@ -1509,7 +1508,7 @@ Options for selectiong position-format and to activate context-menu
 
             if (this.options.selectFormat)
                 popupList.push(
-                    {type:'button', closeOnClick: true, lineBefore: true, text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this)}
+                    {type:'button', closeOnClick: true, icon: 'fa-cog', text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this)}
                 );
             this.options.popupList = popupList.length ? popupList : null;
 

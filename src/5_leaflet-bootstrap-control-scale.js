@@ -48,7 +48,7 @@ https://github.com/nerik/leaflet-graphicscale
                 this.options.popupList.push(
                     {                 icon: this.options.icon, text: {da:'Skala', en:'Scale'} },
                     {type:'checkbox', id:'showBoth',           text: {da:'Vis km og nm', en:'Show km and nm'}, selected: this.options.showBoth, onChange: $.proxy(this._setBoth, this), closeOnClick: true},
-                    {type:'button',   lineBefore: true,        text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this), closeOnClick: true, }
+                    {type:'button',   icon:'fa-cog',           text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this), closeOnClick: true, }
                 );
                 else
                     this.options.popupList.push(
