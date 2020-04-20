@@ -379,7 +379,7 @@ leaflet-bootstrap-control-scale.scss
 .leaflet-bootstrap-control-scale {
   overflow: hidden; }
   .leaflet-bootstrap-control-scale .modal-body {
-    padding: 4px !important; }
+    padding: 2px !important; }
 
 .leaflet-control-singlescale {
   position: relative;
