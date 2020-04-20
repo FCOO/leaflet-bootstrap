@@ -10,9 +10,44 @@
 (function (/*$, L, window, document, undefined*/) {
     "use strict";
 
+
 }(jQuery, L, this, document));
 
 
+
+
+;
+/****************************************************************************
+9_leaflet-bootstrap-control-attribution.js
+
+Create standard attribution control, but with position='bottomleft' and hide by css visibility
+
+****************************************************************************/
+(function ($, L/*, window, document, undefined*/) {
+    "use strict";
+
+    var defaultBsAttributionOptions = {
+            position: 'bottomleft',
+            prefix  : false
+        };
+
+    L.Map.mergeOptions({
+        bsAttributionControl: false
+    });
+
+    L.Map.addInitHook(function () {
+        if (this.options.bsAttributionControl) {
+            this.bsAttributionControl = L.control.attribution( defaultBsAttributionOptions );
+
+            this.bsAttributionControl.addTo(this);
+            $(this.bsAttributionControl._container).addClass('leaflet-control-attribution-bs');
+
+            $(this._container).addClass('has-control-attribution-bs');
+        }
+    });
+
+
+}(jQuery, L, this, document));
 
 
 ;
@@ -1373,6 +1408,7 @@ https://github.com/nerik/leaflet-graphicscale
                         );
                     }
 
+                    item.class = 'text-truncate';
                     list.push(item);
                 });
             });
@@ -2597,6 +2633,7 @@ Adjust standard Leaflet popup to display as Bootstrap modal
             if (this && this.options){
                 options =
                     $.extend({
+keepInView: true,
                         sticky          : !this.options.tooltipPermanent,       //If true, the tooltip will follow the mouse instead of being fixed at the feature center.
                         interactive     : false,                                //If true, the tooltip will listen to the feature events.
                         permanent       : this.options.tooltipPermanent,        //Whether to open the tooltip permanently or only on mouseover.

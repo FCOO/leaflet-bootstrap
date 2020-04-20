@@ -1,4 +1,4 @@
-/***********************************************
+ /***********************************************
 	leaflet-bootstrap.scss,
 
 	(c) 2017, FCOO
@@ -36,6 +36,9 @@
 @import "../bower_components/jquery-bootstrap/src/mixins";
 
 
+//Default variables and values
+@import "leaflet-bootstrap-variables";
+
 //Style for fonts
 @import "leaflet-bootstrap-fonts";
 
@@ -47,6 +50,12 @@
 
 //Style for modal-controls
 @import "leaflet-bootstrap-modal";
+
+//Style for all controls
+@import "leaflet-bootstrap-control";
+
+//Style for control-attribution
+@import "leaflet-bootstrap-control-attribution";
 
 //Style for control-button
 @import "leaflet-bootstrap-control-button";

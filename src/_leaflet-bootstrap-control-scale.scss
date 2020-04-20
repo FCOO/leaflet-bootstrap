@@ -25,17 +25,34 @@ $labelWidth    : 2 * $halfLabelWidth;
 //Remove margin-botton and set fixed height of container to hold diffent height of content
 .leaflet-button-box-scale {
     margin-bottom: 0 !important;
-    min-height: calc(#{$button-square-dimension} + 10px );
 }
 
-.leaflet-button-box-scale-sm {
-    min-height: calc(#{$button-square-dimension-sm} + 10px );
+.leaflet-container:not(.has-control-attribution-bs) {
+    .leaflet-button-box-scale {
+        min-height: calc(#{$button-square-dimension} + #{$leaflet-control-margin-bottom} );
+    }
+
+    .leaflet-button-box-scale-sm {
+        min-height: calc(#{$button-square-dimension-sm} + #{$leaflet-control-margin-bottom} );
+    }
 }
+
+.leaflet-container.has-control-attribution-bs {
+    .leaflet-button-box-scale {
+        min-height: calc(#{$button-square-dimension} + #{$leaflet-control-last-bottom-right-margin-bottom} );
+    }
+
+    .leaflet-button-box-scale-sm {
+        min-height: calc(#{$button-square-dimension-sm} + #{$leaflet-control-last-bottom-right-margin-bottom} );
+    }
+}
+
+
 
 .leaflet-bootstrap-control-scale {
     overflow: hidden;
     .modal-body {
-        padding: 2px !important; //Overwrite default padding
+        padding: 4px !important; //Overwrite default padding
     }
 }
 

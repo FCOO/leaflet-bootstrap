@@ -1,0 +1,30 @@
+/***********************************************
+leaflet-bootstrap-control.scss
+************************************************/
+
+.leaflet-container:not(.has-control-attribution-bs) .leaflet-control-container {
+    .leaflet-bottom {
+        .leaflet-control {
+            margin-bottom: $leaflet-control-margin-bottom;
+        }
+    }
+}
+
+//If a bsAttribution control is add (bottom-left) => adjust second-last control in bottom-left and last control in bottom right to align
+.leaflet-container.has-control-attribution-bs .leaflet-control-container {
+
+    .leaflet-bottom.leaflet-left {
+        .leaflet-control:nth-last-child(2) {
+            //The last control before the bsAttribution control
+            margin-bottom: $leaflet-control-attribution-bs-margin-top;
+        }
+    }
+
+    .leaflet-bottom.leaflet-right {
+        .leaflet-control:last-child {
+            //The last control in bottom right when bsAttribution control is added in bottom left
+            margin-bottom: $leaflet-control-last-bottom-right-margin-bottom;
+        }
+    }
+
+}

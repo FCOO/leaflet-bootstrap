@@ -155,6 +155,9 @@ MARGIN-BOTTOM FOR ELEMENTS IN MODAL
 All elements in modal-windows get same margin-bottom
 ************************************************************/
 /***********************************************
+leaflet-bootstrap-variables.scss
+************************************************/
+/***********************************************
 leaflet-bootstrap-fonts.scss,
 Font-family for four icons used in leaflet-bootstrap
 ************************************************/
@@ -312,6 +315,30 @@ leaflet-bootstrap-tooltip.scss,
   margin: 0; }
 
 /***********************************************
+leaflet-bootstrap-control.scss
+************************************************/
+.leaflet-container:not(.has-control-attribution-bs) .leaflet-control-container .leaflet-bottom .leaflet-control {
+  margin-bottom: 10px; }
+
+.leaflet-container.has-control-attribution-bs .leaflet-control-container .leaflet-bottom.leaflet-left .leaflet-control:nth-last-child(2) {
+  margin-bottom: 2px; }
+
+.leaflet-container.has-control-attribution-bs .leaflet-control-container .leaflet-bottom.leaflet-right .leaflet-control:last-child {
+  margin-bottom: 13px; }
+
+/***********************************************
+leaflet-bootstrap-control-attribution.scss
+************************************************/
+.leaflet-control-container .leaflet-control-attribution.leaflet-control-attribution-bs {
+  font-size: 11px;
+  line-height: 1;
+  height: 11px;
+  cursor: default;
+  background: rgba(255, 255, 255, 0.5); }
+  .mouse-hover .leaflet-control-container .leaflet-control-attribution.leaflet-control-attribution-bs:hover {
+    background: rgba(255, 255, 255, 0.75); }
+
+/***********************************************
 leaflet-bootstrap-control-button.scss
 ************************************************/
 .leaflet-control.leaflet-button-box.extended .hide-for-extended {
@@ -335,16 +362,24 @@ leaflet-bootstrap-control-scale.scss
 
 */
 .leaflet-button-box-scale {
-  margin-bottom: 0 !important;
+  margin-bottom: 0 !important; }
+
+.leaflet-container:not(.has-control-attribution-bs) .leaflet-button-box-scale {
   min-height: calc(2.25rem + 10px); }
 
-.leaflet-button-box-scale-sm {
+.leaflet-container:not(.has-control-attribution-bs) .leaflet-button-box-scale-sm {
   min-height: calc(1.84375rem + 10px); }
+
+.leaflet-container.has-control-attribution-bs .leaflet-button-box-scale {
+  min-height: calc(2.25rem + 13px); }
+
+.leaflet-container.has-control-attribution-bs .leaflet-button-box-scale-sm {
+  min-height: calc(1.84375rem + 13px); }
 
 .leaflet-bootstrap-control-scale {
   overflow: hidden; }
   .leaflet-bootstrap-control-scale .modal-body {
-    padding: 2px !important; }
+    padding: 4px !important; }
 
 .leaflet-control-singlescale {
   position: relative;

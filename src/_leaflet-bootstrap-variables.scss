@@ -1,0 +1,17 @@
+/***********************************************
+leaflet-bootstrap-variables.scss
+************************************************/
+
+//Dimentions of bsAttribution control
+$leaflet-control-attribution-font-size: 11px;
+$leaflet-control-attribution-height   : $leaflet-control-attribution-font-size + 0px;
+
+
+//Standard leaflet control margin-bottom
+$leaflet-control-margin-bottom: 10px;
+
+$leaflet-control-attribution-bs-margin-top: 2px; //Distance between bsAttribution-control and prervious control
+
+//Special margin-bottom for last control bottom-right when bsAttribution is added to align with second-last control bottom-left
+$leaflet-control-last-bottom-right-margin-bottom: $leaflet-control-attribution-bs-margin-top + $leaflet-control-attribution-height;
+

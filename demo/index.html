@@ -16,15 +16,15 @@
         html, body {
             padding: 0; margin: 0; width:100%; height:100%;
         }
-        #map, #map2, #map3 {
+        #map {
         margin: 2px !important;
-            padding: 0; margin: 0; width:33%; height:99%;
+            padding: 0; margin: 0; width:50%; height:99%;
         }
-        .NIELS {
-            background: yellow !important;
-            white-space: nowrap;
-            _max-width: 130px;
+        #map2, #map3 {
+        margin: 2px !important;
+            padding: 0; margin: 0; width:25%; height:99%;
         }
+
     </style>
 
 </head>
@@ -35,13 +35,14 @@
     <div id="map3"></div>
     <script src="bower_components.js"></script>
     <script src="../src/1_leaflet-bootstrap.js"></script>
-    <script src="../src/2_leaflet-bootstrap-control.js"></script>
-    <script src="../src/3_leaflet-bootstrap-control-button.js"></script>
-    <script src="../src/4_leaflet-bootstrap-control-modal.js"></script>
-    <script src="../src/5_leaflet-bootstrap-control-scale.js"></script>
-    <script src="../src/6_leaflet-bootstrap-contextmenu.js"></script>
-    <script src="../src/7_leaflet-bootstrap-control-position.js"></script>
-    <script src="../src/8_leaflet-bootstrap-control-zoom.js"></script>
+    <script src="../src/2_leaflet-bootstrap-control-attribution.js"></script>
+    <script src="../src/3_leaflet-bootstrap-control.js"></script>
+    <script src="../src/4_leaflet-bootstrap-control-button.js"></script>
+    <script src="../src/5_leaflet-bootstrap-control-modal.js"></script>
+    <script src="../src/6_leaflet-bootstrap-control-scale.js"></script>
+    <script src="../src/7_leaflet-bootstrap-contextmenu.js"></script>
+    <script src="../src/8_leaflet-bootstrap-control-position.js"></script>
+    <script src="../src/9_leaflet-bootstrap-control-zoom.js"></script>
     <script src="../src/leaflet-bootstrap-popup.js"></script>
     <script src="../src/leaflet-bootstrap-tooltip.js"></script>
 
@@ -99,11 +100,12 @@
             zoomSnap: .25,
             worldCopyJump: true,
             attributionControl: false,
+            bsAttributionControl: first,
         }).setView([56.2, 11.5], 6);
 
         L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 18,
-            //attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors</a>'
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors</a>'
         }).addTo(nextMap);
 
         L.marker([54,12], {draggable: true}).addTo(nextMap).bindTooltip({icon:'fa-home', text:'Godt'}, {delay:2000});
@@ -513,6 +515,7 @@
 
     };
 //*/
+console.log(map);
     </script>
 </body>
 </html>
