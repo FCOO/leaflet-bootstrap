@@ -237,6 +237,7 @@
                         );
                     }
 
+                    item.class = 'text-truncate';
                     list.push(item);
                 });
             });

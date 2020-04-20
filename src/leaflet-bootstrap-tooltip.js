@@ -77,6 +77,7 @@
             if (this && this.options){
                 options =
                     $.extend({
+keepInView: true,
                         sticky          : !this.options.tooltipPermanent,       //If true, the tooltip will follow the mouse instead of being fixed at the feature center.
                         interactive     : false,                                //If true, the tooltip will listen to the feature events.
                         permanent       : this.options.tooltipPermanent,        //Whether to open the tooltip permanently or only on mouseover.
