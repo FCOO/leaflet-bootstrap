@@ -11856,10 +11856,10 @@ select.selectpicker {
   .has-error .bootstrap-select .dropdown-toggle,
   .error .bootstrap-select .dropdown-toggle,
   .bootstrap-select.is-invalid .dropdown-toggle,
-  .was-validated .bootstrap-select .selectpicker:invalid + .dropdown-toggle {
+  .was-validated .bootstrap-select select:invalid + .dropdown-toggle {
     border-color: #b94a48; }
   .bootstrap-select.is-valid .dropdown-toggle,
-  .was-validated .bootstrap-select .selectpicker:valid + .dropdown-toggle {
+  .was-validated .bootstrap-select select:valid + .dropdown-toggle {
     border-color: #28a745; }
   .bootstrap-select.fit-width {
     width: auto !important; }
@@ -12200,6 +12200,10 @@ $font-size-xs  : .75rem     12px
 /************************************************************
 BUTTON AND MODAL
 Opacity for semi-transparent and transparent content
+************************************************************/
+/************************************************************
+SQUARE BUTTONS
+Dimentions for square buttons with only icons
 ************************************************************/
 /************************************************************
 LABEL

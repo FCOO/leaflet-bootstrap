@@ -1738,9 +1738,10 @@ Options for selectiong position-format and to activate context-menu
 
         _onLatLngFormatChanged: function( newFormatId ){
             this.latLngFormatId = newFormatId;
+
             this.latLngFormatSeparator =
                 [window.latLngFormat.LATLNGFORMAT_DMSS, window.latLngFormat.LATLNGFORMAT_DMM, window.latLngFormat.LATLNGFORMAT_DD].indexOf(newFormatId) >= 0 ?
-                '<br>' : '';
+                '<br>' : '&nbsp;';
 
             //Reste min-width
             this.$cursorPosition.css('min-width', 'initial');
