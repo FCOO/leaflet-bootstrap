@@ -18334,7 +18334,7 @@ return jQuery;
 }(jQuery, this, document));
 ;
 /*!
- * Bootstrap-select v1.13.15 (https://developer.snapappointments.com/bootstrap-select)
+ * Bootstrap-select v1.13.16 (https://developer.snapappointments.com/bootstrap-select)
  *
  * Copyright 2012-2020 SnapAppointments, LLC
  * Licensed under MIT (https://github.com/snapappointments/bootstrap-select/blob/master/LICENSE)
@@ -19012,6 +19012,7 @@ return jQuery;
   }
 
   var elementTemplates = {
+    div: document.createElement('div'),
     span: document.createElement('span'),
     i: document.createElement('i'),
     subtext: document.createElement('small'),
@@ -19020,6 +19021,9 @@ return jQuery;
     whitespace: document.createTextNode('\u00A0'),
     fragment: document.createDocumentFragment()
   }
+
+  elementTemplates.noResults = elementTemplates.li.cloneNode(false);
+  elementTemplates.noResults.className = 'no-results';
 
   elementTemplates.a.setAttribute('role', 'option');
   if (version.major === '4') elementTemplates.a.className = 'dropdown-item';
@@ -19063,7 +19067,7 @@ return jQuery;
         }
       }
 
-      if (typeof classes !== 'undefined' && classes !== '') a.classList.add.apply(a.classList, classes.split(' '));
+      if (typeof classes !== 'undefined' && classes !== '') a.classList.add.apply(a.classList, classes.split(/\s+/));
       if (inline) a.setAttribute('style', inline);
 
       return a;
@@ -19138,6 +19142,13 @@ return jQuery;
     }
   }
 
+  function showNoResults (searchMatch, searchValue) {
+    if (!searchMatch.length) {
+      elementTemplates.noResults.innerHTML = this.options.noneResultsText.replace('{0}', '"' + htmlEscape(searchValue) + '"');
+      this.$menuInner[0].firstChild.appendChild(elementTemplates.noResults);
+    }
+  }
+
   var Selectpicker = function (element, options) {
     var that = this;
 
@@ -19199,7 +19210,7 @@ return jQuery;
     this.init();
   };
 
-  Selectpicker.VERSION = '1.13.15';
+  Selectpicker.VERSION = '1.13.16';
 
   // part of this is duplicated in i18n/defaults-en_US.js. Make sure to update both.
   Selectpicker.DEFAULTS = {
@@ -19866,7 +19877,8 @@ return jQuery;
 
       function addOptgroup (index, selectOptions) {
         var optgroup = selectOptions[index],
-            previous = selectOptions[index - 1],
+            // skip placeholder option
+            previous = index - 1 < startIndex ? false : selectOptions[index - 1],
             next = selectOptions[index + 1],
             options = optgroup.querySelectorAll('option' + optionSelector);
 
@@ -19979,6 +19991,7 @@ return jQuery;
             break;
         }
 
+        item.element = liElement;
         mainElements.push(liElement);
 
         // count the number of characters in the option - not perfect, but should work in most cases
@@ -20148,7 +20161,7 @@ return jQuery;
       if (version.major < 4) {
         newElement.classList.add('bs3');
 
-        if (newElement.parentNode.classList.contains('input-group') &&
+        if (newElement.parentNode.classList && newElement.parentNode.classList.contains('input-group') &&
             (newElement.previousElementSibling || newElement.nextElementSibling) &&
             (newElement.previousElementSibling || newElement.nextElementSibling).classList.contains('input-group-addon')
         ) {
@@ -20175,17 +20188,17 @@ return jQuery;
     liHeight: function (refresh) {
       if (!refresh && (this.options.size === false || Object.keys(this.sizeInfo).length)) return;
 
-      var newElement = document.createElement('div'),
-          menu = document.createElement('div'),
-          menuInner = document.createElement('div'),
+      var newElement = elementTemplates.div.cloneNode(false),
+          menu = elementTemplates.div.cloneNode(false),
+          menuInner = elementTemplates.div.cloneNode(false),
           menuInnerInner = document.createElement('ul'),
-          divider = document.createElement('li'),
-          dropdownHeader = document.createElement('li'),
-          li = document.createElement('li'),
-          a = document.createElement('a'),
-          text = document.createElement('span'),
+          divider = elementTemplates.li.cloneNode(false),
+          dropdownHeader = elementTemplates.li.cloneNode(false),
+          li,
+          a = elementTemplates.a.cloneNode(false),
+          text = elementTemplates.span.cloneNode(false),
           header = this.options.header && this.$menu.find('.' + classNames.POPOVERHEADER).length > 0 ? this.$menu.find('.' + classNames.POPOVERHEADER)[0].cloneNode(true) : null,
-          search = this.options.liveSearch ? document.createElement('div') : null,
+          search = this.options.liveSearch ? elementTemplates.div.cloneNode(false) : null,
           actions = this.options.actionsBox && this.multiple && this.$menu.find('.bs-actionsbox').length > 0 ? this.$menu.find('.bs-actionsbox')[0].cloneNode(true) : null,
           doneButton = this.options.doneButton && this.multiple && this.$menu.find('.bs-donebutton').length > 0 ? this.$menu.find('.bs-donebutton')[0].cloneNode(true) : null,
           firstOption = this.$element.find('option')[0];
@@ -20204,8 +20217,21 @@ return jQuery;
       dropdownHeader.className = 'dropdown-header';
 
       text.appendChild(document.createTextNode('\u200b'));
-      a.appendChild(text);
-      li.appendChild(a);
+
+      if (this.selectpicker.current.data.length) {
+        for (var i = 0; i < this.selectpicker.current.data.length; i++) {
+          var data = this.selectpicker.current.data[i];
+          if (data.type === 'option') {
+            li = data.element;
+            break;
+          }
+        }
+      } else {
+        li = elementTemplates.li.cloneNode(false);
+        a.appendChild(text);
+        li.appendChild(a);
+      }
+
       dropdownHeader.appendChild(text.cloneNode(true));
 
       if (this.selectpicker.view.widestOption) {
@@ -20932,8 +20958,7 @@ return jQuery;
     },
 
     liveSearchListener: function () {
-      var that = this,
-          noResults = document.createElement('li');
+      var that = this;
 
       this.$button.on('click.bs.dropdown.data-api', function () {
         if (!!that.$searchbox.val()) {
@@ -21001,12 +21026,7 @@ return jQuery;
           that.$menuInner.scrollTop(0);
           that.selectpicker.search.elements = searchMatch;
           that.createView(true);
-
-          if (!searchMatch.length) {
-            noResults.className = 'no-results';
-            noResults.innerHTML = that.options.noneResultsText.replace('{0}', '"' + htmlEscape(searchValue) + '"');
-            that.$menuInner[0].firstChild.appendChild(noResults);
-          }
+          showNoResults.call(that, searchMatch, searchValue);
         } else {
           that.$menuInner.scrollTop(0);
           that.createView(false);
@@ -21332,9 +21352,9 @@ return jQuery;
       this.options = config;
 
       this.checkDisabled();
+      this.buildData();
       this.setStyle();
       this.render();
-      this.buildData();
       this.buildList();
       this.setWidth();
 
@@ -21488,13 +21508,19 @@ return jQuery;
     return this;
   };
 
-  // wait until whole page has loaded to set function in case Bootstrap isn't available yet
-  var bootstrapKeydown = function () {};
+  // get Bootstrap's keydown event handler for either Bootstrap 4 or Bootstrap 3
+  function keydownHandler () {
+    if ($.fn.dropdown) {
+      // wait to define until function is called in case Bootstrap isn't loaded yet
+      var bootstrapKeydown = $.fn.dropdown.Constructor._dataApiKeydownHandler || $.fn.dropdown.Constructor.prototype.keydown;
+      return bootstrapKeydown.apply(this, arguments);
+    }
+  }
 
   $(document)
     .off('keydown.bs.dropdown.data-api')
-    .on('keydown.bs.dropdown.data-api', ':not(.bootstrap-select) > [data-toggle="dropdown"]', bootstrapKeydown)
-    .on('keydown.bs.dropdown.data-api', ':not(.bootstrap-select) > .dropdown-menu', bootstrapKeydown)
+    .on('keydown.bs.dropdown.data-api', ':not(.bootstrap-select) > [data-toggle="dropdown"]', keydownHandler)
+    .on('keydown.bs.dropdown.data-api', ':not(.bootstrap-select) > .dropdown-menu', keydownHandler)
     .on('keydown' + EVENT_KEY, '.bootstrap-select [data-toggle="dropdown"], .bootstrap-select [role="listbox"], .bootstrap-select .bs-searchbox input', Selectpicker.prototype.keydown)
     .on('focusin.modal', '.bootstrap-select [data-toggle="dropdown"], .bootstrap-select [role="listbox"], .bootstrap-select .bs-searchbox input', function (e) {
       e.stopPropagation();
@@ -21503,9 +21529,6 @@ return jQuery;
   // SELECTPICKER DATA-API
   // =====================
   $(window).on('load' + EVENT_KEY + '.data-api', function () {
-    // get Bootstrap's keydown event handler for either Bootstrap 4 or Bootstrap 3
-    bootstrapKeydown = $.fn.dropdown.Constructor._dataApiKeydownHandler || $.fn.dropdown.Constructor.prototype.keydown;
-
     $('.selectpicker').each(function () {
       var $selectpicker = $(this);
       Plugin.call($selectpicker, $selectpicker.data());
@@ -55021,13 +55044,14 @@ module.exports = g;
 /*global ActiveXObject, window, console, define, module, jQuery */
 //jshint unused:false, strict: false
 
-/*
-    PDFObject v2.1.1
-    https://github.com/pipwerks/PDFObject
-    Copyright (c) 2008-2018 Philip Hutchison
-    MIT-style license: http://pipwerks.mit-license.org/
-    UMD module pattern from https://github.com/umdjs/umd/blob/master/templates/returnExports.js
-*/
+/**
+ *  PDFObject v2.1.1
+ *  https://github.com/pipwerks/PDFObject
+ *  @license
+ *  Copyright (c) 2008-2018 Philip Hutchison
+ *  MIT-style license: http://pipwerks.mit-license.org/
+ *  UMD module pattern from https://github.com/umdjs/umd/blob/master/templates/returnExports.js
+ */
 
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
@@ -55059,6 +55083,7 @@ module.exports = g;
         //declare booleans
         supportsPDFs,
         isIE,
+        isSafariOsx,
         supportsPdfMimeType = (typeof navigator.mimeTypes !== "undefined" && typeof navigator.mimeTypes['application/pdf'] !== "undefined"),
         supportsPdfActiveX,
         isModernBrowser = (function (){ return (typeof window.Promise !== "undefined"); })(),
@@ -55080,8 +55105,10 @@ module.exports = g;
         embedError,
         embed,
         getTargetElement,
+        appendTargetClassName,
         generatePDFJSiframe,
-        generateEmbedElement;
+        generateEmbedElement,
+        generateIframeElement;
 
 
     /* ----------------------------------------------------
@@ -55106,6 +55133,13 @@ module.exports = g;
     //Constructed as a method (not a prop) to avoid unneccesarry overhead -- will only be evaluated if needed
     isIE = function (){ return !!(window.ActiveXObject || "ActiveXObject" in window); };
 
+    // Detect desktop Safari
+    isSafariOsx = (
+        !isIOS &&
+        navigator.vendor && navigator.vendor.indexOf('Apple') !== -1 &&
+        navigator.userAgent && navigator.userAgent.indexOf('Safari') !== -1
+    );
+
     //If either ActiveX support for "AcroPDF.PDF" or "PDF.PdfCtrl" are found, return true
     //Constructed as a method (not a prop) to avoid unneccesarry overhead -- will only be evaluated if needed
     supportsPdfActiveX = function (){ return !!(createAXO("AcroPDF.PDF") || createAXO("PDF.PdfCtrl")); };
@@ -55117,7 +55151,7 @@ module.exports = g;
         //Therefore if iOS, we shall assume that PDF support is not available
         !isIOS && (
             //Modern versions of Firefox come bundled with PDFJS
-            isFirefoxWithPDFJS || 
+            isFirefoxWithPDFJS ||
             //Browsers that still support the original MIME type check
             supportsPdfMimeType || (
                 //Pity the poor souls still using IE
@@ -55196,12 +55230,22 @@ module.exports = g;
 
     };
 
+    appendTargetClassName = function (targetNode) {
+        // Use classList if we don't need IE9 support
+        var classToAppend = "pdfobject-container";
+        var classes = targetNode.className.split(/\s+/);
+        if (classes.indexOf(classToAppend) === -1) {
+            classes.push(classToAppend);
+            targetNode.className = classes.join(' ');
+        }
+    }
+
     generatePDFJSiframe = function (targetNode, url, pdfOpenFragment, PDFJS_URL, id){
 
         var fullURL = PDFJS_URL + "?file=" + encodeURIComponent(url) + pdfOpenFragment;
         var scrollfix = (isIOS) ? "-webkit-overflow-scrolling: touch; overflow-y: scroll; " : "overflow: hidden; ";
         var iframe = "<div style='" + scrollfix + "position: absolute; top: 0; right: 0; bottom: 0; left: 0;'><iframe  " + id + " src='" + fullURL + "' style='border: none; width: 100%; height: 100%;' frameborder='0'></iframe></div>";
-        targetNode.className += " pdfobject-container";
+        appendTargetClassName(targetNode);
         targetNode.style.position = "relative";
         targetNode.style.overflow = "auto";
         targetNode.innerHTML = iframe;
@@ -55219,10 +55263,27 @@ module.exports = g;
             style = "position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%;";
         }
 
-        targetNode.className += " pdfobject-container";
+        appendTargetClassName(targetNode);
         targetNode.innerHTML = "<embed " + id + " class='pdfobject' src='" + url + pdfOpenFragment + "' type='application/pdf' style='overflow: auto; " + style + "'/>";
 
         return targetNode.getElementsByTagName("embed")[0];
+
+    };
+
+    generateIframeElement = function (targetNode, targetSelector, url, pdfOpenFragment, width, height, id){
+
+        var style = "";
+
+        if(targetSelector && targetSelector !== document.body){
+            style = "width: " + width + "; height: " + height + ";";
+        } else {
+            style = "position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%;";
+        }
+
+        targetNode.className += " pdfobject-container";
+        targetNode.innerHTML = "<iframe " + id + " class='pdfobject' src='" + url + pdfOpenFragment + "' type='application/pdf' style='border: none; " + style + "'/>";
+
+        return targetNode.getElementsByTagName("iframe")[0];
 
     };
 
@@ -55246,6 +55307,7 @@ module.exports = g;
             height = (options.height) ? options.height : "100%",
             assumptionMode = (typeof options.assumptionMode === "boolean") ? options.assumptionMode : true,
             forcePDFJS = (typeof options.forcePDFJS === "boolean") ? options.forcePDFJS : false,
+            supportRedirect = (typeof options.supportRedirect === "boolean") ? options.supportRedirect : false,
             PDFJS_URL = (options.PDFJS_URL) ? options.PDFJS_URL : false,
             targetNode = getTargetElement(targetSelector),
             fallbackHTML = "",
@@ -55273,6 +55335,11 @@ module.exports = g;
 
         //If traditional support is provided, or if this is a modern browser and not iOS (see comment for supportsPDFs declaration)
         } else if(supportsPDFs || (assumptionMode && isModernBrowser && !isIOS)){
+
+            // Safari will not honour redirect responses on embed src.
+            if (supportRedirect && isSafariOsx) {
+                return generateIframeElement(targetNode, targetSelector, url, pdfOpenFragment, width, height, id);
+            }
 
             return generateEmbedElement(targetNode, targetSelector, url, pdfOpenFragment, width, height, id);
 
@@ -55304,6 +55371,7 @@ module.exports = g;
     };
 
 }));
+
 ;
 /****************************************************************************
 	jquery-bootstrap-accordion.js,
@@ -56102,6 +56170,16 @@ module.exports = g;
         },
 
         /*******************************************************
+        getFormGroup
+        *******************************************************/
+        getFormGroup: function(){
+            this.$formGroup = this.$formGroup || this.getElement().parents('.form-group').first();
+            if (!this.$formGroup.length)
+                this.$formGroup = this.getElement();
+            return this.$formGroup;
+        },
+
+        /*******************************************************
         setValue
         *******************************************************/
         setValue: function(value, validate){
@@ -56231,19 +56309,13 @@ module.exports = g;
                     this.resetValue( true );
                 }
 
-                if (!this.$outerElement){
-                    //Find the element to show/hide
-                    this.$outerElement = this.getElement().parents('.form-group').first();
-                    if (!this.$outerElement.length)
-                        this.$outerElement = this.getElement();
-                }
 
                 if (this.options.freeSpaceWhenHidden)
                     //When the element is invisible: Use display:none
-                    this.$outerElement.toggleClass('d-none', !show);
+                    this.getFormGroup().toggleClass('d-none', !show);
                 else
                     //When the element is invisible: Use visibility:hidden to keep structure of form and it elements
-                    this.$outerElement.css('visibility', show ? 'visible' : 'hidden');
+                    this.getFormGroup().css('visibility', show ? 'visible' : 'hidden');
 
                 this.getElement().prop('disabled', !show);
 
@@ -56780,6 +56852,17 @@ module.exports = g;
             return $input._wrapLabel(options);
         },
 
+
+        /******************************************************
+        $.bsText( options )
+        Create a <div> with text inside a <label>
+        ******************************************************/
+        bsText: function( options ){
+            return $('<div/>')
+                       ._bsAddHtml( options )
+                       .addClass('form-control-border form-control no-hover')
+                       ._wrapLabel(options);
+        }
     });
 
 
@@ -57187,6 +57270,7 @@ options
         if (!$modalBackdrop)
             $modalBackdrop =
                 $('<div/>')
+                    .append( $('<i/>')._bsAddHtml({icon:'fa-spinner fa-spin'}) )
                     .addClass('global-backdrop')
                     .appendTo( $('body') );
 
@@ -57198,7 +57282,7 @@ options
 
     /******************************************************
     $._removeModalBackdropLevel
-    Move the backdrop up in z-index
+    Move the backdrop down in z-index
     ******************************************************/
     $._removeModalBackdropLevel = function( noDelay ){
         modalBackdropLevels--;
@@ -57213,6 +57297,27 @@ options
                 window.setTimeout( function(){ $modalBackdrop.addClass('hidden'); }, 2000 );
         }
     };
+
+
+    /******************************************************
+    $.workingOn / $.workingOff
+    Display/hide a bagdrop while some process is 'working'
+    ******************************************************/
+    $.workingOn = function(){
+        window.setTimeout(function(){
+            $._addModalBackdropLevel();
+            $modalBackdrop.addClass('working');
+        }, 100);
+    };
+    $.workingOff = function(){
+        window.setTimeout(function(){
+            $._removeModalBackdropLevel(true);
+            $modalBackdrop.removeClass('working');
+        }, 100);
+
+    };
+
+
 }(jQuery, this, document));
 ;
 /****************************************************************************
@@ -60799,7 +60904,7 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
             function buildBaseSlider(options, $parent){ buildSlider(options, 'baseSlider', $parent); }
             function buildTimeSlider(options, $parent){ buildSlider(options, 'timeSlider', $parent); }
 
-            function buildText( options ){
+            function buildTextBox( options ){
                 return $('<div/>')._bsAddHtml( options );
             }
 
@@ -60812,6 +60917,7 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
                            .addClass('flex-column')
                            ._bsAppendContent(options.content);
             }
+
 
             if (!options)
                 return this;
@@ -60854,7 +60960,8 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
                         case 'accordion'        :   buildFunc = $.bsAccordion;          break;
                         case 'slider'           :   buildFunc = buildBaseSlider;        insideFormGroup = true; addBorder = true; buildInsideParent = true; break;
                         case 'timeslider'       :   buildFunc = buildTimeSlider;        insideFormGroup = true; addBorder = true; buildInsideParent = true; break;
-                        case 'text'             :   buildFunc = buildText;              insideFormGroup = true; addBorder = true; noValidation = true; break;
+                        case 'text'             :   buildFunc = $.bsText;               insideFormGroup = true; break;
+                        case 'textbox'          :   buildFunc = buildTextBox;           insideFormGroup = true; addBorder = true; noValidation = true; break;
                         case 'fileview'         :   buildFunc = $.bsFileView;           break;
                         case 'hidden'           :   buildFunc = buildHidden;            noValidation = true; break;
                         case 'inputgroup'       :   buildFunc = buildInputGroup;        addBorder = true; insideFormGroup = true; buildInsideParent = true; break;

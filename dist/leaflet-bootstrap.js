@@ -1609,7 +1609,7 @@ Options for selectiong position-format and to activate context-menu
                     insideFormGroup: false,
                     noValidation   : true,
                     noBorder       : true,
-                    type           : 'text',
+                    type           : 'textbox',
                     text           : function( $inner ){ $inner.addClass('cursor'); },
                     class          :'show-for-control-position-cursor',
                     before: {
