@@ -438,7 +438,6 @@ Options for selectiong position-format and to activate context-menu
                 }
 
                 delete this.$mapContainers[mapId];
-
                 map.bsPositionControl = null;
             }
             return map;

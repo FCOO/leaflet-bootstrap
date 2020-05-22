@@ -124,16 +124,18 @@
     var test = false;
 
     map.on('click', function(){
-        console.log(map.bsPositionControl.getState());
-
         test = !test;
-        if (test)
-            map.bsPositionControl.addOther(map2, true);
-        else {
-            map.bsPositionControl.removeOther(map2);
-            map.bsPositionControl.removeOther(map2);
-            map.bsPositionControl.removeOther(map2);
+        if (test){
+            map.bsPositionControl.desync(map2);
+            map.bsPositionControl.desync(map3);
+            map2.bsPositionControl.desync(map3);
         }
+        else{
+            map.bsPositionControl.sync(map2);
+            map.bsPositionControl.sync(map3);
+            map2.bsPositionControl.sync(map3);
+        }
+
 
     });
 
@@ -158,17 +160,42 @@
             })
             .addTo(map);
 
-        if (first)
-            marker.on('click', function(){ this.remove(); })
-        else
+//HER        if (first)
+//HER            marker.on('click', function(){ this.remove(); })
+//HER        else
+var content = {
+        type: 'buttongroup',
+        fullWidth: true,
+        vertical: true,
+        list: [
+            {id:'test1', text: 'Test#1', onClick: function(){ console.log('CLICK ON test1') } },
+            {id:'test2', text: 'Test#2', onClick: function(){ console.log('CLICK ON test2') } }
+        ]
+    };
+
+//HERcontent = $.bsButton({id:'test1', text: 'Test#1', onClick: function(){ console.log('CLICK ON test1') } } );
+//HERcontent = {id:'test1', type:'button',  text: 'Test#1', onClick: function(){ console.log('CLICK ON test1') } };
+/*
+content = {
+    type: 'selectlist',
+    fullWidth: true,
+    vertical: true,
+    onChange: function(){ console.log('GODT', arguments); },
+    list: [
+        {id:'test1', text: 'Test#1', onClick: function(){ console.log('CLICK ON test1') } },
+        {id:'test2', text: 'Test#2', onClick: function(){ console.log('CLICK ON test1') } }
+    ]
+};
+*/
+
             marker.bindPopup({
                 header: 'Overskrift',
-                semiTransparent: true,
+                _semiTransparent: first, //true,
                 //clickable: true,
-                content: 'Davslkjsssldkfjslkdjlaksjdflkasjdflaksjdflkasjdf',
+                content: content,//'Davslkjsssldkfjslkdjlaksjdflkasjdflaksjdflkasjdf',
                 fixable: true,
-                width: 321,
-                buttons: [{text:'klik'}]
+                _width: 321,
+                _buttons: [{text:'klik'}]
 
             })
 
@@ -515,7 +542,6 @@
 
     };
 //*/
-console.log(map);
     </script>
 </body>
 </html>
