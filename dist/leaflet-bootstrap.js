@@ -998,7 +998,8 @@ https://github.com/nerik/leaflet-graphicscale
 
         _updateScale: function(maxMeters, options) {
             var scale = this._getBestScale(maxMeters, options.minUnitWidth, options.maxUnitsWidth);
-            this._render(scale);
+            if (scale)
+                this._render(scale);
         },
 
         _getBestScale: function(maxMeters, minUnitWidthPx, maxUnitsWidthPx) {
