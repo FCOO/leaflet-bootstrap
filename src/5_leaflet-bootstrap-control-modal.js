@@ -9,11 +9,13 @@ Create leaflet-control for jquery-bootstrap modal-content:
     "use strict";
 
         /***************************************************
-        _bsModal = common constructor for bsModal and bsForm as Leaflet controls
+        _bsModal = common constructor for bsModal and bsForm as BsControl
         ***************************************************/
-        var _bsModal = L.Control.extend({
+        var _bsModal = L.BsControl.extend({
+//        var _bsModal = L.Control.extend({
             options: {
                 position: 'topcenter',
+                show    : false
             },
 
             show: function() { this.$outerContainer.show(); },
@@ -95,8 +97,8 @@ Create leaflet-control for jquery-bootstrap modal-content:
 
                 var result = $result.get(0);
                 L.DomEvent.disableClickPropagation( result );
-
                 this.$outerContainer = $result;
+
                 this.options.show = show;
                 this.options.show ? this.show() : this.hide();
                 return result;

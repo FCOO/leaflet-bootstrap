@@ -381,16 +381,16 @@ content = {
 
         });
 
-//HER        map.addControl( modalControl );
+        map.addControl( modalControl );
 
     //************************************************************
     var formControl = L.control.bsModalForm({
             id: 'formId',
-            _show: true,
+            //show: false,
             header: 'Davs',
             buttons: [
-                {text:'Reset', onClick: function(){ testModalForm.setValue('formId1', -1);}      },
-                {text:'Set=2', onClick: function(){ testModalForm.setValue('formId1', 'formSelect1');} }
+                {text:'Reset', onClick: function(){ formControl.bsModalForm.setValue('formId1', -1);}      },
+                {text:'Set=2', onClick: function(){ formControl.bsModalForm.setValue('formId1', 'formSelect1');} }
             ],
             onSubmit: function( data ){ console.log( 'SUBMIT=', data ); myData = data; },
             onCancel: function( data ){ console.log( 'CANCEL=', data ); myData = data; },
