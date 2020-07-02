@@ -484,12 +484,15 @@ Create leaflet-control for jquery-bootstrap button-classes:
                 if ($.isFunction(this.options.content))
                     this.options.content($contentContainer, this.options, this.onToggle);
                 else {
-                    $contentContainer._bsAddBaseClassAndSize({
+                    $contentContainer._bsAddBaseClassAndSize($.extend({
                         baseClass   : 'modal-dialog',
                         class       : 'modal-dialog-inline',
                         useTouchSize: true,
-                        small       : true
-                    });
+                        small       : true,
+                    },{
+                        useTouchSize: this.options.content.useTouchSize,
+                        small       : this.options.content.small
+                    }));
 
                     //Adjust options for the content (modal) and create the it
                     var modalOptions = $.extend(true, {},

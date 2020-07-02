@@ -526,7 +526,7 @@ leaflet-bootstrap-control-position.scss
       border-color: #b8c1ca; }
     .leaflet-control-container .input-group .position:focus, .leaflet-control-container .input-group .position.focus {
       border-color: #80bdff; }
-    .leaflet-control-container .input-group .position.disabled, .leaflet-control-container .input-group .position:disabled {
+    .leaflet-control-container .input-group .position.disabled:not(.show-as-normal), .leaflet-control-container .input-group .position:disabled:not(.show-as-normal) {
       border-color: #ced4da; }
     .leaflet-control-container .input-group .position.focus:not(:disabled):not(.disabled):not(.no-hover), .leaflet-control-container .input-group .position:focus:not(:disabled):not(.disabled):not(.no-hover),
     .mouse-hover .leaflet-control-container .input-group .position:hover:not(:disabled):not(.disabled):not(.no-hover) {
