@@ -90,11 +90,12 @@
                 isExtended        : true,
                 showCursorPosition: true,
                 inclContextmenu   : true,
-                selectFormat: setLatLngFormat
+                selectFormat: setLatLngFormat,
             },
             bsScaleControl: true,
             bsScaleOptions: {
                 isExtended: true,
+                tooltipOnButton: !index,
                 selectFormat: first ? function(){ this.setMode(confirm('Use nautical?') ? 'nautical' : 'metric'); } : null
             },
             zoomSnap: .25,

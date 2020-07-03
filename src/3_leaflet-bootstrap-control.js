@@ -35,6 +35,7 @@ L.BsControl = extention of L.Control with
         initialize: function ( options ) {
             $.extend(options, this.forceOptions || {});
             L.Util.setOptions(this, options);
+            this._controlTooltipContent = [];
         },
 
         _getTooltipElements: function( container ){
@@ -141,9 +142,8 @@ L.BsControl = extention of L.Control with
 
 
                 //Set tooltip content
-                this._controlTooltipContent = [];
                 if (this.options.onClose)
-                    this._controlTooltipContent.push({icon: this.options.leftClickIcon, text: this.options.closeText}, '<br>' );
+                    this._controlTooltipContent.push({id:'close', icon: this.options.leftClickIcon, text: this.options.closeText});
 
                 this._controlTooltipContent.push({icon: this.options.rightClickIcon, text: this.options.popupText});
             }
@@ -198,6 +198,11 @@ L.BsControl = extention of L.Control with
             return this;
         },
 
+        //adjustTooltip: Remove items from tooltipContentList (if any) before the items is shown in the tooltip. Can be overwriten by children-constructors
+        adjustTooltip: function(itemList){
+            return itemList;
+        },
+
         hidePopup: function(){
             if (this.$popupElements)
                 this.$popupElements.popover('hide');
@@ -217,7 +222,12 @@ L.BsControl = extention of L.Control with
         },
 
         tooltip_mouseenter: function(event){
-            this._controlTooltip.setContent(this._controlTooltipContent);
+            var contentList = this.adjustTooltip(this._controlTooltipContent.slice());
+
+            //Insert <br> between all items
+            for (var i=1; i < contentList.length; i += 2)
+                contentList.splice(i, 0, '<br>');
+            this._controlTooltip.setContent(contentList);
             if (this._controlTooltipOff)
                 return;
             this._controlTooltip.options.direction = this.options.tooltipDirection;

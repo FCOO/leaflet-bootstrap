@@ -92,8 +92,10 @@ Create leaflet-control for jquery-bootstrap button-classes:
     ********************************************************************************/
     L.Control.BsButtonBox = L.Control.BsButton.extend({
         options: {
-            addOnClose: true,
-            isExtended: false
+            addOnClose     : true,
+            isExtended     : false,
+            tooltipOnButton: false, //When true the tooltip and and popup also apply to the button (isExtended == false), but only for no-touch-mode
+            openText       : {da:'Maksimer', en:'Maximize'},
         },
 
         initialize: function(options){
@@ -101,8 +103,13 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
             //Set default onToggle-function
             this.onToggle = $.proxy(this.toggle, this);
-            if (this.options.addOnClose)
+            if (this.options.addOnClose){
+                //If tooltips also is shown when not isExtended => create extra options and let adjustTooltip dynamic adjust tooltips
+                if (this.options.tooltipOnButton)
+                    this._controlTooltipContent.push({id:'open', icon: this.options.leftClickIcon, text: this.options.openText});
+
                 this.options.onClose = this.onToggle;
+            }
         },
 
         _createContent: function(){
@@ -189,7 +196,23 @@ Create leaflet-control for jquery-bootstrap button-classes:
         },
 
         _getTooltipElements: function( /*container*/ ){
-            return this.$contentContainer;
+            return this.options.tooltipOnButton ? this.$container : this.$contentContainer;
+        },
+
+        adjustTooltip: function(itemList){
+            if (this.options.tooltipOnButton){
+                var result = [],
+                    isExtended = this.options.isExtended;
+                $.each(itemList, function(index, item){
+                    if (!item.id ||
+                        ((item.id == 'close') &&  isExtended) ||
+                        ((item.id == 'open')  && !isExtended) )
+                        result.push(item);
+                });
+                return result;
+            }
+            else
+                return itemList;
         },
 
         //toggle : change between button-state and extended

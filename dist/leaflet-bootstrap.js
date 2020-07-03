@@ -104,6 +104,7 @@ L.BsControl = extention of L.Control with
         initialize: function ( options ) {
             $.extend(options, this.forceOptions || {});
             L.Util.setOptions(this, options);
+            this._controlTooltipContent = [];
         },
 
         _getTooltipElements: function( container ){
@@ -210,9 +211,8 @@ L.BsControl = extention of L.Control with
 
 
                 //Set tooltip content
-                this._controlTooltipContent = [];
                 if (this.options.onClose)
-                    this._controlTooltipContent.push({icon: this.options.leftClickIcon, text: this.options.closeText}, '<br>' );
+                    this._controlTooltipContent.push({id:'close', icon: this.options.leftClickIcon, text: this.options.closeText});
 
                 this._controlTooltipContent.push({icon: this.options.rightClickIcon, text: this.options.popupText});
             }
@@ -267,6 +267,11 @@ L.BsControl = extention of L.Control with
             return this;
         },
 
+        //adjustTooltip: Remove items from tooltipContentList (if any) before the items is shown in the tooltip. Can be overwriten by children-constructors
+        adjustTooltip: function(itemList){
+            return itemList;
+        },
+
         hidePopup: function(){
             if (this.$popupElements)
                 this.$popupElements.popover('hide');
@@ -286,7 +291,12 @@ L.BsControl = extention of L.Control with
         },
 
         tooltip_mouseenter: function(event){
-            this._controlTooltip.setContent(this._controlTooltipContent);
+            var contentList = this.adjustTooltip(this._controlTooltipContent.slice());
+
+            //Insert <br> between all items
+            for (var i=1; i < contentList.length; i += 2)
+                contentList.splice(i, 0, '<br>');
+            this._controlTooltip.setContent(contentList);
             if (this._controlTooltipOff)
                 return;
             this._controlTooltip.options.direction = this.options.tooltipDirection;
@@ -437,8 +447,10 @@ Create leaflet-control for jquery-bootstrap button-classes:
     ********************************************************************************/
     L.Control.BsButtonBox = L.Control.BsButton.extend({
         options: {
-            addOnClose: true,
-            isExtended: false
+            addOnClose     : true,
+            isExtended     : false,
+            tooltipOnButton: false, //When true the tooltip and and popup also apply to the button (isExtended == false), but only for no-touch-mode
+            openText       : {da:'Maksimer', en:'Maximize'},
         },
 
         initialize: function(options){
@@ -446,8 +458,13 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
             //Set default onToggle-function
             this.onToggle = $.proxy(this.toggle, this);
-            if (this.options.addOnClose)
+            if (this.options.addOnClose){
+                //If tooltips also is shown when not isExtended => create extra options and let adjustTooltip dynamic adjust tooltips
+                if (this.options.tooltipOnButton)
+                    this._controlTooltipContent.push({id:'open', icon: this.options.leftClickIcon, text: this.options.openText});
+
                 this.options.onClose = this.onToggle;
+            }
         },
 
         _createContent: function(){
@@ -534,7 +551,23 @@ Create leaflet-control for jquery-bootstrap button-classes:
         },
 
         _getTooltipElements: function( /*container*/ ){
-            return this.$contentContainer;
+            return this.options.tooltipOnButton ? this.$container : this.$contentContainer;
+        },
+
+        adjustTooltip: function(itemList){
+            if (this.options.tooltipOnButton){
+                var result = [],
+                    isExtended = this.options.isExtended;
+                $.each(itemList, function(index, item){
+                    if (!item.id ||
+                        ((item.id == 'close') &&  isExtended) ||
+                        ((item.id == 'open')  && !isExtended) )
+                        result.push(item);
+                });
+                return result;
+            }
+            else
+                return itemList;
         },
 
         //toggle : change between button-state and extended
@@ -2655,7 +2688,7 @@ Adjust standard Leaflet popup to display as Bootstrap modal
             if (this && this.options){
                 options =
                     $.extend({
-keepInView: true,
+                        keepInView      : true,
                         sticky          : !this.options.tooltipPermanent,       //If true, the tooltip will follow the mouse instead of being fixed at the feature center.
                         interactive     : false,                                //If true, the tooltip will listen to the feature events.
                         permanent       : this.options.tooltipPermanent,        //Whether to open the tooltip permanently or only on mouseover.
