@@ -2102,8 +2102,10 @@ Can be used as leaflet standard zoom control with Bootstrap style
             //Set popup-item(s)
             if (!window.bsIsTouch && this.options.historyEnabled){
                 this.options.popupList = [
-//                    {text: 'Zoom'},
-//                    {type:'checkbox', text: {da:'Vis skylder', en:'Show slider'}, selected: this.options.showSlider, onChange: $.proxy(this._showSlider, this), closeOnClick: true},
+/* SLIDER REMOVED FOR NOW. Waits for better slider-zoom in leaflet
+                    {text: 'Zoom'},
+                    {type:'checkbox', text: {da:'Vis skylder', en:'Show slider'}, selected: this.options.showSlider, onChange: $.proxy(this._showSlider, this), closeOnClick: true},
+//*/
                     {id: 'showHistory', type:'checkbox', text: {da:'Vis historik-knapper', en:'Show History Buttons'}, selected: this.options.showHistory, onChange: $.proxy(this._showHistory, this), closeOnClick: true},
 //                    {type:'content',  content: $historyContent,                   closeOnClick: false, lineBefore: true}
                 ];
@@ -2230,7 +2232,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
             map.on('zoomlevelschange', this._setSliderRange, this);
 
             this._showSlider('', this.options.showSlider);
-*/
+//*/
             map.whenReady(this._onLoad, this);
 
             return result;
@@ -2328,7 +2330,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
             if (this._slider)
                 this._slider.bootstrapSlider('setValue', this._map.getZoom());
         },
-*/
+//*/
         _updateDisabled: function () {
             var map      = this.zoom._map,
                 zoom     = map.getZoom(),
@@ -2340,7 +2342,9 @@ Can be used as leaflet standard zoom control with Bootstrap style
             this.$zoomOutButton = this.$zoomOutButton || $(this.zoom._zoomOutButton);
             this.$zoomOutButton.toggleClass( 'disabled', disabled || (zoom === map.getMinZoom()) );
 
-//            this._updateSlider();
+/* SLIDER REMOVED FOR NOW. Waits for better slider-zoom in leaflet
+            this._updateSlider();
+//*/
         },
 
 

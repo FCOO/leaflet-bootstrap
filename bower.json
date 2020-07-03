@@ -1,6 +1,6 @@
 {
   "name": "leaflet-bootstrap",
-  "version": "2.20.0",
+  "version": "2.20.1",
   "homepage": "https://github.com/FCOO/leaflet-bootstrap",
   "authors": [
     "Niels Holt"
@@ -21,7 +21,7 @@
     "leaflet-control-topcenter": "FCOO/leaflet-control-topcenter#^2.0.1",
     "javascript-utilities": "fcoo/javascript-utilities#^1.1.0",
     "numeral": "adamwdraper/Numeral-js#^2.0.6",
-    "seiyria-bootstrap-slider": "seiyria/bootstrap-slider#^10.6.2",
+    "seiyria-bootstrap-slider": "seiyria/bootstrap-slider#^11.0.2",
     "history.js": "fcoo/history.js#^1.0.9",
     "leaflet-latlng-format": "fcoo/leaflet-latlng-format#^2.0.0",
     "leaflet-mouseposition": "fcoo/leaflet-mouseposition#latest",
