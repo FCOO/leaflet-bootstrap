@@ -24,7 +24,6 @@ L.BsControl = extention of L.Control with
             popupTrigger    : null, //Default: contextmenu and click for touch, contextmenu for no-touch
             popupList       : null, //[] of items for bsPopoverMenu
 
-
             closeText       : {da:'Minimer', en:'Minimize'},//{da:'Skjul', en:'Hide'},
             onClose         : null //function. If not null and popupList not null => add as extra button to popupList with text = options.closeText
         },
@@ -32,10 +31,17 @@ L.BsControl = extention of L.Control with
         //forceOptions = options to be forced (e.q. when special conditions are given). Must be set in initialize of desending objects
         forceOptions: {},
 
+        enabled: true,
+
         initialize: function ( options ) {
             $.extend(options, this.forceOptions || {});
             L.Util.setOptions(this, options);
             this._controlTooltipContent = [];
+        },
+
+        _getContainer: function(){
+            this.$container = this.$container || $(this._container);
+            return this.$container;
         },
 
         _getTooltipElements: function( container ){
@@ -115,7 +121,6 @@ L.BsControl = extention of L.Control with
                 });
             }
 
-
             function includes(pos, substring){
                 return pos.indexOf(substring) !== -1;
             }
@@ -185,6 +190,33 @@ L.BsControl = extention of L.Control with
                 this.options.onChange(state, this);
         },
 
+
+        disable: function(){
+            this.enabled = false;
+            this.disableTooltip();
+            this._getContainer().addClass('disabled');
+            this.$popupElements.popover('disable');
+            this.onDisable();
+            if (this.options.onDisable)
+                this.options.onDisable(this);
+        },
+        onDisable: function(){
+        },
+
+        enable: function(){
+            this.enabled = true;
+            this.enableTooltip();
+            this._getContainer().removeClass('disabled');
+            this.$popupElements.popover('enable');
+            this.onEnable();
+            if (this.options.onEnable)
+                this.options.onEnable(this);
+
+        },
+        onEnable: function(){
+        },
+
+
         //getState: Return an object with the settings/state of the object -to be overwritten be inherits
         getState: function(){
             return {show: this.options.show };
@@ -222,14 +254,15 @@ L.BsControl = extention of L.Control with
         },
 
         tooltip_mouseenter: function(event){
+            if (!this.enabled || this._controlTooltipOff)
+                return;
+
             var contentList = this.adjustTooltip(this._controlTooltipContent.slice());
 
             //Insert <br> between all items
             for (var i=1; i < contentList.length; i += 2)
                 contentList.splice(i, 0, '<br>');
             this._controlTooltip.setContent(contentList);
-            if (this._controlTooltipOff)
-                return;
             this._controlTooltip.options.direction = this.options.tooltipDirection;
             this._setTooltipTimeOut(event, 400);
         },
@@ -241,7 +274,7 @@ L.BsControl = extention of L.Control with
         },
 
         tooltip_mousemove: function(event){
-            if (this._controlTooltipOff)
+            if (!this.enabled || this._controlTooltipOff)
                 return;
             if (this._controlTooltipVisible)
                 this.hideTooltip();
@@ -264,7 +297,7 @@ L.BsControl = extention of L.Control with
         },
 
         _showTooltip: function(event){
-            if (event && !this._controlTooltipOff){
+            if (event && this.enabled && !this._controlTooltipOff){
                 this._tooltipTimeout = null;
                 this._controlTooltipVisible = true;
 

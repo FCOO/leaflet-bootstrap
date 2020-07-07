@@ -219,9 +219,11 @@ Create leaflet-control for jquery-bootstrap button-classes:
         toggle: function(){
             this.hidePopup();
             this.hideTooltip();
-            this.$container.modernizrToggle('extended');
-            this.options.isExtended = this.$container.hasClass('extended');
-            this._onChange();
+            if (this.enabled){
+                this.$container.modernizrToggle('extended');
+                this.options.isExtended = this.$container.hasClass('extended');
+                this._onChange();
+            }
             return false;
         },
 

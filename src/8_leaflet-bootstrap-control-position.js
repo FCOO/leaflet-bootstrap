@@ -356,6 +356,7 @@ Options for selectiong position-format and to activate context-menu
         },
 
         _fireContentmenuOnMapCenter: function(){
+            if (!this.enabled) return;
             /*
             Find top element on the map center and fire contextmenu on it.
             Using excellent methods found on https://stackoverflow.com/questions/8813051/determine-which-element-the-mouse-pointer-is-on-top-of-in-javascript
