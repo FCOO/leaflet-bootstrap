@@ -108,11 +108,6 @@ L.BsControl = extention of L.Control with
             this._controlTooltipContent = [];
         },
 
-        _getContainer: function(){
-            this.$container = this.$container || $(this._container);
-            return this.$container;
-        },
-
         _getTooltipElements: function( container ){
             return this.options.getTooltipElements ? this.options.getTooltipElements(container) : $(container);
         },
@@ -263,7 +258,7 @@ L.BsControl = extention of L.Control with
         disable: function(){
             this.enabled = false;
             this.disableTooltip();
-            this._getContainer().addClass('disabled');
+            this.$container.addClass('disabled');
             this.$popupElements.popover('disable');
             this.onDisable();
             if (this.options.onDisable)
@@ -275,7 +270,7 @@ L.BsControl = extention of L.Control with
         enable: function(){
             this.enabled = true;
             this.enableTooltip();
-            this._getContainer().removeClass('disabled');
+            this.$container.removeClass('disabled');
             this.$popupElements.popover('enable');
             this.onEnable();
             if (this.options.onEnable)
