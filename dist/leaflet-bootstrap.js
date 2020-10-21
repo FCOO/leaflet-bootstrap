@@ -2493,6 +2493,7 @@ leaflet-bootstrap-control-legend.js
         *******************************************/
         onAdd: function(map) {
             //Adjust options for width and heigth
+            this.options.content.header    = this.options.header    || this.options.content.header;
             this.options.content.width     = this.options.width     || this.options.content.width;
             this.options.content.maxHeight = this.options.maxHeight || this.options.content.maxHeight;
 
