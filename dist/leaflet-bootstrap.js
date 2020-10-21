@@ -2609,13 +2609,13 @@ leaflet-bootstrap-control-legend.js
 
     //Install L.Control.BsLegend
     L.Map.mergeOptions({
-        bsLegendControl       : false,
-        bsLegendControlOptions: {}
+        bsLegendControl: false,
+        bsLegendOptions: {}
     });
 
     L.Map.addInitHook(function () {
         if (this.options.bsLegendControl){
-            this.bsLegendControl = new L.Control.BsLegend( this.options.bsLegendControlOptions );
+            this.bsLegendControl = new L.Control.BsLegend( this.options.bsLegendOptions );
             this.addControl(this.bsLegendControl);
         }
     });
