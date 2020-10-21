@@ -15,6 +15,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
     var defaultButtonOptions = {
             center         : true,
             square         : true,
+            bigIcon        : false,
             returnFromClick: false,
         },
 
@@ -132,6 +133,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
             this.bsButton =
                 $.bsButton(buttonOptions)
                 .addClass('hide-for-extended')
+                //.toggleClass('fa-lg', buttonOptions.bigIcon)
                 .appendTo($container);
 
             //Create container for extended content

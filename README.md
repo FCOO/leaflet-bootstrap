@@ -67,7 +67,7 @@ Based on [leaflet-graphicscale](https://github.com/nerik/leaflet-graphicscale) b
     maxUnitsWidth       : 200,                  //Max width
     maxUnitsWidthPercent: 90,                   //Max width as percent of map width
 
-See `src/5_leaflet-bootstrap-control-scale.js` for more details
+See `src/25_leaflet-bootstrap-control-scale.js` for more details
 
 
 
@@ -92,7 +92,7 @@ Also possible to include/exclude other maps to show cursor-position from the oth
 #### `options` 
     selectFormat: null    //function() to select format for position using latlng-format (fcoo/latlng-format)
 
-See `src/7_leaflet-bootstrap-control-position.js` for more details
+See `src/35_leaflet-bootstrap-control-position.js` for more details
 
 ### L.control.bsZoom(options)
 Create a extended zoom-control with history of previous {zoom,center} on the map
@@ -104,7 +104,17 @@ Create a extended zoom-control with history of previous {zoom,center} on the map
         	      bsZoomOptions: {position: 'topleft'}
 			  });
 
-See `src/8_leaflet-bootstrap-control-zoom.js` for more details
+See `src/40_leaflet-bootstrap-control-zoom.js` for more details
+
+### L.control.bsLegend(options)
+Create a `bsButtonBox ` with legends for different layers
+	
+	L.control.bsLegend().addTo(map);
+	map.bsLegend.addLegend(...)
+	map.bsLegend.addLegend(...)
+
+See `src/45_leaflet-bootstrap-control-legend.js` for more details
+
 
 ### Contextmenu on the map and on elements
 
@@ -138,7 +148,7 @@ Default include all contextmenu items from the map.
 Call the method to exclude the map-items
 
 
-See `src/6_leaflet-bootstrap-contextmenu.js` for more details
+See `src/30_leaflet-bootstrap-contextmenu.js` for more details
 
 #### Example
     var map = L.map('map', {...});
