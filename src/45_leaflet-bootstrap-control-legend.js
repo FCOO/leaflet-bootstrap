@@ -63,7 +63,9 @@ leaflet-bootstrap-control-legend.js
         initialize
         *******************************************/
         initialize: function(options) {
-            L.Control.BsButtonBox.prototype.initialize.call(this, options);
+            this.options = $.extend(true, this.options, options); 
+            L.Control.BsButtonBox.prototype.initialize.call(this);
+
             this.legends = {};
             this.list = [];
         },
