@@ -219,7 +219,14 @@ leaflet-bootstrap-control-legend.js
         //addTo
         addTo: function( parent ){
             var _this = this,
-                options = this.options;
+                options = this.options,
+                icon    = options.icon || 'fa-square text-white',
+                extraIconClass = ['','',''];
+            //Adjust icon to make it 1.25em width
+            if ($.isArray(icon))
+                extraIconClass[0] = 'fa-fw';
+            else
+                icon = icon + ' fa-fw'; 
             this.parent = parent;
             if (!this.$container){
                 //Craete to modal-content
@@ -229,7 +236,7 @@ leaflet-bootstrap-control-legend.js
                     //noHorizontalPadding: true,
                     noShadow: true,
                     header: {
-                        icon: [(options.icon || 'fa-square text-white')+' fa-fw', 'fa-fw fas fa-spinner fa-spin', 'fa-fw fas fa-eye-slash'],
+                        icon: [icon, 'fa-fw fas fa-spinner fa-spin', 'fa-fw fas fa-eye-slash'],
                         text: options.text
                     },
                     onInfo   : options.onInfo,
@@ -258,9 +265,9 @@ leaflet-bootstrap-control-legend.js
                 
                 //First find the tree icons before header-text used to set state
                 this.stateIcons = {};
-                var iconList = this.$container.bsModal.$header.find('> i');
+                var iconList = this.$container.bsModal.$header.children();
                 $.each(['normal', 'loading', 'hidden'], function(index, id){
-                    _this.stateIcons[id] = $(iconList[index]);
+                    _this.stateIcons[id] = $(iconList[index]).addClass(extraIconClass[index]);
                 });
 
                 

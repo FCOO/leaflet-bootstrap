@@ -556,7 +556,7 @@ content = {
 
     for (var i=0; i<10;i++){
         var legend = map.bsLegendControl.addLegend({
-                icon: i != 4 ? 'fa-home' : '',
+                icon: i != 4 ? 'fa-home' : ['fa-home'],
                 text: i+'. header',
                 index: 100-i,
                 content   : i % 2 ? 'Her<br>er<br>der<br>noget' : null,
