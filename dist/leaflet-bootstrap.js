@@ -2425,33 +2425,6 @@ leaflet-bootstrap-control-legend.js
 (function ($, L, window, document, undefined) {
     "use strict";
 
-//HER ns.mapLegendIcon = 'fa-list';  //TODO fa-th-list when forecast@mouse-position is implemented
-/*
-    var buttonBox = L.control.bsButtonBox({
-        position: 'bottomright',
-        icon: 'icon-leaflet-position-marker',
-        square: true,
-
-        content: {
-            _noVerticalPadding: true,
-            noHorizontalPadding: true,
-            _noHeader: true,
-            header: {
-                text: 'The long header'
-            },
-            content: [
-                {type:'button', semiTransparent: true, text:'Davs', small: true},
-                {type:'button', text:'Davs2', small: true}
-            ],
-            width: 'auto',
-            clickable: false,
-            buttons:[{text:'klik'}],
-            footer: { text: {da: 'Klik på signaturfork. for info', en:'Click on legend for info' }}
-
-
-        }
-    });
-*/
     var legendCounter = 0;
 
     L.Control.BsLegend = L.Control.BsButtonBox.extend({
@@ -2608,6 +2581,9 @@ leaflet-bootstrap-control-legend.js
     /*****************************************************************
     ******************************************************************
     Legend
+    options:
+        normalIconClass: class-name(s) for icons when layer is normal (visible)
+        hiddenIconClass: class-name(s) for icon when layer is hidden
     *******************************************************************
     ******************************************************************/
     function BsLegend( options ){
@@ -2622,23 +2598,35 @@ leaflet-bootstrap-control-legend.js
         addTo: function( parent ){
             var _this = this,
                 options = this.options,
-                icon    = options.icon || 'fa-square text-white',
-                extraIconClass = ['','',''];
-            //Adjust icon to make it 1.25em width
-            if ($.isArray(icon))
-                extraIconClass[0] = 'fa-fw';
+                normalIcon = options.icon || 'fa-square text-white',
+                normalIconContainerClass = '';
+
+            //Add class to normal-icon to make it visible when working = off
+            if ($.isArray(normalIcon))
+                normalIconContainerClass = ' hide-for-bsl-working';
             else
-                icon = icon + ' fa-fw';
+                normalIcon = normalIcon + ' hide-for-bsl-working';
+            /*
+            Create 2+1 icons:
+            The first for layer=visible contains of two icons: normal and working
+            The second for layer=hidden contains not-visible-icon
+            */
+            var icon = [
+                    [normalIcon, 'show-for-bsl-working fa-fw fas fa-spinner fa-spin no-margin-left'],
+                    'fa-fw fas fa-eye-slash ' + (this.options.hiddenIconClass || '')
+                ];
+
+
             this.parent = parent;
             if (!this.$container){
-                //Craete to modal-content
+                //Create modal-content
                 var modalContentOptions = {
 
                     //noVerticalPadding: true,
                     //noHorizontalPadding: true,
                     noShadow: true,
                     header: {
-                        icon: [icon, 'fa-fw fas fa-spinner fa-spin', 'fa-fw fas fa-eye-slash'],
+                        icon: icon,
                         text: options.text
                     },
                     onInfo   : options.onInfo,
@@ -2664,13 +2652,8 @@ leaflet-bootstrap-control-legend.js
 
 
                 //Find all header icons
-
-                //First find the tree icons before header-text used to set state
-                this.stateIcons = {};
-                var iconList = this.$container.bsModal.$header.children();
-                $.each(['normal', 'loading', 'hidden'], function(index, id){
-                    _this.stateIcons[id] = $(iconList[index]).addClass(extraIconClass[index]);
-                });
+                this.stateIcons = this.$container.bsModal.$header.children();
+                $(this.stateIcons[0]).addClass('fa-fw ' + (this.options.normalIconClass || '') + normalIconContainerClass);
 
 
                 this.actionIcons = {};
@@ -2678,12 +2661,13 @@ leaflet-bootstrap-control-legend.js
                     _this.actionIcons[id] = _this.$container.find('[data-header-icon-id="'+id+'"]');
                 });
 
+                this.$header = this.$container.find('.modal-header');
 
                 this.setStateNormal();
+                this.workingOff();
             }
 
             this.$container.appendTo(this.parent.$modalBody);
-
 
         },
 
@@ -2699,17 +2683,22 @@ leaflet-bootstrap-control-legend.js
             return this.toggleIcon(id, false);
         },
 
-        setState: function(id){
-            $.each(this.stateIcons, function(iconId, $icon){
-                $icon.toggle(iconId == id);
-            });
+        workingToggle: function(on){
+            return this.$header.modernizrToggle('bsl-working', on);
+
+        },
+        workingOn : function(){ return this.workingToggle(true ); },
+        workingOff: function(){ return this.workingToggle(false); },
+
+
+
+        _setState: function(visible){
+            $(this.stateIcons[0]).toggle(visible);
+            $(this.stateIcons[1]).toggle(!visible);
             return this;
         },
-
-        setStateNormal   : function(){ return this.setState('normal'); },
-        setStateLoading  : function(){ return this.setState('loading'); },
-        setStateWorking  : function(){ return this.setStateLoading(); },
-        setStateHidden   : function(){ return this.setState('hidden'); },
+        setStateNormal   : function(){ return this._setState(true); },
+        setStateHidden   : function(){ return this._setState(false); },
         setStateInvisible: function(){ return this.setStateHidden(); },
 
 

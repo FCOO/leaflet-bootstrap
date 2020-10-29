@@ -1,0 +1,15 @@
+/***********************************************
+leaflet-bootstrap-control-legend.scss
+************************************************/
+//Moderinzr classes for show/hide history-buttons
+@include show-and-hide-for-modernizr-test(
+    $modernizr-test: 'bsl-working',
+    $parent-element-type: '.modal-header',
+    $incl-no-selector: false,
+    $display-value: '',
+    $incl-table-display: false
+);
+
+.no-margin-left {
+    margin-left: 0 !important;
+}

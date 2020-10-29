@@ -556,8 +556,8 @@ content = {
 
     for (var i=0; i<10;i++){
         var legend = map.bsLegendControl.addLegend({
-                icon: i != 4 ? 'fa-home' : ['fa-home'],
-                text: i+'. header',
+                icon: i != 4 ? 'fa-home' : ['far fa-square', 'far fa-heart'],
+                text: '| ' +i+'. header',
                 index: 100-i,
                 content   : i % 2 ? 'Her<br>er<br>der<br>noget' : null,
                 onInfo    : function(){ console.log('INFO');},
@@ -565,7 +565,9 @@ content = {
                 onRemove  : function(){ console.log('REMOVE');},
             });
 		if (i==1)
-			legend.setStateWorking()
+			legend.workingOn()
+		if (i==2)
+			legend.setStateHidden()
 
 		if (i==5)
             legend.hideIcon('info')
