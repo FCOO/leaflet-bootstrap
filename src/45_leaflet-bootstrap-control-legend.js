@@ -225,6 +225,7 @@ leaflet-bootstrap-control-legend.js
                 options.onRemove = options.onRemove || options.onClose;
                 if (options.onRemove)
                     modalContentOptions.icons.close = {
+                        title  : {da:'Skjul', en:'Hide'},
                         onClick: $.proxy(this.remove, this)
                     };
                 this.$container    = $('<div/>')._bsModalContent(modalContentOptions);
