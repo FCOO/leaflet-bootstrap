@@ -27,7 +27,8 @@ $labelWidth    : 2 * $halfLabelWidth;
     margin-bottom: 0 !important;
 }
 
-.leaflet-container:not(.has-control-attribution-bs) {
+//Inside a leaflet-bottom position WITHOUT a bsAttribution-control
+.leaflet-bottom:not(.has-control-attribution-bs) {
     .leaflet-button-box-scale {
         min-height: calc(#{$button-square-dimension} + #{$leaflet-control-margin-bottom} );
     }
@@ -37,7 +38,8 @@ $labelWidth    : 2 * $halfLabelWidth;
     }
 }
 
-.leaflet-container.has-control-attribution-bs {
+//Inside a leaflet-bottom position WITH a bsAttribution-control
+.leaflet-bottom.has-control-attribution-bs {
     .leaflet-button-box-scale {
         min-height: calc(#{$button-square-dimension} + #{$leaflet-control-last-bottom-right-margin-bottom} );
     }

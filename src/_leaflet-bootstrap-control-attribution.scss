@@ -10,6 +10,8 @@ leaflet-bootstrap-control-attribution.scss
         line-height: 1;
         height     : $leaflet-control-attribution-height;
 
+margin: 0 !important;
+
         cursor: default;
         background: $modal-content-bg-semi-transparent;
         .mouse-hover &:hover {

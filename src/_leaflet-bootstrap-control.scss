@@ -2,6 +2,7 @@
 leaflet-bootstrap-control.scss
 ************************************************/
 
+//If there are NO bsAttribution-control on the map => controls gets normal leaflet control margin
 .leaflet-container:not(.has-control-attribution-bs) .leaflet-control-container {
     .leaflet-bottom {
         .leaflet-control {
@@ -10,19 +11,19 @@ leaflet-bootstrap-control.scss
     }
 }
 
-//If a bsAttribution control is add (bottom-left) => adjust second-last control in bottom-left and last control in bottom right to align
+//If a bsAttribution control is add => adjust the controls that are together with a bsAttribution-control and adjust the controls that are NOT together with a bsAttribution-control
 .leaflet-container.has-control-attribution-bs .leaflet-control-container {
 
-    .leaflet-bottom.leaflet-left {
+    .leaflet-bottom.has-control-attribution-bs {
         .leaflet-control:nth-last-child(2) {
             //The last control before the bsAttribution control
             margin-bottom: $leaflet-control-attribution-bs-margin-top;
         }
     }
 
-    .leaflet-bottom.leaflet-right {
+    .leaflet-bottom:not(.has-control-attribution-bs) {
         .leaflet-control:last-child {
-            //The last control in bottom right when bsAttribution control is added in bottom left
+            //The last control in bottom when bsAttribution control is in the other side
             margin-bottom: $leaflet-control-last-bottom-right-margin-bottom;
         }
     }

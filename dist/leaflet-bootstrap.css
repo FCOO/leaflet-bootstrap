@@ -320,10 +320,10 @@ leaflet-bootstrap-control.scss
 .leaflet-container:not(.has-control-attribution-bs) .leaflet-control-container .leaflet-bottom .leaflet-control {
   margin-bottom: 10px; }
 
-.leaflet-container.has-control-attribution-bs .leaflet-control-container .leaflet-bottom.leaflet-left .leaflet-control:nth-last-child(2) {
+.leaflet-container.has-control-attribution-bs .leaflet-control-container .leaflet-bottom.has-control-attribution-bs .leaflet-control:nth-last-child(2) {
   margin-bottom: 2px; }
 
-.leaflet-container.has-control-attribution-bs .leaflet-control-container .leaflet-bottom.leaflet-right .leaflet-control:last-child {
+.leaflet-container.has-control-attribution-bs .leaflet-control-container .leaflet-bottom:not(.has-control-attribution-bs) .leaflet-control:last-child {
   margin-bottom: 13px; }
 
 /***********************************************
@@ -333,6 +333,7 @@ leaflet-bootstrap-control-attribution.scss
   font-size: 11px;
   line-height: 1;
   height: 11px;
+  margin: 0 !important;
   cursor: default;
   background: rgba(255, 255, 255, 0.5); }
   .mouse-hover .leaflet-control-container .leaflet-control-attribution.leaflet-control-attribution-bs:hover {
@@ -364,16 +365,16 @@ leaflet-bootstrap-control-scale.scss
 .leaflet-button-box-scale {
   margin-bottom: 0 !important; }
 
-.leaflet-container:not(.has-control-attribution-bs) .leaflet-button-box-scale {
+.leaflet-bottom:not(.has-control-attribution-bs) .leaflet-button-box-scale {
   min-height: calc(2.25rem + 10px); }
 
-.leaflet-container:not(.has-control-attribution-bs) .leaflet-button-box-scale-sm {
+.leaflet-bottom:not(.has-control-attribution-bs) .leaflet-button-box-scale-sm {
   min-height: calc(1.84375rem + 10px); }
 
-.leaflet-container.has-control-attribution-bs .leaflet-button-box-scale {
+.leaflet-bottom.has-control-attribution-bs .leaflet-button-box-scale {
   min-height: calc(2.25rem + 13px); }
 
-.leaflet-container.has-control-attribution-bs .leaflet-button-box-scale-sm {
+.leaflet-bottom.has-control-attribution-bs .leaflet-button-box-scale-sm {
   min-height: calc(1.84375rem + 13px); }
 
 .leaflet-bootstrap-control-scale {

@@ -154,6 +154,12 @@ leaflet-bootstrap-control-legend.js
         if (this.options.bsLegendControl){
             this.bsLegendControl = new L.Control.BsLegend( this.options.bsLegendOptions );
             this.addControl(this.bsLegendControl);
+
+
+            this.bsLegendControl2 = new L.Control.BsLegend( this.options.bsLegendOptions );
+            this.addControl(this.bsLegendControl2);
+
+
         }
     });
 
