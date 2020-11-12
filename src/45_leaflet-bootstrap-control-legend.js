@@ -154,12 +154,6 @@ leaflet-bootstrap-control-legend.js
         if (this.options.bsLegendControl){
             this.bsLegendControl = new L.Control.BsLegend( this.options.bsLegendOptions );
             this.addControl(this.bsLegendControl);
-
-
-            this.bsLegendControl2 = new L.Control.BsLegend( this.options.bsLegendOptions );
-            this.addControl(this.bsLegendControl2);
-
-
         }
     });
 
@@ -185,11 +179,11 @@ leaflet-bootstrap-control-legend.js
             var _this = this,
                 options = this.options,
                 normalIcon = options.icon || 'fa-square text-white',
-                normalIconContainerClass = '';
+                normalIconIsStackedIcon = false;
 
             //Add class to normal-icon to make it visible when working = off
             if ($.isArray(normalIcon))
-                normalIconContainerClass = ' hide-for-bsl-working';
+                normalIconIsStackedIcon = true;
             else
                 normalIcon = normalIcon + ' hide-for-bsl-working';
             /*
@@ -240,8 +234,10 @@ leaflet-bootstrap-control-legend.js
 
                 //Find all header icons
                 this.stateIcons = this.$container.bsModal.$header.children();
-                $(this.stateIcons[0]).addClass('fa-fw ' + (this.options.normalIconClass || '') + normalIconContainerClass);
-
+                var $normalIcon = $(this.stateIcons[0]);
+                $normalIcon.addClass('fa-fw ' + (this.options.normalIconClass || ''));
+                if (normalIconIsStackedIcon)
+                    $normalIcon.children('.container-stacked-icons').addClass('hide-for-bsl-working');
 
                 this.actionIcons = {};
                 $.each(['warning', 'info', 'help', 'close'], function(index, id){
