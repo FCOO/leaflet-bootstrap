@@ -42,18 +42,18 @@ Create standard attribution control, but with position='bottomleft' and hide by 
 (function ($, L/*, window, document, undefined*/) {
     "use strict";
 
-    var defaultBsAttributionOptions = {
+    L.Map.mergeOptions({
+        bsAttributionControl: false,
+        bsAttributionOptions: {
             position: 'bottomleft',
             prefix  : false
-        };
+        }
 
-    L.Map.mergeOptions({
-        bsAttributionControl: false
     });
 
     L.Map.addInitHook(function () {
         if (this.options.bsAttributionControl) {
-            this.bsAttributionControl = L.control.attribution( defaultBsAttributionOptions );
+            this.bsAttributionControl = L.control.attribution( this.options.bsAttributionOptions );
 
             this.bsAttributionControl.addTo(this);
             $(this.bsAttributionControl._container).addClass('leaflet-control-attribution-bs');
