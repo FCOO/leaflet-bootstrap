@@ -143,6 +143,13 @@ Create leaflet-control for jquery-bootstrap button-classes:
                     .addClass('show-for-extended')
                     .appendTo($container);
 
+            //Prevent different events from propagating to the map
+            $contentContainer.on('contextmenu mousewheel', function( event ) {
+                event.preventDefault();
+                event.stopPropagation();
+                return false;
+            });
+
             //this.options = null OR bsModal-options OR function($container, options, onToggle)
             if (this.options.content){
                 if ($.isFunction(this.options.content))

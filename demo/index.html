@@ -566,6 +566,7 @@ content = {
                 text: '| ' +i+'. header',
                 index: 100-i,
                 content   : i % 2 ? 'Her<br>er<br>der<br>noget' : null,
+                buttons   : i % 2 ? null : [{icon:'fa-home', text:'click me', onClick:alert}, {icon:'fa-home', text:'click me to'}],
                 onInfo    : function(){ console.log('INFO');},
                 onWarning : function(){ console.log('WARNING');},
                 onRemove  : function(){ console.log('REMOVE');},

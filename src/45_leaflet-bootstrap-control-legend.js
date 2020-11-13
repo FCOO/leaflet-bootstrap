@@ -75,13 +75,13 @@ leaflet-bootstrap-control-legend.js
 
         diminishAll: function(){
             $.each(this.list, function(index, legend){
-                if (!legend.$modalContent.hasClass('modal-normal') && legend.options.content)
+                if (!legend.$modalContent.hasClass('modal-normal') && legend.options.hasContent)
                     legend.$container._bsModalDiminish();
             });
         },
         extendAll: function(){
             $.each(this.list, function(index, legend){
-                if (!legend.$modalContent.hasClass('modal-extended') && legend.options.content)
+                if (!legend.$modalContent.hasClass('modal-extended') && legend.options.hasContent)
                     legend.$container._bsModalExtend();
             });
         },
@@ -217,11 +217,40 @@ leaflet-bootstrap-control-legend.js
                     closeButton: false
                 };
 
-                if (options.content){
-                    modalContentOptions.extended   = {content: options.content};
+
+                //The extended content can be 'normal' content or buttons/buttonList
+                if (options.content || options.buttons || options.buttonList){
+                    if (options.content)
+                        modalContentOptions.extended   = {content: options.content};
+                    else {
+                        var list = options.buttons || options.buttonList;
+                        $.each(list, function(index, options){ options.type = 'button'; });
+                        modalContentOptions.extended   = {className: 'text-right modal-footer', content: list};
+                    }
                     modalContentOptions.isExtended = true;
+                    options.hasContent = true;
                 }
 
+/*
+        $.each( buttons, function( index, buttonOptions ){
+
+            focusAdded = focusAdded || buttonOptions.focus;
+            if (!focusAdded && (index+1 == buttons.length ) )
+                buttonOptions.focus = true;
+
+            //Add same onClick as close-icon if closeOnClick: true
+            if (buttonOptions.closeOnClick)
+                buttonOptions.equalIconId = (buttonOptions.equalIconId || '') + ' close';
+
+            buttonOptions.class = defaultButtonClass + ' ' + (buttonOptions.className || '');
+
+            var $button =
+                $.bsButton( $.extend({}, defaultButtonOptions, buttonOptions ) )
+                    .appendTo( $modalButtonContainer );
+
+
+
+*/
                 options.onRemove = options.onRemove || options.onClose;
                 if (options.onRemove)
                     modalContentOptions.icons.close = {
