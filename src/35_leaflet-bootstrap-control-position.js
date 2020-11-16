@@ -118,7 +118,8 @@ Options for selectiong position-format and to activate context-menu
                     iconSize  : [36, 36],
                     iconAnchor: [18, 18],
                 }),
-                pane: controlPositionMarkerPane
+                interactive: false,
+                pane       : controlPositionMarkerPane
             });
             centerMarker.addTo(map);
             this.centerMarkers[ mapId ] = centerMarker;
