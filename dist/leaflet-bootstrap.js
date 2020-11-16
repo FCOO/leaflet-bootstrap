@@ -1662,7 +1662,7 @@ Options for selectiong position-format and to activate context-menu
         },
 
         addCenterMarker: function(map, isInOtherMap){
-            //Create pane to contain marker for map center. Is placed just below popup-pane
+            //Create pane to contain marker for map center. Is placed just below tooltip-pane
             var mapId = L.Util.stamp(map);
             this.centerMarkers = this.centerMarkers || {};
 
@@ -1670,7 +1670,7 @@ Options for selectiong position-format and to activate context-menu
                 map.createPane(controlPositionMarkerPane);
 
                 map.whenReady( function(){
-                    var zIndex = $(this.getPanes().popupPane).css('z-index');
+                    var zIndex = $(this.getPanes().tooltipPane).css('z-index');
                     this[controlPositionMarkerPane] = this.getPane(controlPositionMarkerPane);
                     $(this[controlPositionMarkerPane]).css('z-index', zIndex-1 );
                 }, map );
