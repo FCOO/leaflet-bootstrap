@@ -250,6 +250,8 @@ Options for selectiong position-format and to activate context-menu
                 var $icon = $(marker._icon);
                 showCenterMarker ? $icon.show() : $icon.hide();
             });
+            if (this.options.isExtended)
+                this._updatePositions(true);
         },
 
         getState: function(BsButtonBox_getState){
@@ -282,14 +284,14 @@ Options for selectiong position-format and to activate context-menu
             this._updatePositions();
         },
 
-        _updatePositions: function(){
+        _updatePositions: function(force){
             if (!this._map._loaded) return;
 
             //Update cursor position. It is updated two time to ensure correct min-width even if no mouse-position is saved
-            this._onMousePosition( this.mouseEvent );
+            this._onMousePosition( this.mouseEvent, false, force );
             var mouseEvent = this.mouseEventWithLatLng;
             if (mouseEvent && mouseEvent.latlng)
-                this._onMousePosition( mouseEvent );
+                this._onMousePosition( mouseEvent, false, force );
 
             //Update center position
             this._onMapMoveEnd();
@@ -313,18 +315,28 @@ Options for selectiong position-format and to activate context-menu
             return latlng.format({separator: this.latLngFormatSeparator});
         },
 
-        _onMousePosition: function ( mouseEvent, fromOtherMap ) {
+        _onMousePosition: function ( mouseEvent, fromOtherMap, force ) {
             if (this.dontUpdateMousePosition) return;
 
-            if ((this.mouseEvent ? this.mouseEvent.latlng : null) != (mouseEvent ? mouseEvent.latlng : null)){
+
+            if (force || ((this.mouseEvent ? this.mouseEvent.latlng : null) != (mouseEvent ? mouseEvent.latlng : null))){
+                var callOnMousePosition = this.options.onMousePosition && this.options.isExtended && (this.options.mode == 'CURSOR');
+
                 if ( mouseEvent &&
                      mouseEvent.latlng &&
                     (!fromOtherMap || this._map.getBounds().contains(mouseEvent.latlng))
-                   )
+                   ){
                     this.$cursorPosition.html( this._formatLatLng( mouseEvent.latlng ) );
+                    if (callOnMousePosition)
+                        this.options.onMousePosition(mouseEvent.latlng, this.$cursorPosition, this);
+
+                }
                 else {
                     this._saveAndSetMinWidth();
                     this.$cursorPosition.html('&nbsp;');
+                    if (callOnMousePosition)
+                        this.options.onMousePosition(null, this.$cursorPosition, this);
+
                 }
 
                 if (this.syncWithList && !this.dontUpdateMousePosition){
@@ -353,6 +365,9 @@ Options for selectiong position-format and to activate context-menu
             });
 
             this.$centerPosition.html( this._formatLatLng( position ) );
+
+            if (this.options.onCenterPosition && this.options.isExtended && (this.options.mode == 'MAPCENTER'))
+                this.options.onCenterPosition(position, this.$centerPosition, this);
         },
 
         _fireContentmenuOnMapCenter: function(){

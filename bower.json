@@ -1,6 +1,6 @@
 {
   "name": "leaflet-bootstrap",
-  "version": "2.26.0",
+  "version": "2.27.0",
   "homepage": "https://github.com/FCOO/leaflet-bootstrap",
   "authors": [
     "Niels Holt"
@@ -35,7 +35,8 @@
     "modernizr-mixin": "latest",
     "mathsass": "latest",
     "modernizr-scss": "FCOO/modernizr-scss#^2.1.2",
-    "sass-color-helpers": "^2.1.1"
+    "sass-color-helpers": "^2.1.1",
+    "leaflet-polyline": "fcoo/leaflet-polyline#^2.4.2"
   },
   "license": "MIT",
   "ignore": [
