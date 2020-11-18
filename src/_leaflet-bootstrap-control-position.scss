@@ -24,8 +24,8 @@ leaflet-bootstrap-control-position.scss
         margin : 0;
         padding: 0;
 
-        //Class for inner container with the position
-        .position {
+        //Class for inner container with the info for the position
+        .bsPosition-content {
             @include control-border-color( $incl-error: false );
             @include vertical-align-center();
             text-align : right;
@@ -44,8 +44,16 @@ leaflet-bootstrap-control-position.scss
     $incl-table-display : false
 );
 
-//Mode = Show map senter position
+//Mode = Show map center position
 @include show-and-hide-for-modernizr-test(
     $modernizr-test     : 'control-position-map-center',
     $incl-table-display : false
 );
+
+//Create Moderinzr classes for show/hide for when the cursor in on/off the map
+.control-position-cursor .no-cursor-on-map .hide-for-no-cursor-on-map {
+    color: transparent;
+    * {
+        visibility: hidden !important;
+    }
+}

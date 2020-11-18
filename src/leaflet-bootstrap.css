@@ -525,7 +525,7 @@ leaflet-bootstrap-control-position.scss
   width: initial;
   margin: 0;
   padding: 0; }
-  .leaflet-control-container .input-group .position {
+  .leaflet-control-container .input-group .bsPosition-content {
     border: 1px solid #ced4da;
     outline: none !important;
     display: flex;
@@ -535,17 +535,17 @@ leaflet-bootstrap-control-position.scss
     padding: 0 0.25rem;
     padding-top: 1px;
     font-size: 13px; }
-    .leaflet-control-container .input-group .position:active, .leaflet-control-container .input-group .position.active {
+    .leaflet-control-container .input-group .bsPosition-content:active, .leaflet-control-container .input-group .bsPosition-content.active {
       border-color: #b8c1ca; }
-    .leaflet-control-container .input-group .position:focus, .leaflet-control-container .input-group .position.focus {
+    .leaflet-control-container .input-group .bsPosition-content:focus, .leaflet-control-container .input-group .bsPosition-content.focus {
       border-color: #80bdff; }
-    .leaflet-control-container .input-group .position.disabled:not(.show-as-normal), .leaflet-control-container .input-group .position:disabled:not(.show-as-normal) {
+    .leaflet-control-container .input-group .bsPosition-content.disabled:not(.show-as-normal), .leaflet-control-container .input-group .bsPosition-content:disabled:not(.show-as-normal) {
       border-color: #ced4da; }
-    .leaflet-control-container .input-group .position.focus:not(:disabled):not(.disabled):not(.no-hover), .leaflet-control-container .input-group .position:focus:not(:disabled):not(.disabled):not(.no-hover),
-    .mouse-hover .leaflet-control-container .input-group .position:hover:not(:disabled):not(.disabled):not(.no-hover) {
+    .leaflet-control-container .input-group .bsPosition-content.focus:not(:disabled):not(.disabled):not(.no-hover), .leaflet-control-container .input-group .bsPosition-content:focus:not(:disabled):not(.disabled):not(.no-hover),
+    .mouse-hover .leaflet-control-container .input-group .bsPosition-content:hover:not(:disabled):not(.disabled):not(.no-hover) {
       position: relative;
       z-index: 4; }
-    .mouse-hover .leaflet-control-container .input-group .position:hover:not(:focus):not(:disabled):not(.disabled):not(.no-hover) {
+    .mouse-hover .leaflet-control-container .input-group .bsPosition-content:hover:not(:focus):not(:disabled):not(.disabled):not(.no-hover) {
       border-color: #8C959D; }
 
 .control-position-cursor .hide-for-control-position-cursor {
@@ -571,3 +571,8 @@ leaflet-bootstrap-control-position.scss
 
 .no-control-position-map-center .hide-for-no-control-position-map-center {
   display: none !important; }
+
+.control-position-cursor .no-cursor-on-map .hide-for-no-cursor-on-map {
+  color: transparent; }
+  .control-position-cursor .no-cursor-on-map .hide-for-no-cursor-on-map * {
+    visibility: hidden !important; }

@@ -85,6 +85,7 @@
             zoomControl: first,
             bsZoomControl: true, //first,
             bsZoomOptions: {
+                position: 'topleft',
                 isExtended: false,
                 showHistory: false,
                 historyEnabled: first
@@ -116,7 +117,7 @@
             attributionControl: false,
             bsAttributionControl: first,
             bsAttributionOptions: {
-                position: 'bottomleft'
+                position: 'bottomright'
             }
 
         }).setView([56.2, 11.5], 6);
@@ -128,6 +129,29 @@
 
         L.marker([54,12], {draggable: true}).addTo(nextMap).bindTooltip({icon:'fa-home', text:'Godt'}, {delay:2000});
 
+nextMap.bsPositionControl.addInfoBox({
+    id: 'test', 
+    index: 4000,
+    class: 'text-monospace',
+//HER    before: {
+//HER        icon: 'fa-home'
+//HER    },
+    content: 'MEGET&nbsp;LANG&nbsp;Davs&nbsp;4000'
+}).width('20em');
+
+nextMap.bsPositionControl.addInfoBox({
+    index: 3000,
+    before: {
+        icon: 'fa-map',
+        onClick: function(){ nextMap.bsPositionControl.removeInfoBox('test'); }
+    },
+    content: {icon: 'fa-sync', text: {da:'Dansk 3000', en:'Eng 3000'}},
+    after: {
+        icon: 'fa-eye-slash',
+        onClick: function(){ nextMap.bsPositionControl.removeInfoBox('test'); }
+    }
+});
+        
         window[id] = nextMap;
         first = false;
     });

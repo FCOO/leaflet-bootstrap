@@ -44,6 +44,9 @@ Options for selectiong position-format and to activate context-menu
             selectFormat      : null    //function() to select format for position using latlng-format (fcoo/latlng-format)
         },
 
+        /************************************************************
+        initialize
+        ************************************************************/
         initialize: function ( options ) {
             if (window.bsIsTouch)
                 //Zoom- and history buttons are shown in a bsModal-box
@@ -82,7 +85,7 @@ Options for selectiong position-format and to activate context-menu
 
             //Set format-options and event for change of format
 
-            //latLngFormatSeparator = separator used in formatting the latLng-string. Using <br> for all geo-ref formats
+            //latLngFormatSeparator = separator used in formatting the latlng-string. Using <br> for all geo-ref formats
             this.latLngFormatSeparator = '<br>';
 
             //latLngFormatWidth = min-width of the position-element for different latlng-formats
@@ -91,11 +94,17 @@ Options for selectiong position-format and to activate context-menu
             window.latLngFormat.onChange( $.proxy( this._onLatLngFormatChanged, this ));
         },
 
+        /************************************************************
+        addMapContainer
+        ************************************************************/
         addMapContainer: function(map){
             this.$mapContainers = this.$mapContainers || {};
             this.$mapContainers[ L.Util.stamp(map) ] = $(map.getContainer());
         },
 
+        /************************************************************
+        addCenterMarker
+        ************************************************************/
         addCenterMarker: function(map, isInOtherMap){
             //Create pane to contain marker for map center. Is placed just below tooltip-pane
             var mapId = L.Util.stamp(map);
@@ -125,17 +134,21 @@ Options for selectiong position-format and to activate context-menu
             this.centerMarkers[ mapId ] = centerMarker;
         },
 
+        /************************************************************
+        onAdd
+        ************************************************************/
         onAdd: function(map){
             this.addMapContainer(map);
             this.addCenterMarker(map);
 
             //Create the content for the control
-            var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map ),
-                $contentContainer = this.$contentContainer.bsModal.$body;
+            var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map );
+
+            this.$innerContentContainer = this.$contentContainer.bsModal.$body;
 
             //Empty and remove borders on modal
             this.$contentContainer.bsModal.$modalContent.css('border', 'none');
-            $contentContainer.empty();
+            this.$innerContentContainer.empty();
 
             //Create two sets of button-input-button
             var cursorOptions = {
@@ -183,23 +196,25 @@ Options for selectiong position-format and to activate context-menu
                 mapCenterOptions.after.onClick = $.proxy(this._fireContentmenuOnMapCenter, this);
             }
 
-            $contentContainer
+            this.$innerContentContainer
                 ._bsAppendContent( cursorOptions )
                 ._bsAppendContent( mapCenterOptions );
 
             //Use the added class name to find the two containers for cursor- and map center position
-            this.$cursorPosition = $contentContainer.find('.cursor').parent().empty().addClass('position text-monospace').html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
-            this.$centerPosition = $contentContainer.find('.center').parent().empty().addClass('position text-monospace').html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
+            var contentClassName = 'hide-for-no-cursor-on-map bsPosition-content text-monospace justify-content-center align-items-center flex-grow-1';
+            this.$cursorPosition = this.$innerContentContainer.find('.cursor').parent().empty().addClass(contentClassName).html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
+            this.$centerPosition = this.$innerContentContainer.find('.center').parent().empty().addClass(contentClassName).html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
 
             if (this.options.inclContextmenu){
                 //Remove tooltips from the two buttons to the right
-                var $rightButtons = $contentContainer.find('.input-group-append .btn');
+                var $rightButtons = this.$innerContentContainer.find('.input-group-append .btn');
                 $rightButtons.on('click', $.proxy(this.hidePopup, this ));
                 this.removeTooltip( $rightButtons );
             }
 
             //Add events to update position
              map.on('mouseposition', this._onMousePosition, this);
+            $('body').on('mouseleave', $.proxy(this._onMousePosition, this));
 
             map.on('move', this._onMapMove, this);
             map.on('moveend', this._onMapMoveEnd, this);
@@ -212,6 +227,150 @@ Options for selectiong position-format and to activate context-menu
             return result;
         },
 
+
+        /************************************************************
+        *************************************************************
+        infoBox
+        add, hide, show and remove extra boxes with additional
+        information on the position
+        options for an infoBox =
+            id       : STRING
+            index    : NUMBER
+            className: STRING
+            before   : {
+                icon   : STRING
+                onClick: function. If null the left side will just be the icon
+            },
+            content : STRING or OBJECT or FUNCTION
+            after   : As options.before
+        *************************************************************
+        ************************************************************/
+        addInfoBox: function(options){
+            this.infoBoxList = this.infoBoxList || [];
+            this.infoBoxes = this.infoBoxes || [];
+
+            options.index = options.index || this.infoBoxList.length;
+            options.id = options.id || 'id'+options.index;
+
+            var innerContainerClassName = 'info-box-'+options.index,
+                boxOptions = {
+                    insideFormGroup: false,
+                    noValidation   : true,
+                    noBorder       : true,
+                    type           : 'textbox',
+                    text           : function( $inner ){ $inner.addClass(innerContainerClassName); },
+                    class          : (options.className || ''),
+                    before: {
+                        type   : 'button',
+                        icon   : 'fa-_',
+                        text   : '',
+                        square : true,
+                        class  : 'disabled show-as-normal',
+                        semiTransparent: true
+                    },
+                    after: {
+                        type   : 'button',
+                        icon   : 'fa-_',
+                        text   : '',
+                        square : true,
+                        class  : 'disabled show-as-normal',
+                        semiTransparent: true
+                    }
+
+                };
+
+            if (options.before){
+                boxOptions.before.icon = options.before.icon || boxOptions.before.icon;
+                if (options.before.onClick){
+                    boxOptions.before.class    = '';
+                    boxOptions.before.onClick  = options.before.onClick;
+                }
+            }
+
+            if (this.options.inclContextmenu || options.after){
+                options.after = options.after || {};
+                boxOptions.after.icon = options.after.icon || boxOptions.after.icon;
+                if (options.after.onClick){
+                    boxOptions.after.class    = '';
+                    boxOptions.after.onClick  = options.after.onClick;
+                }
+            }
+            else
+                delete boxOptions.after;
+
+            this.$innerContentContainer._bsAppendContent( boxOptions );
+
+            var $result  =
+                    this.$innerContentContainer.find('.' + innerContainerClassName).parent()
+                        .addClass('hide-for-no-cursor-on-map d-flex bsPosition-content justify-content-center align-items-center flex-grow-1'),
+                infoBox = {
+                    id               : options.id,
+                    index            : options.index,
+                    $container       : $result.parent(),
+                    $contentContainer: $result
+                };
+            $result.empty()._bsAddHtml(options.content);
+
+            //Remove tooltip from active buttons
+            var _this = this;
+            $result.parent().find('a:not(.disabled)').each(function(){ _this.removeTooltip( $(this) ); });
+
+
+            this.infoBoxList.push(infoBox);
+            this.infoBoxes[options.id] = infoBox;
+
+            //Sort info-boxes by index
+            this.infoBoxList.sort(function(box1, box2){ return box1.index - box2.index; });
+            for (var i=0; i<this.infoBoxList.length; i++)
+                this.infoBoxList[i].$container.detach().prependTo(this.$innerContentContainer);
+
+            return $result;
+        },
+
+
+        /************************************************************
+        getInfoBox
+        ************************************************************/
+        getInfoBox: function(idOrIndex){
+            var result = null;
+            if (typeof idOrIndex == 'string')
+                return this.infoBoxes[idOrIndex];
+            $.each(this.infoBoxList, function(dummy, infoBox){
+                if (infoBox.index == idOrIndex)
+                    result = infoBox;
+            });
+            return result;
+        },
+
+        /************************************************************
+        removeInfoBox
+        ************************************************************/
+        removeInfoBox: function(idOrIndex){
+            var _this = this,
+                removeInfoBox = this.getInfoBox(idOrIndex);
+
+            if (!removeInfoBox) return;
+
+            removeInfoBox.$container.remove();
+
+            $.each(this.infoBoxList, function(index, infoBox){
+                if (infoBox.id == removeInfoBox.id){
+                    _this.infoBoxList.splice(index, 1);
+                    return true;
+                }
+            });
+            delete this.infoBoxes[removeInfoBox.id];
+
+            //Reste min-width and re-calc
+            this.$cursorPosition.css('min-width', 'initial');
+            this.$centerPosition.css('min-width', 'initial');
+
+            window.setTimeout($.proxy(this._saveAndSetMinWidth, this), 200);
+        },
+
+        /************************************************************
+        onRemove
+        ************************************************************/
         onRemove: function (map) {
             this.centerMarkers[L.Util(map)].remove();
             delete this.centerMarkers[L.Util(map)];
@@ -225,6 +384,9 @@ Options for selectiong position-format and to activate context-menu
             this.setMode( this.options.mode );
         },
 
+        /************************************************************
+        setMode
+        ************************************************************/
         setMode: function( mode ){
             this.options.mode = mode;
 
@@ -245,6 +407,9 @@ Options for selectiong position-format and to activate context-menu
         },
 
 
+        /************************************************************
+        onChange
+        ************************************************************/
         onChange: function(/*state*/){
             var showCenterMarker = this.options.show && this.options.isExtended && (this.options.mode == 'MAPCENTER');
             $.each(this.centerMarkers, function(id, marker){
@@ -255,12 +420,18 @@ Options for selectiong position-format and to activate context-menu
                 this._updatePositions(true);
         },
 
+        /************************************************************
+        getState
+        ************************************************************/
         getState: function(BsButtonBox_getState){
             return function () {
                 return $.extend({mode: this.options.mode}, BsButtonBox_getState.call(this) );
             };
         }(L.Control.BsButtonBox.prototype.getState),
 
+        /************************************************************
+        setState
+        ************************************************************/
         setState: function(BsButtonBox_setState){
             return function (options) {
                 BsButtonBox_setState.call(this, options);
@@ -321,23 +492,21 @@ Options for selectiong position-format and to activate context-menu
 
 
             if (force || ((this.mouseEvent ? this.mouseEvent.latlng : null) != (mouseEvent ? mouseEvent.latlng : null))){
-                var callOnMousePosition = this.options.onMousePosition && this.options.isExtended && (this.options.mode == 'CURSOR');
+                var callOnMousePosition = this.options.onMousePosition && this.options.isExtended && (this.options.mode == 'CURSOR'),
+                    latlng = mouseEvent ? mouseEvent.latlng : null;
 
-                if ( mouseEvent &&
-                     mouseEvent.latlng &&
-                    (!fromOtherMap || this._map.getBounds().contains(mouseEvent.latlng))
-                   ){
-                    this.$cursorPosition.html( this._formatLatLng( mouseEvent.latlng ) );
+                this.$contentContainer.modernizrToggle('cursor-on-map', !!latlng);
+
+                if ( latlng && (!fromOtherMap || this._map.getBounds().contains(latlng)) ){
+                    this.$cursorPosition.html( this._formatLatLng( latlng ) );
                     if (callOnMousePosition)
                         this.options.onMousePosition(mouseEvent.latlng, this.$cursorPosition, this);
 
                 }
                 else {
                     this._saveAndSetMinWidth();
-                    this.$cursorPosition.html('&nbsp;');
                     if (callOnMousePosition)
                         this.options.onMousePosition(null, this.$cursorPosition, this);
-
                 }
 
                 if (this.syncWithList && !this.dontUpdateMousePosition){
