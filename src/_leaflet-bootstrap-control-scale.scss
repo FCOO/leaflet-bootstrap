@@ -161,3 +161,18 @@ $labelWidth    : 2 * $halfLabelWidth;
         }
     } //end of .leaflet-control-singlescale-inner
 } //end of .leaflet-control-singlescale
+
+
+/********************************************************************************
+L.Control.Reticle
+Leaflet control representning a reticle at map center
+
+Modified version of leaflet-reticle
+https://github.com/rwev/leaflet-reticle by https://github.com/rwev
+********************************************************************************/
+//Hide when zooming
+.leaflet-zoom-anim .icon-reticle {
+    display: none !important;
+}
+
+

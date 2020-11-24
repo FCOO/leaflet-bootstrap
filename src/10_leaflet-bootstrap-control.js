@@ -36,7 +36,6 @@ L.BsControl = extention of L.Control with
         initialize: function ( options ) {
             $.extend(options, this.forceOptions || {});
             L.Util.setOptions(this, options);
-            this._controlTooltipContent = [];
         },
 
         _getTooltipElements: function( container ){
@@ -48,6 +47,8 @@ L.BsControl = extention of L.Control with
         },
 
         addTo: function(map) {
+            this._controlTooltipContent = [];
+
             var result = L.Control.prototype.addTo.apply(this, arguments);
             L.DomEvent.disableClickPropagation(this._container);
 

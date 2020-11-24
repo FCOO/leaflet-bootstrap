@@ -27,6 +27,27 @@
     });
 
 
+    /**********************************************************
+    L.Map.getPaneBelow(paneId)
+    Create and return a pane named paneId+'below' that gets zIndex just below pane with paneId
+    **********************************************************/
+    L.Map.prototype.getPaneBelow = function(paneId){
+        var paneBelowId = paneId+'below';
+
+        if (!this.getPane(paneBelowId)){
+            this.createPane(paneBelowId);
+
+            this.whenReady( function(){
+                var zIndex = $(this.getPanes()[paneId]).css('z-index');
+                this[paneBelowId] = this.getPane(paneBelowId);
+                $(this[paneBelowId]).css('z-index', zIndex-1 );
+            }, this );
+        }
+
+        return this.getPane(paneBelowId);
+
+    };
+
 }(jQuery, L, this, document));
 
 

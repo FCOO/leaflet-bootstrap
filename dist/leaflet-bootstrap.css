@@ -450,6 +450,16 @@ leaflet-bootstrap-control-scale.scss
     .leaflet-control-singlescale .leaflet-control-singlescale-inner .division.hidden .label {
       opacity: 0; }
 
+/********************************************************************************
+L.Control.Reticle
+Leaflet control representning a reticle at map center
+
+Modified version of leaflet-reticle
+https://github.com/rwev/leaflet-reticle by https://github.com/rwev
+********************************************************************************/
+.leaflet-zoom-anim .icon-reticle {
+  display: none !important; }
+
 /***********************************************
 leaflet-bootstrap-control-zoom.scss
 ************************************************/

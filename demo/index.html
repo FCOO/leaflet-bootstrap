@@ -57,7 +57,9 @@
 //HER    window.bsIsTouch = window.bsIsTouch || (window.location.search =='?touch');
 
     i18next.init();
-    i18next.changeLanguage('da');
+    i18next.changeLanguage('en');
+    i18next.options.fallbackLng = i18next.language == 'da' ? 'en' : 'da';
+
 
     //latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_UTM);
     //latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_MGRS);
@@ -93,6 +95,7 @@
             bsPositionControl: true,
             bsPositionOptions: {
                 position          : 'bottomright',
+                mode              : 'CURSOR',
                 isExtended        : true,
                 showCursorPosition: true,
                 inclContextmenu   : true,
@@ -104,8 +107,8 @@
             bsScaleOptions: {
                 position          : 'bottomleft',
                 isExtended: true,
-                tooltipOnButton: !index,
-                selectFormat: first ? function(){ this.setMode(confirm('Use nautical?') ? 'nautical' : 'metric'); } : null
+                tooltipOnButton: false,//!index,
+                selectFormat: first ? function(){ console.log(this); this.setMode(confirm('Use nautical?') ? 'NAUTICAL' : 'METRIC'); } : null
             },
             bsLegendControl: true,
 			bsLegendOptions: {
@@ -121,6 +124,14 @@
             }
 
         }).setView([56.2, 11.5], 6);
+
+nextMap.removeControl( nextMap.bsScaleControl );
+nextMap.addControl( nextMap.bsScaleControl );
+nextMap.removeControl( nextMap.bsScaleControl );
+nextMap.addControl( nextMap.bsScaleControl );
+nextMap.removeControl( nextMap.bsScaleControl );
+nextMap.addControl( nextMap.bsScaleControl );
+
 
         L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 18,
@@ -138,6 +149,10 @@ nextMap.bsPositionControl.addInfoBox({
 //HER    },
     content: 'MEGET&nbsp;LANG&nbsp;Davs&nbsp;4000'
 }).width('20em');
+
+
+
+
 
 nextMap.bsPositionControl.addInfoBox({
     index: 3000,

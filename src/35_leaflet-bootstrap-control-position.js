@@ -8,9 +8,7 @@ Options for selectiong position-format and to activate context-menu
 (function ($, L, window/*, document, undefined*/) {
     "use strict";
 
-    var controlPositionMarkerPane = 'controlPositionMarkerPane',
-
-        iconCursorPosition = 'fa-mouse-pointer',
+    var iconCursorPosition = 'fa-mouse-pointer',
         iconMapCenter      = 'fa-lb-center-marker';
 
     /********************************************************************************
@@ -106,19 +104,8 @@ Options for selectiong position-format and to activate context-menu
         addCenterMarker
         ************************************************************/
         addCenterMarker: function(map, isInOtherMap){
-            //Create pane to contain marker for map center. Is placed just below tooltip-pane
             var mapId = L.Util.stamp(map);
             this.centerMarkers = this.centerMarkers || {};
-
-            if (!map.getPane(controlPositionMarkerPane)){
-                map.createPane(controlPositionMarkerPane);
-
-                map.whenReady( function(){
-                    var zIndex = $(this.getPanes().tooltipPane).css('z-index');
-                    this[controlPositionMarkerPane] = this.getPane(controlPositionMarkerPane);
-                    $(this[controlPositionMarkerPane]).css('z-index', zIndex-1 );
-                }, map );
-            }
 
             //Append the cross in the center of the map
             var centerMarker = L.marker([0,0], {
@@ -128,8 +115,9 @@ Options for selectiong position-format and to activate context-menu
                     iconAnchor: [18, 18],
                 }),
                 interactive: false,
-                pane       : controlPositionMarkerPane
+                pane       : map.getPaneBelow('tooltipPane') //Create/get pane to contain marker for map center. Is placed just below tooltip-pane
             });
+
             centerMarker.addTo(map);
             this.centerMarkers[ mapId ] = centerMarker;
         },
@@ -213,7 +201,7 @@ Options for selectiong position-format and to activate context-menu
             }
 
             //Add events to update position
-             map.on('mouseposition', this._onMousePosition, this);
+            map.on('mouseposition', this._onMousePosition, this);
             $('body').on('mouseleave', $.proxy(this._onMousePosition, this));
 
             map.on('move', this._onMapMove, this);
@@ -364,16 +352,17 @@ Options for selectiong position-format and to activate context-menu
             //Reste min-width and re-calc
             this.$cursorPosition.css('min-width', 'initial');
             this.$centerPosition.css('min-width', 'initial');
+            this.latLngFormatWidth = {};
 
-            window.setTimeout($.proxy(this._saveAndSetMinWidth, this), 200);
+            this._updatePositions();
         },
 
         /************************************************************
         onRemove
         ************************************************************/
         onRemove: function (map) {
-            this.centerMarkers[L.Util(map)].remove();
-            delete this.centerMarkers[L.Util(map)];
+            this.centerMarkers[L.Util.stamp(map)].remove();
+            delete this.centerMarkers[L.Util.stamp(map)];
             map.off('mouseposition', this._onMousePosition, this);
             map.off('move', this._onMapMove, this);
             map.off('moveend', this._onMapMoveEnd, this);
@@ -479,6 +468,7 @@ Options for selectiong position-format and to activate context-menu
                             this.$cursorPosition.outerWidth() :
                             this.$centerPosition.outerWidth()
                     );
+
             this.$cursorPosition.css('min-width', minWidth+'px');
             this.$centerPosition.css('min-width', minWidth+'px');
         },
