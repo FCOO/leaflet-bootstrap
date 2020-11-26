@@ -212,6 +212,8 @@ Options for selectiong position-format and to activate context-menu
             //Set/update latlng-format
             this._onLatLngFormatChanged(window.latLngFormat.options.formatId);
 
+            this.addedToMap = true;
+
             return result;
         },
 
@@ -367,6 +369,7 @@ Options for selectiong position-format and to activate context-menu
             map.off('move', this._onMapMove, this);
             map.off('moveend', this._onMapMoveEnd, this);
 
+            this.addedToMap = false;
         },
 
         _onLoad: function(){
@@ -446,7 +449,7 @@ Options for selectiong position-format and to activate context-menu
         },
 
         _updatePositions: function(force){
-            if (!this._map._loaded) return;
+            if (!this.addedToMap || !this._map || !this._map._loaded) return;
 
             //Update cursor position. It is updated two time to ensure correct min-width even if no mouse-position is saved
             this._onMousePosition( this.mouseEvent, false, force );
