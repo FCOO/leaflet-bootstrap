@@ -171,7 +171,7 @@ L.BsControl = extention of L.Control with
                 var controlContainer = map._controlContainer;
 
                 //Prevent event on control-container from map
-                L.DomEvent.on(controlContainer, 'contextmenu dblclick', L.DomEvent.stop);
+                L.DomEvent.on(controlContainer, 'contextmenu dblclick mousewheel', L.DomEvent.stop);
 
                 //Close all popup on the map when contextmenu on any control
                 $(controlContainer).on('touchstart mousedown', $.proxy(map.closeAllPopup, map));
@@ -512,13 +512,18 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
             //Set default onToggle-function
             this.onToggle = $.proxy(this.toggle, this);
-            if (this.options.addOnClose){
-                //If tooltips also is shown when not isExtended => create extra options and let adjustTooltip dynamic adjust tooltips
-                if (this.options.tooltipOnButton)
-                    this._controlTooltipContent.push({id:'open', icon: this.options.leftClickIcon, text: this.options.openText});
-
+            if (this.options.addOnClose)
                 this.options.onClose = this.onToggle;
-            }
+        },
+
+        addTo: function(){
+            var result = L.Control.BsButton.prototype.addTo.apply(this, arguments);
+
+            //If tooltips also is shown when not isExtended => create extra options and let adjustTooltip dynamic adjust tooltips
+            if (this.options.addOnClose && this.options.tooltipOnButton)
+                this._controlTooltipContent.unshift({id:'open', icon: this.options.leftClickIcon, text: this.options.openText});
+
+            return result;
         },
 
         _createContent: function(){
@@ -550,13 +555,6 @@ Create leaflet-control for jquery-bootstrap button-classes:
                     .width('auto')
                     .addClass('show-for-extended')
                     .appendTo($container);
-
-            //Prevent different events from propagating to the map
-            $contentContainer.on('contextmenu mousewheel', function( event ) {
-                event.preventDefault();
-                event.stopPropagation();
-                return false;
-            });
 
             //this.options = null OR bsModal-options OR function($container, options, onToggle)
             if (this.options.content){

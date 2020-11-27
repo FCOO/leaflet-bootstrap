@@ -54,7 +54,6 @@
     window.bsIsTouch = false;
     if (window.location.search =='?touch')
         window.bsIsTouch = true;
-//HER    window.bsIsTouch = window.bsIsTouch || (window.location.search =='?touch');
 
     i18next.init();
     i18next.changeLanguage('en');
@@ -99,6 +98,7 @@
                 isExtended        : true,
                 showCursorPosition: true,
                 inclContextmenu   : true,
+                tooltipOnButton   : true,
                 selectFormat: setLatLngFormat,
                 //onCenterPosition: function(pos, con, x){ console.log('Center', pos); },
                 //onMousePosition: function(pos){ console.log('mouse', pos); }
@@ -144,9 +144,9 @@ nextMap.bsPositionControl.addInfoBox({
     id: 'test', 
     index: 4000,
     class: 'text-monospace',
-//HER    before: {
-//HER        icon: 'fa-home'
-//HER    },
+    before: {
+        icon: 'fa-home'
+    },
     content: 'MEGET&nbsp;LANG&nbsp;Davs&nbsp;4000'
 }).width('20em');
 
@@ -520,8 +520,9 @@ content = {
             }
             ]}
     });
-
     map.addControl( formControl );
+
+
     var myData = { mySlider: 33 };
     map.addControl( L.control.bsButton({
         icon:'fa-edit',
@@ -535,6 +536,7 @@ content = {
     map.addControl( L.control.bsButton({
         icon:['fa-edit', 'fa-pencil-alt'],
     }) );
+
 
     //************************************************************
     var state, state2;

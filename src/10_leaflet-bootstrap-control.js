@@ -78,7 +78,7 @@ L.BsControl = extention of L.Control with
                 var controlContainer = map._controlContainer;
 
                 //Prevent event on control-container from map
-                L.DomEvent.on(controlContainer, 'contextmenu dblclick', L.DomEvent.stop);
+                L.DomEvent.on(controlContainer, 'contextmenu dblclick mousewheel', L.DomEvent.stop);
 
                 //Close all popup on the map when contextmenu on any control
                 $(controlContainer).on('touchstart mousedown', $.proxy(map.closeAllPopup, map));
