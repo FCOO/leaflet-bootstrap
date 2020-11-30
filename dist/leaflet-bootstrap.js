@@ -870,10 +870,12 @@ https://github.com/nerik/leaflet-graphicscale
 
             //Set popup-items - two different modes: With and without options.selectFormat
             var reticlePopup = {
-                    icon    : 'fa-ruler-combined', text: {da:'Vis trådkors', en:'Show Reticle'},
-                    type    : 'checkbox',
-                    selected: this.options.showReticle,
-                    onChange: $.proxy(this._onShowReticle, this)
+                    id          : 'showReticle',
+                    icon        : 'fa-ruler-combined', text: {da:'Vis trådkors', en:'Show Reticle'},
+                    type        : 'checkbox',
+                    closeOnClick: false,
+                    selected    : this.options.showReticle,
+                    onChange    : $.proxy(this._onShowReticle, this)
                 };
             this.options.popupList = [];
             if (options.selectFormat)
@@ -997,7 +999,10 @@ https://github.com/nerik/leaflet-graphicscale
         },
         onShowReticle: function(show){
             this.options.showReticle = show;
-            this.reticleMarker.setShow(show);
+            this.reticleMarker.setShow(this.options.showReticle && this.options.show);
+
+            this._onChange();
+
         },
 
         getState: function(BsButtonBox_getState){
