@@ -2187,31 +2187,31 @@ Options for selectiong position-format and to activate context-menu
 
             this.$innerContentContainer._bsAppendContent( boxOptions );
 
-            var $result  =
+            var $contentContainer  =
                     this.$innerContentContainer.find('.' + innerContainerClassName).parent()
                         .addClass('hide-for-no-cursor-on-map d-flex bsPosition-content justify-content-center align-items-center flex-grow-1'),
                 infoBox = {
                     id               : options.id,
                     index            : options.index,
-                    $container       : $result.parent(),
-                    $contentContainer: $result
+                    $container       : $contentContainer.parent(),
+                    $contentContainer: $contentContainer
                 };
-            $result.empty()._bsAddHtml(options.content);
+            $contentContainer.empty()._bsAddHtml(options.content);
 
             //Remove tooltip from active buttons
             var _this = this;
-            $result.parent().find('a:not(.disabled)').each(function(){ _this.removeTooltip( $(this) ); });
+            $contentContainer.parent().find('a:not(.disabled)').each(function(){ _this.removeTooltip( $(this) ); });
 
 
             this.infoBoxList.push(infoBox);
             this.infoBoxes[options.id] = infoBox;
 
             //Sort info-boxes by index
-            this.infoBoxList.sort(function(box1, box2){ return box1.index - box2.index; });
+            this.infoBoxList.sort(function(box1, box2){ return box2.index - box1.index; });
             for (var i=0; i<this.infoBoxList.length; i++)
                 this.infoBoxList[i].$container.detach().prependTo(this.$innerContentContainer);
 
-            return $result;
+            return infoBox;
         },
 
 
@@ -2239,11 +2239,10 @@ Options for selectiong position-format and to activate context-menu
             if (!removeInfoBox) return;
 
             removeInfoBox.$container.remove();
-
             $.each(this.infoBoxList, function(index, infoBox){
                 if (infoBox.id == removeInfoBox.id){
                     _this.infoBoxList.splice(index, 1);
-                    return true;
+                    return false;
                 }
             });
             delete this.infoBoxes[removeInfoBox.id];
