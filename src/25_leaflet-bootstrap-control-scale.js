@@ -512,14 +512,11 @@ https://github.com/nerik/leaflet-graphicscale
     Modified version of leaflet-reticle
     https://github.com/rwev/leaflet-reticle by https://github.com/rwev
     ********************************************************************************/
-
-    L.Icon.Reticle = L.Icon.extend({
-        createIcon: function(){
-            if (!this.canvas){
-                this.canvas = document.createElement(`canvas`);
-                $(this.canvas).addClass('icon-reticle');
-            }
-            return this.canvas;
+    L.Icon.Reticle = L.DivIcon.extend({
+        options: {
+            className : 'visible', //Must be <> ""
+            iconSize  : [10, 10],
+            iconAnchor: [ 0,  0],
         }
     });
 
@@ -536,14 +533,20 @@ https://github.com/nerik/leaflet-graphicscale
         onAdd: function(map) {
             var result = L.Marker.prototype.onAdd.apply(this, arguments);
 
+            this.canvas = document.createElement(`canvas`);
+
             this.options.canvasDim = 2*this.options.maxLength;
-            this.canvas = this._icon;
+
             this.canvas.width = this.options.canvasDim;
             this.canvas.height = this.options.canvasDim;
-            $(this.canvas).css({
-                'margin-top' : -this.options.margin + 'px',
-                'margin-left': -this.options.margin + 'px'
-            });
+            $(this.canvas)
+                .css({
+                    'margin-top' : -this.options.margin + 'px',
+                    'margin-left': -this.options.margin + 'px'
+                })
+                .addClass('icon-reticle')
+                .appendTo(this._icon);
+
             this.ctx = this.canvas.getContext(`2d`);
 
             map.on('move', this._update, this);
@@ -553,16 +556,13 @@ https://github.com/nerik/leaflet-graphicscale
         },
 
         onRemove: function(map){
-            var result = L.Marker.prototype.onRemove.apply(this, arguments);
-
-            $(this.canvas).remove();
             map.off('move', this._update, this);
-
-            return result;
+            this.canvas = null;
+            return L.Marker.prototype.onRemove.apply(this, arguments);
         },
 
         setShow: function(show){
-            $(this.canvas).toggle(!!show);
+            $(this._icon).toggle(!!show);
         },
 
         _update: function() {
