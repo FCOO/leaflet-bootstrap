@@ -34,7 +34,7 @@ L.BsControl = extention of L.Control with
         enabled: true,
 
         initialize: function ( options ) {
-            $.extend(options, this.forceOptions || {});
+            options = $.extend(true, {}, this.options, options, this.forceOptions || {});
             L.Util.setOptions(this, options);
         },
 
