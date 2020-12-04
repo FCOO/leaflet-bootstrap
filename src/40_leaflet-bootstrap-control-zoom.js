@@ -87,6 +87,9 @@ Can be used as leaflet standard zoom control with Bootstrap style
             if (includes(pos, 'TOP'))
                 this.options.tooltipDirection = 'bottom';
 
+            //Set options.positionIsLeft = true if the control is in the left-side of the map
+            this.options.positionIsLeft = includes(pos, 'LEFT');
+
             //Set popup-item(s)
             if (!window.bsIsTouch && this.options.historyEnabled){
                 this.options.popupList = [
@@ -121,7 +124,6 @@ Can be used as leaflet standard zoom control with Bootstrap style
             var bsButtonGroupClassNames = $.bsButtonGroup({vertical:true, center:true}).attr('class'),
                 bsButtonClassNames = $.bsButton({square: true, bigIcon: true}).attr('class'),
                 $zoomContainer = $(this.zoom._container);
-
             $zoomContainer
                 .removeClass()
                 .addClass( bsButtonGroupClassNames )
@@ -165,14 +167,18 @@ Can be used as leaflet standard zoom control with Bootstrap style
                             {id:'history_forward', icon: 'fa-angle-right'   , bigIcon: true, onClick: $.proxy(this.historyList.goForward, this.historyList) },
                         ]} )
                     )
-                        .css('margin-right', '2px')
-                        .prependTo($contentContainer)
+//HER                        .css('margin-right', '2px')
                         .find('.btn')
                             .addClass('disabled')
                             .css({
                                 'border-top-left-radius': '0px',
                                 'border-bottom-left-radius': '0px'
                             });
+
+                if (this.options.positionIsLeft)
+                    $forwardButtons.parent().appendTo($contentContainer);
+                else
+                    $forwardButtons.parent().prependTo($contentContainer)
 
                 $backButtons =
                     $.bsButtonGroup( $.extend(buttonGroupOptions, {
@@ -182,12 +188,19 @@ Can be used as leaflet standard zoom control with Bootstrap style
                         ]} )
                     )
                         .prependTo($contentContainer)
+                        .insertBefore( $forwardButtons.parent() )
                         .find('.btn')
                             .addClass('disabled')
                             .css({
                                 'border-top-right-radius': '0px',
                                 'border-bottom-right-radius': '0px'
                             });
+
+                //Set margin to zoom-buttons
+                if (this.options.positionIsLeft)
+                    $backButtons.parent().css('margin-left', '2px');
+                else
+                    $forwardButtons.parent().css('margin-right', '2px');
 
                 $contentContainer.find('.btn-group-vertical').css('margin-top', 0);
 
