@@ -178,7 +178,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
                 if (this.options.positionIsLeft)
                     $forwardButtons.parent().appendTo($contentContainer);
                 else
-                    $forwardButtons.parent().prependTo($contentContainer)
+                    $forwardButtons.parent().prependTo($contentContainer);
 
                 $backButtons =
                     $.bsButtonGroup( $.extend(buttonGroupOptions, {

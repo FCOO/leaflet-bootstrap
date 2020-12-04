@@ -127,7 +127,7 @@ L.BsControl = extention of L.Control with
         enabled: true,
 
         initialize: function ( options ) {
-            $.extend(options, this.forceOptions || {});
+            options = $.extend(true, {}, this.options, options, this.forceOptions || {});
             L.Util.setOptions(this, options);
         },
 
@@ -1334,14 +1334,11 @@ https://github.com/nerik/leaflet-graphicscale
     Modified version of leaflet-reticle
     https://github.com/rwev/leaflet-reticle by https://github.com/rwev
     ********************************************************************************/
-
-    L.Icon.Reticle = L.Icon.extend({
-        createIcon: function(){
-            if (!this.canvas){
-                this.canvas = document.createElement(`canvas`);
-                $(this.canvas).addClass('icon-reticle');
-            }
-            return this.canvas;
+    L.Icon.Reticle = L.DivIcon.extend({
+        options: {
+            className : 'visible', //Must be <> ""
+            iconSize  : [10, 10],
+            iconAnchor: [ 0,  0],
         }
     });
 
@@ -1358,14 +1355,20 @@ https://github.com/nerik/leaflet-graphicscale
         onAdd: function(map) {
             var result = L.Marker.prototype.onAdd.apply(this, arguments);
 
+            this.canvas = document.createElement(`canvas`);
+
             this.options.canvasDim = 2*this.options.maxLength;
-            this.canvas = this._icon;
+
             this.canvas.width = this.options.canvasDim;
             this.canvas.height = this.options.canvasDim;
-            $(this.canvas).css({
-                'margin-top' : -this.options.margin + 'px',
-                'margin-left': -this.options.margin + 'px'
-            });
+            $(this.canvas)
+                .css({
+                    'margin-top' : -this.options.margin + 'px',
+                    'margin-left': -this.options.margin + 'px'
+                })
+                .addClass('icon-reticle')
+                .appendTo(this._icon);
+
             this.ctx = this.canvas.getContext(`2d`);
 
             map.on('move', this._update, this);
@@ -1375,16 +1378,13 @@ https://github.com/nerik/leaflet-graphicscale
         },
 
         onRemove: function(map){
-            var result = L.Marker.prototype.onRemove.apply(this, arguments);
-
-            $(this.canvas).remove();
             map.off('move', this._update, this);
-
-            return result;
+            this.canvas = null;
+            return L.Marker.prototype.onRemove.apply(this, arguments);
         },
 
         setShow: function(show){
-            $(this.canvas).toggle(!!show);
+            $(this._icon).toggle(!!show);
         },
 
         _update: function() {
@@ -2651,6 +2651,9 @@ Can be used as leaflet standard zoom control with Bootstrap style
             if (includes(pos, 'TOP'))
                 this.options.tooltipDirection = 'bottom';
 
+            //Set options.positionIsLeft = true if the control is in the left-side of the map
+            this.options.positionIsLeft = includes(pos, 'LEFT');
+
             //Set popup-item(s)
             if (!window.bsIsTouch && this.options.historyEnabled){
                 this.options.popupList = [
@@ -2685,7 +2688,6 @@ Can be used as leaflet standard zoom control with Bootstrap style
             var bsButtonGroupClassNames = $.bsButtonGroup({vertical:true, center:true}).attr('class'),
                 bsButtonClassNames = $.bsButton({square: true, bigIcon: true}).attr('class'),
                 $zoomContainer = $(this.zoom._container);
-
             $zoomContainer
                 .removeClass()
                 .addClass( bsButtonGroupClassNames )
@@ -2729,14 +2731,18 @@ Can be used as leaflet standard zoom control with Bootstrap style
                             {id:'history_forward', icon: 'fa-angle-right'   , bigIcon: true, onClick: $.proxy(this.historyList.goForward, this.historyList) },
                         ]} )
                     )
-                        .css('margin-right', '2px')
-                        .prependTo($contentContainer)
+//HER                        .css('margin-right', '2px')
                         .find('.btn')
                             .addClass('disabled')
                             .css({
                                 'border-top-left-radius': '0px',
                                 'border-bottom-left-radius': '0px'
                             });
+
+                if (this.options.positionIsLeft)
+                    $forwardButtons.parent().appendTo($contentContainer);
+                else
+                    $forwardButtons.parent().prependTo($contentContainer);
 
                 $backButtons =
                     $.bsButtonGroup( $.extend(buttonGroupOptions, {
@@ -2746,12 +2752,19 @@ Can be used as leaflet standard zoom control with Bootstrap style
                         ]} )
                     )
                         .prependTo($contentContainer)
+                        .insertBefore( $forwardButtons.parent() )
                         .find('.btn')
                             .addClass('disabled')
                             .css({
                                 'border-top-right-radius': '0px',
                                 'border-bottom-right-radius': '0px'
                             });
+
+                //Set margin to zoom-buttons
+                if (this.options.positionIsLeft)
+                    $backButtons.parent().css('margin-left', '2px');
+                else
+                    $forwardButtons.parent().css('margin-right', '2px');
 
                 $contentContainer.find('.btn-group-vertical').css('margin-top', 0);
 
