@@ -191,10 +191,10 @@ leaflet-bootstrap-control-legend.js
             The first for layer=visible contains of two icons: normal and working
             The second for layer=hidden contains not-visible-icon
             */
-            var icon = [
-                    [normalIcon, 'show-for-bsl-working fa-fw fas fa-spinner fa-spin no-margin-left'],
-                    'fa-fw fas fa-eye-slash ' + (this.options.hiddenIconClass || '')
-                ];
+            this.options.iconArray = [
+                [normalIcon, 'show-for-bsl-working fa-fw fas fa-spinner fa-spin no-margin-left'],
+                'fa-fw fas fa-eye-slash ' + (this.options.hiddenIconClass || '')
+            ];
 
 
             this.parent = parent;
@@ -206,7 +206,7 @@ leaflet-bootstrap-control-legend.js
                     //noHorizontalPadding: true,
                     noShadow: true,
                     header: {
-                        icon: icon,
+                        icon: this.options.iconArray,
                         text: options.text
                     },
                     onInfo   : options.onInfo,
