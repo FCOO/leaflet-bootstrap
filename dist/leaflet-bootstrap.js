@@ -2172,6 +2172,7 @@ Options for selectiong position-format and to activate context-menu
                     boxOptions.before.class    = '';
                     boxOptions.before.onClick  = options.before.onClick;
                 }
+                boxOptions.before.class = boxOptions.before.class + ' ' + (options.before.class || options.before.className || '');
             }
 
             if (this.options.inclContextmenu || options.after){
@@ -2181,6 +2182,7 @@ Options for selectiong position-format and to activate context-menu
                     boxOptions.after.class    = '';
                     boxOptions.after.onClick  = options.after.onClick;
                 }
+                boxOptions.after.class = boxOptions.after.class + ' ' + (options.after.class || options.after.className || '');
             }
             else
                 delete boxOptions.after;
