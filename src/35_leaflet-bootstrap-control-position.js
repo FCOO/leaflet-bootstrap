@@ -235,84 +235,33 @@ Options for selectiong position-format and to activate context-menu
             after   : As options.before
         *************************************************************
         ************************************************************/
-        addInfoBox: function(options){
+        addInfoBox: function(optionsOrInfoBox){
             this.infoBoxList = this.infoBoxList || [];
             this.infoBoxes = this.infoBoxes || [];
-
-            options.index = options.index || this.infoBoxList.length;
-            options.id = options.id || 'id'+options.index;
-
-            var innerContainerClassName = 'info-box-'+options.index,
-                boxOptions = {
-                    insideFormGroup: false,
-                    noValidation   : true,
-                    noBorder       : true,
-                    type           : 'textbox',
-                    text           : function( $inner ){ $inner.addClass(innerContainerClassName); },
-                    class          : (options.className || ''),
-                    before: {
-                        type   : 'button',
-                        icon   : 'fa-_',
-                        text   : '',
-                        square : true,
-                        class  : 'disabled show-as-normal',
-                        semiTransparent: true
-                    },
-                    after: {
-                        type   : 'button',
-                        icon   : 'fa-_',
-                        text   : '',
-                        square : true,
-                        class  : 'disabled show-as-normal',
-                        semiTransparent: true
-                    }
-
-                };
-
-            if (options.before){
-                boxOptions.before.icon = options.before.icon || boxOptions.before.icon;
-                if (options.before.onClick){
-                    boxOptions.before.class    = '';
-                    boxOptions.before.onClick  = options.before.onClick;
-                }
-                boxOptions.before.class = boxOptions.before.class + ' ' + (options.before.class || options.before.className || '');
-            }
-
-            if (this.options.inclContextmenu || options.after){
-                options.after = options.after || {};
-                boxOptions.after.icon = options.after.icon || boxOptions.after.icon;
-                if (options.after.onClick){
-                    boxOptions.after.class    = '';
-                    boxOptions.after.onClick  = options.after.onClick;
-                }
-                boxOptions.after.class = boxOptions.after.class + ' ' + (options.after.class || options.after.className || '');
-            }
-            else
-                delete boxOptions.after;
-
-            this.$innerContentContainer._bsAppendContent( boxOptions );
-
-            var $contentContainer  =
-                    this.$innerContentContainer.find('.' + innerContainerClassName).parent()
-                        .addClass('hide-for-no-cursor-on-map d-flex bsPosition-content justify-content-center align-items-center flex-grow-1'),
-                infoBox = {
-                    id               : options.id,
-                    index            : options.index,
-                    $container       : $contentContainer.parent(),
-                    $contentContainer: $contentContainer
-                };
-            $contentContainer.empty()._bsAddHtml(options.content);
-
-            //Remove tooltip from active buttons
             var _this = this;
-            $contentContainer.parent().find('a:not(.disabled)').each(function(){ _this.removeTooltip( $(this) ); });
+            function adjustOptions(options){
+                options.index = options.index || _this.infoBoxList.length;
+                options.id = options.id || 'id'+optionsOrInfoBox.index;
 
+                if (_this.options.inclContextmenu)
+                    options.after = options.after || {};
+                return options;
+            }
+
+            var infoBox = optionsOrInfoBox instanceof L.Control.BsInfoBox ? optionsOrInfoBox : null;
+
+            if (infoBox)
+                adjustOptions(infoBox.options);
+            else
+                infoBox = new L.Control.BsInfoBox(adjustOptions(optionsOrInfoBox));
 
             this.infoBoxList.push(infoBox);
-            this.infoBoxes[options.id] = infoBox;
+            this.infoBoxes[infoBox.id] = infoBox;
+
+            infoBox.addTo(this);
 
             //Sort info-boxes by index
-            this.infoBoxList.sort(function(box1, box2){ return box2.index - box1.index; });
+            this.infoBoxList.sort(function(box1, box2){ return box2.options.index - box1.options.index; });
             for (var i=0; i<this.infoBoxList.length; i++)
                 this.infoBoxList[i].$container.detach().prependTo(this.$innerContentContainer);
 
@@ -323,12 +272,14 @@ Options for selectiong position-format and to activate context-menu
         /************************************************************
         getInfoBox
         ************************************************************/
-        getInfoBox: function(idOrIndex){
+        getInfoBox: function(idOrIndexOrInfoBox){
+            if (idOrIndexOrInfoBox instanceof L.Control.BsInfoBox)
+                return idOrIndexOrInfoBox;
+            if (typeof idOrIndexOrInfoBox == 'string')
+                return this.infoBoxes[idOrIndexOrInfoBox];
             var result = null;
-            if (typeof idOrIndex == 'string')
-                return this.infoBoxes[idOrIndex];
             $.each(this.infoBoxList, function(dummy, infoBox){
-                if (infoBox.index == idOrIndex)
+                if (infoBox.index == idOrIndexOrInfoBox)
                     result = infoBox;
             });
             return result;
@@ -337,13 +288,13 @@ Options for selectiong position-format and to activate context-menu
         /************************************************************
         removeInfoBox
         ************************************************************/
-        removeInfoBox: function(idOrIndex){
+        removeInfoBox: function(idOrIndexorInfoBox){
             var _this = this,
-                removeInfoBox = this.getInfoBox(idOrIndex);
-
+                removeInfoBox = this.getInfoBox(idOrIndexorInfoBox);
             if (!removeInfoBox) return;
 
-            removeInfoBox.$container.remove();
+            removeInfoBox.remove();
+
             $.each(this.infoBoxList, function(index, infoBox){
                 if (infoBox.id == removeInfoBox.id){
                     _this.infoBoxList.splice(index, 1);
@@ -358,6 +309,8 @@ Options for selectiong position-format and to activate context-menu
             this.latLngFormatWidth = {};
 
             this._updatePositions();
+
+            return removeInfoBox;
         },
 
         /************************************************************
@@ -660,8 +613,97 @@ Options for selectiong position-format and to activate context-menu
             this.addControl(this.bsPositionControl);
         }
     });
-
     L.control.bsPosition = function(options){ return new L.Control.BsPosition(options); };
+
+    /********************************************************************************
+    L.Control.bsInfoBox
+    Represent a info-box in bsPosition
+    ********************************************************************************/
+    L.Control.BsInfoBox = function(options){
+        this.id = options.id;
+        this.options = options;
+        var innerContainerClassName = this.innerContainerClassName = 'info-box-'+options.index;
+
+        var boxOptions = this.boxOptions = {
+                insideFormGroup: false,
+                noValidation   : true,
+                noBorder       : true,
+                type           : 'textbox',
+                text           : function( $inner ){ $inner.addClass(innerContainerClassName); },
+                class          : (options.className || ''),
+                before: {
+                    type   : 'button',
+                    icon   : 'fa-_',
+                    text   : '',
+                    square : true,
+                    class  : 'disabled show-as-normal',
+                    semiTransparent: true
+                },
+                after: {
+                    type   : 'button',
+                    icon   : 'fa-_',
+                    text   : '',
+                    square : true,
+                    class  : 'disabled show-as-normal',
+                    semiTransparent: true
+                }
+            };
+
+        if (options.before){
+            boxOptions.before.icon = options.before.icon || boxOptions.before.icon;
+            if (options.before.onClick){
+                boxOptions.before.class    = '';
+                boxOptions.before.onClick  = options.before.onClick;
+            }
+            boxOptions.before.class = boxOptions.before.class + ' ' + (options.before.class || options.before.className || '');
+        }
+
+        if (options.after){
+            boxOptions.after.icon = options.after.icon || boxOptions.after.icon;
+            if (options.after.onClick){
+                boxOptions.after.class    = '';
+                boxOptions.after.onClick  = options.after.onClick;
+            }
+            boxOptions.after.class = boxOptions.after.class + ' ' + (options.after.class || options.after.className || '');
+        }
+        else
+            delete boxOptions.after;
+
+    };
+
+    L.Control.BsInfoBox.prototype = {
+        addTo: function(bsPositionControl){
+            if (this.bsPositionControl) return this;
+
+            this.bsPositionControl = bsPositionControl;
+
+            //Create the content inside the position-controls inner-content-container
+            var $parentContainer = this.bsPositionControl.$innerContentContainer;
+
+            $parentContainer._bsAppendContent( this.boxOptions );
+            this.$contentContainer  =
+                $parentContainer.find('.' + this.innerContainerClassName).parent()
+                    .addClass('hide-for-no-cursor-on-map d-flex bsPosition-content justify-content-center align-items-center flex-grow-1');
+            this.$container = this.$contentContainer.parent();
+
+            this.$contentContainer.empty()._bsAddHtml(this.options.content);
+
+            //Remove tooltip from active buttons
+            this.$contentContainer.parent().find('a:not(.disabled)').each(function(){ bsPositionControl.removeTooltip( $(this) ); });
+
+            return this;
+
+        },
+
+        remove: function(){
+            if (!this.bsPositionControl) return this;
+
+            this.$container.detach(); //remove();
+
+            this.bsPositionControl = null;
+            return this;
+        }
+    };
 
 }(jQuery, L, this, document));
 
