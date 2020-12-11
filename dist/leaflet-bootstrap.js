@@ -2569,27 +2569,37 @@ Options for selectiong position-format and to activate context-menu
     };
 
     L.Control.BsInfoBox.prototype = {
+        _create$content: function(){
+            if (this.$container) return;
+
+            //Create the content inside a dummy div
+            var $parent = $('<div/>');
+
+            $parent._bsAppendContent( this.boxOptions );
+            this.$contentContainer  =
+                $parent.find('.' + this.innerContainerClassName).parent()
+                    .addClass('hide-for-no-cursor-on-map d-flex bsPosition-content justify-content-center align-items-center flex-grow-1');
+
+            this.$container = this.$contentContainer.parent();
+            this.$container.detach();
+
+            this.$contentContainer.empty()._bsAddHtml(this.options.content);
+
+        },
+
+
         addTo: function(bsPositionControl){
             if (this.bsPositionControl) return this;
 
             this.bsPositionControl = bsPositionControl;
 
-            //Create the content inside the position-controls inner-content-container
-            var $parentContainer = this.bsPositionControl.$innerContentContainer;
-
-            $parentContainer._bsAppendContent( this.boxOptions );
-            this.$contentContainer  =
-                $parentContainer.find('.' + this.innerContainerClassName).parent()
-                    .addClass('hide-for-no-cursor-on-map d-flex bsPosition-content justify-content-center align-items-center flex-grow-1');
-            this.$container = this.$contentContainer.parent();
-
-            this.$contentContainer.empty()._bsAddHtml(this.options.content);
+            this._create$content();
+            this.bsPositionControl.$innerContentContainer.append(this.$container);
 
             //Remove tooltip from active buttons
             this.$contentContainer.parent().find('a:not(.disabled)').each(function(){ bsPositionControl.removeTooltip( $(this) ); });
 
             return this;
-
         },
 
         remove: function(){
