@@ -584,5 +584,5 @@ leaflet-bootstrap-control-position.scss
 
 .control-position-cursor .no-cursor-on-map .hide-for-no-cursor-on-map {
   color: transparent; }
-  .control-position-cursor .no-cursor-on-map .hide-for-no-cursor-on-map * {
+  .control-position-cursor .no-cursor-on-map .hide-for-no-cursor-on-map > *:not(.show-for-no-cursor-on-map) {
     visibility: hidden !important; }

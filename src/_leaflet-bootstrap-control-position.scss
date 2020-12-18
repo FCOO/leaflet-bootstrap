@@ -53,7 +53,7 @@ leaflet-bootstrap-control-position.scss
 //Create Moderinzr classes for show/hide for when the cursor in on/off the map
 .control-position-cursor .no-cursor-on-map .hide-for-no-cursor-on-map {
     color: transparent;
-    * {
+    > *:not(.show-for-no-cursor-on-map) {
         visibility: hidden !important;
     }
 }
