@@ -227,6 +227,7 @@ Options for selectiong position-format and to activate context-menu
             id       : STRING
             index    : NUMBER
             className: STRING
+            alwaysVisible: BOOLEAN if true the infobox is always visible if false it is hidden when the cursor is outside of the map
             before   : {
                 icon   : STRING
                 onClick: function. If null the left side will just be the icon
@@ -681,7 +682,8 @@ Options for selectiong position-format and to activate context-menu
             $parent._bsAppendContent( this.boxOptions );
             this.$contentContainer  =
                 $parent.find('.' + this.innerContainerClassName).parent()
-                    .addClass('hide-for-no-cursor-on-map d-flex bsPosition-content justify-content-center align-items-center flex-grow-1');
+                    .addClass('d-flex bsPosition-content justify-content-center align-items-center flex-grow-1')
+                    .toggleClass('hide-for-no-cursor-on-map', !this.options.alwaysVisible);
 
             this.$container = this.$contentContainer.parent();
             this.$container.detach();
