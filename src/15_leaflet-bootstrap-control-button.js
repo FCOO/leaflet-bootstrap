@@ -155,7 +155,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
             this.options[id] = value;
 
             if (this.popups[id]._onChange)
-                this.popups[id]._onChange(value);
+                this.popups[id]._onChange(value, id, this);
 
             this._onChange();
         },
@@ -297,7 +297,15 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
         setState: function(BsControl_setState){
             return function (options) {
+                var _this = this;
                 BsControl_setState.call(this, options);
+
+                //Set values in items in popupList (if any)
+                $.each(this.popups, function(id, itemOptions){
+                    if (itemOptions._onChange)
+                        itemOptions._onChange(options[id], id, _this);
+                });
+
 
                 this.$container.modernizrToggle('extended', this.options.isExtended);
                 return this;

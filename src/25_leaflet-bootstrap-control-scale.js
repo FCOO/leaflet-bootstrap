@@ -186,8 +186,6 @@ https://github.com/nerik/leaflet-graphicscale
 
         getState: function(BsButtonBox_getState){
             return function () {
-//HERconsole.log('getState scale', this);
-
                 return $.extend(
                     this.options.selectFormat ? {showBoth: this.options.showBoth} : {mode: this.options.mode},
                     {showReticle: this.options.showReticle},
@@ -198,8 +196,6 @@ https://github.com/nerik/leaflet-graphicscale
 
         setState: function(BsButtonBox_setState){
             return function (options) {
-
-//HERconsole.log('setState scale', this);
                 BsButtonBox_setState.call(this, options);
                 if (this.options.selectFormat)
                     this.setBoth(this.options.showBoth);
