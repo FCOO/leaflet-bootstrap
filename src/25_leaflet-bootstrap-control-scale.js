@@ -55,34 +55,35 @@ https://github.com/nerik/leaflet-graphicscale
                     selected    : this.options.showReticle,
                     onChange    : $.proxy(this._onShowReticle, this)
                 };
-            this.options.popupList = [];
-            if (options.selectFormat)
-                this.options.popupList.push(
-                    {                 icon: this.options.icon, text: {da:'Skala (in situ)', en:'Scale (in situ)'} },
-                    reticlePopup,
-                    {type:'checkbox', id:'showBoth',           text: {da:'Vis km og nm', en:'Show km and nm'}, selected: this.options.showBoth, onChange: $.proxy(this._setBoth, this), closeOnClick: false},
-                    {type:'button',   icon:'fa-cog',           text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this), closeOnClick: true, }
-                );
-                else
-                    this.options.popupList.push({
-                            icon: this.options.icon,
-                            text: {da:'Vis', en:'Show'}
-                        },
-                        reticlePopup,
-                        {
-                            radioGroupId: 'mode',
-                            type        :'radio',
-                            selectedId  : this.options.mode,
-                            closeOnClick: true,
-                            onChange    : $.proxy(this.setMode, this),
-                            list: [
-                                {id:'METRIC',   text: {da:'Kilometer', en:'Metric'}     },
-                                {id:'NAUTICAL', text: {da:'Sømil', en:'Nautical miles'} },
-                                {id:'BOTH',     text: {da:'Begge', en:'Both'}           }
-                            ]
-                        }
-                    );
 
+            this._adjustPopupList(
+                //Items above options.popupList
+                options.selectFormat ? [
+                    {icon: this.options.icon, text: {da:'Skala (in situ)', en:'Scale (in situ)'} },
+                    reticlePopup,
+                    {type:'checkbox', id:'showBoth', text: {da:'Vis km og nm', en:'Show km and nm'}, selected: this.options.showBoth, onChange: $.proxy(this._setBoth, this), closeOnClick: false},
+                ] : [
+                    {icon: this.options.icon, text: {da:'Vis', en:'Show'} },
+                    reticlePopup,
+                    {
+                        radioGroupId: 'mode',
+                        type        :'radio',
+                        selectedId  : this.options.mode,
+                        closeOnClick: true,
+                        onChange    : $.proxy(this.setMode, this),
+                        list: [
+                            {id:'METRIC',   text: {da:'Kilometer', en:'Metric'}     },
+                            {id:'NAUTICAL', text: {da:'Sømil', en:'Nautical miles'} },
+                            {id:'BOTH',     text: {da:'Begge', en:'Both'}           }
+                        ]
+                    }
+                ],
+
+                //Items belows options.popupList
+                options.selectFormat ?
+                    [{type:'button',   icon:'fa-cog',           text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this), closeOnClick: true, }] :
+                    null
+            );
         },
 
         onAdd: function (map) {
@@ -185,6 +186,8 @@ https://github.com/nerik/leaflet-graphicscale
 
         getState: function(BsButtonBox_getState){
             return function () {
+//HERconsole.log('getState scale', this);
+
                 return $.extend(
                     this.options.selectFormat ? {showBoth: this.options.showBoth} : {mode: this.options.mode},
                     {showReticle: this.options.showReticle},
@@ -195,6 +198,8 @@ https://github.com/nerik/leaflet-graphicscale
 
         setState: function(BsButtonBox_setState){
             return function (options) {
+
+//HERconsole.log('setState scale', this);
                 BsButtonBox_setState.call(this, options);
                 if (this.options.selectFormat)
                     this.setBoth(this.options.showBoth);

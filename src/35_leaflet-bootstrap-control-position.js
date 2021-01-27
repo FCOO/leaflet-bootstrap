@@ -57,10 +57,9 @@ Options for selectiong position-format and to activate context-menu
             if (this.options.position.toUpperCase().indexOf('TOP') !== -1)
                 this.options.popupPlacement = this.options.tooltipDirection = 'bottom';
 
-            //Set popup-item(s)
-            var popupList = [];
-            if (!window.bsIsTouch)
-                popupList = [
+            this._adjustPopupList(
+                //Items above options.popupList
+                window.bsIsTouch ? [] : [
                     {text: {da:'Position ved', en:'Position at'} },
                     {
                         radioGroupId: 'mode',
@@ -73,14 +72,13 @@ Options for selectiong position-format and to activate context-menu
                             {id:'MAPCENTER', icon: iconMapCenter,      text: {da:'Kortcentrum', en:'Map Center'}},
                         ]
                     }
-                ];
+                ],
 
-            if (this.options.selectFormat)
-                popupList.push(
-                    {type:'button', closeOnClick: true, icon: 'fa-cog', text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this)}
-                );
-            this.options.popupList = popupList.length ? popupList : null;
-
+                //Items belows options.popupList
+                this.options.selectFormat ?
+                    [{type:'button', closeOnClick: true, icon: 'fa-cog', text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this)}] :
+                    null
+            );
             //Set format-options and event for change of format
 
             //latLngFormatSeparator = separator used in formatting the latlng-string. Using <br> for all geo-ref formats

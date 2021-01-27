@@ -498,6 +498,14 @@ Create leaflet-control for jquery-bootstrap button-classes:
     /********************************************************************************
     L.Control.BsButtonBox
     Create a bsButton that opens a box with bs-content given by options.content
+
+    Individual menu-items in the popup is set in
+    options.popupList = []{
+        id  : STRING - mandatory for type="checkbox" or "radio"
+        type: "checkbox", "radio", "button" etc.
+        onChange: function(value) called when the item is changed or setState is called on the control
+        icon, text
+    }
     ********************************************************************************/
     L.Control.BsButtonBox = L.Control.BsButton.extend({
         options: {
@@ -525,6 +533,41 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
             return result;
         },
+
+        //_adjustPopupList: Adjust this.options.popupList with default items above and below
+        _adjustPopupList: function(aboveList = [], belowList = []){
+            var _this = this,
+                list = this.options.popupList || [],
+                onChange = $.proxy(this._popupList_onChange, this);
+
+            this.popups = {};
+            $.each(list, function(index, itemOptions){
+                var id = itemOptions.id;
+                if (id && ((itemOptions.type == 'radio') || (itemOptions.type == 'checkbox'))){
+                    itemOptions._onChange = itemOptions.onChange;
+                    itemOptions.onChange = onChange;
+
+                    if (itemOptions.type == 'radio')
+                        itemOptions.selectedId = itemOptions.selectedId || _this.options[id];
+
+                    if (itemOptions.type == 'checkbox')
+                        itemOptions.selected = itemOptions.selected == undefined ? _this.options[id] : itemOptions.selected;
+                    _this.popups[id] = itemOptions;
+                }
+            });
+
+            this.options.popupList = aboveList.concat( this.options.popupList || [], belowList);
+        },
+
+        _popupList_onChange: function(id, value){
+            this.options[id] = value;
+
+            if (this.popups[id]._onChange)
+                this.popups[id]._onChange(value);
+
+            this._onChange();
+        },
+
 
         _createContent: function(){
             //Create container
@@ -644,8 +687,17 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
         getState: function(BsControl_getState){
             return function () {
+                var _this = this,
+                    popupListOptions = {};
+
+                //Get values from items in popupList (if any)
+                $.each(this.popups, function(id){
+                    popupListOptions[id] = _this.options[id];
+                });
+
                 return $.extend(
                     {isExtended: this.options.isExtended},
+                    popupListOptions,
                     BsControl_getState.call(this)
                 );
             };
@@ -654,6 +706,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
         setState: function(BsControl_setState){
             return function (options) {
                 BsControl_setState.call(this, options);
+
                 this.$container.modernizrToggle('extended', this.options.isExtended);
                 return this;
             };
@@ -877,34 +930,35 @@ https://github.com/nerik/leaflet-graphicscale
                     selected    : this.options.showReticle,
                     onChange    : $.proxy(this._onShowReticle, this)
                 };
-            this.options.popupList = [];
-            if (options.selectFormat)
-                this.options.popupList.push(
-                    {                 icon: this.options.icon, text: {da:'Skala (in situ)', en:'Scale (in situ)'} },
-                    reticlePopup,
-                    {type:'checkbox', id:'showBoth',           text: {da:'Vis km og nm', en:'Show km and nm'}, selected: this.options.showBoth, onChange: $.proxy(this._setBoth, this), closeOnClick: false},
-                    {type:'button',   icon:'fa-cog',           text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this), closeOnClick: true, }
-                );
-                else
-                    this.options.popupList.push({
-                            icon: this.options.icon,
-                            text: {da:'Vis', en:'Show'}
-                        },
-                        reticlePopup,
-                        {
-                            radioGroupId: 'mode',
-                            type        :'radio',
-                            selectedId  : this.options.mode,
-                            closeOnClick: true,
-                            onChange    : $.proxy(this.setMode, this),
-                            list: [
-                                {id:'METRIC',   text: {da:'Kilometer', en:'Metric'}     },
-                                {id:'NAUTICAL', text: {da:'Sømil', en:'Nautical miles'} },
-                                {id:'BOTH',     text: {da:'Begge', en:'Both'}           }
-                            ]
-                        }
-                    );
 
+            this._adjustPopupList(
+                //Items above options.popupList
+                options.selectFormat ? [
+                    {icon: this.options.icon, text: {da:'Skala (in situ)', en:'Scale (in situ)'} },
+                    reticlePopup,
+                    {type:'checkbox', id:'showBoth', text: {da:'Vis km og nm', en:'Show km and nm'}, selected: this.options.showBoth, onChange: $.proxy(this._setBoth, this), closeOnClick: false},
+                ] : [
+                    {icon: this.options.icon, text: {da:'Vis', en:'Show'} },
+                    reticlePopup,
+                    {
+                        radioGroupId: 'mode',
+                        type        :'radio',
+                        selectedId  : this.options.mode,
+                        closeOnClick: true,
+                        onChange    : $.proxy(this.setMode, this),
+                        list: [
+                            {id:'METRIC',   text: {da:'Kilometer', en:'Metric'}     },
+                            {id:'NAUTICAL', text: {da:'Sømil', en:'Nautical miles'} },
+                            {id:'BOTH',     text: {da:'Begge', en:'Both'}           }
+                        ]
+                    }
+                ],
+
+                //Items belows options.popupList
+                options.selectFormat ?
+                    [{type:'button',   icon:'fa-cog',           text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this), closeOnClick: true, }] :
+                    null
+            );
         },
 
         onAdd: function (map) {
@@ -1007,6 +1061,8 @@ https://github.com/nerik/leaflet-graphicscale
 
         getState: function(BsButtonBox_getState){
             return function () {
+//HERconsole.log('getState scale', this);
+
                 return $.extend(
                     this.options.selectFormat ? {showBoth: this.options.showBoth} : {mode: this.options.mode},
                     {showReticle: this.options.showReticle},
@@ -1017,6 +1073,8 @@ https://github.com/nerik/leaflet-graphicscale
 
         setState: function(BsButtonBox_setState){
             return function (options) {
+
+//HERconsole.log('setState scale', this);
                 BsButtonBox_setState.call(this, options);
                 if (this.options.selectFormat)
                     this.setBoth(this.options.showBoth);
@@ -1954,10 +2012,9 @@ Options for selectiong position-format and to activate context-menu
             if (this.options.position.toUpperCase().indexOf('TOP') !== -1)
                 this.options.popupPlacement = this.options.tooltipDirection = 'bottom';
 
-            //Set popup-item(s)
-            var popupList = [];
-            if (!window.bsIsTouch)
-                popupList = [
+            this._adjustPopupList(
+                //Items above options.popupList
+                window.bsIsTouch ? [] : [
                     {text: {da:'Position ved', en:'Position at'} },
                     {
                         radioGroupId: 'mode',
@@ -1970,14 +2027,13 @@ Options for selectiong position-format and to activate context-menu
                             {id:'MAPCENTER', icon: iconMapCenter,      text: {da:'Kortcentrum', en:'Map Center'}},
                         ]
                     }
-                ];
+                ],
 
-            if (this.options.selectFormat)
-                popupList.push(
-                    {type:'button', closeOnClick: true, icon: 'fa-cog', text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this)}
-                );
-            this.options.popupList = popupList.length ? popupList : null;
-
+                //Items belows options.popupList
+                this.options.selectFormat ?
+                    [{type:'button', closeOnClick: true, icon: 'fa-cog', text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this)}] :
+                    null
+            );
             //Set format-options and event for change of format
 
             //latLngFormatSeparator = separator used in formatting the latlng-string. Using <br> for all geo-ref formats

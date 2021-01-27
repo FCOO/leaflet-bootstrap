@@ -101,6 +101,8 @@
                 tooltipOnButton   : true,
                 selectFormat: setLatLngFormat,
                 semiTransparent   : true,
+                popupList: [{id: 'positionOptions1',  type: 'checkbox', text: 'Skide godt 1'}],
+
                 content: {
                     semiTransparent: false
                 },
@@ -112,7 +114,10 @@
                 position          : 'bottomleft',
                 isExtended: true,
                 tooltipOnButton: false,//!index,
-                selectFormat: first ? function(){ console.log(this); this.setMode(confirm('Use nautical?') ? 'NAUTICAL' : 'METRIC'); } : null
+                selectFormat: first ? function(){ console.log(this); this.setMode(confirm('Use nautical?') ? 'NAUTICAL' : 'METRIC'); } : null,
+                scaleOptions1: true,
+                popupList: [{id: 'scaleOptions1', type: 'checkbox', text: 'Skide godt 2(closeOnClick:false)', onChange: function(value){ console.log('scaleOptions1',value);}, closeOnClick: false}],
+                //onChange: function(state){ console.log('onChange state=', state); }
             },
             bsLegendControl: true,
 			bsLegendOptions: {
@@ -133,6 +138,14 @@
             }
 
         }).setView([56.2, 11.5], 6);
+
+/*TEST
+        nextMap.on('click', function(){
+            nextMap.bsScaleControl.setState({
+                scaleOptions1: true
+            });
+        });
+*/
 
 nextMap.removeControl( nextMap.bsScaleControl );
 nextMap.addControl( nextMap.bsScaleControl );

@@ -90,6 +90,14 @@ Create leaflet-control for jquery-bootstrap button-classes:
     /********************************************************************************
     L.Control.BsButtonBox
     Create a bsButton that opens a box with bs-content given by options.content
+
+    Individual menu-items in the popup is set in
+    options.popupList = []{
+        id  : STRING - mandatory for type="checkbox" or "radio"
+        type: "checkbox", "radio", "button" etc.
+        onChange: function(value) called when the item is changed or setState is called on the control
+        icon, text
+    }
     ********************************************************************************/
     L.Control.BsButtonBox = L.Control.BsButton.extend({
         options: {
@@ -117,6 +125,41 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
             return result;
         },
+
+        //_adjustPopupList: Adjust this.options.popupList with default items above and below
+        _adjustPopupList: function(aboveList = [], belowList = []){
+            var _this = this,
+                list = this.options.popupList || [],
+                onChange = $.proxy(this._popupList_onChange, this);
+
+            this.popups = {};
+            $.each(list, function(index, itemOptions){
+                var id = itemOptions.id;
+                if (id && ((itemOptions.type == 'radio') || (itemOptions.type == 'checkbox'))){
+                    itemOptions._onChange = itemOptions.onChange;
+                    itemOptions.onChange = onChange;
+
+                    if (itemOptions.type == 'radio')
+                        itemOptions.selectedId = itemOptions.selectedId || _this.options[id];
+
+                    if (itemOptions.type == 'checkbox')
+                        itemOptions.selected = itemOptions.selected == undefined ? _this.options[id] : itemOptions.selected;
+                    _this.popups[id] = itemOptions;
+                }
+            });
+
+            this.options.popupList = aboveList.concat( this.options.popupList || [], belowList);
+        },
+
+        _popupList_onChange: function(id, value){
+            this.options[id] = value;
+
+            if (this.popups[id]._onChange)
+                this.popups[id]._onChange(value);
+
+            this._onChange();
+        },
+
 
         _createContent: function(){
             //Create container
@@ -236,8 +279,17 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
         getState: function(BsControl_getState){
             return function () {
+                var _this = this,
+                    popupListOptions = {};
+
+                //Get values from items in popupList (if any)
+                $.each(this.popups, function(id){
+                    popupListOptions[id] = _this.options[id];
+                });
+
                 return $.extend(
                     {isExtended: this.options.isExtended},
+                    popupListOptions,
                     BsControl_getState.call(this)
                 );
             };
@@ -246,6 +298,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
         setState: function(BsControl_setState){
             return function (options) {
                 BsControl_setState.call(this, options);
+
                 this.$container.modernizrToggle('extended', this.options.isExtended);
                 return this;
             };
