@@ -3292,8 +3292,16 @@ leaflet-bootstrap-control-legend.js
                         modalContentOptions.extended   = {content: options.content};
                     else {
                         var list = options.buttons || options.buttonList;
-                        $.each(list, function(index, options){ options.type = 'button'; });
-                        modalContentOptions.extended   = {className: 'text-right modal-footer', content: list};
+                        $.each(list, function(index, options){
+                            options.type  = 'button';
+                            options.small = true;
+                        });
+                        modalContentOptions.extended   = {
+                            className           : 'text-right modal-footer',
+                            noVerticalPadding   : true,
+                            noHorizontalPadding : true,
+                            content             : list
+                        };
                     }
                     modalContentOptions.isExtended = true;
                     options.hasContent = true;
