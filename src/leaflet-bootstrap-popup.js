@@ -82,7 +82,7 @@ Adjust standard Leaflet popup to display as Bootstrap modal
             });
 
             //Close open popup and brint to front when "touched"
-            L.DomEvent.on(this._contentNode, 'mousedown', this._brintToFocus, this );
+            L.DomEvent.on(this._contentNode, 'click', this._brintToFocus, this );
 
             return this;
         };

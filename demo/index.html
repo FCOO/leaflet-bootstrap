@@ -242,21 +242,6 @@ nextMap.bsPositionControl.addInfoBox({
             })
             .addTo(map);
 
-//HER        if (first)
-//HER            marker.on('click', function(){ this.remove(); })
-//HER        else
-var content = {
-        type: 'buttongroup',
-        fullWidth: true,
-        vertical: true,
-        list: [
-            {id:'test1', text: 'Test#1', onClick: function(){ console.log('CLICK ON test1') } },
-            {id:'test2', text: 'Test#2', onClick: function(){ console.log('CLICK ON test2') } }
-        ]
-    };
-
-//HERcontent = $.bsButton({id:'test1', text: 'Test#1', onClick: function(){ console.log('CLICK ON test1') } } );
-//HERcontent = {id:'test1', type:'button',  text: 'Test#1', onClick: function(){ console.log('CLICK ON test1') } };
 /*
 content = {
     type: 'selectlist',
@@ -273,11 +258,33 @@ content = {
             marker.bindPopup({
                 header: 'Overskrift',
                 _semiTransparent: first, //true,
-                //clickable: true,
-                content: content,//'Davslkjsssldkfjslkdjlaksjdflkasjdflaksjdflkasjdf',
+                clickable: true,
+
+                minimized: {
+                    width              : 70,
+                    //noVerticalPadding  : true,
+                    //noHorizontalPadding: true,
+                    center             : true,
+                    showHeaderOnClick  : true,
+                    content            : {type:'textbox', text:'Davs'}
+                },
+                content: {
+                    type: 'buttongroup',
+                    fullWidth: true,
+                    vertical: true,
+                    list: [
+                        {id:'test1', text: 'Test#1', onClick: function(){ console.log('CLICK ON test1') } },
+                        {id:'test2', text: 'Test#2', onClick: function(){ console.log('CLICK ON test2') } }
+                    ]
+                },
+                extended: {
+                    width: 300,
+                    height: 300,
+                    content : {type:'textbox', text:'EXTENDED'}
+                },
                 fixable: true,
                 _width: 321,
-                _buttons: [{text:'klik'}]
+                buttons: [{text:'klik'}]
 
             })
 
