@@ -260,15 +260,24 @@ content = {
                 _semiTransparent: first, //true,
                 clickable: true,
 
+                isMinimized: true,
                 minimized: {
                     width              : 70,
                     //noVerticalPadding  : true,
                     //noHorizontalPadding: true,
                     center             : true,
                     showHeaderOnClick  : true,
-                    content            : {type:'textbox', text:'Davs'}
+                    dynamic            : true,
+                    content            : function($body){
+                        $body.html( moment().format('HH:mm.ss'));
+                    }
                 },
-                content: {
+                dynamic: true,
+                content: function($body){
+                    $body.html( 'Normal ' + moment().format('HH:mm.ss'));
+                },
+
+                _content: {
                     type: 'buttongroup',
                     fullWidth: true,
                     vertical: true,
@@ -277,10 +286,17 @@ content = {
                         {id:'test2', text: 'Test#2', onClick: function(){ console.log('CLICK ON test2') } }
                     ]
                 },
+
+                isExtended: false,
                 extended: {
                     width: 300,
                     height: 300,
-                    content : {type:'textbox', text:'EXTENDED'}
+                    dynamic            : true,
+                    content            : function($body){
+                        $body.html( 'Extended ' + moment().format('HH:mm.ss'));
+                    },
+
+                    _content : {type:'textbox', text:'EXTENDED'}
                 },
                 fixable: true,
                 _width: 321,
