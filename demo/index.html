@@ -289,11 +289,11 @@ content = {
 
                 isExtended: false,
                 extended: {
-                    width: 300,
-                    height: 300,
-                    dynamic            : true,
-                    content            : function($body){
-                        $body.html( 'Extended ' + moment().format('HH:mm.ss'));
+                    width  : 300,
+                    height : 300,
+                    //dynamic: true,
+                    content: function($body, popup, map){
+                        $body.html( 'Extended map._leaflet_id=' + map._leaflet_id +' '+moment().format('HH:mm.ss'));
                     },
 
                     _content : {type:'textbox', text:'EXTENDED'}

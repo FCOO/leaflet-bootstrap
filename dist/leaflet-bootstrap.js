@@ -3486,7 +3486,7 @@ Adjust standard Leaflet popup to display as Bootstrap modal
             //Original function/method
             _initLayout.apply(this, arguments);
 
-            //Save ref to popup in DOM-eleemnt
+            //Save ref to popup in DOM-element
             $(this._container).data('popup', this);
 
             //Set class-name for wrapper to remove margin, bg-color etc.
@@ -3535,9 +3535,11 @@ Adjust standard Leaflet popup to display as Bootstrap modal
         this._setPinned(false);
 
         //Create and adjust options in this._content into options for bsModal
-        //this._content can be 1: string or function, 2: object with the content, 3: Full popup-options
+        //this._content can be 1: string or function, 2: object with the content, 3: Full popup-options.
+        //If any of the contents are functions the functions must be function($body, popup, map)
         //Convert this._content into bsModal-options
         var contentAsModalOptions = ($.isPlainObject(this._content) && !!this._content.content) ? this._content : {content: this._content},
+            contentArg = [this, this._map],
             modalOptions = $.extend(true, {
                 small         : true,
                 smallButtons  : true,
@@ -3549,10 +3551,16 @@ Adjust standard Leaflet popup to display as Bootstrap modal
                 closeButton   : contentAsModalOptions.closeButton === true, //Change default to false
                 noHeader      : !contentAsModalOptions.header,
                 contentContext: this,
-
-                onChange: $.proxy( this._updatePosition, this )
+                contentArg    : contentArg,
+                onChange      : $.proxy( this._updatePosition, this )
             },
             contentAsModalOptions );
+
+        if (modalOptions.minimized)
+            modalOptions.minimized.contentArg = contentArg;
+
+        if (modalOptions.extended)
+            modalOptions.extended.contentArg = contentArg;
 
         if (modalOptions.fixable){
             this.options.fixable = true;
