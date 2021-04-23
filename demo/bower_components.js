@@ -73207,9 +73207,9 @@ jquery-bootstrap-modal-promise.js
         modalVerticalMargin = 10, //Top and bottom margin for modal windows
 
         //Const to set different size of modal-window
-        MODAL_SIZE_NORMAL    = 1, //'normal',
-        MODAL_SIZE_MINIMIZED = 2, //'minimized',
-        MODAL_SIZE_EXTENDED  = 4, //'extended';
+        MODAL_SIZE_NORMAL    = $.MODAL_SIZE_NORMAL    = 1, //'normal',
+        MODAL_SIZE_MINIMIZED = $.MODAL_SIZE_MINIMIZED = 2, //'minimized',
+        MODAL_SIZE_EXTENDED  = $.MODAL_SIZE_EXTENDED  = 4, //'extended';
 
         modalSizeName = {};
         modalSizeName[MODAL_SIZE_NORMAL   ] = 'normal';

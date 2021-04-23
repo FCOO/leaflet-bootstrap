@@ -291,8 +291,9 @@ content = {
                 extended: {
                     width  : 300,
                     height : 300,
-                    //dynamic: true,
+                    dynamic: true,
                     content: function($body, popup, map){
+
                         $body.html( 'Extended map._leaflet_id=' + map._leaflet_id +' '+moment().format('HH:mm.ss'));
                     },
 
@@ -303,6 +304,8 @@ content = {
                 buttons: [{text:'klik'}]
 
             })
+
+        marker.on('popupopen',  function(){ marker._popup.setSizeExtended(); });
 
 
         marker.addContextmenuItems([

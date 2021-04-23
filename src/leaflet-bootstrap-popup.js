@@ -170,13 +170,13 @@ Adjust standard Leaflet popup to display as Bootstrap modal
         this.modalOptions = modalOptions;
 
         //Get the content-node and build the content as a Bootstrap modal
-        var $contentNode = $(this._contentNode);
-        $contentNode
+        this.$contentNode = $(this._contentNode);
+        this.$contentNode
             .empty()
             ._bsModalContent( modalOptions );
 
         //Save the modal-object
-        this.bsModal = $contentNode.bsModal;
+        this.bsModal = this.$contentNode.bsModal;
 
         this._setPinned(isPinned);
 
@@ -184,7 +184,10 @@ Adjust standard Leaflet popup to display as Bootstrap modal
     };
 
     /*********************************************************
-    NEW METHOD L.Popup.changeContent - only changes the content
+    NEW METHOD FOR L.Popup
+    *********************************************************/
+    /*********************************************************
+    L.Popup.changeContent - only changes the content
     of the "body" of the bsModal inside the popup
     *********************************************************/
     L.Popup.prototype.changeContent = function(content, contentContext) {
@@ -222,8 +225,52 @@ Adjust standard Leaflet popup to display as Bootstrap modal
 		return this;
 	};
 
+    /******************************************************
+    Methods to get and set the size of the popup
+    extend()
+    diminish()
+    getSize()
+    setSize(size)
+    setSizeExtended()
+    setSizeNormal()
+    setSizeMinimized()
+    ******************************************************/
+    L.Popup.prototype.extend = function(){
+        this.$contentNode._bsModalExtend();
+        return this;
+    };
+
+    L.Popup.prototype.diminish = function(){
+        this.$contentNode._bsModalDiminish();
+        return this;
+    };
+
+
+    L.Popup.prototype.getSize = function(){
+        this.$contentNode._bsModalGetSize();
+        return this;
+    };
+
+    L.Popup.prototype.setSize = function(size){
+        this.$contentNode._bsModalSetSize(size);
+        return this;
+    };
+
+    L.Popup.prototype.setSizeExtended  = function(){ return this.setSize($.MODAL_SIZE_EXTENDED ); };
+    L.Popup.prototype.setSizeNormal    = function(){ return this.setSize($.MODAL_SIZE_NORMAL   ); };
+    L.Popup.prototype.setSizeMinimized = function(){ return this.setSize($.MODAL_SIZE_MINIMIZED); };
+
+
     /*********************************************************
-    NEW METHOD L.Map.closeAllPopup - close all popup on the map
+    L.Popup.changeContent - only changes the content
+    of the "body" of the bsModal inside the popup
+    *********************************************************/
+
+
+
+    /*********************************************************
+    NEW METHOD FOR L.Map
+    L.Map.closeAllPopup - close all popup on the map
     *********************************************************/
     L.Map.prototype.closeAllPopup = function() {
         $(this.getPane('popupPane')).find('.leaflet-popup').each(function(){
