@@ -32,22 +32,38 @@
     Create and return a pane named paneId+'below' that gets zIndex just below pane with paneId
     **********************************************************/
     L.Map.prototype.getPaneBelow = function(paneId){
-        var paneBelowId = paneId+'below';
+        return this._getPaneDeltaZIndex(paneId, 'below', -1);
+    };
 
-        if (!this.getPane(paneBelowId)){
-            this.createPane(paneBelowId);
+    /**********************************************************
+    L.Map.getPaneAbove(paneId)
+    Create and return a pane named paneId+'above' that gets zIndex just above pane with paneId
+    **********************************************************/
+    L.Map.prototype.getPaneAbove = function(paneId){
+        return this._getPaneDeltaZIndex(paneId, 'above', +1);
+    };
+
+    /**********************************************************
+    L.Map._getPaneDeltaZIndex(paneId, postfix, deltaZIndex)
+    Create and return a pane named paneId+postfix that gets
+    zIndex deltaZIndex (+/-) relative to pane with paneId
+    **********************************************************/
+    L.Map.prototype._getPaneDeltaZIndex = function(paneId, postfix, deltaZIndex){
+        var newPaneId = paneId+postfix;
+
+        if (!this.getPane(newPaneId)){
+            this.createPane(newPaneId);
 
             this.whenReady( function(){
-                var zIndex = $(this.getPanes()[paneId]).css('z-index');
-                this[paneBelowId] = this.getPane(paneBelowId);
-                $(this[paneBelowId]).css('z-index', zIndex-1 );
+                var zIndex = parseInt( $(this.getPanes()[paneId]).css('z-index') );
+                this[newPaneId] = this.getPane(newPaneId);
+                $(this[newPaneId]).css('z-index', zIndex + deltaZIndex);
             }, this );
         }
 
-        return this.getPane(paneBelowId);
+        return this.getPane(newPaneId);
 
     };
-
 }(jQuery, L, this, document));
 
 
@@ -3466,6 +3482,14 @@ Adjust standard Leaflet popup to display as Bootstrap modal
         return function () {
             if (!this._pinned || this._closeViaCloseButton){
                 this._closeViaCloseButton = false;
+
+                if (this.showingTooltipOnPopup){
+                    //Move tooltip back into the original pane
+                    this.showingTooltipOnPopup = false;
+
+//                    this._source.closeTooltip();
+                    this._source.getTooltip().options.pane = 'tooltipPane';
+                }
                 _close.apply(this, arguments);
             }
         };
@@ -3531,7 +3555,8 @@ Adjust standard Leaflet popup to display as Bootstrap modal
     *********************************************************/
     L.Popup.prototype._updateContent = function(){
         //Reset pinned-status
-        var isPinned = !!this._pinned;
+        var _this = this,
+            isPinned = !!this._pinned;
         this._setPinned(false);
 
         //Create and adjust options in this._content into options for bsModal
@@ -3596,6 +3621,57 @@ Adjust standard Leaflet popup to display as Bootstrap modal
 
         //Save the modal-object
         this.bsModal = this.$contentNode.bsModal;
+
+        //If any of the contents (minimized, normal, or extended) should have the same tooltip as the source
+        if (this._source && this._source.getTooltip()){
+            var $list = [];
+            $.each(['', 'minimized', 'extended'], function(index, id){
+                var show     = id ? modalOptions[id] && modalOptions[id].showTooltip : modalOptions.showTooltip,
+                    elements = id ? _this.bsModal[id] : _this.bsModal;
+                if (show){
+                    $list.push(elements.$body);
+                    if (elements.$fixedContent)
+                        $list.push(elements.$fixedContent);
+                }
+            });
+
+            this.showingTooltipOnPopup = !!$list.length;
+
+            if (this.showingTooltipOnPopup){
+                //Move the tooltip from tooltip-pane to a tempory pane just above popups
+                this._source.getTooltip().options.pane = this._map.getPaneAbove('popupPane');
+                var this_source = this._source;
+
+                this_source.showtooltip_mouseenter =
+                    this_source.showtooltip_mouseenter ||
+                    $.proxy(function(){
+                        if (this._popup.showingTooltipOnPopup){
+                            this.openTooltip();
+                            this.showTooltip();
+                        }
+                    }, this_source);
+
+                this_source.showtooltip_mouseleave =
+                    this_source.showtooltip_mouseleave ||
+                    $.proxy(function(){
+                        if (this._popup.showingTooltipOnPopup){
+                            this.closeTooltip();
+                            this.hideTooltip();
+                        }
+                    }, this_source);
+
+                this_source.showtooltip_mousemove =
+                    this_source.showtooltip_mousemove ||
+                    $.proxy(this_source._moveTooltip, this_source);
+
+                $.each($list, function(index, $elem){
+                    $elem
+                        .on('mouseenter', this_source.showtooltip_mouseenter)
+                        .on('mouseleave', this_source.showtooltip_mouseleave)
+                        .on('mousemove',  this_source.showtooltip_mousemove);
+                });
+            }
+        }
 
         this._setPinned(isPinned);
 

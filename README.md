@@ -182,10 +182,17 @@ Extended to take same options as bsModal (see details [here](https://github.com/
         closeButton     : true,
         buttons,
         verticalButtons : false,
-        content
+        content, minimized, extended 
+
+
 
         fixable: false, //if true the popup can be pinned/fixed and only closes on the close-button
     }
+
+    options.showTooltip: BOOLEAN, 
+    options.minimized.showTooltip: BOOLEAN,
+    options.extended.showTooltip: BOOLEAN    If true the tooltip of the source is shown in the popup.
+    *** NOTE ***: showTooltip is only working on markers if the marker has tooltipHideWhenPopupOpen = true         
 
     //Methods
     .changeContent(content, contentContext) //Only changes the content of the "body" of the bsModal inside the popup

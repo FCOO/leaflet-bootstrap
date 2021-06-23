@@ -17,7 +17,7 @@
         html, body {
             padding: 0; margin: 0; width:100%; height:100%;
         }
-        #map {
+        #map1 {
         margin: 2px !important;
             padding: 0; margin: 0; _width:50%; width:100%; height:99%;
         }
@@ -31,7 +31,7 @@
 </head>
 
 <body style="display:flex">
-    <div id="map" ></div>
+    <div id="map1" ></div>
     <!-- <div id="map2"></div> -->
     <!-- <div id="map3"></div> -->
     <script src="bower_components.js"></script>
@@ -80,8 +80,8 @@
 
         window.notyInfo('Auto changed to format id = '+ latLngFormat.options.formatId, { layout: 'center', timeout: 1500 } );
     }
-    var map, map2, map3, first = true;
-    $.each(['map'/*, 'map2', 'map3'*/], function(index, id){
+    var map1, map2, map3, first = true;
+    $.each(['map1'/*, 'map2', 'map3'*/], function(index, id){
         var nextMap = L.map(id, {
             zoomControl: first,
             bsZoomControl: true, //first,
@@ -160,7 +160,11 @@ nextMap.addControl( nextMap.bsScaleControl );
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors</a>'
         }).addTo(nextMap);
 
-        L.marker([54,12], {draggable: true}).addTo(nextMap).bindTooltip({icon:'fa-home', text:'Godt'}, {delay:2000});
+        L.marker([54,12], {draggable: true})
+            .addTo(nextMap)
+            .bindTooltip({icon:'fa-home', text:'Godt'}, {delay:2000})
+            .bindPopup({showTooltip: true, content: 'HER ER EN POPUP'}) 
+            ;
 
 var testIB = nextMap.bsPositionControl.addInfoBox({
     id: 'test', 
@@ -194,22 +198,22 @@ nextMap.bsPositionControl.addInfoBox({
         first = false;
     });
 
-//    map.bsPositionControl.sync(map2);
-//    map.bsPositionControl.sync(map3);
+//    map1.bsPositionControl.sync(map2);
+//    map1.bsPositionControl.sync(map3);
 //    map2.bsPositionControl.sync(map3);
 
 
 //HER    var test = false;
-//HER    map.on('click', function(){
+//HER    map1.on('click', function(){
 //HER        test = !test;
 //HER        if (test){
-//HER            map.bsPositionControl.desync(map2);
-//HER            map.bsPositionControl.desync(map3);
+//HER            map1.bsPositionControl.desync(map2);
+//HER            map1.bsPositionControl.desync(map3);
 //HER            map2.bsPositionControl.desync(map3);
 //HER        }
 //HER        else{
-//HER            map.bsPositionControl.sync(map2);
-//HER            map.bsPositionControl.sync(map3);
+//HER            map1.bsPositionControl.sync(map2);
+//HER            map1.bsPositionControl.sync(map3);
 //HER            map2.bsPositionControl.sync(map3);
 //HER        }
 //HER
@@ -226,21 +230,24 @@ nextMap.bsPositionControl.addInfoBox({
     Add contextmenu to the map
     **********************************************/
     var first = null;
-    map.setContextmenuHeader({icon:'fa-map', text:'MAP header'});
+    map1.setContextmenuHeader({icon:'fa-map', text:'MAP header'});
 
-    map.addContextmenuItems([
+    map1.addContextmenuItems([
         {icon:'fa-home', text:{da:'Map#1 (w=180)'}, onClick: function(latlng){ console.log('MAP 1',this, latlng); }, width:180 },
         {icon:'fa-map',  text:'Map#2 (dont close)', onClick: function(latlng){ console.log('MAP 2',this, latlng); }, closeOnClick: false }
     ]);
 
-    map.on('click', function( e ){
+    map1.on('click', function( e ){
         var marker =
-            (!first ? L.bsMarkerCircle : L.marker)( e.latlng, {
+//HER            (!first ? L.bsMarkerCircle : L.marker)( e.latlng, {
+            L.bsMarkerCircle( e.latlng, {
                 draggable: true,
                 colorName: 'red',
-                shadow: false
+                shadow: false,
+                tooltipHideWhenPopupOpen: true,
+                tooltip: 'TOOLTIP____________________________________!'
             })
-            .addTo(map);
+            .addTo(map1);
 
 /*
 content = {
@@ -261,7 +268,10 @@ content = {
                 clickable: true,
 
                 isMinimized: true,
+                fixedContent: 'FIXED',
                 minimized: {
+                    fixedContent: true,
+                    showTooltip: true,
                     width              : 70,
                     //noVerticalPadding  : true,
                     //noHorizontalPadding: true,
@@ -273,6 +283,7 @@ content = {
                     }
                 },
                 dynamic: true,
+                showTooltip: true,
                 content: function($body){
                     $body.html( 'Normal ' + moment().format('HH:mm.ss'));
                 },
@@ -289,12 +300,13 @@ content = {
 
                 isExtended: false,
                 extended: {
+                    showTooltip: true,
                     width  : 300,
                     height : 300,
                     dynamic: true,
-                    content: function($body, popup, map){
+                    content: function($body, popup, map1){
 
-                        $body.html( 'Extended map._leaflet_id=' + map._leaflet_id +' '+moment().format('HH:mm.ss'));
+                        $body.html( 'Extended map._leaflet_id=' + map1._leaflet_id +' '+moment().format('HH:mm.ss'));
                     },
 
                     _content : {type:'textbox', text:'EXTENDED'}
@@ -338,7 +350,7 @@ content = {
         interactive: true, 
         hover: true
     })
-        .addTo(map)
+        .addTo(map1)
         .addContextmenuItems([
             {icon:'fa-home', text:{da:'RED Poly 1'}, onClick: function(latlng){ console.log('RED Poly 1',this, latlng); }},
             {icon:'fa-map',  text:'RED Poly 2', onClick: function(latlng){ console.log('RED Poly 2',this, latlng); }},
@@ -351,7 +363,7 @@ content = {
         [56.94,15.03],
         [57.99,15.05]
     ]], {color:'green'})
-        .addTo(map)
+        .addTo(map1)
         .addContextmenuItems([
             {icon:'fa-home', text:{da:'GREEN Poly 1'}, onClick: function(latlng){ console.log('GREEN Poly 1',this, latlng); }},
             {icon:'fa-map',  text:'GREEN Poly 2', onClick: function(latlng){ console.log('GREEN Poly 2',this, latlng); }},
@@ -367,7 +379,7 @@ content = {
                 {icon:'fa-map'}
             ]
         });
-        map.addControl(bGroup);
+        map1.addControl(bGroup);
 
 
     //************************
@@ -396,7 +408,7 @@ content = {
         }
     });
 
-    map.addControl(buttonBox);
+    map1.addControl(buttonBox);
     //************************
     var selectItems3 = [
             {id: 'item1', text:{da:'Emne#1', en: 'Item#1'} },
@@ -499,7 +511,7 @@ content = {
 
         });
 
-        map.addControl( modalControl );
+        map1.addControl( modalControl );
 
     //************************************************************
     var formControl = L.control.bsModalForm({
@@ -569,11 +581,11 @@ content = {
             }
             ]}
     });
-    map.addControl( formControl );
+    map1.addControl( formControl );
 
 
     var myData = { mySlider: 33 };
-    map.addControl( L.control.bsButton({
+    map1.addControl( L.control.bsButton({
         icon:'fa-edit',
         onClick: function(){
             formControl.bsModalForm.edit( myData );
@@ -582,29 +594,29 @@ content = {
 
 
     //************************************************************
-    map.addControl( L.control.bsButton({
+    map1.addControl( L.control.bsButton({
         icon:['fa-edit', 'fa-pencil-alt'],
     }) );
 
 
     //************************************************************
     var state, state2;
-    map.addControl( L.control.bsButton({
+    map1.addControl( L.control.bsButton({
         icon:'fa-save',
         onClick: function(){
-//            map.bsPositionControl.toggleShowHide();
-            state = map.bsScaleControl.getState();
+//            map1.bsPositionControl.toggleShowHide();
+            state = map1.bsScaleControl.getState();
             state2 = map2.bsScaleControl.getState();
             console.log('save 1',state);
             console.log('save 2',state2);
         }
     }) );
-    map.addControl( L.control.bsButton({
+    map1.addControl( L.control.bsButton({
         icon:'fa-folder-open',
         onClick: function(){
             console.log('load 1',state);
             console.log('load 2',state2);
-            map.bsScaleControl.setState(state);
+            map1.bsScaleControl.setState(state);
             map2.bsScaleControl.setState(state2);
         }
     }) );
@@ -657,7 +669,7 @@ content = {
             },
         });
 
-        var marker = L.marker(mouseEvent.latlng).addTo(map);
+        var marker = L.marker(mouseEvent.latlng).addTo(map1);
         marker.bindPopup(popup).openPopup();
 
     };
@@ -665,7 +677,7 @@ content = {
     //************************************************************
 
     for (var i=0; i<10;i++){
-        var legend = map.bsLegendControl.addLegend({
+        var legend = map1.bsLegendControl.addLegend({
                 icon: i != 4 ? 'fa-home' : ['far fa-square', 'far fa-heart'],
                 text: '| ' +i+'. header',
                 index: 100-i,

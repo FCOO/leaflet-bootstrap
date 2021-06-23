@@ -32,22 +32,38 @@
     Create and return a pane named paneId+'below' that gets zIndex just below pane with paneId
     **********************************************************/
     L.Map.prototype.getPaneBelow = function(paneId){
-        var paneBelowId = paneId+'below';
+        return this._getPaneDeltaZIndex(paneId, 'below', -1);
+    };
 
-        if (!this.getPane(paneBelowId)){
-            this.createPane(paneBelowId);
+    /**********************************************************
+    L.Map.getPaneAbove(paneId)
+    Create and return a pane named paneId+'above' that gets zIndex just above pane with paneId
+    **********************************************************/
+    L.Map.prototype.getPaneAbove = function(paneId){
+        return this._getPaneDeltaZIndex(paneId, 'above', +1);
+    };
+
+    /**********************************************************
+    L.Map._getPaneDeltaZIndex(paneId, postfix, deltaZIndex)
+    Create and return a pane named paneId+postfix that gets
+    zIndex deltaZIndex (+/-) relative to pane with paneId
+    **********************************************************/
+    L.Map.prototype._getPaneDeltaZIndex = function(paneId, postfix, deltaZIndex){
+        var newPaneId = paneId+postfix;
+
+        if (!this.getPane(newPaneId)){
+            this.createPane(newPaneId);
 
             this.whenReady( function(){
-                var zIndex = $(this.getPanes()[paneId]).css('z-index');
-                this[paneBelowId] = this.getPane(paneBelowId);
-                $(this[paneBelowId]).css('z-index', zIndex-1 );
+                var zIndex = parseInt( $(this.getPanes()[paneId]).css('z-index') );
+                this[newPaneId] = this.getPane(newPaneId);
+                $(this[newPaneId]).css('z-index', zIndex + deltaZIndex);
             }, this );
         }
 
-        return this.getPane(paneBelowId);
+        return this.getPane(newPaneId);
 
     };
-
 }(jQuery, L, this, document));
 
 
