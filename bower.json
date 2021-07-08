@@ -1,6 +1,6 @@
 {
   "name": "leaflet-bootstrap",
-  "version": "2.35.0",
+  "version": "3.0.0",
   "homepage": "https://github.com/FCOO/leaflet-bootstrap",
   "authors": [
     "Niels Holt"
@@ -18,7 +18,7 @@
     "jquery": "latest",
     "leaflet": "latest",
     "leaflet-bugfix": "fcoo/leaflet-bugfix#^2.0.2",
-    "jquery-bootstrap": "fcoo/jquery-bootstrap#^1.53.0",
+    "jquery-bootstrap": "fcoo/jquery-bootstrap#^2.2.0",
     "leaflet-control-topcenter": "FCOO/leaflet-control-topcenter#^2.0.1",
     "javascript-utilities": "fcoo/javascript-utilities#^1.1.0",
     "numeral": "adamwdraper/Numeral-js#^2.0.6",
@@ -27,7 +27,7 @@
     "leaflet-latlng-format": "fcoo/leaflet-latlng-format#^2.0.0",
     "leaflet-latlng-geodesy": "fcoo/leaflet-latlng-geodesy#^1.0.2",
     "leaflet-mouseposition": "fcoo/leaflet-mouseposition#latest",
-    "leaflet-bootstrap-marker": "fcoo/leaflet-bootstrap-marker#^2.3.2",
+    "leaflet-bootstrap-marker": "fcoo/leaflet-bootstrap-marker#^3.0.0",
     "modernizr-javascript": "fcoo/modernizr-javascript#^1.1.2",
     "modernizr-scss": "fcoo/modernizr-scss#^2.3.0"
   },
