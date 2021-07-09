@@ -127,10 +127,13 @@ Create leaflet-control for jquery-bootstrap button-classes:
         },
 
         //_adjustPopupList: Adjust this.options.popupList with default items above and below
-        _adjustPopupList: function(aboveList = [], belowList = []){
+        _adjustPopupList: function(aboveList, belowList){
             var _this = this,
                 list = this.options.popupList || [],
                 onChange = $.proxy(this._popupList_onChange, this);
+
+            aboveList = aboveList || [];
+            belowList = belowList || [];
 
             this.popups = {};
             $.each(list, function(index, itemOptions){
