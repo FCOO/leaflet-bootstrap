@@ -173,16 +173,14 @@ Create leaflet-control for jquery-bootstrap button-classes:
                         .modernizrToggle('extended', !!this.options.extended);
 
             //Adjust options for the button and create it
-            var buttonOptions = $.extend(true, {}, {
-                        onClick        : this.onToggle,
-                        semiTransparent: true,
-                        square         : true,
-                    },
-                    this.options
-                );
+            var defaultButtonOptions = {
+                    onClick        : this.onToggle,
+                    semiTransparent: true,
+                    square         : true,
+                };
 
             this.bsButton =
-                $.bsButton(buttonOptions)
+                $.bsButton( $.extend(true, {}, defaultButtonOptions, this.options) )
                 .addClass('hide-for-extended')
                 .appendTo($container);
 
@@ -195,7 +193,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
             if (this.options.extendedButton){
                 this.bsButtonExtended =
-                    $.bsButton( $.extend(true, {}, buttonOptions, this.options.extendedButton) )
+                    $.bsButton( $.extend(true, {}, defaultButtonOptions, this.options.extendedButton) )
                         .addClass('show-for-extended')
                         .appendTo($container);
 
