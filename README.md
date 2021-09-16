@@ -31,9 +31,14 @@ Create a `L.Control.bsButton`. When clicked it opens a box with content
     text:.... 
 
     content: ...
+    extendedButton: {icon:..., text:...}
+
+The extended content can be given by either `options.extendedButton` or `options.content`: 
+
+- `options.content` is either [bsModal-options](https://github.com/FCOO/jquery-bootstrap#modal) OR a `function($container, options, onToggle)` creating the content inside `$container` 
+- `options.extendedButton` = simple button-options `{icon: STRING, text:{da:STRING, en:STRING}}`
 
 
-`options.content` is either [bsModal-options](https://github.com/FCOO/jquery-bootstrap#modal) OR a `function($container, options, onToggle)` creating the content inside `$container` 
 
     //Default bsModal-options
     {

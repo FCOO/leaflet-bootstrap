@@ -184,63 +184,80 @@ Create leaflet-control for jquery-bootstrap button-classes:
             this.bsButton =
                 $.bsButton(buttonOptions)
                 .addClass('hide-for-extended')
-                //.toggleClass('fa-lg', buttonOptions.bigIcon)
                 .appendTo($container);
 
-            //Create container for extended content
-            var $contentContainer = this.$contentContainer =
-                $('<div/>')
-                    .width('auto')
-                    .addClass('show-for-extended')
-                    .appendTo($container);
 
-            //this.options = null OR bsModal-options OR function($container, options, onToggle)
-            if (this.options.content){
-                if ($.isFunction(this.options.content))
-                    this.options.content($contentContainer, this.options, this.onToggle);
-                else {
-                    $contentContainer._bsAddBaseClassAndSize($.extend({
-                        baseClass   : 'modal-dialog',
-                        class       : 'modal-dialog-inline',
-                        useTouchSize: true,
-                        small       : true,
-                    },{
-                        useTouchSize: this.options.content.useTouchSize,
-                        small       : this.options.content.small
-                    }));
+            /*
+            The extended content can be a bsButton or a bsModal:
+            if options.extendedButton => bsButton
+            if options.content => bsModal
+            */
 
-                    //Adjust options for the content (modal) and create the it
-                    var modalOptions = $.extend(true, {},
-                        //Default options
-                        {
-                            closeButton     : false,
-                            clickable       : true,
-                            semiTransparent : true,
-                            extended        : null,
-                            minimized       : null,
-                            isExtended      : false, //Not the same as this.options.isExtended
-                            isMinimized     : false,
-                            width           : this.options.width || 100,
-                        },
-                        this.options.content,
-                        //Forced options
-                        {
-                            show: false,
-                        }
-                    );
+            if (this.options.extendedButton){
+                this.bsButtonExtended =
+                    $.bsButton( $.extend(true, {}, buttonOptions, this.options.extendedButton) )
+                        .addClass('show-for-extended')
+                        .appendTo($container);
 
-                    //Add close icon to header (if any)
-                    if (!modalOptions.noHeader && modalOptions.header && !(modalOptions.icons && modalOptions.icons.close)){
-                        modalOptions.icons = modalOptions.icons || {};
-                        modalOptions.icons.close = { onClick: this.onToggle };
-                    }
-
-                    //Add default onClick if clickable and bsControl will not add popup triggered by click
-                    if (modalOptions.clickable && !modalOptions.onClick && !(this.options.popupList && window.bsIsTouch))
-                        modalOptions.onClick = this.onToggle;
-                    $contentContainer._bsModalContent(modalOptions);
-                }
+                this.options.tooltipOnButton = true;
             }
+            else {
+
+                //Create container for extended content
+                var $contentContainer = this.$contentContainer =
+                    $('<div/>')
+                        .width('auto')
+                        .addClass('show-for-extended')
+                        .appendTo($container);
+
+                //this.options = null OR bsModal-options OR function($container, options, onToggle)
+                if (this.options.content){
+                    if ($.isFunction(this.options.content))
+                        this.options.content($contentContainer, this.options, this.onToggle);
+                    else {
+                        $contentContainer._bsAddBaseClassAndSize($.extend({
+                            baseClass   : 'modal-dialog',
+                            class       : 'modal-dialog-inline',
+                            useTouchSize: true,
+                            small       : true,
+                        },{
+                            useTouchSize: this.options.content.useTouchSize,
+                            small       : this.options.content.small
+                        }));
+
+                        //Adjust options for the content (modal) and create the it
+                        var modalOptions = $.extend(true, {},
+                            //Default options
+                            {
+                                closeButton     : false,
+                                clickable       : true,
+                                semiTransparent : true,
+                                extended        : null,
+                                minimized       : null,
+                                isExtended      : false, //Not the same as this.options.isExtended
+                                isMinimized     : false,
+                                width           : this.options.width || 100,
+                            },
+                            this.options.content,
+                            //Forced options
+                            {
+                                show: false,
+                            }
+                        );
+
+                        //Add close icon to header (if any)
+                        if (!modalOptions.noHeader && modalOptions.header && !(modalOptions.icons && modalOptions.icons.close)){
+                            modalOptions.icons = modalOptions.icons || {};
+                            modalOptions.icons.close = { onClick: this.onToggle };
+                        }
+
+                        //Add default onClick if clickable and bsControl will not add popup triggered by click
+                        if (modalOptions.clickable && !modalOptions.onClick && !(this.options.popupList && window.bsIsTouch))
+                            modalOptions.onClick = this.onToggle;
+                        $contentContainer._bsModalContent(modalOptions);
+                    }
+                }
+            } //end of if (this.options.extendedButton).. else {...
 
             if (this.options.isExtended)
                 this.toggle();
