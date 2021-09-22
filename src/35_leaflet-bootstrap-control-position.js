@@ -159,10 +159,10 @@ Options for selectiong position-format and to activate context-menu
                             window.notyInfo(
                                 { icon: L.BsControl.prototype.options.rightClickIcon,
                                   text: { da: 'Højre-klik på kortet for at se info om positionen',
-                                          en: 'Right-click on the map to see info on the position'
+                                          en: 'Right-click on the map to<br>see info on the position'
                                         }
                                 },
-                                { layout: 'center', timeout: 4000 }
+                                { layout: 'center', _timeout: 4000 }
                             );
                         }
                     },
