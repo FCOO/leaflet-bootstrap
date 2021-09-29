@@ -112,8 +112,13 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
             //Set default onToggle-function
             this.onToggle = $.proxy(this.toggle, this);
-            if (this.options.addOnClose)
+            if (this.options.addOnClose){
                 this.options.onClose = this.onToggle;
+
+                //If extended conent is a button AND the control has popups AND iot is touch mode => supres click on extended button to trigger show popup on the container
+                if (this.options.extendedButton && this.options.popupList && window.bsIsTouch)
+                    this.options.extendedButton.addOnClick = false;
+            }
         },
 
         addTo: function(){
@@ -193,7 +198,10 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
             if (this.options.extendedButton){
                 this.bsButtonExtended =
-                    $.bsButton( $.extend(true, {}, defaultButtonOptions, this.options.extendedButton) )
+                    $.bsButton($.extend(true, {},
+                        defaultButtonOptions,
+                        this.options.extendedButton
+                    ))
                         .addClass('show-for-extended')
                         .appendTo($container);
 

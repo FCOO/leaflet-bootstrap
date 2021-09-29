@@ -170,9 +170,12 @@ nextMap.addControl( nextMap.bsScaleControl );
         var bb = L.control.bsButtonBox({
             position: 'bottomcenter',
             icon: 'fa-home',
-            text: 'Davs',
-            square: false,
+            square: true,
             tooltipOnButton: true,
+            semiTransparent: false,
+
+//popupTrigger: 'hover',
+
             popupList: [{
                 type     : 'button',
                 icon     : 'fa-map',
@@ -183,15 +186,16 @@ nextMap.addControl( nextMap.bsScaleControl );
 
             extendedButton: {
                 square: false,
+                semiTransparent: false,
                 icon: 'fa-map', 
-                text:'Extended'
+                text:'Extended',
             },
             onChange: function( options ){
                 //console.log('onChange', options);
             },
         }).addTo(nextMap);
 
-        bb.disable();
+        //bb.disable();
 /*
 var testIB = nextMap.bsPositionControl.addInfoBox({
     id: 'test', 
