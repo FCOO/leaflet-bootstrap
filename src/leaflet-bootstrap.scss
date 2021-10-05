@@ -17,23 +17,14 @@
 //MATHSASS - https://github.com/terkel/mathsass
 @import "../bower_components/mathsass/dist/math";
 
-
 //COLOR-HELPER - https://github.com/voxpelli/sass-color-helpers
 @import "../bower_components/sass-color-helpers/stylesheets/color-helpers";
-
-//BOOTSTRAP
-@import "../bower_components/bootstrap/scss/functions";
-@import "../bower_components/bootstrap/scss/variables";
-@import "../bower_components/bootstrap/scss/mixins";
 
 //MODERNIZR-SCSS - https://github.com/fcoo/modernizr-scss
 @import "../bower_components/modernizr-scss/dist/modernizr-scss";
 
-//JQUERY-BOOTSTRAP - https://github.com/fcoo/jquery-bootstrap
-@import "../bower_components/jquery-bootstrap/src/bootstrap-variables";
-@import "../bower_components/jquery-bootstrap/src/color";
-@import "../bower_components/jquery-bootstrap/src/variables";
-@import "../bower_components/jquery-bootstrap/src/mixins";
+//JQUERY-BOOTSTRAP VARIABLES AND MIXINS
+@import "../bower_components/jquery-bootstrap/src/include-jquery-bootstrap-variables";
 
 
 //Default variables and values
