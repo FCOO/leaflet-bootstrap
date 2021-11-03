@@ -709,8 +709,8 @@ content = {
 
     for (var i=0; i<10;i++){
         var legend = map1.bsLegendControl.addLegend({
-                icon: i != 4 ? 'fa-home' : ['far fa-square', 'far fa-heart'],
-                text: '| ' +i+'. header',
+                icon: i != 4 ? [['fas fa-slash', 'fa-long-arrow-alt-up']] : ['far fa-square', 'far fa-heart'],
+                text: '| ' +i+'. header' + (i == 3 ? 'Dette er en meget lang title, der geren skulle blive forkortet, så den ikke løber over' : ''),
                 index: 100-i,
                 content   : i % 2 ? 'Her<br>er<br>der<br>noget' : null,
                 buttons   : i % 2 ? null : [{icon:'fa-home', text:'click me', onClick:alert}, {icon:'fa-home', text:'click me to'}],
@@ -718,8 +718,8 @@ content = {
                 onWarning : function(){ console.log('WARNING');},
                 onRemove  : function(){ console.log('REMOVE');},
             });
-		if ((i==1) || (i==4))
-			legend.workingOn()
+//HER	if ((i==1) || (i==4))
+//HER			legend.workingOn()
 		if (i==2)
 			legend.setStateHidden()
 
