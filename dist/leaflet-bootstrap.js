@@ -3274,6 +3274,9 @@ leaflet-bootstrap-control-legend.js
     options:
         normalIconClass: class-name(s) for icons when layer is normal (visible)
         hiddenIconClass: class-name(s) for icon when layer is hidden
+        buttons/buttonList: []button-options. NOTE: The onClick-function is called with (id, map, $button, bsLegend, bsLegendControl)
+
+
     *******************************************************************
     ******************************************************************/
     function BsLegend( options ){
@@ -3282,6 +3285,26 @@ leaflet-bootstrap-control-legend.js
     }
 
     L.BsLegend = BsLegend;
+
+//(id, map, $button, bsLegend, bsLegendControl)
+
+    //bsLegend_button_onClick = click-event for buttons in legend. Includes the map in the arguments for the button
+    function bsLegend_button_onClick(){
+        var options = $(this).data('bsButton_options'),
+            bsLegendControl = options.bsLegend_control,
+            arg = [
+                options.id,
+                bsLegendControl._map,
+                $(this),
+                options.bsLegend,
+                bsLegendControl
+            ];
+
+        options.onClick.apply(options.context, arg);
+
+        return false;
+    };
+
     //Extend the prototype
     BsLegend.prototype = {
         //addTo
@@ -3335,8 +3358,17 @@ leaflet-bootstrap-control-legend.js
                     else {
                         var list = options.buttons || options.buttonList;
                         $.each(list, function(index, options){
+
+                            //Create the buttons and modify the click-event to call options.onClick(id, null, $button, map); map is added
                             options.type  = 'button';
                             options.small = true;
+                            options.addOnClick = false;
+                            options.bsLegend = _this;
+                            options.bsLegend_control = parent;
+
+                            var $button = list[index] = $.bsButton(options);
+                            $button.on('click', bsLegend_button_onClick);
+
                         });
                         modalContentOptions.extended   = {
                             className           : 'text-right modal-footer',

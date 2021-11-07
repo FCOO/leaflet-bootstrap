@@ -713,7 +713,10 @@ content = {
                 text: '| ' +i+'. header' + (i == 3 ? 'Dette er en meget lang title, der geren skulle blive forkortet, så den ikke løber over' : ''),
                 index: 100-i,
                 content   : i % 2 ? 'Her<br>er<br>der<br>noget' : null,
-                buttons   : i % 2 ? null : [{icon:'fa-home', text:'click me', onClick:alert}, {icon:'fa-home', text:'click me to'}],
+                buttons   : i % 2 ? null : [
+                                {id:'button'+i, icon:'fa-home', text:'click me', onClick: function(id, map){ console.log('click me:', id, map)} }, 
+                                {icon:'fa-home', text:'click me to'}
+                            ],
                 onInfo    : function(){ console.log('INFO');},
                 onWarning : function(){ console.log('WARNING');},
                 onRemove  : function(){ console.log('REMOVE');},
