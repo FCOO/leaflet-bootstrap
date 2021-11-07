@@ -3303,7 +3303,7 @@ leaflet-bootstrap-control-legend.js
         options.onClick.apply(options.context, arg);
 
         return false;
-    };
+    }
 
     //Extend the prototype
     BsLegend.prototype = {
@@ -3356,25 +3356,31 @@ leaflet-bootstrap-control-legend.js
                     if (options.content)
                         modalContentOptions.extended   = {content: options.content};
                     else {
-                        var list = options.buttons || options.buttonList;
+                        var list = options.buttons || options.buttonList,
+                            content = [];
                         $.each(list, function(index, options){
+                            if (options instanceof $)
+                                content.push( options );
+                            else {
+                                //Create the buttons and modify the click-event to call options.onClick(id, null, $button, map); map is added
+                                options.type  = 'button';
+                                options.small = true;
+                                options.addOnClick = false;
+                                options.bsLegend = _this;
+                                options.bsLegend_control = parent;
 
-                            //Create the buttons and modify the click-event to call options.onClick(id, null, $button, map); map is added
-                            options.type  = 'button';
-                            options.small = true;
-                            options.addOnClick = false;
-                            options.bsLegend = _this;
-                            options.bsLegend_control = parent;
+                                var $button = $.bsButton(options);
+                                $button.on('click', bsLegend_button_onClick);
 
-                            var $button = list[index] = $.bsButton(options);
-                            $button.on('click', bsLegend_button_onClick);
+                                content.push( $button );
+                            }
 
                         });
                         modalContentOptions.extended   = {
                             className           : 'text-right modal-footer',
                             noVerticalPadding   : true,
                             noHorizontalPadding : true,
-                            content             : list
+                            content             : content
                         };
                     }
                     modalContentOptions.isExtended = true;
