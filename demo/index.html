@@ -160,7 +160,7 @@ nextMap.addControl( nextMap.bsScaleControl );
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors</a>'
         }).addTo(nextMap);
 
-        L.marker([54,12], {draggable: true})
+        L.marker([54,12], {draggable: true, popupContainerClassName:'niels-was-here'})
             .addTo(nextMap)
             .bindTooltip({icon:'fa-home', text:'Godt'}, {delay:2000})
             .bindPopup({showTooltip: true, content: 'HER ER EN POPUP'}) 

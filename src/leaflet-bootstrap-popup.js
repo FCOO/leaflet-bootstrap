@@ -70,13 +70,28 @@ Adjust standard Leaflet popup to display as Bootstrap modal
     /*********************************************************
     Extend L.Popup._initLayout to create popup with Bootstrap-components
     *********************************************************/
+    function findPopupContainerClassName( elem ){
+        function check( opt ){ return opt ? opt.popupContainerClassName || '' : ''; }
+        var result = elem ? check( elem ) || check( elem.options ) || check( elem.modalOptions ) : '';
+
+        if (!result && elem)
+            $.each(['owner', 'source','feature', 'properties'], function(index, id){
+                result = result || findPopupContainerClassName( elem[id] ) || findPopupContainerClassName( elem['_'+id] );
+            });
+        return result;
+    }
+
     L.Popup.prototype._initLayout = function (_initLayout) {
         return function () {
             //Original function/method
             _initLayout.apply(this, arguments);
 
-            //Save ref to popup in DOM-element
-            $(this._container).data('popup', this);
+
+            $(this._container)
+                //Save ref to popup in DOM-element
+                .data('popup', this)
+                //Add class-name to container from 'owners' options
+                .addClass( findPopupContainerClassName(this) );
 
             //Set class-name for wrapper to remove margin, bg-color etc.
             $(this._wrapper).addClass('modal-wrapper');
