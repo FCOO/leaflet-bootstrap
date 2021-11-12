@@ -227,15 +227,14 @@ leaflet-bootstrap-control-legend.js
 
                     //noVerticalPadding: true,
                     //noHorizontalPadding: true,
-                    noShadow: true,
+                    noShadow  : true,
                     header: {
                         icon: this.options.iconArray,
                         text: options.text
                     },
-                    onInfo   : options.onInfo,
-                    onWarning: options.onWarning,
-                    icons: {
-                    },
+                    onInfo     : options.onInfo,
+                    onWarning  : options.onWarning,
+                    icons      : {},
                     content    : '',
                     closeButton: false
                 };
@@ -300,6 +299,9 @@ leaflet-bootstrap-control-legend.js
                 options.onRemove = options.onRemove || options.onClose;
                 if (options.onRemove)
                     modalContentOptions.icons.close = {
+                        //icon   : ['fas fa-home _back', 'far fa-home _middle', 'far fa-home _front'],
+                        icon   : ['fa-map', 'fa-slash'],
+                        className: 'fa-map-margin-right',
                         title  : {da:'Skjul', en:'Hide'},
                         onClick: $.proxy(this.remove, this)
                     };

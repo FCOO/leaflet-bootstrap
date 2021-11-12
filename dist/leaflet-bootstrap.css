@@ -541,6 +541,9 @@ leaflet-bootstrap-control-legend.scss
 .no-margin-left {
   margin-left: 0 !important; }
 
+.fa-map-margin-right {
+  margin-right: 0.4rem; }
+
 /***********************************************
 leaflet-bootstrap-contextmenu.scss
 ************************************************/
