@@ -3752,37 +3752,46 @@ Adjust standard Leaflet popup to display as Bootstrap modal
     of the "body" of the bsModal inside the popup
     *********************************************************/
     L.Popup.prototype.changeContent = function(content, contentContext) {
-        var _contentContent = ($.isPlainObject(content) && !!content.content) ? content : {content: content, contentContext: contentContext};
+        var size = null,
+            _contentContent = ($.isPlainObject(content) && !!content.content) ? content : {content: content, contentContext: contentContext};
 
         $.extend(this._content, _contentContent );
 
-        //Update normal content
-        this.bsModal.$body.empty();
-        this.bsModal.$body._bsAppendContent(
-            this._content.content,
-            this._content.contentContext
-        );
+        if (this.isOpen()){
+            size = this.getSize();
 
-
-        if (this.bsModal.minimized){
-            //Update extended content
-            this.bsModal.minimized.$body.empty();
-            this.bsModal.minimized.$body._bsAppendContent(
-                this._content.minimized.content,
-                this._content.minimized.contentContext
+            //Update normal content
+            this.bsModal.$body.empty();
+            this.bsModal.$body._bsAppendContent(
+                this._content.content,
+                this._content.contentContext
             );
-        }
 
-        if (this.bsModal.extended){
-            //Update extended content
-            this.bsModal.extended.$body.empty();
-            this.bsModal.extended.$body._bsAppendContent(
-                this._content.extended.content,
-                this._content.extended.contentContext
-            );
+            if (this.bsModal.minimized){
+                //Update extended content
+                this.bsModal.minimized.$body.empty();
+                this.bsModal.minimized.$body._bsAppendContent(
+                    this._content.minimized.content,
+                    this._content.minimized.contentContext
+                );
+            }
+
+            if (this.bsModal.extended){
+                //Update extended content
+                this.bsModal.extended.$body.empty();
+                this.bsModal.extended.$body._bsAppendContent(
+                    this._content.extended.content,
+                    this._content.extended.contentContext
+                );
+            }
+
         }
 
         this.update();
+
+        if (size)
+            this.setSize(size);
+
 		return this;
 	};
 
@@ -3808,8 +3817,7 @@ Adjust standard Leaflet popup to display as Bootstrap modal
 
 
     L.Popup.prototype.getSize = function(){
-        this.$contentNode._bsModalGetSize();
-        return this;
+        return this.$contentNode._bsModalGetSize();
     };
 
     L.Popup.prototype.setSize = function(size){
