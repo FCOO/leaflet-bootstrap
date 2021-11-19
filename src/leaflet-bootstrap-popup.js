@@ -307,8 +307,7 @@ Adjust standard Leaflet popup to display as Bootstrap modal
 
 
     L.Popup.prototype.getSize = function(){
-        this.$contentNode._bsModalGetSize();
-        return this;
+        return this.$contentNode._bsModalGetSize();
     };
 
     L.Popup.prototype.setSize = function(size){
