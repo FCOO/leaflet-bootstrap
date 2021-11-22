@@ -3307,7 +3307,9 @@ leaflet-bootstrap-control-legend.js
 
     //Extend the prototype
     BsLegend.prototype = {
-        //addTo
+        /*******************************************
+        addTo
+        *******************************************/
         addTo: function( parent ){
             var _this = this,
                 options = this.options,
@@ -3339,7 +3341,7 @@ leaflet-bootstrap-control-legend.js
                     //noHorizontalPadding: true,
                     noShadow  : true,
                     header: {
-                        icon: this.options.iconArray,
+                        icon: options.iconArray,
                         text: options.text
                     },
                     onInfo     : options.onInfo,
@@ -3350,16 +3352,33 @@ leaflet-bootstrap-control-legend.js
                 };
 
 
-                //The extended content can be 'normal' content or buttons/buttonList
+                //The extended content can be 'normal' content and/or buttons/buttonList
                 if (options.content || options.buttons || options.buttonList){
-                    if (options.content)
-                        modalContentOptions.extended   = {content: options.content};
-                    else {
+                    var content = [];
+
+                    if (options.content){
+
+                        this.$contentContainer =
+                            $('<div/>')
+                                .addClass('modal-body')
+                                .addClass(options.contentClassName)
+
+                                .toggleClass('no-vertical-padding',   !!options.noVerticalPadding)
+                                .toggleClass('no-horizontal-padding', !!options.noHorizontalPadding);
+
+                        this.updateContent( options.content );
+
+                        content.push( this.$contentContainer );
+                    }
+
+                    if (options.buttons || options.buttonList){
+                        //Convert button-list to content
                         var list = options.buttons || options.buttonList,
-                            content = [];
+                            $buttonList = [];
+
                         $.each(list, function(index, options){
                             if (options instanceof $)
-                                content.push( options );
+                                $buttonList.push( options );
                             else {
                                 //Create the buttons and modify the click-event to call options.onClick(id, null, $button, map); map is added
                                 options.type  = 'button';
@@ -3371,41 +3390,30 @@ leaflet-bootstrap-control-legend.js
                                 var $button = $.bsButton(options);
                                 $button.on('click', bsLegend_button_onClick);
 
-                                content.push( $button );
+                                $buttonList.push( $button );
                             }
-
                         });
-                        modalContentOptions.extended   = {
-                            className           : 'text-right modal-footer',
-                            noVerticalPadding   : true,
-                            noHorizontalPadding : true,
-                            content             : content
-                        };
+
+                        this.$buttonContainer =
+                            $('<div/>')
+                                .addClass('text-right modal-footer')
+                                .css('padding', 0)
+                                ._bsAppendContent( $buttonList );
+
+                        content.push( this.$buttonContainer );
                     }
+
+                    modalContentOptions.extended = {
+                        //className           : 'text-right modal-footer',
+                        noVerticalPadding   : true,
+                        noHorizontalPadding : true,
+                        content             : content
+                    };
+
                     modalContentOptions.isExtended = true;
                     options.hasContent = true;
                 }
 
-/*
-        $.each( buttons, function( index, buttonOptions ){
-
-            focusAdded = focusAdded || buttonOptions.focus;
-            if (!focusAdded && (index+1 == buttons.length ) )
-                buttonOptions.focus = true;
-
-            //Add same onClick as close-icon if closeOnClick: true
-            if (buttonOptions.closeOnClick)
-                buttonOptions.equalIconId = (buttonOptions.equalIconId || '') + ' close';
-
-            buttonOptions.class = defaultButtonClass + ' ' + (buttonOptions.className || '');
-
-            var $button =
-                $.bsButton( $.extend({}, defaultButtonOptions, buttonOptions ) )
-                    .appendTo( $modalButtonContainer );
-
-
-
-*/
                 options.onRemove = options.onRemove || options.onClose;
                 if (options.onRemove)
                     modalContentOptions.icons.close = {
@@ -3441,7 +3449,9 @@ leaflet-bootstrap-control-legend.js
 
         },
 
-        //Show or hide icons
+        /*******************************************
+        Show or hide icons
+        *******************************************/
         toggleIcon: function(id, show){
             this.actionIcons[id].toggle(!!show);
             return this;
@@ -3472,7 +3482,9 @@ leaflet-bootstrap-control-legend.js
         setStateInvisible: function(){ return this.setStateHidden(); },
 
 
-        //Remove legend
+        /*******************************************
+        Remove legend
+        *******************************************/
         remove: function(){
             this.parent.removeLegend(this);
         },
@@ -3482,12 +3494,23 @@ leaflet-bootstrap-control-legend.js
             this.options.onRemove(this);
         },
 
-        //update
-        update: function(){
+        /*******************************************
+        update
+        *******************************************/
+        update: function( content ){
+            if (content){
+                this.options.content = content;
+                this.updateContent( content );
+            }
             if (this.options.onUpdate)
                 this.options.onUpdate(this);
         },
 
+        updateContent( content ){
+            this.$contentContainer
+                .empty()
+                ._bsAppendContent( content );
+        }
 
 
     };
