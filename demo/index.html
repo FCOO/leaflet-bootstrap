@@ -163,7 +163,7 @@ nextMap.addControl( nextMap.bsScaleControl );
         L.marker([54,12], {draggable: true})
             .addTo(nextMap)
             .bindTooltip({icon:'fa-home', text:'Godt'}, {delay:2000})
-            .bindPopup({showTooltip: true, content: 'HER ER EN POPUP'}) 
+            .bindPopup({showTooltip: true, buttons: [{icon:'fa-home', text:'Davs'}], content: 'HER ER EN POPUP'}) 
             ;
 
 
@@ -712,7 +712,12 @@ content = {
                 icon: i != 4 ? [['fas fa-slash', 'fa-long-arrow-alt-up']] : ['far fa-square', 'far fa-heart'],
                 text: '| ' +i+'. header' + (i == 3 ? 'Dette er en meget lang title, der geren skulle blive forkortet, så den ikke løber over' : ''),
                 index: 100-i,
-                content   : i % 2 ? 'Her<br>er<br>der<br>noget' : null,
+                content   : i % 2 ? [
+                    {type:'text', label: {icon:'fa-home', text:'Header'}, text:' Dette er en linie tekst'},
+                    {type:'text', label: {icon:'fa-home', text:'Header'}, text:' Dette er en linie tekst', small: true, center: true},
+                    {type:'text', label: {icon:'fa-home', text:'Header'}, text:' Dette er en linie tekst'},
+
+                ] : null,
                 //noVerticalPadding: true,
                 //noHorizontalPadding: true,
 

@@ -32400,11 +32400,11 @@ return jQuery;
 	var minor = parseInt(splitVersion[1]);
 
 	var JQ_LT_17 = (major < 1) || (major == 1 && minor < 7);
-
+	
 	function eventsData($el) {
 		return JQ_LT_17 ? $el.data('events') : $._data($el[0]).events;
 	}
-
+	
 	function moveHandlerToTop($el, eventName, isDelegated) {
 		var data = eventsData($el);
 		var events = data[eventName];
@@ -32422,7 +32422,7 @@ return jQuery;
 			events.unshift(events.pop());
 		}
 	}
-
+	
 	function moveEventHandlers($elems, eventsString, isDelegate) {
 		var events = eventsString.split(/\s+/);
 		$elems.each(function() {
@@ -32432,7 +32432,7 @@ return jQuery;
 			}
 		});
 	}
-
+	
 	function makeMethod(methodName) {
 		$.fn[methodName + 'First'] = function() {
 			var args = $.makeArray(arguments);
@@ -32457,7 +32457,7 @@ return jQuery;
 	$.fn.delegateFirst = function() {
 		var args = $.makeArray(arguments);
 		var eventsString = args[1];
-
+		
 		if (eventsString) {
 			args.splice(0, 2);
 			$.fn.delegate.apply(this, arguments);
@@ -32477,7 +32477,7 @@ return jQuery;
 
 		return this;
 	};
-
+	
 	// on (jquery >= 1.7)
 	if (!JQ_LT_17) {
 		$.fn.onFirst = function(types, selector) {
@@ -38419,40 +38419,6 @@ if (typeof define === 'function' && define.amd) {
     return _typeof(obj);
   }
 
-  function _defineProperty(obj, key, value) {
-    if (key in obj) {
-      Object.defineProperty(obj, key, {
-        value: value,
-        enumerable: true,
-        configurable: true,
-        writable: true
-      });
-    } else {
-      obj[key] = value;
-    }
-
-    return obj;
-  }
-
-  function _objectSpread(target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i] != null ? Object(arguments[i]) : {};
-      var ownKeys = Object.keys(source);
-
-      if (typeof Object.getOwnPropertySymbols === 'function') {
-        ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
-          return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-        }));
-      }
-
-      ownKeys.forEach(function (key) {
-        _defineProperty(target, key, source[key]);
-      });
-    }
-
-    return target;
-  }
-
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
@@ -38483,21 +38449,6 @@ if (typeof define === 'function' && define.amd) {
     return self;
   }
 
-  function _possibleConstructorReturn(self, call) {
-    if (call && (_typeof(call) === "object" || typeof call === "function")) {
-      return call;
-    }
-
-    return _assertThisInitialized(self);
-  }
-
-  function _getPrototypeOf(o) {
-    _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
-      return o.__proto__ || Object.getPrototypeOf(o);
-    };
-    return _getPrototypeOf(o);
-  }
-
   function _setPrototypeOf(o, p) {
     _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
       o.__proto__ = p;
@@ -38521,6 +38472,40 @@ if (typeof define === 'function' && define.amd) {
     });
     if (superClass) _setPrototypeOf(subClass, superClass);
   }
+
+  function _possibleConstructorReturn(self, call) {
+    if (call && (_typeof(call) === "object" || typeof call === "function")) {
+      return call;
+    }
+
+    return _assertThisInitialized(self);
+  }
+
+  function _getPrototypeOf(o) {
+    _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+      return o.__proto__ || Object.getPrototypeOf(o);
+    };
+    return _getPrototypeOf(o);
+  }
+
+  function _defineProperty(obj, key, value) {
+    if (key in obj) {
+      Object.defineProperty(obj, key, {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    } else {
+      obj[key] = value;
+    }
+
+    return obj;
+  }
+
+  function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+  function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
   var consoleLogger = {
     type: 'logger',
@@ -38607,9 +38592,9 @@ if (typeof define === 'function' && define.amd) {
     }, {
       key: "create",
       value: function create(moduleName) {
-        return new Logger(this.logger, _objectSpread({}, {
+        return new Logger(this.logger, _objectSpread(_objectSpread({}, {
           prefix: "".concat(this.prefix, ":").concat(moduleName, ":")
-        }, this.options));
+        }), this.options));
       }
     }]);
 
@@ -38824,6 +38809,14 @@ if (typeof define === 'function' && define.amd) {
     return matched;
   }
 
+  function ownKeys$1(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+  function _objectSpread$1(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$1(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$1(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+  function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
   function deepFind(obj, path) {
     var keySeparator = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '.';
     if (!obj) return undefined;
@@ -38866,6 +38859,8 @@ if (typeof define === 'function' && define.amd) {
   var ResourceStore = function (_EventEmitter) {
     _inherits(ResourceStore, _EventEmitter);
 
+    var _super = _createSuper(ResourceStore);
+
     function ResourceStore(data) {
       var _this;
 
@@ -38876,7 +38871,7 @@ if (typeof define === 'function' && define.amd) {
 
       _classCallCheck(this, ResourceStore);
 
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(ResourceStore).call(this));
+      _this = _super.call(this);
 
       if (isIE10) {
         EventEmitter.call(_assertThisInitialized(_this));
@@ -38987,7 +38982,7 @@ if (typeof define === 'function' && define.amd) {
         if (deep) {
           deepExtend(pack, resources, overwrite);
         } else {
-          pack = _objectSpread({}, pack, resources);
+          pack = _objectSpread$1(_objectSpread$1({}, pack), resources);
         }
 
         setPath(this.data, path, pack);
@@ -39012,7 +39007,7 @@ if (typeof define === 'function' && define.amd) {
       key: "getResourceBundle",
       value: function getResourceBundle(lng, ns) {
         if (!ns) ns = this.options.defaultNS;
-        if (this.options.compatibilityAPI === 'v1') return _objectSpread({}, {}, this.getResource(lng, ns));
+        if (this.options.compatibilityAPI === 'v1') return _objectSpread$1(_objectSpread$1({}, {}), this.getResource(lng, ns));
         return this.getResource(lng, ns);
       }
     }, {
@@ -39054,10 +39049,19 @@ if (typeof define === 'function' && define.amd) {
     }
   };
 
+  function ownKeys$2(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+  function _objectSpread$2(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$2(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$2(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+  function _createSuper$1(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct$1(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$1() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
   var checkedLoadedFor = {};
 
   var Translator = function (_EventEmitter) {
     _inherits(Translator, _EventEmitter);
+
+    var _super = _createSuper$1(Translator);
 
     function Translator(services) {
       var _this;
@@ -39066,7 +39070,7 @@ if (typeof define === 'function' && define.amd) {
 
       _classCallCheck(this, Translator);
 
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(Translator).call(this));
+      _this = _super.call(this);
 
       if (isIE10) {
         EventEmitter.call(_assertThisInitialized(_this));
@@ -39180,7 +39184,7 @@ if (typeof define === 'function' && define.amd) {
               this.logger.warn('accessing an object - but returnObjects options is not enabled!');
             }
 
-            return this.options.returnedObjectHandler ? this.options.returnedObjectHandler(resUsedKey, res, _objectSpread({}, options, {
+            return this.options.returnedObjectHandler ? this.options.returnedObjectHandler(resUsedKey, res, _objectSpread$2(_objectSpread$2({}, options), {}, {
               ns: namespaces
             })) : "key '".concat(key, " (").concat(this.language, ")' returned an object instead of string.");
           }
@@ -39193,7 +39197,7 @@ if (typeof define === 'function' && define.amd) {
             for (var m in res) {
               if (Object.prototype.hasOwnProperty.call(res, m)) {
                 var deepKey = "".concat(newKeyToUse).concat(keySeparator).concat(m);
-                copy[m] = this.translate(deepKey, _objectSpread({}, options, {
+                copy[m] = this.translate(deepKey, _objectSpread$2(_objectSpread$2({}, options), {
                   joinArrays: false,
                   ns: namespaces
                 }));
@@ -39232,7 +39236,7 @@ if (typeof define === 'function' && define.amd) {
             this.logger.log(updateMissing ? 'updateKey' : 'missingKey', lng, namespace, key, updateMissing ? defaultValue : res);
 
             if (keySeparator) {
-              var fk = this.resolve(key, _objectSpread({}, options, {
+              var fk = this.resolve(key, _objectSpread$2(_objectSpread$2({}, options), {}, {
                 keySeparator: false
               }));
               if (fk && fk.res) this.logger.warn('Seems the loaded translations were in flat JSON format instead of nested. Either set keySeparator: false on init or make sure your translations are published in nested format.');
@@ -39291,8 +39295,8 @@ if (typeof define === 'function' && define.amd) {
             resolved: resolved
           });
         } else if (!options.skipInterpolation) {
-          if (options.interpolation) this.interpolator.init(_objectSpread({}, options, {
-            interpolation: _objectSpread({}, this.options.interpolation, options.interpolation)
+          if (options.interpolation) this.interpolator.init(_objectSpread$2(_objectSpread$2({}, options), {
+            interpolation: _objectSpread$2(_objectSpread$2({}, this.options.interpolation), options.interpolation)
           }));
           var skipOnVariables = options.interpolation && options.interpolation.skipOnVariables || this.options.interpolation.skipOnVariables;
           var nestBef;
@@ -39303,7 +39307,7 @@ if (typeof define === 'function' && define.amd) {
           }
 
           var data = options.replace && typeof options.replace !== 'string' ? options.replace : options;
-          if (this.options.interpolation.defaultVariables) data = _objectSpread({}, this.options.interpolation.defaultVariables, data);
+          if (this.options.interpolation.defaultVariables) data = _objectSpread$2(_objectSpread$2({}, this.options.interpolation.defaultVariables), data);
           res = this.interpolator.interpolate(res, data, options.lng || this.language, options);
 
           if (skipOnVariables) {
@@ -39332,7 +39336,7 @@ if (typeof define === 'function' && define.amd) {
         var postProcessorNames = typeof postProcess === 'string' ? [postProcess] : postProcess;
 
         if (res !== undefined && res !== null && postProcessorNames && postProcessorNames.length && options.applyPostProcessor !== false) {
-          res = postProcessor.handle(postProcessorNames, res, key, this.options && this.options.postProcessPassResolved ? _objectSpread({
+          res = postProcessor.handle(postProcessorNames, res, key, this.options && this.options.postProcessPassResolved ? _objectSpread$2({
             i18nResolved: resolved
           }, options) : options, this);
         }
@@ -39914,6 +39918,10 @@ if (typeof define === 'function' && define.amd) {
     return PluralResolver;
   }();
 
+  function ownKeys$3(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+  function _objectSpread$3(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$3(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$3(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
   var Interpolator = function () {
     function Interpolator() {
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -39985,7 +39993,7 @@ if (typeof define === 'function' && define.amd) {
         var handleFormat = function handleFormat(key) {
           if (key.indexOf(_this.formatSeparator) < 0) {
             var path = getPathWithDefaults(data, defaultData, key);
-            return _this.alwaysFormat ? _this.format(path, undefined, lng, _objectSpread({}, options, data, {
+            return _this.alwaysFormat ? _this.format(path, undefined, lng, _objectSpread$3(_objectSpread$3(_objectSpread$3({}, options), data), {}, {
               interpolationkey: key
             })) : path;
           }
@@ -39993,7 +40001,7 @@ if (typeof define === 'function' && define.amd) {
           var p = key.split(_this.formatSeparator);
           var k = p.shift().trim();
           var f = p.join(_this.formatSeparator).trim();
-          return _this.format(getPathWithDefaults(data, defaultData, k), f, lng, _objectSpread({}, options, data, {
+          return _this.format(getPathWithDefaults(data, defaultData, k), f, lng, _objectSpread$3(_objectSpread$3(_objectSpread$3({}, options), data), {}, {
             interpolationkey: k
           }));
         };
@@ -40062,7 +40070,7 @@ if (typeof define === 'function' && define.amd) {
         var match;
         var value;
 
-        var clonedOptions = _objectSpread({}, options);
+        var clonedOptions = _objectSpread$3({}, options);
 
         clonedOptions.applyPostProcessor = false;
         delete clonedOptions.defaultValue;
@@ -40078,7 +40086,7 @@ if (typeof define === 'function' && define.amd) {
 
           try {
             clonedOptions = JSON.parse(optionsString);
-            if (inheritedOptions) clonedOptions = _objectSpread({}, inheritedOptions, clonedOptions);
+            if (inheritedOptions) clonedOptions = _objectSpread$3(_objectSpread$3({}, inheritedOptions), clonedOptions);
           } catch (e) {
             this.logger.warn("failed parsing options string in nesting for key ".concat(key), e);
             return "".concat(key).concat(sep).concat(optionsString);
@@ -40112,7 +40120,7 @@ if (typeof define === 'function' && define.amd) {
 
           if (doReduce) {
             value = formatters.reduce(function (v, f) {
-              return _this2.format(v, f, options.lng, _objectSpread({}, options, {
+              return _this2.format(v, f, options.lng, _objectSpread$3(_objectSpread$3({}, options), {}, {
                 interpolationkey: match[1].trim()
               }));
             }, value.trim());
@@ -40187,6 +40195,10 @@ if (typeof define === 'function' && define.amd) {
     return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
   }
 
+  function ownKeys$4(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+  function _objectSpread$4(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$4(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$4(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
   function parseFormatStr(formatStr) {
     var formatName = formatStr.toLowerCase().trim();
     var formatOptions = {};
@@ -40237,18 +40249,18 @@ if (typeof define === 'function' && define.amd) {
           return new Intl.NumberFormat(lng, options).format(val);
         },
         currency: function currency(val, lng, options) {
-          return new Intl.NumberFormat(lng, _objectSpread({}, options, {
+          return new Intl.NumberFormat(lng, _objectSpread$4(_objectSpread$4({}, options), {}, {
             style: 'currency'
           })).format(val);
         },
         datetime: function datetime(val, lng, options) {
-          return new Intl.DateTimeFormat(lng, _objectSpread({}, options)).format(val);
+          return new Intl.DateTimeFormat(lng, _objectSpread$4({}, options)).format(val);
         },
         relativetime: function relativetime(val, lng, options) {
-          return new Intl.RelativeTimeFormat(lng, _objectSpread({}, options)).format(val, options.range || 'day');
+          return new Intl.RelativeTimeFormat(lng, _objectSpread$4({}, options)).format(val, options.range || 'day');
         },
         list: function list(val, lng, options) {
-          return new Intl.ListFormat(lng, _objectSpread({}, options)).format(val);
+          return new Intl.ListFormat(lng, _objectSpread$4({}, options)).format(val);
         }
       };
       this.init(options);
@@ -40286,7 +40298,7 @@ if (typeof define === 'function' && define.amd) {
             try {
               var valOptions = options && options.formatParams && options.formatParams[options.interpolationkey] || {};
               var l = valOptions.locale || valOptions.lng || options.locale || options.lng || lng;
-              formatted = _this.formats[formatName](mem, l, _objectSpread({}, formatOptions, options, valOptions));
+              formatted = _this.formats[formatName](mem, l, _objectSpread$4(_objectSpread$4(_objectSpread$4({}, formatOptions), options), valOptions));
             } catch (error) {
               _this.logger.warn(error);
             }
@@ -40305,6 +40317,14 @@ if (typeof define === 'function' && define.amd) {
     return Formatter;
   }();
 
+  function ownKeys$5(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+  function _objectSpread$5(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$5(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$5(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+  function _createSuper$2(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct$2(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$2() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
   function remove(arr, what) {
     var found = arr.indexOf(what);
 
@@ -40317,6 +40337,8 @@ if (typeof define === 'function' && define.amd) {
   var Connector = function (_EventEmitter) {
     _inherits(Connector, _EventEmitter);
 
+    var _super = _createSuper$2(Connector);
+
     function Connector(backend, store, services) {
       var _this;
 
@@ -40324,7 +40346,7 @@ if (typeof define === 'function' && define.amd) {
 
       _classCallCheck(this, Connector);
 
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(Connector).call(this));
+      _this = _super.call(this);
 
       if (isIE10) {
         EventEmitter.call(_assertThisInitialized(_this));
@@ -40521,7 +40543,7 @@ if (typeof define === 'function' && define.amd) {
         if (key === undefined || key === null || key === '') return;
 
         if (this.backend && this.backend.create) {
-          this.backend.create(languages, namespace, key, fallbackValue, null, _objectSpread({}, options, {
+          this.backend.create(languages, namespace, key, fallbackValue, null, _objectSpread$5(_objectSpread$5({}, options), {}, {
             isUpdate: isUpdate
           }));
         }
@@ -40612,6 +40634,14 @@ if (typeof define === 'function' && define.amd) {
     return options;
   }
 
+  function ownKeys$6(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+  function _objectSpread$6(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$6(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$6(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+  function _createSuper$3(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct$3(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+  function _isNativeReflectConstruct$3() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
   function noop() {}
 
   function bindMemberFunctions(inst) {
@@ -40626,6 +40656,8 @@ if (typeof define === 'function' && define.amd) {
   var I18n = function (_EventEmitter) {
     _inherits(I18n, _EventEmitter);
 
+    var _super = _createSuper$3(I18n);
+
     function I18n() {
       var _this;
 
@@ -40634,7 +40666,7 @@ if (typeof define === 'function' && define.amd) {
 
       _classCallCheck(this, I18n);
 
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(I18n).call(this));
+      _this = _super.call(this);
 
       if (isIE10) {
         EventEmitter.call(_assertThisInitialized(_this));
@@ -40685,7 +40717,8 @@ if (typeof define === 'function' && define.amd) {
         }
 
         var defOpts = get();
-        this.options = _objectSpread({}, defOpts, this.options, transformOptions(options));
+        this.options = _objectSpread$6(_objectSpread$6(_objectSpread$6({}, defOpts), this.options), transformOptions(options));
+        this.options.interpolation = _objectSpread$6({}, this.options.interpolation);
 
         if (options.keySeparator !== undefined) {
           this.options.userDefinedKeySeparator = options.keySeparator;
@@ -41012,7 +41045,7 @@ if (typeof define === 'function' && define.amd) {
 
             options = _this5.options.overloadTranslationOptionHandler([key, opts].concat(rest));
           } else {
-            options = _objectSpread({}, opts);
+            options = _objectSpread$6({}, opts);
           }
 
           options.lng = options.lng || fixedT.lng;
@@ -41143,13 +41176,6 @@ if (typeof define === 'function' && define.amd) {
         return rtlLngs.indexOf(this.services.languageUtils.getLanguagePartFromCode(lng)) > -1 || lng.toLowerCase().indexOf('-arab') > 1 ? 'rtl' : 'ltr';
       }
     }, {
-      key: "createInstance",
-      value: function createInstance() {
-        var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-        var callback = arguments.length > 1 ? arguments[1] : undefined;
-        return new I18n(options, callback);
-      }
-    }, {
       key: "cloneInstance",
       value: function cloneInstance() {
         var _this8 = this;
@@ -41157,7 +41183,7 @@ if (typeof define === 'function' && define.amd) {
         var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
         var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : noop;
 
-        var mergedOptions = _objectSpread({}, this.options, options, {
+        var mergedOptions = _objectSpread$6(_objectSpread$6(_objectSpread$6({}, this.options), options), {
           isClone: true
         });
 
@@ -41166,7 +41192,7 @@ if (typeof define === 'function' && define.amd) {
         membersToCopy.forEach(function (m) {
           clone[m] = _this8[m];
         });
-        clone.services = _objectSpread({}, this.services);
+        clone.services = _objectSpread$6({}, this.services);
         clone.services.utils = {
           hasLoadedNamespace: clone.hasLoadedNamespace.bind(clone)
         };
@@ -41201,9 +41227,16 @@ if (typeof define === 'function' && define.amd) {
     return I18n;
   }(EventEmitter);
 
-  var i18next = new I18n();
+  _defineProperty(I18n, "createInstance", function () {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var callback = arguments.length > 1 ? arguments[1] : undefined;
+    return new I18n(options, callback);
+  });
 
-  return i18next;
+  var instance = I18n.createInstance();
+  instance.createInstance = I18n.createInstance;
+
+  return instance;
 
 })));
 
@@ -41310,8 +41343,8 @@ if (typeof define === 'function' && define.amd) {
     };
     (function(factory) {
         if (true) {
-            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(2) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory,
-            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__,
+            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(2) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory, 
+            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__, 
             __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
         } else {}
     })(function(Inputmask) {
@@ -41405,8 +41438,8 @@ if (typeof define === 'function' && define.amd) {
     };
     (function(factory) {
         if (true) {
-            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(3), __webpack_require__(5) ],
-            __WEBPACK_AMD_DEFINE_FACTORY__ = factory, __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__,
+            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(3), __webpack_require__(5) ], 
+            __WEBPACK_AMD_DEFINE_FACTORY__ = factory, __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__, 
             __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
         } else {}
     })(function($, window, undefined) {
@@ -42919,7 +42952,7 @@ if (typeof define === 'function' && define.amd) {
             function seekPrevious(pos, newBlock) {
                 var position = pos, tests;
                 if (position <= 0) return 0;
-                while (--position > 0 && (newBlock === true && getTest(position).match.newBlockMarker !== true || newBlock !== true && !isMask(position) && (tests = getTests(position),
+                while (--position > 0 && (newBlock === true && getTest(position).match.newBlockMarker !== true || newBlock !== true && !isMask(position) && (tests = getTests(position), 
                 tests.length < 2 || tests.length === 2 && tests[1].match.def === ""))) {}
                 return position;
             }
@@ -44156,8 +44189,8 @@ if (typeof define === 'function' && define.amd) {
     };
     (function(factory) {
         if (true) {
-            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(4) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory,
-            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__,
+            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(4) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory, 
+            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__, 
             __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
         } else {}
     })(function($) {
@@ -44186,8 +44219,8 @@ if (typeof define === 'function' && define.amd) {
     };
     (function(factory) {
         if (true) {
-            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(2) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory,
-            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__,
+            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(2) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory, 
+            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__, 
             __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
         } else {}
     })(function(Inputmask) {
@@ -44438,8 +44471,8 @@ if (typeof define === 'function' && define.amd) {
     };
     (function(factory) {
         if (true) {
-            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(2) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory,
-            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__,
+            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(2) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory, 
+            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__, 
             __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
         } else {}
     })(function(Inputmask) {
@@ -44989,8 +45022,8 @@ if (typeof define === 'function' && define.amd) {
     };
     (function(factory) {
         if (true) {
-            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(4), __webpack_require__(2) ],
-            __WEBPACK_AMD_DEFINE_FACTORY__ = factory, __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__,
+            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(4), __webpack_require__(2) ], 
+            __WEBPACK_AMD_DEFINE_FACTORY__ = factory, __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__, 
             __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
         } else {}
     })(function($, Inputmask) {
@@ -45644,7 +45677,7 @@ if (typeof define === 'function' && define.amd) {
 
 ;
 /****************************************************************************
-	modernizr-javascript.js,
+	modernizr-javascript.js, 
 
 	(c) 2016, FCOO
 
@@ -45655,20 +45688,20 @@ if (typeof define === 'function' && define.amd) {
 
 (function ($, window, document, undefined) {
 	"use strict";
-
+	
 	var ns = window;
 
     //Extend the jQuery prototype
     $.fn.extend({
-        modernizrOn : function( test ){
-            return this.modernizrToggle( test, true );
+        modernizrOn : function( test ){ 
+            return this.modernizrToggle( test, true ); 
         },
 
-        modernizrOff: function( test ){
-            return this.modernizrToggle( test, false );
+        modernizrOff: function( test ){ 
+            return this.modernizrToggle( test, false ); 
         },
-
-        modernizrToggle: function( test, on ){
+        
+        modernizrToggle: function( test, on ){ 
 		if ( on === undefined )
             return this.modernizrToggle( test, !this.hasClass( test ) );
 
@@ -48562,19 +48595,19 @@ if (typeof define === 'function' && define.amd) {
 ;
 /* @preserve
  * The MIT License (MIT)
- *
+ * 
  * Copyright (c) 2013-2018 Petka Antonov
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
@@ -48582,7 +48615,7 @@ if (typeof define === 'function' && define.amd) {
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- *
+ * 
  */
 /**
  * bluebird build version 3.7.2
@@ -52174,28 +52207,28 @@ _dereq_('./using.js')(Promise, apiRejection, tryConvertToPromise, createContext,
 _dereq_('./any.js')(Promise);
 _dereq_('./each.js')(Promise, INTERNAL);
 _dereq_('./filter.js')(Promise, INTERNAL);
-
-    util.toFastProperties(Promise);
-    util.toFastProperties(Promise.prototype);
-    function fillTypes(value) {
-        var p = new Promise(INTERNAL);
-        p._fulfillmentHandler0 = value;
-        p._rejectionHandler0 = value;
-        p._promise0 = value;
-        p._receiver0 = value;
-    }
-    // Complete slack tracking, opt out of field-type tracking and
-    // stabilize map
-    fillTypes({a: 1});
-    fillTypes({b: 2});
-    fillTypes({c: 3});
-    fillTypes(1);
-    fillTypes(function(){});
-    fillTypes(undefined);
-    fillTypes(false);
-    fillTypes(new Promise(INTERNAL));
-    debug.setBounds(Async.firstLineError, util.lastLineError);
-    return Promise;
+                                                         
+    util.toFastProperties(Promise);                                          
+    util.toFastProperties(Promise.prototype);                                
+    function fillTypes(value) {                                              
+        var p = new Promise(INTERNAL);                                       
+        p._fulfillmentHandler0 = value;                                      
+        p._rejectionHandler0 = value;                                        
+        p._promise0 = value;                                                 
+        p._receiver0 = value;                                                
+    }                                                                        
+    // Complete slack tracking, opt out of field-type tracking and           
+    // stabilize map                                                         
+    fillTypes({a: 1});                                                       
+    fillTypes({b: 2});                                                       
+    fillTypes({c: 3});                                                       
+    fillTypes(1);                                                            
+    fillTypes(function(){});                                                 
+    fillTypes(undefined);                                                    
+    fillTypes(false);                                                        
+    fillTypes(new Promise(INTERNAL));                                        
+    debug.setBounds(Async.firstLineError, util.lastLineError);               
+    return Promise;                                                          
 
 };
 
@@ -64978,7 +65011,7 @@ return index;
 
     var keys = ['Hours', 'Minutes', 'Seconds', 'Milliseconds'];
     var maxValues = [24, 60, 60, 1000];
-
+    
     // Capitalize first letter
     key = key.charAt(0).toUpperCase() + key.slice(1).toLowerCase();
 
@@ -67590,12 +67623,12 @@ options:
 /*! @websanova/url - v2.6.3 - 2020-01-25 */
 !function(){function t(t,r){var a,o={};if("tld?"!==t){if(r=r||window.location.toString(),!t)return r;if(t=t.toString(),a=r.match(/^mailto:([^\/].+)/))o.protocol="mailto",o.email=a[1];else{if((a=r.match(/(.*?)\/#\!(.*)/))&&(r=a[1]+a[2]),(a=r.match(/(.*?)#(.*)/))&&(o.hash=a[2],r=a[1]),o.hash&&t.match(/^#/))return h(t,o.hash);if((a=r.match(/(.*?)\?(.*)/))&&(o.query=a[2],r=a[1]),o.query&&t.match(/^\?/))return h(t,o.query);if((a=r.match(/(.*?)\:?\/\/(.*)/))&&(o.protocol=a[1].toLowerCase(),r=a[2]),(a=r.match(/(.*?)(\/.*)/))&&(o.path=a[2],r=a[1]),o.path=(o.path||"").replace(/^([^\/])/,"/$1"),t.match(/^[\-0-9]+$/)&&(t=t.replace(/^([^\/])/,"/$1")),t.match(/^\//))return e(t,o.path.substring(1));if((a=(a=e("/-1",o.path.substring(1)))&&a.match(/(.*?)\.([^.]+)$/))&&(o.file=a[0],o.filename=a[1],o.fileext=a[2]),(a=r.match(/(.*)\:([0-9]+)$/))&&(o.port=a[2],r=a[1]),(a=r.match(/(.*?)@(.*)/))&&(o.auth=a[1],r=a[2]),o.auth&&(a=o.auth.match(/(.*)\:(.*)/),o.user=a?a[1]:o.auth,o.pass=a?a[2]:void 0),o.hostname=r.toLowerCase(),"."===t.charAt(0))return e(t,o.hostname);o.port=o.port||("https"===o.protocol?"443":"80"),o.protocol=o.protocol||("443"===o.port?"https":"http")}return t in o?o[t]:"{}"===t?o:void 0}}function e(t,r){var a=t.charAt(0),o=r.split(a);return a===t?o:o[(t=parseInt(t.substring(1),10))<0?o.length+t:t-1]}function h(t,r){for(var a,o=t.charAt(0),e=r.split("&"),h=[],n={},c=[],i=t.substring(1),p=0,u=e.length;p<u;p++)if(""!==(h=(h=e[p].match(/(.*?)=(.*)/))||[e[p],e[p],""])[1].replace(/\s/g,"")){if(h[2]=(a=h[2]||"",decodeURIComponent(a.replace(/\+/g," "))),i===h[1])return h[2];(c=h[1].match(/(.*)\[([0-9]+)\]/))?(n[c[1]]=n[c[1]]||[],n[c[1]][c[2]]=h[2]):n[h[1]]=h[2]}return o===t?n:n[i]}window.url=t}();
 ;
-/*
-  @package NOTY - Dependency-free notification library
-  @version version: 3.1.4
-  @contributors https://github.com/needim/noty/graphs/contributors
-  @documentation Examples and Documentation - http://needim.github.com/noty
-  @license Licensed under the MIT licenses: http://www.opensource.org/licenses/mit-license.php
+/* 
+  @package NOTY - Dependency-free notification library 
+  @version version: 3.1.4 
+  @contributors https://github.com/needim/noty/graphs/contributors 
+  @documentation Examples and Documentation - http://needim.github.com/noty 
+  @license Licensed under the MIT licenses: http://www.opensource.org/licenses/mit-license.php 
 */
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -69628,7 +69661,7 @@ Promise$2.prototype = {
     The primary way of interacting with a promise is through its `then` method,
     which registers callbacks to receive either a promise's eventual value or the
     reason why the promise cannot be fulfilled.
-
+  
     ```js
     findUser().then(function(user){
       // user is available
@@ -69636,14 +69669,14 @@ Promise$2.prototype = {
       // user is unavailable, and you are given the reason why
     });
     ```
-
+  
     Chaining
     --------
-
+  
     The return value of `then` is itself a promise.  This second, 'downstream'
     promise is resolved with the return value of the first promise's fulfillment
     or rejection handler, or rejected if the handler throws an exception.
-
+  
     ```js
     findUser().then(function (user) {
       return user.name;
@@ -69653,7 +69686,7 @@ Promise$2.prototype = {
       // If `findUser` fulfilled, `userName` will be the user's name, otherwise it
       // will be `'default name'`
     });
-
+  
     findUser().then(function (user) {
       throw new Error('Found user, but still unhappy');
     }, function (reason) {
@@ -69666,7 +69699,7 @@ Promise$2.prototype = {
     });
     ```
     If the downstream promise does not specify a rejection handler, rejection reasons will be propagated further downstream.
-
+  
     ```js
     findUser().then(function (user) {
       throw new PedagogicalException('Upstream error');
@@ -69678,15 +69711,15 @@ Promise$2.prototype = {
       // The `PedgagocialException` is propagated all the way down to here
     });
     ```
-
+  
     Assimilation
     ------------
-
+  
     Sometimes the value you want to propagate to a downstream promise can only be
     retrieved asynchronously. This can be achieved by returning a promise in the
     fulfillment or rejection handler. The downstream promise will then be pending
     until the returned promise is settled. This is called *assimilation*.
-
+  
     ```js
     findUser().then(function (user) {
       return findCommentsByAuthor(user);
@@ -69694,9 +69727,9 @@ Promise$2.prototype = {
       // The user's comments are now available
     });
     ```
-
+  
     If the assimliated promise rejects, then the downstream promise will also reject.
-
+  
     ```js
     findUser().then(function (user) {
       return findCommentsByAuthor(user);
@@ -69706,15 +69739,15 @@ Promise$2.prototype = {
       // If `findCommentsByAuthor` rejects, we'll have the reason here
     });
     ```
-
+  
     Simple Example
     --------------
-
+  
     Synchronous Example
-
+  
     ```javascript
     let result;
-
+  
     try {
       result = findResult();
       // success
@@ -69722,9 +69755,9 @@ Promise$2.prototype = {
       // failure
     }
     ```
-
+  
     Errback Example
-
+  
     ```js
     findResult(function(result, err){
       if (err) {
@@ -69734,9 +69767,9 @@ Promise$2.prototype = {
       }
     });
     ```
-
+  
     Promise Example;
-
+  
     ```javascript
     findResult().then(function(result){
       // success
@@ -69744,15 +69777,15 @@ Promise$2.prototype = {
       // failure
     });
     ```
-
+  
     Advanced Example
     --------------
-
+  
     Synchronous Example
-
+  
     ```javascript
     let author, books;
-
+  
     try {
       author = findAuthor();
       books  = findBooksByAuthor(author);
@@ -69761,19 +69794,19 @@ Promise$2.prototype = {
       // failure
     }
     ```
-
+  
     Errback Example
-
+  
     ```js
-
+  
     function foundBooks(books) {
-
+  
     }
-
+  
     function failure(reason) {
-
+  
     }
-
+  
     findAuthor(function(author, err){
       if (err) {
         failure(err);
@@ -69798,9 +69831,9 @@ Promise$2.prototype = {
       }
     });
     ```
-
+  
     Promise Example;
-
+  
     ```javascript
     findAuthor().
       then(findBooksByAuthor).
@@ -69810,7 +69843,7 @@ Promise$2.prototype = {
       // something went wrong
     });
     ```
-
+  
     @method then
     @param {Function} onFulfilled
     @param {Function} onRejected
@@ -69822,25 +69855,25 @@ Promise$2.prototype = {
   /**
     `catch` is simply sugar for `then(undefined, onRejection)` which makes it the same
     as the catch block of a try/catch statement.
-
+  
     ```js
     function findAuthor(){
       throw new Error('couldn't find that author');
     }
-
+  
     // synchronous
     try {
       findAuthor();
     } catch(reason) {
       // something went wrong
     }
-
+  
     // async with promises
     findAuthor().catch(function(reason){
       // something went wrong
     });
     ```
-
+  
     @method catch
     @param {Function} onRejection
     Useful for tooling.
@@ -70698,10 +70731,10 @@ module.exports = g;
     //Will choke on undefined navigator and window vars when run on server
     //Return boolean false and exit function when running server-side
 
-    if( typeof window === "undefined" ||
-        window.navigator === undefined ||
-        window.navigator.userAgent === undefined ||
-        window.navigator.mimeTypes === undefined){
+    if( typeof window === "undefined" || 
+        window.navigator === undefined || 
+        window.navigator.userAgent === undefined || 
+        window.navigator.mimeTypes === undefined){ 
             return false;
     }
 
@@ -70712,8 +70745,8 @@ module.exports = g;
     //Time to jump through hoops -- browser vendors do not make it easy to detect PDF support.
 
     /*
-        IE11 still uses ActiveX for Adobe Reader, but IE 11 doesn't expose window.ActiveXObject the same way
-        previous versions of IE did. window.ActiveXObject will evaluate to false in IE 11, but "ActiveXObject"
+        IE11 still uses ActiveX for Adobe Reader, but IE 11 doesn't expose window.ActiveXObject the same way 
+        previous versions of IE did. window.ActiveXObject will evaluate to false in IE 11, but "ActiveXObject" 
         in window evaluates to true.
 
         MS Edge does not support ActiveX so this test will evaluate false
@@ -70731,20 +70764,20 @@ module.exports = g;
     let supportsPdfMimeType = (nav.mimeTypes["application/pdf"] !== undefined);
 
     //Safari on iPadOS doesn't report as 'mobile' when requesting desktop site, yet still fails to embed PDFs
-    let isSafariIOSDesktopMode = (  nav.platform !== undefined &&
-                                    nav.platform === "MacIntel" &&
-                                    nav.maxTouchPoints !== undefined &&
+    let isSafariIOSDesktopMode = (  nav.platform !== undefined && 
+                                    nav.platform === "MacIntel" && 
+                                    nav.maxTouchPoints !== undefined && 
                                     nav.maxTouchPoints > 1 );
 
     //Quick test for mobile devices.
     let isMobileDevice = (isSafariIOSDesktopMode || /Mobi|Tablet|Android|iPad|iPhone/.test(ua));
 
-    //Safari desktop requires special handling
-    let isSafariDesktop = ( !isMobileDevice &&
-                            nav.vendor !== undefined &&
-                            /Apple/.test(nav.vendor) &&
+    //Safari desktop requires special handling 
+    let isSafariDesktop = ( !isMobileDevice && 
+                            nav.vendor !== undefined && 
+                            /Apple/.test(nav.vendor) && 
                             /Safari/.test(ua) );
-
+    
     //Firefox started shipping PDF.js in Firefox 19. If this is Firefox 19 or greater, assume PDF.js is available
     let isFirefoxWithPDFJS = (!isMobileDevice && /irefox/.test(ua) && ua.split("rv:").length > 1) ? (parseInt(ua.split("rv:")[1].split(".")[0], 10) > 18) : false;
 
@@ -70862,14 +70895,14 @@ module.exports = g;
         let fullURL = PDFJS_URL + "?file=" + encodeURIComponent(url) + pdfOpenFragment;
         let div = document.createElement("div");
         let iframe = document.createElement("iframe");
-
+        
         iframe.src = fullURL;
         iframe.className = "pdfobject";
         iframe.type = "application/pdf";
         iframe.frameborder = "0";
         iframe.allow = "fullscreen";
         iframe.title = title;
-
+        
         if(id){
             iframe.id = id;
         }
@@ -70878,13 +70911,13 @@ module.exports = g;
             div.style.cssText = "position: absolute; top: 0; right: 0; bottom: 0; left: 0;";
             iframe.style.cssText = "border: none; width: 100%; height: 100%;";
             targetNode.style.position = "relative";
-            targetNode.style.overflow = "auto";
+            targetNode.style.overflow = "auto";        
         }
 
         div.appendChild(iframe);
         targetNode.appendChild(div);
         targetNode.classList.add("pdfobject-container");
-
+        
         return targetNode.getElementsByTagName("iframe")[0];
 
     };
@@ -70918,7 +70951,7 @@ module.exports = g;
                 style += "position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%;";
             }
 
-            embed.style.cssText = style;
+            embed.style.cssText = style; 
 
         }
 
@@ -70976,32 +71009,32 @@ module.exports = g;
         if(forcePDFJS && PDFJS_URL){
             return generatePDFJSMarkup(targetNode, url, pdfOpenFragment, PDFJS_URL, id, title, omitInlineStyles);
         }
-
+ 
         // --== Embed attempt #2 ==--
 
         //Embed PDF if traditional support is provided, or if this developer is willing to roll with assumption
-        //that modern desktop (not mobile) browsers natively support PDFs
+        //that modern desktop (not mobile) browsers natively support PDFs 
         if(supportsPDFs || (assumptionMode && !isMobileDevice)){
-
-            //Should we use <embed> or <iframe>? In most cases <embed>.
+            
+            //Should we use <embed> or <iframe>? In most cases <embed>. 
             //Allow developer to force <iframe>, if desired
             //There is an edge case where Safari does not respect 302 redirect requests for PDF files when using <embed> element.
             //Redirect appears to work fine when using <iframe> instead of <embed> (Addresses issue #210)
             //Forcing Safari desktop to use iframe due to freezing bug in macOS 11 (Big Sur)
             let embedtype = (forceIframe || supportRedirect || isSafariDesktop) ? "iframe" : "embed";
-
+            
             return generatePDFObjectMarkup(embedtype, targetNode, targetSelector, url, pdfOpenFragment, width, height, id, title, omitInlineStyles);
 
         }
-
+        
         // --== Embed attempt #3 ==--
-
+        
         //If everything else has failed and a PDFJS fallback is provided, try to use it
         if(PDFJS_URL){
             return generatePDFJSMarkup(targetNode, url, pdfOpenFragment, PDFJS_URL, id, title, omitInlineStyles);
         }
-
-        // --== PDF embed not supported! Use fallback ==--
+        
+        // --== PDF embed not supported! Use fallback ==-- 
 
         //Display the fallback link if available
         if(fallbackLink){
@@ -71286,7 +71319,7 @@ module.exports = g;
 
             //Add content: string, element, function or children (=accordion)
             if (opt.content)
-                $contentContainer._bsAppendContent( opt.content, opt.contentContext );
+                $contentContainer._bsAppendContent( opt.content, opt.contentContext, null, options );
 
             //If opt.list exists => create a accordion inside $contentContainer
             if ($.isArray(opt.list))
@@ -71359,7 +71392,7 @@ module.exports = g;
     bsButton( options ) - create a Bootstrap-button
     Is also used to create list-items for select-lists
     **********************************************************/
-    $.bsButton = function( options ){
+    $.bsButton = function( options = {} ){
         var optionToClassName = {
                 primary             : 'primary',
                 transparent         : 'transparent',
@@ -71372,8 +71405,6 @@ module.exports = g;
                 noBorder            : 'no-border',
                 focus               : 'init_focus'
             };
-
-        options = options || {};
 
         //Add class-name corresponding to options
         var newClass = [options.class || ''];
@@ -71476,9 +71507,7 @@ module.exports = g;
     bsStandardCheckboxButton( options ) - create a standard
     Bootstrap-button as a checkbox with check-icon in blue box
     **********************************************************/
-    $.bsStandardCheckboxButton = function( options ){
-        options = options || {};
-
+    $.bsStandardCheckboxButton = function( options = {}){
         if (!options.icon)
             options.icon =
                 options.type == 'radio' ?
@@ -71840,8 +71869,7 @@ module.exports = g;
 
     /**********************************************************
     **********************************************************/
-    $.bsFileView = $.bsFileview = function( options ){
-        options = options || {};
+    $.bsFileView = $.bsFileview = function( options = {}){
         var fileName    = $._bsAdjustText(options.fileName),
             theFileName = i18next.sentence(fileName),
             fileNameExt = window.url('fileext', theFileName),
@@ -71921,12 +71949,12 @@ module.exports = g;
         extraClassName: string or string[]. Extra class-name added
         partOfList : true if the icon is part of a list => return [icon-name] instead of [[icon-name]]
     ********************************************/
-    $.bsMarkerAsIcon = function(colorClassName, borderColorClassName, options){
+    $.bsMarkerAsIcon = function(colorClassName, borderColorClassName, options = {}){
         options = $.extend({
             faClassName   : 'fa-circle',
             extraClassName: '',
             partOfList    : false
-        }, options || {});
+        }, options);
 
         colorClassName       = colorClassName || 'text-white';
         borderColorClassName = borderColorClassName || 'text-black';
@@ -72267,11 +72295,11 @@ module.exports = g;
         //Create the form
         this.$form = $('<form/>');
         if (this.options.extended && this.options.useExtended){
-            this.$form._bsAppendContent( this.options.extended.content, this.options.contentContext );
+            this.$form._bsAppendContent( this.options.extended.content, this.options.contentContext, null, this.options );
             this.options.extended.content = this.$form;
         }
         else {
-            this.$form._bsAppendContent( this.options.content, this.options.contentContext );
+            this.$form._bsAppendContent( this.options.content, this.options.contentContext, null, this.options );
             this.options.content = this.$form;
         }
 
@@ -72959,9 +72987,8 @@ options
             $lastItem.addClass('last');
     }
 
-    $.bsMenu = function( options ){
+    $.bsMenu = function( options = {}){
         //Adjust options.list
-        options = $.extend({}, options || {});
         var list = options.list = options.list || [];
         $.each(list, function(index, itemOptions){
 
@@ -73291,8 +73318,7 @@ options
     /**********************************************************
     bsModalFile( fileName, options )
     **********************************************************/
-    $.bsModalFile = function( fileName, options ){
-        options = options || {};
+    $.bsModalFile = function( fileName, options = {} ){
         fileName = $._bsAdjustText(fileName);
         var theFileName = i18next.sentence(fileName),
             fileNameExt = window.url('fileext', theFileName),
@@ -73571,6 +73597,8 @@ jquery-bootstrap-modal-promise.js
         noVerticalPadding
         noHorizontalPadding
         noShadow
+        small: BOOLEAN if true the content gets extra small
+        smallButtons: BOOLEAN If true the modal gents extra small buttons
         content
         scroll: boolean | 'vertical' | 'horizontal'
         minimized,
@@ -73844,10 +73872,10 @@ jquery-bootstrap-modal-promise.js
         update: function( options ){
             var _this = this;
             //***********************************************************
-            function updateElement($element, newOptions, methodName, param, param2 ){
+            function updateElement($element, newOptions, methodName, param, param2, param3 ){
                 if ($element && newOptions){
                     $element.empty();
-                    $element[methodName](newOptions, param, param2);
+                    $element[methodName](newOptions, param, param2, param3);
                 }
             }
             //***********************************************************
@@ -73865,8 +73893,8 @@ jquery-bootstrap-modal-promise.js
                     contentOptions = id ? options[id]       : options;
 
                 if (containers && contentOptions){
-                    updateElement(containers.$fixedContent, contentOptions.fixedContent, '_bsAppendContent', contentOptions.fixedContentContext, contentOptions.fixedContentArg );
-                    updateElement(containers.$content,      contentOptions.content,      '_bsAppendContent', contentOptions.contentContext,      contentOptions.contentArg      );
+                    updateElement(containers.$fixedContent, contentOptions.fixedContent, '_bsAppendContent', contentOptions.fixedContentContext, contentOptions.fixedContentArg, options );
+                    updateElement(containers.$content,      contentOptions.content,      '_bsAppendContent', contentOptions.contentContext,      contentOptions.contentArg,      options );
                     updateElement(containers.$footer,       contentOptions.footer,       '_bsAddHtml' );
                 }
             });
@@ -73888,7 +73916,6 @@ jquery-bootstrap-modal-promise.js
     of a modal inside this. Created elements are saved in parts
     ******************************************************/
     $.fn._bsModalBodyAndFooter = function(size, options, parts, className, initSize){
-
         //Set variables used to set scroll-bar (if any)
         var hasScroll       = !!options.scroll,
             isTabs          = !!(options && options.content && (options.content.type == 'tabs')),
@@ -73919,7 +73946,7 @@ jquery-bootstrap-modal-promise.js
                     .appendTo( this );
 
         if (options.fixedContent)
-            $modalFixedContent._bsAppendContent( options.fixedContent, options.fixedContentContext );
+            $modalFixedContent._bsAppendContent( options.fixedContent, options.fixedContentContext, null, options );
 
         //Append body and content
         var $modalBody = parts.$body =
@@ -73954,7 +73981,7 @@ jquery-bootstrap-modal-promise.js
             parts.dynamicContentArg     = options.contentArg;
         }
         else
-            $modalContent._bsAppendContent( options.content, options.contentContext, options.contentArg );
+            $modalContent._bsAppendContent( options.content, options.contentContext, options.contentArg, options  );
 
         //Add scroll-event to close any bootstrapopen -select
         if (hasScroll)
@@ -73987,9 +74014,7 @@ jquery-bootstrap-modal-promise.js
     Create the content of a modal inside this
     Sets object with all parts of the result in this.bsModal
     ******************************************************/
-    $.fn._bsModalContent = function( options ){
-        options = options || {};
-
+    $.fn._bsModalContent = function( options = {}){
         //this.bsModal contains all created elements
         this.bsModal = {};
         this.bsModal.onChange = options.onChange || null;
@@ -74105,6 +74130,15 @@ jquery-bootstrap-modal-promise.js
                 help    : { className: '',                      onClick: options.onHelp ? $.proxy(options.onHelp, this) : null },
             }
         }, options );
+
+
+        //Save parentOptions for dynamic update
+        var parentOptions = this.bsModal.parentOptions = {};
+        $.each($.parentOptionsToInherit, function(index, id){
+            if (options.hasOwnProperty(id))
+                parentOptions[id] = options[id];
+            });
+
 
         //Adjust for options.buttons: null
         options.buttons = options.buttons || [];
@@ -74337,7 +74371,7 @@ jquery-bootstrap-modal-promise.js
         var parts = this.bsModal[ modalSizeName[size] ] || this.bsModal;
 
         if (parts && parts.dynamicContent){
-            parts.$content._bsAppendContent( parts.dynamicContent, parts.dynamicContentContext, parts.dynamicContentArg );
+            parts.$content._bsAppendContent( parts.dynamicContent, parts.dynamicContentContext, parts.dynamicContentArg, this.bsModal.parentOptions );
 
             parts.dynamicContent        = null;
             parts.dynamicContentContext = null;
@@ -74898,11 +74932,8 @@ jquery-bootstrap-modal-promise.js
     window.notyDefault
     Noty with default options as descried above
     ****************************************************************/
-    function notyDefault( type, text, options ){
-        options = options || {};
-
-        options.type = type;
-
+    function notyDefault( type, text, options = {}){
+        options.type    = type;
         options.content = $._bsAdjustIconAndText( text );
 
         //Set killer
@@ -74931,11 +74962,11 @@ jquery-bootstrap-modal-promise.js
     window.notySuccess / $.bsNotySuccess / window.notyOk / $.bsNotyOk
     Simple centered noty with centered text
     ****************************************************************/
-    window.notySuccess = $.bsNotySuccess = window.notyOk = $.bsNotyOk = function( text, options ){
+    window.notySuccess = $.bsNotySuccess = window.notyOk = $.bsNotyOk = function( text, options = {}){
         return  notyDefault(
                     'success',
                     {icon: $.bsNotyIcon['success'], text: text},
-                    $.extend( options || {}, {layout: 'center'})
+                    $.extend( options, {layout: 'center'})
                 );
     };
 
@@ -75825,7 +75856,7 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
     /**********************************************************
     asModal - display the table in a modal-window with fixed header and scrolling content
     **********************************************************/
-    $.BSASMODAL.BSTABLE = function( modalOptions ){
+    $.BSASMODAL.BSTABLE = function( modalOptions = {}){
         var showHeader = this.find('.no-header').length == 0,
             _this      = this,
             $tableWithHeader,
@@ -75851,7 +75882,7 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
         }
 
         $result = $.bsModal(
-                        $.extend( modalOptions || {}, {
+                        $.extend( modalOptions, {
                             flexWidth        : true,
                             noVerticalPadding: true,
                             content          : this,
@@ -76512,7 +76543,7 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
 
             //Add content: string, element, function, setup-json-object, or children (=accordion)
             if (opt.content)
-                $content._bsAppendContent( opt.content, opt.contentContext );
+                $content._bsAppendContent( opt.content, opt.contentContext, null, options );
 
         });
         $result._$tabs = $tabs;
@@ -76866,6 +76897,8 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
     };
 
 
+    //$.parentOptionsToInherit = []ID = id of options that modal-content can inherit from the modal itself
+    $.parentOptionsToInherit = ['small'];
 
     $.fn.extend({
         //_bsAddIdAndName
@@ -76914,9 +76947,7 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
             "left right center lowercase uppercase capitalize normal bold italic" or
             {left: true, right: true, center: true, lowercase: true, uppercase: true, capitalize: true, normal: true, bold: true, italic: true}
         ****************************************************************************************/
-        _bsAddStyleClasses: function( options ){
-            options = options || {};
-
+        _bsAddStyleClasses: function( options = {}){
             var _this = this,
 
                 bsStyleClass = {
@@ -77111,9 +77142,12 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
         },
 
         /****************************************************************************************
-        _bsAppendContent( options, context, arg )
+        _bsAppendContent( options, context, arg, parentOptions )
         Create and append any content to this.
         options can be $-element, function, json-object or array of same
+
+        If parentOptions is given => some options from parentOptions is used if they are not given in options
+
 
         The default bootstrap structure used for elements in a form is
         <div class="form-group">
@@ -77133,7 +77167,7 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
             </div>
         </div>
         ****************************************************************************************/
-        _bsAppendContent: function( options, context, arg ){
+        _bsAppendContent: function( options, context, arg, parentOptions = {} ){
 
             //Internal functions to create baseSlider and timeSlider
             function buildSlider(options, constructorName, $parent){
@@ -77161,7 +77195,7 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
                 return $parent
                            .attr('id', options.id)
                            .addClass('flex-column')
-                           ._bsAppendContent(options.content);
+                           ._bsAppendContent(options.content, null, null, options);
             }
 
 
@@ -77172,7 +77206,7 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
             if ($.isArray( options )){
                 var _this = this;
                 $.each(options, function( index, opt){
-                    _this._bsAppendContent(opt, context );
+                    _this._bsAppendContent(opt, context, null, parentOptions );
                 });
                 return this;
             }
@@ -77185,126 +77219,131 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
                 return this;
             }
 
-            //json-object with options to create bs-elements
-            if ($.isPlainObject(options)){
-                var buildFunc = $.fn._bsAddHtml,
-                    insideFormGroup   = false,
-                    addBorder         = false,
-                    buildInsideParent = false,
-                    noValidation      = false;
-
-                if (options.type){
-                    var type = options.type.toLowerCase();
-                    switch (type){
-                        case 'input'            :   buildFunc = $.bsInput;              insideFormGroup = true; break;
-                        case 'button'           :   buildFunc = $.bsButton;             break;
-                        case 'buttongroup'      :   buildFunc = $.bsButtonGroup;        break;
-                        case 'menu'             :   buildFunc = $.bsMenu;               break;
-                        case 'select'           :   buildFunc = $.bsSelectBox;          insideFormGroup = true; break;
-                        case 'selectlist'       :   buildFunc = $.bsSelectList;         break;
-                        case 'radiobuttongroup' :   buildFunc = $.bsRadioButtonGroup;   addBorder = true; insideFormGroup = true; break;
-                        case 'checkbox'         :   buildFunc = $.bsCheckbox;           insideFormGroup = true; break;
-                        case 'tabs'             :   buildFunc = $.bsTabs;               break;
-                        case 'table'            :   buildFunc = $.bsTable;              break;
-                        case 'list'             :   buildFunc = $.bsList;               break;
-                        case 'accordion'        :   buildFunc = $.bsAccordion;          break;
-                        case 'slider'           :   buildFunc = buildBaseSlider;        insideFormGroup = true; addBorder = true; buildInsideParent = true; break;
-                        case 'timeslider'       :   buildFunc = buildTimeSlider;        insideFormGroup = true; addBorder = true; buildInsideParent = true; break;
-                        case 'text'             :   buildFunc = $.bsText;               insideFormGroup = true; break;
-                        case 'textarea'         :   buildFunc = $.bsTextArea;           insideFormGroup = true; break;
-                        case 'textbox'          :   buildFunc = buildTextBox;           insideFormGroup = true; addBorder = true; noValidation = true; break;
-                        case 'fileview'         :   buildFunc = $.bsFileView;           break;
-                        case 'hidden'           :   buildFunc = buildHidden;            noValidation = true; break;
-                        case 'inputgroup'       :   buildFunc = buildInputGroup;        addBorder = true; insideFormGroup = true; buildInsideParent = true; break;
-//                        case 'xx'               :   buildFunc = $.bsXx;               break;
-
-                        default                 :   buildFunc = $.fn._bsAddHtml;        buildInsideParent = true;
-
-                    }
-                }
-
-                //Overwrite insideFormGroup if value given in options
-                if ( $.type( options.insideFormGroup ) == "boolean")
-                    insideFormGroup = options.insideFormGroup;
-
-                //Set the parent-element where to append to created element(s)
-                var $parent = this,
-                    insideInputGroup = false;
-
-                if (insideFormGroup){
-                    //Create outer form-group
-                    insideInputGroup = true;
-                    $parent = $divXXGroup('form-group', options).appendTo( $parent );
-                    if (options.smallBottomPadding)
-                        $parent.addClass('small-bottom-padding');
-
-                    if (options.lineBefore)
-                        $('<hr/>')
-                            .addClass('before')
-                            .toggleClass('above-label', !!options.label)
-                            .appendTo( $parent );
-
-                    if (noValidation || options.noValidation)
-                        $parent.addClass('no-validation');
-                }
-                var $originalParent = $parent;
-                if (insideInputGroup || options.prepend || options.before || options.append || options.after){
-                    //Create element inside input-group
-                    var $inputGroup = $divXXGroup('input-group', options);
-                    if (addBorder && !options.noBorder){
-                        //Add border and label (if any)
-                        $inputGroup.addClass('input-group-border');
-
-                        if (options.darkBorderlabel)
-                            $inputGroup.addClass('input-group-border-dark');
-
-                        if (options.label){
-                            $inputGroup.addClass('input-group-border-with-label');
-                            $('<span/>')
-                                .addClass('has-fixed-label')
-                                ._bsAddHtml( options.label )
-                                .appendTo( $inputGroup );
-                        }
-                    }
-                    $parent = $inputGroup.appendTo( $parent );
-                }
-
-                //Build the element. Build inside $parent or add to $parent after
-                if (buildInsideParent)
-                    buildFunc.call( this, options, $parent );
-                else
-                    buildFunc.call( this, options ).appendTo( $parent );
-
-                if (options.center)
-                    $parent.addClass('justify-content-center text-center');
-
-
-                var prepend = options.prepend || options.before;
-                if (prepend)
-                    $('<div/>')
-                        .addClass('input-group-prepend')
-                        ._bsAppendContent( prepend, options.contentContext  )
-                        .prependTo( $parent );
-                var append = options.append || options.after;
-                if (append)
-                    $('<div/>')
-                        .addClass('input-group-append')
-                        ._bsAppendContent( append, options.contentContext  )
-                        .appendTo( $parent );
-
-                if (options.lineAfter)
-                    $('<hr/>')
-                        .addClass('after')
-                        .appendTo( $originalParent );
-
-
+            if (!$.isPlainObject(options)){
+                //Assume it is a $-element or other object that can be appended directly
+                this.append( options );
                 return this;
             }
 
-            //Assume it is a $-element or other object that can be appended directly
-            this.append( options );
+            //json-object with options to create bs-elements
+            var buildFunc = $.fn._bsAddHtml,
+                insideFormGroup   = false,
+                addBorder         = false,
+                buildInsideParent = false,
+                noValidation      = false;
+
+
+            //Set values fro parentOptions into options
+            $.each($.parentOptionsToInherit, function(index, id){
+                if (parentOptions.hasOwnProperty(id) && !options.hasOwnProperty(id))
+                    options[id] = parentOptions[id];
+            });
+
+
+            if (options.type){
+                var type = options.type.toLowerCase();
+                switch (type){
+                    case 'input'            :   buildFunc = $.bsInput;              insideFormGroup = true; break;
+                    case 'button'           :   buildFunc = $.bsButton;             break;
+                    case 'buttongroup'      :   buildFunc = $.bsButtonGroup;        break;
+                    case 'menu'             :   buildFunc = $.bsMenu;               break;
+                    case 'select'           :   buildFunc = $.bsSelectBox;          insideFormGroup = true; break;
+                    case 'selectlist'       :   buildFunc = $.bsSelectList;         break;
+                    case 'radiobuttongroup' :   buildFunc = $.bsRadioButtonGroup;   addBorder = true; insideFormGroup = true; break;
+                    case 'checkbox'         :   buildFunc = $.bsCheckbox;           insideFormGroup = true; break;
+                    case 'tabs'             :   buildFunc = $.bsTabs;               break;
+                    case 'table'            :   buildFunc = $.bsTable;              break;
+                    case 'list'             :   buildFunc = $.bsList;               break;
+                    case 'accordion'        :   buildFunc = $.bsAccordion;          break;
+                    case 'slider'           :   buildFunc = buildBaseSlider;        insideFormGroup = true; addBorder = true; buildInsideParent = true; break;
+                    case 'timeslider'       :   buildFunc = buildTimeSlider;        insideFormGroup = true; addBorder = true; buildInsideParent = true; break;
+                    case 'text'             :   buildFunc = $.bsText;               insideFormGroup = true; break;
+                    case 'textarea'         :   buildFunc = $.bsTextArea;           insideFormGroup = true; break;
+                    case 'textbox'          :   buildFunc = buildTextBox;           insideFormGroup = true; addBorder = true; noValidation = true; break;
+                    case 'fileview'         :   buildFunc = $.bsFileView;           break;
+                    case 'hidden'           :   buildFunc = buildHidden;            noValidation = true; break;
+                    case 'inputgroup'       :   buildFunc = buildInputGroup;        addBorder = true; insideFormGroup = true; buildInsideParent = true; break;
+//                    case 'xx'               :   buildFunc = $.bsXx;               break;
+
+                    default                 :   buildFunc = $.fn._bsAddHtml;        buildInsideParent = true;
+                }
+            }
+
+            //Overwrite insideFormGroup if value given in options
+            if ( $.type( options.insideFormGroup ) == "boolean")
+                insideFormGroup = options.insideFormGroup;
+
+            //Set the parent-element where to append to created element(s)
+            var $parent = this,
+                insideInputGroup = false;
+
+            if (insideFormGroup){
+                //Create outer form-group
+                insideInputGroup = true;
+                $parent = $divXXGroup('form-group', options).appendTo( $parent );
+                if (options.smallBottomPadding)
+                    $parent.addClass('small-bottom-padding');
+
+                if (options.lineBefore)
+                    $('<hr/>')
+                        .addClass('before')
+                        .toggleClass('above-label', !!options.label)
+                        .appendTo( $parent );
+
+                if (noValidation || options.noValidation)
+                    $parent.addClass('no-validation');
+            }
+            var $originalParent = $parent;
+            if (insideInputGroup || options.prepend || options.before || options.append || options.after){
+                //Create element inside input-group
+                var $inputGroup = $divXXGroup('input-group', options);
+                if (addBorder && !options.noBorder){
+                    //Add border and label (if any)
+                    $inputGroup.addClass('input-group-border');
+
+                    if (options.darkBorderlabel)
+                        $inputGroup.addClass('input-group-border-dark');
+
+                    if (options.label){
+                        $inputGroup.addClass('input-group-border-with-label');
+                        $('<span/>')
+                            .addClass('has-fixed-label')
+                            ._bsAddHtml( options.label )
+                            .appendTo( $inputGroup );
+                    }
+                }
+                $parent = $inputGroup.appendTo( $parent );
+            }
+
+            //Build the element. Build inside $parent or add to $parent after
+            if (buildInsideParent)
+                buildFunc.call( this, options, $parent );
+            else
+                buildFunc.call( this, options ).appendTo( $parent );
+
+            if (options.center)
+                $parent.addClass('justify-content-center text-center');
+
+            var prepend = options.prepend || options.before;
+            if (prepend)
+                $('<div/>')
+                    .addClass('input-group-prepend')
+                    ._bsAppendContent( prepend, options.contentContext, null, options  )
+                    .prependTo( $parent );
+            var append = options.append || options.after;
+            if (append)
+                $('<div/>')
+                    .addClass('input-group-append')
+                    ._bsAppendContent( append, options.contentContext, null, options  )
+                    .appendTo( $parent );
+
+            if (options.lineAfter)
+                $('<hr/>')
+                    .addClass('after')
+                    .appendTo( $originalParent );
+
             return this;
-        }
+        }   //end of _bsAppendContent
     }); //$.fn.extend
 
 
@@ -78329,7 +78368,7 @@ Extent L.Map with methods
             //bottomcenter need an extra container to be placed at the bottom
             this._controlCorners['bottomcenter'] =
                 L.DomUtil.create(
-                    'div',
+                    'div', 
                     'leaflet-bottom leaflet-center',
                     L.DomUtil.create('div', 'leaflet-control-bottomcenter',    this._controlContainer)
                 );
@@ -79029,7 +79068,7 @@ Extent L.Map with methods
         }
     });
 
-
+    
 
 (function() {
         numeral.register('format', 'bps', {
@@ -81837,7 +81876,7 @@ if (Number.prototype.toDegrees === undefined) {
 
 ;
 /*! =======================================================
-                      VERSION  11.0.2
+                      VERSION  11.0.2              
 ========================================================= */
 "use strict";
 

@@ -18,23 +18,15 @@ leaflet-bootstrap-control-position.scss
 
 //CONTROL
 //Adjust input-group inside a leaflet-control
-.leaflet-control-container {
-    .input-group {
-        width  : initial;
-        margin : 0;
-        padding: 0;
-
-        //Class for inner container with the info for the position
-        .bsPosition-content {
-            @include control-border-color( $incl-error: false );
-            @include vertical-align-center();
-            text-align : center;
-            line-height: 1;
-            padding    : 0 $content-padding-y-sm;
-            padding-top: 1px; //Super adjustment :-)
-            font-size  : 13px;
-        }
-    }
+.leaflet-control-container .input-group .bsPosition-content {
+    //Class for inner container with the info for the position
+    @include control-border-color( $incl-error: false );
+    @include vertical-align-center();
+    text-align : center;
+    line-height: 1;
+    padding    : 0 $content-padding-y-sm;
+    padding-top: 1px; //Super adjustment :-)
+    font-size  : 13px;
 }
 
 //Create Moderinzr classes for show/hide for different modes
