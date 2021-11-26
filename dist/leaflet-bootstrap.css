@@ -191,8 +191,17 @@ All elements in modal-windows get same margin-bottom
 /***********************************************
 leaflet-bootstrap-variables.scss
 ************************************************/
+/*********************************************************
+leaflet-bootstrap-fonts.scss
+
+**********************************************************/
 /***********************************************
-leaflet-bootstrap-fonts.scss,
+Use same font-family as Bootstrap via fcoo/jqury-bootstrap
+************************************************/
+.leaflet-container {
+  font: inherit !important; }
+
+/***********************************************
 Font-family for four icons used in leaflet-bootstrap
 ************************************************/
 @font-face {

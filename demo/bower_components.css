@@ -11276,14 +11276,17 @@ body.modal-open .modal {
 .modal-dialog .modal-body.scrollbar-horizontal, .modal-dialog.modal-dialog-sm .modal-body.scrollbar-horizontal, .modal-dialog.modal-dialog-xs .modal-body.scrollbar-horizontal {
   padding-bottom: 0.625rem; }
 
-.modal-dialog .modal-body-with-vertical-padding {
-  padding-top: 0.3125rem;
-  padding-bottom: 0.3125rem; }
-
-.modal-dialog.modal-dialog-xs .modal-body-with-vertical-padding,
-.modal-dialog.modal-dialog-sm .modal-body-with-vertical-padding {
-  padding-top: 0.1875rem;
-  padding-bottom: 0.1875rem; }
+.modal-body-with-vertical-padding {
+  /*
+    sm and xs uses same top and bottom padding
+    .modal-dialog.modal-dialog-xs &,
+    .modal-dialog.modal-dialog-sm & {
+        @include content-padding-sm(true);
+    }
+*/ }
+  .modal-dialog .modal-body-with-vertical-padding {
+    padding-top: 0.3125rem;
+    padding-bottom: 0.3125rem; }
 
 .modal-content .modal-body-fixed.no-vertical-padding,
 .modal-content .modal-body.no-vertical-padding {
@@ -13781,7 +13784,7 @@ Adjust font-size and top for .inner to fit inside a fa-map-marker icon
   top: calc(-4.1em / 0.5 * 1.2); }
 
 /***********************************************
-	leaflet-control-topcenter.scss, 
+	leaflet-control-topcenter.scss,
 
 	(c) 2016, FCOO
 
@@ -13809,7 +13812,7 @@ Adjust font-size and top for .inner to fit inside a fa-map-marker icon
   right: 0; }
 
 /*! =======================================================
-                      VERSION  11.0.2              
+                      VERSION  11.0.2
 ========================================================= */
 /*! =========================================================
  * bootstrap-slider.js
@@ -13826,7 +13829,7 @@ Adjust font-size and top for .inner to fit inside a fa-map-marker icon
  *
  * bootstrap-slider is released under the MIT License
  * Copyright (c) 2019 Kyle Kemp, Rohit Kalkur, and contributors
- * 
+ *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -13835,10 +13838,10 @@ Adjust font-size and top for .inner to fit inside a fa-map-marker icon
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND

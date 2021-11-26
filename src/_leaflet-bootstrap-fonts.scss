@@ -1,8 +1,20 @@
+/*********************************************************
+leaflet-bootstrap-fonts.scss
+
+**********************************************************/
+
 /***********************************************
-leaflet-bootstrap-fonts.scss,
+Use same font-family as Bootstrap via fcoo/jqury-bootstrap
+************************************************/
+.leaflet-container {
+    font: inherit !important;
+}
+
+
+
+/***********************************************
 Font-family for four icons used in leaflet-bootstrap
 ************************************************/
-
 @font-face {
   font-family: 'leaflet-bootstrap';
   src:  url('fonts/leaflet-bootstrap.eot?jxmi9r');
