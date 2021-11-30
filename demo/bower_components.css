@@ -1541,7 +1541,6 @@ Class ps__rail added by jquery-scroll-container
 .scroll-at-end .jq-scroll-shadow.bottom-right {
   display: none; }
 
-@charset "UTF-8";
 /***********************************************
 	jquery-bootstrap.scss,
 
@@ -1573,13 +1572,22 @@ in integer px from rem
 /*Not used. No lg-buttons
 $input-btn-padding-y-lg: .75rem;
 $input-btn-padding-x-lg: $input-btn-padding-y-lg;
-*/
-/* VERSION 1.x
-//$font-size-sm = .875rem; // = 14px
-$font-size-sm: rem(13px); //<= TODO MANGLER. Skal muligvis sættes til 14px og så skal padding for buttons rettes tilsvarrende
 
-$input-btn-padding-y-sm: rem(4px);
-$input-btn-padding-x-sm: $input-btn-padding-y-sm;
+Syntax and relations:
+In Bootstrap
+    $input-btn-padding(-x|-y)[-sm|-lg]
+    $btn-padding(-x|-y)[-sm|-lg] = $input-btn-padding(-x|-y)[-sm|-lg]
+
+
+
+In jquery-bootstrap
+    $input-btn-padding-x-sm = 3px
+    $input-btn-padding-y-sm = 4px
+
+    xs-versions added
+    $input-btn-padding-x-xs = 2px
+    $input-btn-padding-y-xs = 3px
+
 */
 /************************************************************
 Including "size" xs as in Bootstrap 4
@@ -2995,8 +3003,8 @@ pre {
 .form-control {
   display: block;
   width: 100%;
-  height: calc(1.5em + 0.625rem + 2px);
-  padding: 0.3125rem 0.3125rem;
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 0.3125rem;
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
@@ -3046,8 +3054,8 @@ select.form-control:focus::-ms-value {
   width: 100%; }
 
 .col-form-label {
-  padding-top: calc(0.3125rem + 1px);
-  padding-bottom: calc(0.3125rem + 1px);
+  padding-top: calc(0.25rem + 1px);
+  padding-bottom: calc(0.25rem + 1px);
   margin-bottom: 0;
   font-size: inherit;
   line-height: 1.5; }
@@ -3067,7 +3075,7 @@ select.form-control:focus::-ms-value {
 .form-control-plaintext {
   display: block;
   width: 100%;
-  padding: 0.3125rem 0;
+  padding: 0.25rem 0;
   margin-bottom: 0;
   font-size: 1rem;
   line-height: 1.5;
@@ -3176,11 +3184,11 @@ textarea.form-control {
 
 .was-validated .form-control:valid, .form-control.is-valid {
   border-color: #28a745;
-  padding-right: calc(1.5em + 0.625rem) !important;
+  padding-right: calc(1.5em + 0.5rem) !important;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
   background-repeat: no-repeat;
-  background-position: right calc(0.375em + 0.15625rem) center;
-  background-size: calc(0.75em + 0.3125rem) calc(0.75em + 0.3125rem); }
+  background-position: right calc(0.375em + 0.125rem) center;
+  background-size: calc(0.75em + 0.25rem) calc(0.75em + 0.25rem); }
   .was-validated .form-control:valid:focus, .form-control.is-valid:focus {
     border-color: #28a745;
     box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25); }
@@ -3190,13 +3198,13 @@ textarea.form-control {
   background-position: right 0.625rem center; }
 
 .was-validated textarea.form-control:valid, textarea.form-control.is-valid {
-  padding-right: calc(1.5em + 0.625rem);
-  background-position: top calc(0.375em + 0.15625rem) right calc(0.375em + 0.15625rem); }
+  padding-right: calc(1.5em + 0.5rem);
+  background-position: top calc(0.375em + 0.125rem) right calc(0.375em + 0.125rem); }
 
 .was-validated .custom-select:valid, .custom-select.is-valid {
   border-color: #28a745;
-  padding-right: calc(0.75em + 1.78125rem) !important;
-  background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") right 0.3125rem center/8px 10px no-repeat, #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e") center right 1.3125rem/calc(0.75em + 0.3125rem) calc(0.75em + 0.3125rem) no-repeat; }
+  padding-right: calc(0.75em + 1.6875rem) !important;
+  background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") right 0.3125rem center/8px 10px no-repeat, #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e") center right 1.3125rem/calc(0.75em + 0.25rem) calc(0.75em + 0.25rem) no-repeat; }
   .was-validated .custom-select:valid:focus, .custom-select.is-valid:focus {
     border-color: #28a745;
     box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25); }
@@ -3264,11 +3272,11 @@ textarea.form-control {
 
 .was-validated .form-control:invalid, .form-control.is-invalid {
   border-color: #dc3545;
-  padding-right: calc(1.5em + 0.625rem) !important;
+  padding-right: calc(1.5em + 0.5rem) !important;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
   background-repeat: no-repeat;
-  background-position: right calc(0.375em + 0.15625rem) center;
-  background-size: calc(0.75em + 0.3125rem) calc(0.75em + 0.3125rem); }
+  background-position: right calc(0.375em + 0.125rem) center;
+  background-size: calc(0.75em + 0.25rem) calc(0.75em + 0.25rem); }
   .was-validated .form-control:invalid:focus, .form-control.is-invalid:focus {
     border-color: #dc3545;
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25); }
@@ -3278,13 +3286,13 @@ textarea.form-control {
   background-position: right 0.625rem center; }
 
 .was-validated textarea.form-control:invalid, textarea.form-control.is-invalid {
-  padding-right: calc(1.5em + 0.625rem);
-  background-position: top calc(0.375em + 0.15625rem) right calc(0.375em + 0.15625rem); }
+  padding-right: calc(1.5em + 0.5rem);
+  background-position: top calc(0.375em + 0.125rem) right calc(0.375em + 0.125rem); }
 
 .was-validated .custom-select:invalid, .custom-select.is-invalid {
   border-color: #dc3545;
-  padding-right: calc(0.75em + 1.78125rem) !important;
-  background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") right 0.3125rem center/8px 10px no-repeat, #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e") center right 1.3125rem/calc(0.75em + 0.3125rem) calc(0.75em + 0.3125rem) no-repeat; }
+  padding-right: calc(0.75em + 1.6875rem) !important;
+  background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") right 0.3125rem center/8px 10px no-repeat, #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e") center right 1.3125rem/calc(0.75em + 0.25rem) calc(0.75em + 0.25rem) no-repeat; }
   .was-validated .custom-select:invalid:focus, .custom-select.is-invalid:focus {
     border-color: #dc3545;
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25); }
@@ -3373,7 +3381,7 @@ textarea.form-control {
   user-select: none;
   background-color: transparent;
   border: 1px solid transparent;
-  padding: 0.3125rem 0.3125rem;
+  padding: 0.25rem 0.3125rem;
   font-size: 1rem;
   line-height: 1.5;
   border-radius: 0.25rem;
@@ -4249,7 +4257,7 @@ input[type="button"].btn-block {
 .input-group-text {
   display: flex;
   align-items: center;
-  padding: 0.3125rem 0.3125rem;
+  padding: 0.25rem 0.3125rem;
   margin-bottom: 0;
   font-size: 1rem;
   font-weight: 400;
@@ -4438,8 +4446,8 @@ input[type="button"].btn-block {
 .custom-select {
   display: inline-block;
   width: 100%;
-  height: calc(1.5em + 0.625rem + 2px);
-  padding: 0.3125rem 1.3125rem 0.3125rem 0.3125rem;
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 1.3125rem 0.25rem 0.3125rem;
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
@@ -4488,14 +4496,14 @@ input[type="button"].btn-block {
   position: relative;
   display: inline-block;
   width: 100%;
-  height: calc(1.5em + 0.625rem + 2px);
+  height: calc(1.5em + 0.5rem + 2px);
   margin-bottom: 0; }
 
 .custom-file-input {
   position: relative;
   z-index: 2;
   width: 100%;
-  height: calc(1.5em + 0.625rem + 2px);
+  height: calc(1.5em + 0.5rem + 2px);
   margin: 0;
   overflow: hidden;
   opacity: 0; }
@@ -4516,8 +4524,8 @@ input[type="button"].btn-block {
   right: 0;
   left: 0;
   z-index: 1;
-  height: calc(1.5em + 0.625rem + 2px);
-  padding: 0.3125rem 0.3125rem;
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 0.3125rem;
   overflow: hidden;
   font-weight: 400;
   line-height: 1.5;
@@ -4533,8 +4541,8 @@ input[type="button"].btn-block {
     bottom: 0;
     z-index: 3;
     display: block;
-    height: calc(1.5em + 0.625rem);
-    padding: 0.3125rem 0.3125rem;
+    height: calc(1.5em + 0.5rem);
+    padding: 0.25rem 0.3125rem;
     line-height: 1.5;
     color: #495057;
     content: "Browse";
@@ -10241,8 +10249,8 @@ div.btn, div.list-group-item {
     align-items: center;
     justify-content: center;
     padding: 0 !important;
-    height: 2.25rem;
-    width: 2.25rem; }
+    height: 2.125rem;
+    width: 2.125rem; }
     .btn.btn-standard.square.btn-sm, .btn-group-sm > .btn.btn-standard.square {
       height: 1.8125rem;
       width: 1.8125rem; }
@@ -10318,7 +10326,7 @@ BUTTON-GROUP
   display: flex;
   align-items: center;
   cursor: default;
-  padding: 0.3125rem 0.3125rem;
+  padding: 0.25rem 0.3125rem;
   font-size: 1rem;
   line-height: 1.5;
   border-radius: inherit;
@@ -10341,7 +10349,7 @@ BUTTON-GROUP
   display: flex;
   align-items: center;
   cursor: default;
-  padding: 0.25rem 0.25rem;
+  padding: 0.1875rem 0.25rem;
   font-size: 0.875rem;
   line-height: 1.5;
   border-radius: inherit;
@@ -10361,7 +10369,7 @@ BUTTON-GROUP
   display: flex;
   align-items: center;
   cursor: default;
-  padding: 0.25rem 0.25rem;
+  padding: 0.125rem 0.1875rem;
   font-size: 0.75rem;
   line-height: 1.5;
   border-radius: inherit;
@@ -10377,7 +10385,7 @@ BUTTON-GROUP
     padding-left: 0.5rem; }
 
 .btn-group-vertical + .btn-group-vertical {
-  margin-top: 0.3125rem; }
+  margin-top: 0.25rem; }
   .btn-group-vertical + .btn-group-vertical.btn-group-sm {
     margin-top: 0.1875rem; }
   .btn-group-vertical + .btn-group-vertical.btn-group-xs {
@@ -10388,7 +10396,7 @@ MENU (BUTTON-GROUP)
 ************************************************************/
 .bs-menu-container hr {
   width: 100%;
-  margin: 0.3125rem 0;
+  margin: 0.25rem 0;
   padding: 0; }
 
 .bs-menu-container hr.first.before, .bs-menu-container hr.last.after, .bs-menu-container hr + hr {
@@ -10406,8 +10414,8 @@ classes to create "shadow-buttons"
   visibility: hidden; }
 
 .btn-shadow {
-  width: 2.25rem;
-  height: 2.25rem; }
+  width: 2.125rem;
+  height: 2.125rem; }
 
 .btn-shadow-sm {
   width: 1.8125rem;
@@ -10426,7 +10434,7 @@ POPOVER
   display: flex;
   align-items: center;
   cursor: default;
-  padding: 0.3125rem 0.3125rem;
+  padding: 0.25rem 0.3125rem;
   font-size: 0.875rem;
   line-height: 1.5;
   border-radius: inherit;
@@ -10455,7 +10463,7 @@ POPOVER
   display: flex;
   align-items: center;
   cursor: default;
-  padding: 0.3125rem 0.3125rem;
+  padding: 0.25rem 0.3125rem;
   font-size: 0.875rem;
   line-height: 1.5;
   border-radius: inherit;
@@ -10480,7 +10488,7 @@ POPOVER
   display: flex;
   align-items: center;
   cursor: default;
-  padding: 0.25rem 0.25rem;
+  padding: 0.1875rem 0.25rem;
   font-size: 0.75rem;
   line-height: 1.5;
   border-radius: inherit;
@@ -10500,7 +10508,7 @@ POPOVER
   display: flex;
   align-items: center;
   cursor: default;
-  padding: 0.25rem 0.25rem;
+  padding: 0.1875rem 0.25rem;
   font-size: 0.75rem;
   line-height: 1.5;
   border-radius: inherit;
@@ -10663,11 +10671,11 @@ div.radio input + label::before {
 div.checkbox, div.radio {
   font-size: 1rem; }
   div.checkbox:not(.multi-lines), div.radio:not(.multi-lines) {
-    height: 2.125rem; }
+    height: 2rem; }
   div.checkbox input + label, div.radio input + label {
     padding-left: 1.375rem;
-    padding-top: 0.3125rem;
-    padding-bottom: 0.3125rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
     font-size: 1rem; }
     div.checkbox input + label::before, div.radio input + label::before {
       margin-top: 0.1875rem;
@@ -10764,7 +10772,7 @@ bsSelectList
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    padding: 0.3125rem 0.3125rem;
+    padding: 0.25rem 0.3125rem;
     font-size: 1rem;
     line-height: 1.5;
     border-radius: 0.25rem;
@@ -10806,7 +10814,7 @@ bsSelectList
     display: flex;
     align-items: center;
     cursor: default;
-    padding: 0.3125rem 0.3125rem;
+    padding: 0.25rem 0.3125rem;
     font-size: 0.875rem;
     line-height: 1.5;
     border-radius: inherit;
@@ -10832,7 +10840,7 @@ bsSelectList
   display: flex;
   align-items: center;
   cursor: default;
-  padding: 0.25rem 0.25rem;
+  padding: 0.1875rem 0.25rem;
   font-size: 0.75rem;
   line-height: 1.5;
   border-radius: inherit;
@@ -10856,7 +10864,7 @@ bsSelectList
   display: flex;
   align-items: center;
   cursor: default;
-  padding: 0.25rem 0.25rem;
+  padding: 0.125rem 0.1875rem;
   font-size: 0.75rem;
   line-height: 1.5;
   border-radius: inherit; }
@@ -11052,7 +11060,7 @@ body.modal-open .modal {
     display: flex;
     align-items: center;
     cursor: default;
-    padding: 0.3125rem 0.3125rem;
+    padding: 0.25rem 0.3125rem;
     font-size: 0.875rem;
     line-height: 1.5;
     border-radius: inherit;
@@ -11088,14 +11096,14 @@ body.modal-open .modal {
     flex-shrink: 0;
     flex-grow: 0;
     overflow: hidden;
-    padding: 0.3125rem 0.3125rem;
+    padding: 0.25rem 0.3125rem;
     font-size: 1rem; }
     .modal-dialog .modal-content .modal-body-fixed:empty {
       display: none !important; }
   .modal-dialog .modal-content .modal-body {
     flex-shrink: 1;
     flex-grow: 1;
-    padding: 0.3125rem 0.3125rem;
+    padding: 0.25rem 0.3125rem;
     font-size: 1rem;
     border-radius: calc( 0.3125rem - 1px); }
     .modal-dialog .modal-content .modal-body.modal-type-alert {
@@ -11123,7 +11131,7 @@ body.modal-open .modal {
     display: flex;
     align-items: center;
     cursor: default;
-    padding: 0.3125rem 0.3125rem;
+    padding: 0.25rem 0.3125rem;
     font-size: 0.875rem;
     line-height: 1.5;
     border-radius: inherit;
@@ -11173,7 +11181,7 @@ body.modal-open .modal {
     display: flex;
     align-items: center;
     cursor: default;
-    padding: 0.25rem 0.25rem;
+    padding: 0.1875rem 0.25rem;
     font-size: 0.75rem;
     line-height: 1.5;
     border-radius: inherit;
@@ -11189,14 +11197,14 @@ body.modal-open .modal {
       word-break: keep-all; }
   .modal-dialog.modal-dialog-sm .modal-content .modal-body,
   .modal-dialog.modal-dialog-sm .modal-content .modal-body-fixed {
-    padding: 0.3125rem 0.3125rem;
+    padding: 0.25rem 0.3125rem;
     font-size: 0.875rem; }
   .modal-dialog.modal-dialog-sm .modal-content .modal-footer-header {
     font-weight: 400;
     display: flex;
     align-items: center;
     cursor: default;
-    padding: 0.25rem 0.25rem;
+    padding: 0.1875rem 0.25rem;
     font-size: 0.75rem;
     line-height: 1.5;
     border-radius: inherit;
@@ -11220,7 +11228,7 @@ body.modal-open .modal {
     display: flex;
     align-items: center;
     cursor: default;
-    padding: 0.25rem 0.25rem;
+    padding: 0.125rem 0.1875rem;
     font-size: 0.75rem;
     line-height: 1.5;
     border-radius: inherit;
@@ -11236,14 +11244,14 @@ body.modal-open .modal {
       word-break: keep-all; }
   .modal-dialog.modal-dialog-xs .modal-content .modal-body,
   .modal-dialog.modal-dialog-xs .modal-content .modal-body-fixed {
-    padding: 0.3125rem 0.3125rem;
+    padding: 0.25rem 0.3125rem;
     font-size: 0.75rem; }
   .modal-dialog.modal-dialog-xs .modal-content .modal-footer-header {
     font-weight: 400;
     display: flex;
     align-items: center;
     cursor: default;
-    padding: 0.25rem 0.25rem;
+    padding: 0.1875rem 0.25rem;
     font-size: 0.75rem;
     line-height: 1.5;
     border-radius: inherit;
@@ -11285,8 +11293,8 @@ body.modal-open .modal {
     }
 */ }
   .modal-dialog .modal-body-with-vertical-padding {
-    padding-top: 0.3125rem;
-    padding-bottom: 0.3125rem; }
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem; }
 
 .modal-content .modal-body-fixed.no-vertical-padding,
 .modal-content .modal-body.no-vertical-padding {
@@ -11314,7 +11322,7 @@ Style for elements used to display any file in a modal-window
   display: flex;
   align-items: center;
   cursor: default;
-  padding: 0.25rem 0.25rem;
+  padding: 0.125rem 0.1875rem;
   font-size: 0.75rem;
   line-height: 1.5;
   border-radius: inherit;
@@ -11330,7 +11338,7 @@ Style for elements used to display any file in a modal-window
     word-break: keep-all; }
 
 .file-view-content {
-  padding: 0.3125rem 0.3125rem;
+  padding: 0.25rem 0.3125rem;
   font-size: 0.875rem; }
 
 /************************************************************
@@ -11460,19 +11468,19 @@ The default bootstrap structure used for elements in a form is
 .form-group {
   line-height: 1;
   margin-bottom: 0;
-  padding-top: 0.3125rem;
-  padding-bottom: 0.625rem; }
+  padding-top: 0.25rem;
+  padding-bottom: 0.5rem; }
   .form-group.small-bottom-padding {
-    padding-bottom: 0.3125rem; }
+    padding-bottom: 0.25rem; }
   .form-group hr {
     border-color: #afb4ba; }
     .form-group hr.before {
       margin-top: 0;
-      margin-bottom: 0.3125rem; }
+      margin-bottom: 0.25rem; }
       .form-group hr.before.above-label {
-        margin-bottom: 0.9375rem; }
+        margin-bottom: 0.75rem; }
     .form-group hr.after {
-      margin-top: 0.3125rem;
+      margin-top: 0.25rem;
       margin-bottom: 0; }
 
 .form-group.form-group-xs,
@@ -11501,8 +11509,8 @@ Style for formValidation (via fcoo-form-validation)
 form-group inside a <form class="form-validation"> gets special style for validation-state and messages
 ************************************************************/
 form.form-validation .form-group {
-  padding-top: 0.3125rem;
-  padding-bottom: 1.5rem; }
+  padding-top: 0.25rem;
+  padding-bottom: 1.375rem; }
   form.form-validation .form-group .form-control-feedback {
     line-height: 1;
     padding-top: 0;
@@ -11510,9 +11518,9 @@ form.form-validation .form-group {
   form.form-validation .form-group.has-warning {
     padding-bottom: 0px; }
   form.form-validation .form-group.no-validation {
-    padding-bottom: 0.3125rem; }
+    padding-bottom: 0.25rem; }
   form.form-validation .form-group .form-control-feedback {
-    height: 1.5rem;
+    height: 1.375rem;
     font-size: 0.875rem;
     color: #dc3545;
     padding-left: 0.3125rem;
@@ -11591,7 +11599,7 @@ form.form-validation .form-group {
   border-radius: 0.125rem; }
 
 .input-group-border {
-  padding: 0.3125rem 0.3125rem;
+  padding: 0.25rem 0.3125rem;
   border: 1px solid #ced4da;
   border-radius: 0.25rem; }
   .input-group-border.input-group-border-dark {
@@ -11670,7 +11678,7 @@ Only supports the html-structure
     font-size: 1rem;
     color: #6c757d;
     line-height: 1.5;
-    top: calc(0.3125rem + 1px); }
+    top: calc(0.25rem + 1px); }
     .input-group .has-float-label .form-control-with-label.show-label-as-placeholder + *:after,
     .input-group .has-float-label .form-control-with-label:placeholder-shown:not(:focus) + *:after {
       background: transparent; }
@@ -11798,7 +11806,7 @@ Adjustmernt to Bootstrap table
     display: flex;
     align-items: center;
     cursor: default;
-    padding: 0.3125rem 0.3125rem;
+    padding: 0.25rem 0.3125rem;
     font-size: 1rem;
     line-height: 1.5;
     border-radius: inherit;
@@ -11882,7 +11890,7 @@ Adjustmernt to Bootstrap table
   .table tbody tr.filter-out {
     display: none; }
   .table tbody tr td {
-    padding: 0.3125rem 0.3125rem;
+    padding: 0.25rem 0.3125rem;
     font-size: 0.875rem; }
     .table tbody tr td.no-horizontal-padding {
       padding-left: 0;
@@ -11900,7 +11908,7 @@ Adjustmernt to Bootstrap table
   display: flex;
   align-items: center;
   cursor: default;
-  padding: 0.25rem 0.25rem;
+  padding: 0.1875rem 0.25rem;
   font-size: 0.875rem;
   line-height: 1.5;
   border-radius: inherit; }
@@ -11923,7 +11931,7 @@ Adjustmernt to Bootstrap table
 
 .modal-dialog:not(.modal-dialog-sm) .table.table-selectable tbody tr td,
 .table.table-selectable:not(.table-sm) tbody tr td {
-  padding: 0.3125rem 0.3125rem;
+  padding: 0.25rem 0.3125rem;
   font-size: 1rem; }
   .modal-dialog:not(.modal-dialog-sm) .table.table-selectable tbody tr td.no-horizontal-padding,
   .table.table-selectable:not(.table-sm) tbody tr td.no-horizontal-padding {
@@ -11960,7 +11968,7 @@ Using Bootstrap Collapse to create accordion
     display: flex;
     align-items: center;
     cursor: default;
-    padding: 0.3125rem 0.3125rem;
+    padding: 0.25rem 0.3125rem;
     font-size: 1rem;
     line-height: 1.5;
     border-radius: inherit;
@@ -12004,7 +12012,7 @@ Using Bootstrap Collapse to create accordion
     .accordion .card-header.collapsed .chevrolet:before {
       content: "\f054"; }
   .accordion .card-block {
-    padding: 0.3125rem 0.3125rem;
+    padding: 0.25rem 0.3125rem;
     font-size: 0.875rem;
     border-radius: 0.25rem; }
   .accordion .card-footer {
@@ -12012,7 +12020,7 @@ Using Bootstrap Collapse to create accordion
     display: flex;
     align-items: center;
     cursor: default;
-    padding: 0.3125rem 0.3125rem;
+    padding: 0.25rem 0.3125rem;
     font-size: 0.875rem;
     line-height: 1.5;
     border-radius: inherit;
@@ -12050,43 +12058,33 @@ Using Bootstrap Collapse to create accordion
       border-top-left-radius: 0;
       border-top-right-radius: 0; }
 
-.modal-dialog-sm .accordion .card-header,
-.modal-dialog-xs .accordion .card-header,
-.accordion-sm .card-header {
+.modal-dialog-sm .accordion .card-header, .accordion-sm .card-header {
   font-weight: 400;
   display: flex;
   align-items: center;
   cursor: default;
-  padding: 0.25rem 0.25rem;
+  padding: 0.1875rem 0.25rem;
   font-size: 0.875rem;
   line-height: 1.5;
   border-radius: inherit; }
-  .modal-dialog-sm .accordion .card-header span,
-  .modal-dialog-xs .accordion .card-header span,
-  .accordion-sm .card-header span {
+  .modal-dialog-sm .accordion .card-header span, .accordion-sm .card-header span {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap; }
-  .modal-dialog-sm .accordion .card-header span.fixed-header,
-  .modal-dialog-xs .accordion .card-header span.fixed-header,
-  .accordion-sm .card-header span.fixed-header {
+  .modal-dialog-sm .accordion .card-header span.fixed-header, .accordion-sm .card-header span.fixed-header {
     overflow: visible;
     word-break: keep-all; }
 
-.modal-dialog-sm .accordion .card-block,
-.modal-dialog-xs .accordion .card-block,
-.accordion-sm .card-block {
-  padding: 0.3125rem 0.3125rem;
+.modal-dialog-sm .accordion .card-block, .accordion-sm .card-block {
+  padding: 0.25rem 0.3125rem;
   font-size: 0.875rem; }
 
-.modal-dialog-sm .accordion .card-footer,
-.modal-dialog-xs .accordion .card-footer,
-.accordion-sm .card-footer {
+.modal-dialog-sm .accordion .card-footer, .accordion-sm .card-footer {
   font-weight: 400;
   display: flex;
   align-items: center;
   cursor: default;
-  padding: 0.25rem 0.25rem;
+  padding: 0.1875rem 0.25rem;
   font-size: 0.75rem;
   line-height: 1.5;
   border-radius: inherit;
@@ -12096,20 +12094,60 @@ Using Bootstrap Collapse to create accordion
   border-top-left-radius: 0 !important;
   border-top-right-radius: 0 !important;
   border-radius: 0.25rem; }
-  .modal-dialog-sm .accordion .card-footer span,
-  .modal-dialog-xs .accordion .card-footer span,
-  .accordion-sm .card-footer span {
+  .modal-dialog-sm .accordion .card-footer span, .accordion-sm .card-footer span {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap; }
-  .modal-dialog-sm .accordion .card-footer span.fixed-header,
-  .modal-dialog-xs .accordion .card-footer span.fixed-header,
-  .accordion-sm .card-footer span.fixed-header {
+  .modal-dialog-sm .accordion .card-footer span.fixed-header, .accordion-sm .card-footer span.fixed-header {
     overflow: visible;
     word-break: keep-all; }
-  .modal-dialog-sm .accordion .card-footer:empty,
-  .modal-dialog-xs .accordion .card-footer:empty,
-  .accordion-sm .card-footer:empty {
+  .modal-dialog-sm .accordion .card-footer:empty, .accordion-sm .card-footer:empty {
+    display: none !important; }
+
+.modal-dialog-xs .accordion .card-header, .accordion-xs .card-header {
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  cursor: default;
+  padding: 0.125rem 0.1875rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-radius: inherit; }
+  .modal-dialog-xs .accordion .card-header span, .accordion-xs .card-header span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; }
+  .modal-dialog-xs .accordion .card-header span.fixed-header, .accordion-xs .card-header span.fixed-header {
+    overflow: visible;
+    word-break: keep-all; }
+
+.modal-dialog-xs .accordion .card-block, .accordion-xs .card-block {
+  padding: 0.25rem 0.3125rem;
+  font-size: 0.75rem; }
+
+.modal-dialog-xs .accordion .card-footer, .accordion-xs .card-footer {
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  cursor: default;
+  padding: 0.1875rem 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  border-radius: inherit;
+  color: #495057;
+  background-color: #f2f2f2;
+  line-height: 1;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-radius: 0.25rem; }
+  .modal-dialog-xs .accordion .card-footer span, .accordion-xs .card-footer span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; }
+  .modal-dialog-xs .accordion .card-footer span.fixed-header, .accordion-xs .card-footer span.fixed-header {
+    overflow: visible;
+    word-break: keep-all; }
+  .modal-dialog-xs .accordion .card-footer:empty, .accordion-xs .card-footer:empty {
     display: none !important; }
 
 /************************************************************
@@ -12211,7 +12249,7 @@ for noty is copyed and modified
     -webkit-box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.5);
     box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.5); }
     .noty_bar.noty_theme__jquery-bootstrap .noty_body {
-      padding: 0.3125rem 0.3125rem;
+      padding: 0.25rem 0.3125rem;
       font-size: 1rem;
       font-size: 0.875rem; }
       .noty_bar.noty_theme__jquery-bootstrap .noty_body * {
@@ -12223,7 +12261,7 @@ for noty is copyed and modified
       position: absolute;
       top: 0;
       right: 0;
-      margin-top: 0.3125rem;
+      margin-top: 0.25rem;
       margin-right: 0.3125rem; }
       .noty_bar.noty_theme__jquery-bootstrap.no-header .header-icon-container.header-icon-container-sm {
         margin-top: 0.1875rem;
@@ -12235,7 +12273,7 @@ for noty is copyed and modified
     display: flex;
     align-items: center;
     cursor: default;
-    padding: 0.3125rem 0.3125rem;
+    padding: 0.25rem 0.3125rem;
     font-size: 0.875rem;
     line-height: 1.5;
     border-radius: inherit;
@@ -12254,7 +12292,7 @@ for noty is copyed and modified
       display: flex;
       align-items: center;
       cursor: default;
-      padding: 0.25rem 0.25rem;
+      padding: 0.1875rem 0.25rem;
       font-size: 0.75rem;
       line-height: 1.5;
       border-radius: inherit;
@@ -12272,13 +12310,13 @@ for noty is copyed and modified
     background-color: #e5e5e5; }
   .noty_bar hr {
     padding: 0;
-    margin: 0.3125rem 0; }
+    margin: 0.25rem 0; }
   .noty_bar .noty-footer {
     font-weight: 400;
     display: flex;
     align-items: center;
     cursor: default;
-    padding: 0.25rem 0.25rem;
+    padding: 0.1875rem 0.25rem;
     font-size: 0.75rem;
     line-height: 1.5;
     border-radius: inherit;
@@ -12298,7 +12336,7 @@ for noty is copyed and modified
     .noty_bar .noty-footer:empty {
       display: none !important; }
   .noty_bar .noty-buttons {
-    padding: 0.3125rem 0.3125rem;
+    padding: 0.25rem 0.3125rem;
     font-size: 1rem;
     background-color: #fff;
     text-align: right; }
@@ -12434,7 +12472,7 @@ Adjustment to Bootstrap tabs
   .nav-tabs a.nav-item.nav-link {
     position: relative;
     cursor: default;
-    padding: 0.3125rem 0.3125rem;
+    padding: 0.25rem 0.3125rem;
     font-size: 1rem;
     line-height: 1.5;
     border-radius: 0.25rem;
@@ -12562,7 +12600,7 @@ Adjustment to Bootstrap tabs
     flex-shrink: 1;
     flex-grow: 1;
     background-color: #fff;
-    padding: 0.3125rem 0.3125rem;
+    padding: 0.25rem 0.3125rem;
     font-size: 1rem;
     font-size: 0.875rem;
     padding-left: 0.625rem;
@@ -12576,7 +12614,7 @@ Adjustment to Bootstrap tabs
     display: flex;
     align-items: center;
     cursor: default;
-    padding: 0.3125rem 0.3125rem;
+    padding: 0.25rem 0.3125rem;
     font-size: 0.875rem;
     line-height: 1.5;
     border-radius: inherit;
@@ -12603,7 +12641,7 @@ Adjustment to Bootstrap tabs
   display: flex;
   align-items: center;
   cursor: default;
-  padding: 0.25rem 0.25rem;
+  padding: 0.1875rem 0.25rem;
   font-size: 0.75rem;
   line-height: 1.5;
   border-radius: inherit;
@@ -13784,7 +13822,7 @@ Adjust font-size and top for .inner to fit inside a fa-map-marker icon
   top: calc(-4.1em / 0.5 * 1.2); }
 
 /***********************************************
-	leaflet-control-topcenter.scss,
+	leaflet-control-topcenter.scss, 
 
 	(c) 2016, FCOO
 
@@ -13812,7 +13850,7 @@ Adjust font-size and top for .inner to fit inside a fa-map-marker icon
   right: 0; }
 
 /*! =======================================================
-                      VERSION  11.0.2
+                      VERSION  11.0.2              
 ========================================================= */
 /*! =========================================================
  * bootstrap-slider.js
@@ -13829,7 +13867,7 @@ Adjust font-size and top for .inner to fit inside a fa-map-marker icon
  *
  * bootstrap-slider is released under the MIT License
  * Copyright (c) 2019 Kyle Kemp, Rohit Kalkur, and contributors
- *
+ * 
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
  * files (the "Software"), to deal in the Software without
@@ -13838,10 +13876,10 @@ Adjust font-size and top for .inner to fit inside a fa-map-marker icon
  * copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following
  * conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
  * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND

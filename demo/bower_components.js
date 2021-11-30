@@ -71288,7 +71288,7 @@ module.exports = g;
                     .toggleClass('collapsed', !isOpen)
                     .toggleClass('collapsible', !options.neverClose)
                     .attr(headerAttr)
-                    ._bsAddHtml( opt.header || opt )
+                    ._bsAddHtml( $.extend({text:'&nbsp;'}, opt.header || opt )) //'&nbsp;' = bug fix to prevent header without text to be wronge height - not pretty :-)
                     //Add chevrolet-icon
                     .append( options.neverClose ? null : $('<i/>').addClass('fa chevrolet') )
             );
@@ -72663,7 +72663,7 @@ module.exports = g;
     $.fn._bsHeaderAndIcons = function(options){
         var $this = this;
 
-        options = $.extend( true, {headerClassName: '', inclHeader: true, icons: {} }, options );
+        options = $.extend( true, {text:'DAVS MED DIG', headerClassName: '', inclHeader: true, icons: {} }, options );
         this.addClass( options.headerClassName );
 
         if (options.inclHeader){
