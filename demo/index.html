@@ -393,7 +393,7 @@ content = {
                 content: function($body){
                     $body.html( 'Normal ' + moment().format('HH:mm.ss'));
                 },
-
+                verticalButtons: true,
                 _content: {
                     type: 'buttongroup',
                     fullWidth: true,
@@ -414,12 +414,26 @@ content = {
 
                         $body.html( 'Extended map._leaflet_id=' + map1._leaflet_id +' '+moment().format('HH:mm.ss'));
                     },
+                    verticalButtons: false,
 
                     _content : {type:'textbox', text:'EXTENDED'}
                 },
                 fixable: true,
                 _width: 321,
-                buttons: [{text:'klik'}]
+                buttons: [
+                    {text:'klik', onClick: function(){ 
+                        console.log('klik', arguments); 
+                    }},
+                    {text:'klik2', onClick: function(){ console.log('klik2', arguments); }},
+                    $.bsButton({icon:'fa-map', text: 'Kort', onClick: function(){ console.log('Kort', arguments); }}),
+                    $.bsStandardCheckboxButton({
+                        id:'popup_radion_button', type:'radio', text: {da:'Vælg', en:'Select'}, selected: true,
+                        onChange: function(id, selected, _this, map, owner){ 
+                            console.log('bsStandardCheckboxButton', id,selected, owner, map); 
+                            console.log('theMap',owner.data('theMap') ); 
+                        }
+                    })
+                ]
 
             })
 
@@ -507,7 +521,7 @@ content = {
             ],
             width: 'auto',
             clickable: false,
-            buttons:[{text:'klik'}],
+            buttons:[{text:'Click'}],
             footer: { text: {da: 'Klik på signaturfork. for info', en:'Click on legend for info' }}
 
 
@@ -796,9 +810,15 @@ content = {
                 //noVerticalPadding: true,
                 //noHorizontalPadding: true,
 
-                buttons   : /*i % 2 ? null : */[
-                                {id:'button'+i, icon:'fa-home', text:'click me', onClick: function(id, map){ console.log('click me:', id, map, legend); legend.updateContent('Skide godt do!'); } }, 
-                                {icon:'fa-home', text:'click me to'}
+                buttons   : [
+                    {id:'button_'+i, icon:'fa-home', text:'click me', 
+                        onClick: function(id, selected, button, map, legend){ console.log('click me:', id, map, legend); legend.updateContent('Skide godt do!'); } }, 
+
+                    $.bsCheckboxButton({id:'checkbox_button_'+i, text: {da:'Vælg mig', en:'Select me'}, icon: ['fa-thumbs-down', 'fa-thumbs-up'], selected: false,
+                        onChange: function(id, selected, _this, map){ console.log('bsCheckboxButton', id,selected, _this, map); }
+                    }),
+
+                    {icon:'fa-home', text:'click me to'}
                             ],
                 onInfo    : function(){ console.log('INFO');},
                 onWarning : function(){ console.log('WARNING');},

@@ -3,6 +3,10 @@ leaflet-bootstrap-popup.js
 
 Adjust standard Leaflet popup to display as Bootstrap modal
 
+Note: All buttons in options.buttons will have event-methods
+with arguments = (id, selected, $button, map, owner) where owner = the popup
+Eq., onClick: function(id, selected, $button, map, popup){...}
+
 ****************************************************************************/
 (function ($, L/*, window, document, undefined*/) {
     "use strict";
@@ -145,6 +149,10 @@ Adjust standard Leaflet popup to display as Bootstrap modal
                 onChange      : $.proxy( this._updatePosition, this )
             },
             contentAsModalOptions );
+
+        //Adjust buttons to include map in arguments for onClick/onChange
+        if (modalOptions.buttons)
+            modalOptions.buttons = L._adjustButtonList(modalOptions.buttons, this);
 
         if (modalOptions.minimized)
             modalOptions.minimized.contentArg = contentArg;

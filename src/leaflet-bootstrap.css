@@ -69,6 +69,9 @@ $font-size-base         : 1rem !default;
 $spacer                 : 1rem !default;
 */
 /************************************************************
+Set margin for buttons in block
+************************************************************/
+/************************************************************
 Adjust dropdown-menu
 ************************************************************/
 /************************************************************
@@ -281,7 +284,7 @@ leaflet-bootstrap-popup.scss,
 leaflet-bootstrap-tooltip.scss,
 ************************************************/
 .leaflet-tooltip {
-  padding: 0.1875rem 0.25rem;
+  padding: 0.125rem 0.1875rem;
   background-color: #fff;
   border: 1px solid #868e96;
   border-radius: 0.25rem;

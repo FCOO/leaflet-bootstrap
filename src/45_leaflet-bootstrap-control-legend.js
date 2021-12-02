@@ -107,7 +107,7 @@ leaflet-bootstrap-control-legend.js
         *******************************************/
         addLegend: function(  options ) {
             var legendId = '_'+legendCounter++,
-                newLegend = options instanceof BsLegend ? options : new BsLegend(options);
+                newLegend = options instanceof L.BsLegend ? options : new L.BsLegend(options);
             newLegend.id = legendId;
             newLegend.index = newLegend.index == undefined ? this.list.length : newLegend.index;
 
@@ -125,7 +125,7 @@ leaflet-bootstrap-control-legend.js
         removeLegend
         *******************************************/
         removeLegend: function(legend) {
-            var legendId = legend instanceof BsLegend ? legend.id : legend;
+            var legendId = legend instanceof L.BsLegend ? legend.id : legend;
             legend = this.legends[legendId];
             if (legend){
                 legend.onRemove();
@@ -164,39 +164,24 @@ leaflet-bootstrap-control-legend.js
     options:
         normalIconClass: class-name(s) for icons when layer is normal (visible)
         hiddenIconClass: class-name(s) for icon when layer is hidden
-        buttons/buttonList: []button-options. NOTE: The onClick-function is called with (id, map, $button, bsLegend, bsLegendControl)
+        buttons/buttonList: []button-options.
+        NOTE:
 
+    Note: All buttons in options.buttons will have event-methods
+    with arguments = (id, selected, $button, map, owner) where owner = the popup
+    Eq.
+    onClick : function(id, selected, $button, map, popup){...}, or
+    onChange: function(id, selected, $button, map, popup){...}
 
     *******************************************************************
     ******************************************************************/
-    function BsLegend( options ){
+    L.BsLegend = function( options ){
         this.options = options;
         this.index = options.index;
-    }
-
-    L.BsLegend = BsLegend;
-
-//(id, map, $button, bsLegend, bsLegendControl)
-
-    //bsLegend_button_onClick = click-event for buttons in legend. Includes the map in the arguments for the button
-    function bsLegend_button_onClick(){
-        var options = $(this).data('bsButton_options'),
-            bsLegendControl = options.bsLegend_control,
-            arg = [
-                options.id,
-                bsLegendControl._map,
-                $(this),
-                options.bsLegend,
-                bsLegendControl
-            ];
-
-        options.onClick.apply(options.context, arg);
-
-        return false;
-    }
+    };
 
     //Extend the prototype
-    BsLegend.prototype = {
+    L.BsLegend.prototype = {
         /*******************************************
         addTo
         *******************************************/
@@ -263,26 +248,7 @@ leaflet-bootstrap-control-legend.js
 
                     if (options.buttons || options.buttonList){
                         //Convert button-list to content
-                        var list = options.buttons || options.buttonList,
-                            $buttonList = [];
-
-                        $.each(list, function(index, options){
-                            if (options instanceof $)
-                                $buttonList.push( options );
-                            else {
-                                //Create the buttons and modify the click-event to call options.onClick(id, null, $button, map); map is added
-                                options.type  = 'button';
-                                options.small = true;
-                                options.addOnClick = false;
-                                options.bsLegend = _this;
-                                options.bsLegend_control = parent;
-
-                                var $button = $.bsButton(options);
-                                $button.on('click', bsLegend_button_onClick);
-
-                                $buttonList.push( $button );
-                            }
-                        });
+                        var $buttonList = L._adjustButtonList(options.buttons || options.buttonList, this );
 
                         this.$buttonContainer =
                             $('<div/>')

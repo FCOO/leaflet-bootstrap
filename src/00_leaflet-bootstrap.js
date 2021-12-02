@@ -64,6 +64,79 @@
         return this.getPane(newPaneId);
 
     };
+
+
+
+    /**********************************************************
+    L._adjustButtonList(list, owner)
+    Adjust buttons in list ($-elemnt or options) to have
+    map and 'owner' (bsLegend or popup or ...) annded to the arguments
+    onClick  = function( id, $button, map, owner )
+    onChange = function( id, selected, $button, map, owner )
+    **********************************************************/
+    function any_button_on_click(id, selected, $button){
+        var options = $button.data('lbOptions');
+        if (options.event)
+            $.proxy( options.event, options.context )( id, selected, $button, options.map, options.owner );
+        return options.returnFromClick || false;
+    }
+
+    L._adjustButtonList = function(list, owner){
+        var $buttonList = [];
+        $.each(list, function(index, options){
+            var $button,
+                lbOptions = {
+                    returnFromClick: false
+                };
+
+            if (options instanceof $){
+                $button = options;
+                //If $button is a checkbox-button => overwrite onChange
+                var buttonOptions = $button.data('cbx_options');
+                if (buttonOptions){
+                    lbOptions.event = buttonOptions.onChange;
+                    buttonOptions.onChange = any_button_on_click;
+                    $button.data('cbx_options', buttonOptions);
+                }
+                else {
+                    //$button is a normal button => overwrite onClick
+                    buttonOptions = $button.data('bsButton_options');
+                    lbOptions.event = buttonOptions.onClick;
+                    buttonOptions.onClick = any_button_on_click;
+                    $button.data('bsButton_options', buttonOptions);
+                }
+                lbOptions.context = buttonOptions.context;
+            }
+            else {
+                //Create the buttons and modify the click-event to call options.onClick(id, null, $button, map); map is added
+                lbOptions = {
+                    event           : options.onClick,
+                    context         : options.context,
+                    returnFromClick : options.returnFromClick
+                };
+                options.type    = options.type || 'button';
+                options.small   = true;
+                options.onClick = any_button_on_click;
+                options.context = null;
+
+                $button = $.bsButton(options);
+            }
+
+            lbOptions.owner = owner;
+            lbOptions.map   = owner._map || (owner.parent ? owner.parent._map : null);
+            $button.data('lbOptions', lbOptions);
+            $buttonList.push( $button );
+
+        });
+
+        return $buttonList;
+    };
+
+
+
+
+
+
 }(jQuery, L, this, document));
 
 

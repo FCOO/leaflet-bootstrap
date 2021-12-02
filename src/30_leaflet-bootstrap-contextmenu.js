@@ -256,7 +256,7 @@
             this.popup
                 .setLatLng(latlng)
                 .setContent({
-                    content: $.bsMenu({fullWidth: true, list: list}),
+                    content: $.bsMenu({fullWidth: true, list: list, small: true}),
                     width  : width
                 });
 

@@ -64,6 +64,79 @@
         return this.getPane(newPaneId);
 
     };
+
+
+
+    /**********************************************************
+    L._adjustButtonList(list, owner)
+    Adjust buttons in list ($-elemnt or options) to have
+    map and 'owner' (bsLegend or popup or ...) annded to the arguments
+    onClick  = function( id, $button, map, owner )
+    onChange = function( id, selected, $button, map, owner )
+    **********************************************************/
+    function any_button_on_click(id, selected, $button){
+        var options = $button.data('lbOptions');
+        if (options.event)
+            $.proxy( options.event, options.context )( id, selected, $button, options.map, options.owner );
+        return options.returnFromClick || false;
+    }
+
+    L._adjustButtonList = function(list, owner){
+        var $buttonList = [];
+        $.each(list, function(index, options){
+            var $button,
+                lbOptions = {
+                    returnFromClick: false
+                };
+
+            if (options instanceof $){
+                $button = options;
+                //If $button is a checkbox-button => overwrite onChange
+                var buttonOptions = $button.data('cbx_options');
+                if (buttonOptions){
+                    lbOptions.event = buttonOptions.onChange;
+                    buttonOptions.onChange = any_button_on_click;
+                    $button.data('cbx_options', buttonOptions);
+                }
+                else {
+                    //$button is a normal button => overwrite onClick
+                    buttonOptions = $button.data('bsButton_options');
+                    lbOptions.event = buttonOptions.onClick;
+                    buttonOptions.onClick = any_button_on_click;
+                    $button.data('bsButton_options', buttonOptions);
+                }
+                lbOptions.context = buttonOptions.context;
+            }
+            else {
+                //Create the buttons and modify the click-event to call options.onClick(id, null, $button, map); map is added
+                lbOptions = {
+                    event           : options.onClick,
+                    context         : options.context,
+                    returnFromClick : options.returnFromClick
+                };
+                options.type    = options.type || 'button';
+                options.small   = true;
+                options.onClick = any_button_on_click;
+                options.context = null;
+
+                $button = $.bsButton(options);
+            }
+
+            lbOptions.owner = owner;
+            lbOptions.map   = owner._map || (owner.parent ? owner.parent._map : null);
+            $button.data('lbOptions', lbOptions);
+            $buttonList.push( $button );
+
+        });
+
+        return $buttonList;
+    };
+
+
+
+
+
+
 }(jQuery, L, this, document));
 
 
@@ -1960,7 +2033,7 @@ https://github.com/nerik/leaflet-graphicscale
             this.popup
                 .setLatLng(latlng)
                 .setContent({
-                    content: $.bsMenu({fullWidth: true, list: list}),
+                    content: $.bsMenu({fullWidth: true, list: list, small: true}),
                     width  : width
                 });
 
@@ -3217,7 +3290,7 @@ leaflet-bootstrap-control-legend.js
         *******************************************/
         addLegend: function(  options ) {
             var legendId = '_'+legendCounter++,
-                newLegend = options instanceof BsLegend ? options : new BsLegend(options);
+                newLegend = options instanceof L.BsLegend ? options : new L.BsLegend(options);
             newLegend.id = legendId;
             newLegend.index = newLegend.index == undefined ? this.list.length : newLegend.index;
 
@@ -3235,7 +3308,7 @@ leaflet-bootstrap-control-legend.js
         removeLegend
         *******************************************/
         removeLegend: function(legend) {
-            var legendId = legend instanceof BsLegend ? legend.id : legend;
+            var legendId = legend instanceof L.BsLegend ? legend.id : legend;
             legend = this.legends[legendId];
             if (legend){
                 legend.onRemove();
@@ -3274,39 +3347,24 @@ leaflet-bootstrap-control-legend.js
     options:
         normalIconClass: class-name(s) for icons when layer is normal (visible)
         hiddenIconClass: class-name(s) for icon when layer is hidden
-        buttons/buttonList: []button-options. NOTE: The onClick-function is called with (id, map, $button, bsLegend, bsLegendControl)
+        buttons/buttonList: []button-options.
+        NOTE:
 
+    Note: All buttons in options.buttons will have event-methods
+    with arguments = (id, selected, $button, map, owner) where owner = the popup
+    Eq.
+    onClick : function(id, selected, $button, map, popup){...}, or
+    onChange: function(id, selected, $button, map, popup){...}
 
     *******************************************************************
     ******************************************************************/
-    function BsLegend( options ){
+    L.BsLegend = function( options ){
         this.options = options;
         this.index = options.index;
-    }
-
-    L.BsLegend = BsLegend;
-
-//(id, map, $button, bsLegend, bsLegendControl)
-
-    //bsLegend_button_onClick = click-event for buttons in legend. Includes the map in the arguments for the button
-    function bsLegend_button_onClick(){
-        var options = $(this).data('bsButton_options'),
-            bsLegendControl = options.bsLegend_control,
-            arg = [
-                options.id,
-                bsLegendControl._map,
-                $(this),
-                options.bsLegend,
-                bsLegendControl
-            ];
-
-        options.onClick.apply(options.context, arg);
-
-        return false;
-    }
+    };
 
     //Extend the prototype
-    BsLegend.prototype = {
+    L.BsLegend.prototype = {
         /*******************************************
         addTo
         *******************************************/
@@ -3373,26 +3431,7 @@ leaflet-bootstrap-control-legend.js
 
                     if (options.buttons || options.buttonList){
                         //Convert button-list to content
-                        var list = options.buttons || options.buttonList,
-                            $buttonList = [];
-
-                        $.each(list, function(index, options){
-                            if (options instanceof $)
-                                $buttonList.push( options );
-                            else {
-                                //Create the buttons and modify the click-event to call options.onClick(id, null, $button, map); map is added
-                                options.type  = 'button';
-                                options.small = true;
-                                options.addOnClick = false;
-                                options.bsLegend = _this;
-                                options.bsLegend_control = parent;
-
-                                var $button = $.bsButton(options);
-                                $button.on('click', bsLegend_button_onClick);
-
-                                $buttonList.push( $button );
-                            }
-                        });
+                        var $buttonList = L._adjustButtonList(options.buttons || options.buttonList, this );
 
                         this.$buttonContainer =
                             $('<div/>')
@@ -3526,6 +3565,10 @@ leaflet-bootstrap-control-legend.js
 leaflet-bootstrap-popup.js
 
 Adjust standard Leaflet popup to display as Bootstrap modal
+
+Note: All buttons in options.buttons will have event-methods
+with arguments = (id, selected, $button, map, owner) where owner = the popup
+Eq., onClick: function(id, selected, $button, map, popup){...}
 
 ****************************************************************************/
 (function ($, L/*, window, document, undefined*/) {
@@ -3669,6 +3712,10 @@ Adjust standard Leaflet popup to display as Bootstrap modal
                 onChange      : $.proxy( this._updatePosition, this )
             },
             contentAsModalOptions );
+
+        //Adjust buttons to include map in arguments for onClick/onChange
+        if (modalOptions.buttons)
+            modalOptions.buttons = L._adjustButtonList(modalOptions.buttons, this);
 
         if (modalOptions.minimized)
             modalOptions.minimized.contentArg = contentArg;
