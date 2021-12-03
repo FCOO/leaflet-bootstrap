@@ -210,21 +210,19 @@ leaflet-bootstrap-control-legend.js
             this.parent = parent;
             if (!this.$container){
                 //Create modal-content
-                var modalContentOptions = {
-
-                    //noVerticalPadding: true,
-                    //noHorizontalPadding: true,
-                    noShadow  : true,
-                    header: {
-                        icon: options.iconArray,
-                        text: options.text
-                    },
-                    onInfo     : options.onInfo,
-                    onWarning  : options.onWarning,
-                    icons      : {},
-                    content    : '',
-                    closeButton: false
-                };
+                    var modalContentOptions = {
+                        noShadow  : true,
+scroll: false,
+                        header: {
+                            icon: options.iconArray,
+                            text: options.text
+                        },
+                        onInfo     : options.onInfo,
+                        onWarning  : options.onWarning,
+                        icons      : {},
+                        content    : '',
+                        closeButton: false
+                    };
 
 
                 //The extended content can be 'normal' content and/or buttons/buttonList
@@ -259,12 +257,7 @@ leaflet-bootstrap-control-legend.js
                         content.push( this.$buttonContainer );
                     }
 
-                    modalContentOptions.extended = {
-                        //className           : 'text-right modal-footer',
-                        noVerticalPadding   : true,
-                        noHorizontalPadding : true,
-                        content             : content
-                    };
+                    modalContentOptions.extended = {content: content};
 
                     modalContentOptions.isExtended = true;
                     options.hasContent = true;
