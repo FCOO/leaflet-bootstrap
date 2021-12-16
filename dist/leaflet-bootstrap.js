@@ -133,12 +133,29 @@
     };
 
 
+    /**********************************************************
+    Overwrite ScrollWheelZoom.prototype._onWheelScroll to
+    prevent map zooming when mouse wheel on elements with scroll
+    **********************************************************/
+    L.Map.ScrollWheelZoom.prototype._onWheelScroll = function(_onWheelScroll){
+        return function(event){
+            var elem = event ? event.srcElement : null,
+                zoomMap = true,
+                className;
 
-
+            while (elem && zoomMap){
+                className = elem.className;
+                if ( (typeof className == 'string') && className.split(' ').includes('leaflet-control') )
+                    zoomMap = false;
+                else
+                    elem = elem.offsetParent;
+            }
+            return zoomMap ? _onWheelScroll.apply(this, arguments) : false;
+        };
+    }(L.Map.ScrollWheelZoom.prototype._onWheelScroll);
 
 
 }(jQuery, L, this, document));
-
 
 
 
@@ -190,9 +207,11 @@ L.BsControl = extention of L.Control with
 (function ($, L, window, document, undefined) {
     "use strict";
 
-    var controlTooltipPane = 'controlTooltipPane';
+    var controlId = 0,
+        controlTooltipPane = 'controlTooltipPane';
 
     L.BsControl = L.Control.extend({
+        hasRelativeHeight: false,
         options: {
             show            : true,
 
@@ -217,6 +236,7 @@ L.BsControl = extention of L.Control with
 
         initialize: function ( options ) {
             options = $.extend(true, {}, this.options, options, this.forceOptions || {});
+            this.lbControlId = 'lbc_'+ controlId++;
             L.Util.setOptions(this, options);
         },
 
@@ -228,11 +248,32 @@ L.BsControl = extention of L.Control with
             return this._getTooltipElements(container) || $(container);
         },
 
+
+        _getMap: function(){
+            return this._map;
+        },
+
+        _map_lbOnResize: function(){
+            this._getMap()._lbOnResize(true);
+            return this;
+        },
+
+        _getMapHeight: function(){
+            return $(this._getMap()._container).innerHeight();
+        },
+
         addTo: function(map) {
             this._controlTooltipContent = [];
 
+            //Append the control to the maps list of controls
+            map.lbControls = map.lbControls || {};
+            map.lbControls[this.lbControlId] = this;
+
+
             var result = L.Control.prototype.addTo.apply(this, arguments);
+
             L.DomEvent.disableClickPropagation(this._container);
+
 
             //Create pane to contain tooltip for control inside the map's control-container
             if (!map.getPane(controlTooltipPane))
@@ -260,7 +301,7 @@ L.BsControl = extention of L.Control with
                 var controlContainer = map._controlContainer;
 
                 //Prevent event on control-container from map
-                L.DomEvent.on(controlContainer, 'contextmenu dblclick mousewheel', L.DomEvent.stop);
+                //L.DomEvent.on(controlContainer, 'contextmenu dblclick wheel mousewheel', L.DomEvent.stop);
 
                 //Close all popup on the map when contextmenu on any control
                 $(controlContainer).on('touchstart mousedown', $.proxy(map.closeAllPopup, map));
@@ -331,10 +372,28 @@ L.BsControl = extention of L.Control with
                 this._controlTooltipContent.push({icon: this.options.rightClickIcon, text: this.options.popupText});
             }
 
+
+            //Add common resize-event to the map to adjust any control that has size depending on the map size
+            if (this.hasRelativeHeight && !map.lbOnResizeAdded){
+                $(map.getContainer()).resize( $.proxy(map._lbOnResize, map) );
+                map.lbOnResizeAdded = true;
+                map._lbOnResize(true);
+            }
+
             this.options.show ? this.show() : this.hide();
             return result;
         },
 
+
+        remove: function() {
+            if (this._map){
+                //Remove the control from the maps list of controls
+                this._map.lbControls = this._map.lbControls || {};
+                delete this._map.lbControls[this.lbControlId];
+            }
+
+            return L.Control.prototype.remove.apply(this, arguments);
+        },
 
 
         show: function(){
@@ -354,6 +413,7 @@ L.BsControl = extention of L.Control with
 
             this.$container.css('visibility', this.options.show ? 'inherit' : 'hidden');
             this._onChange();
+
             return this;
         },
 
@@ -362,8 +422,11 @@ L.BsControl = extention of L.Control with
         },
 
         _onChange: function(){
+            this._map_lbOnResize();
+
             var state = this.getState();
             this.onChange(state);
+
             if (this.options.onChange)
                 this.options.onChange(state, this);
         },
@@ -491,7 +554,93 @@ L.BsControl = extention of L.Control with
                 this._controlTooltipVisible = false;
             }
         },
+
+
+
+        //_setMaxHeight(maxHeihgt, mapHeight) Adjust the height if the control har relative height
+        _setMaxHeight: function(/*maxHeight, mapHeight*/){
+            return this;
+        }
+
     });
+
+    /**********************************************************
+    Methods to handle size of controls when the map is resized
+
+    To avoid controls with relative-height to overlap other
+    controls the controls are divides into 3 sets of two groups of control-position:
+    topleft   + bottomleft
+    topcenter + bottomcenter
+    topright  + bottomright
+
+    In each set the controls with relative-height in each group is checked
+    against all other controls in the other group to ensure that the control
+    is not overlapping any other control.
+
+
+    **********************************************************/
+    L.Map.prototype._lbOnResize = function(force){
+        var _this = this,
+            height = $(this._container).innerHeight();
+
+        if (force || (height != this.lbHeight)){
+            this.lbHeight = height;
+
+            $.each(['left', 'center', 'right'], function(index, horizontal){
+
+                var topControlList = [],
+                    bottomControlList = [];
+                $.each(_this.lbControls, function(id, control){
+                    if ( !(control.options.show && $(control._container).is(':visible')) )
+                        return;
+
+                    if (control.options.position == 'top'+horizontal)    topControlList.push(control);
+                    if (control.options.position == 'bottom'+horizontal) bottomControlList.push(control);
+
+                    control.lbTop = 0;
+                    var elem = control._container;
+                    while (elem && (elem !== _this._container)){
+                        control.lbTop = control.lbTop + elem.offsetTop;
+                        elem = elem.offsetParent;
+                    }
+                    control.lbBottom = control.lbTop + $(control._container).outerHeight(false);// - parseInt($container.css('margin-bottom'));
+                });
+
+                //Find max bottom-position of no-relative-height controls at the top
+                //and max top-position of no-relative-height controls at the bottom
+                var maxBottom = 0,        //= max lbBottom of controls at top-position
+                    minTop    = height,  //= min lbTop of controls at bottom-position
+                    bottomHasRelativeControlList = [],  //=[] of Controls at the bottom with relative height
+                    topHasRelativeControlList    = [];  //=[] of Controls at the top with relative height
+
+                $.each(topControlList, function(index, control){
+                    if (control.hasRelativeHeight)
+                        topHasRelativeControlList.push(control);
+                    else
+                        if ((control.lbTop >= 0) && (control.lbBottom <= height))
+                            maxBottom = Math.max(maxBottom, control.lbBottom);
+                });
+                $.each(bottomControlList, function(index, control){
+                    if (control.hasRelativeHeight)
+                        bottomHasRelativeControlList.push(control);
+                    else
+                        if ((control.lbTop >= 0)/* && (control.lbBottom <= height)*/)
+                            minTop = Math.min(minTop, control.lbTop);
+                });
+
+
+                //Update all controls at top with new relative/max height
+                $.each(topHasRelativeControlList, function(index, control){
+                    control._setMaxHeight( minTop - control.lbTop, height );
+                });
+
+                //Update all controls at bottom with new relative/max height
+                $.each(bottomHasRelativeControlList, function(index, control){
+                    control._setMaxHeight( control.lbBottom - maxBottom, height );
+                });
+            });
+        }
+    };
 
 }(jQuery, L, this, document));
 ;
@@ -606,6 +755,9 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
         initialize: function(options){
             L.Control.BsButton.prototype.initialize.call(this, options);
+
+            if (this.options.extendedButton)
+                this.hasRelativeHeight = false;
 
             //Set default onToggle-function
             this.onToggle = $.proxy(this.toggle, this);
@@ -740,12 +892,20 @@ Create leaflet-control for jquery-bootstrap button-classes:
                                 isExtended      : false, //Not the same as this.options.isExtended
                                 isMinimized     : false,
                                 width           : this.options.width || 100,
+                                parentContainerHeight: $.proxy(this._getMapHeight, this),
                             },
+
+                            //Standard relative height if the class has it
+                            this.hasRelativeHeight ? {
+                                relativeHeight      : 1,
+                                relativeHeightOffset: 0
+                            } : {},
+
+
                             this.options.content,
+
                             //Forced options
-                            {
-                                show: false,
-                            }
+                            {show: false}
                         );
 
                         //Add close icon to header (if any)
@@ -759,6 +919,11 @@ Create leaflet-control for jquery-bootstrap button-classes:
                             modalOptions.onClick = this.onToggle;
                         $contentContainer._bsModalContent(modalOptions);
                     }
+
+
+                    //To avoid resizing relative to window height the class 'modal-flex-height' is removed
+                    $contentContainer.bsModal.$modalContent.removeClass('modal-flex-height');
+
                 }
             } //end of if (this.options.extendedButton).. else {...
 
@@ -835,6 +1000,14 @@ Create leaflet-control for jquery-bootstrap button-classes:
             };
         }(L.BsControl.prototype.setState),
 
+
+        _setMaxHeight: function(maxHeight/*, mapHeight*/){
+            maxHeight = Math.max(100, maxHeight-10); //TODO 100 and 10 as options
+            this.$contentContainer.bsModal.$modalContent.css({
+                'max-height': maxHeight+'px',
+                'height'    : maxHeight+'px'
+            });
+        }
     });
 
 
@@ -858,7 +1031,8 @@ Create leaflet-control for jquery-bootstrap modal-content:
         _bsModal = common constructor for bsModal and bsForm as BsControl
         ***************************************************/
         var _bsModal = L.BsControl.extend({
-//        var _bsModal = L.Control.extend({
+hasRelativeHeight: true,
+
             options: {
                 position: 'topcenter',
                 show    : false
@@ -886,6 +1060,12 @@ Create leaflet-control for jquery-bootstrap modal-content:
                         smallButtons: true,
                     }
                 );
+
+
+                //Set onChange to update height
+                this.options.onChange_user = this.options.onChange;
+                this.options.onChange = $.proxy(this._lbOnChange, this);
+
                 var show = this.options.show;
                 this.options.show = false;
 
@@ -904,14 +1084,6 @@ Create leaflet-control for jquery-bootstrap modal-content:
                             .append( this.$modalContent )
                             .appendTo( $result );
 
-
-                //Prevent different events from propagating to the map
-                $modalContainer.on('contextmenu mousewheel', function( event ) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    return false;
-                });
-
                 //Add copy of _attachCloseHandler from select2 to close dropdown on mousedown on control
                 $result.on('mousedown', function( event ) {
                     var $select = $(event.target).closest('.select2');
@@ -927,7 +1099,6 @@ Create leaflet-control for jquery-bootstrap modal-content:
                 this._createModal();
 
                 this.$modalContent = this.bsModal.bsModal.$modalContent;
-
                 $modalContainer.bsModal = this.bsModal.bsModal;
 
                 //'Move the container into the control
@@ -938,7 +1109,7 @@ Create leaflet-control for jquery-bootstrap modal-content:
                 this.bsModal.show   = $.proxy(this.show, this);
                 this.bsModal._close = $.proxy(this.hide, this);
 
-                //ASdjust width and height
+                //Adjust width and height
                 $modalContainer._bsModalSetHeightAndWidth();
 
                 var result = $result.get(0);
@@ -949,6 +1120,59 @@ Create leaflet-control for jquery-bootstrap modal-content:
                 this.options.show ? this.show() : this.hide();
                 return result;
             },
+
+            _lbOnChange: function(){
+                if (this.options.onChange_user)
+                    this.options.onChange_user.apply(this, arguments);
+
+                //To avoid resizing relative to window height the class 'modal-flex-height' is removed
+                if (this.$modalContent){
+                    this.$modalContent.removeClass('modal-flex-height');
+                    this._map_lbOnResize();
+                }
+            },
+
+
+            _setMaxHeight: function(maxHeight/*, mapHeight*/){
+                /*
+                Get the css for heights form the modal
+                The modal gets the following cssHeight:
+                    if (options.height)    return {height: options.height+'px'   maxHeight: null};
+                    if (options.maxHeight) return {height: 'auto'                maxHeight: options.maxHeight+'px', };
+                    else return null;
+                */
+                var cssHeight = this.bsModal.bsModal.cssHeight[ this.$modalContent._bsModalGetSize() ],
+                    modalHeight    = 'auto',
+                    modalMaxHeight = null,
+                    adjustMaxHeight = true;
+
+                if (!cssHeight)
+                    //Flex-height => adjust
+                    modalMaxHeight = maxHeight;
+                else
+                    if (cssHeight.maxHeight){
+                        //options.maxHeight given
+                        modalMaxHeight = parseInt(cssHeight.maxHeight);
+
+                    }
+                    else {
+                        //options.height given
+                        modalHeight = cssHeight.height;
+                        modalMaxHeight = parseInt(modalHeight);
+                        adjustMaxHeight = false;
+                    }
+
+                if (adjustMaxHeight){
+                    modalMaxHeight = Math.min(parseInt(modalMaxHeight), maxHeight);
+                    modalMaxHeight = Math.max(100, modalMaxHeight - 10); //TODO 100 and 10 as options
+                }
+
+                this.$modalContent.css({
+                    'height'    : modalHeight,
+                    'max-height': modalMaxHeight ? modalMaxHeight+'px' : null,
+                });
+            }
+
         });
 
         /***************************************************
@@ -3191,6 +3415,7 @@ leaflet-bootstrap-control-legend.js
     var legendCounter = 0;
 
     L.Control.BsLegend = L.Control.BsButtonBox.extend({
+        hasRelativeHeight: true,
         options: {
             position        : "topright",
             icon            : 'fa-list',
@@ -3236,7 +3461,7 @@ leaflet-bootstrap-control-legend.js
             this.options.content.maxHeight = this.options.maxHeight || this.options.content.maxHeight;
 
             var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map);
-            this.$modalBody       = this.$contentContainer.bsModal.$body;
+            this.$modalContent = this.$contentContainer.bsModal.$content;
 
             //Manually implement extend and diminish functionality
             var $header = this.$contentContainer.bsModal.$header;
@@ -3247,7 +3472,7 @@ leaflet-bootstrap-control-legend.js
             this.diminishIcon.on('click', $.proxy(this.diminishAll, this) );
 
             //Add the 'No layer' text
-            this.$noLayer = this.$modalBody.find('.no-layer')
+            this.$noLayer = this.$modalContent.find('.no-layer')
                     .i18n({da: 'Ingen ting...', en:'Nothing...'})
                     .addClass('text-center w-100 text-secondary');
 
@@ -3277,11 +3502,11 @@ leaflet-bootstrap-control-legend.js
 
             //Sort the list
             this.list.sort(function(item1,item2){ return item1.index - item2.index; });
-            var $body = this.$modalBody;
+            var $content = this.$modalContent;
             $.each(this.list, function(index, legend){
                 legend.indexInList = index;
                 legend.$container.detach();
-                $body.append( legend.$container );
+                $content.append( legend.$container );
             });
         },
 
@@ -3393,21 +3618,19 @@ leaflet-bootstrap-control-legend.js
             this.parent = parent;
             if (!this.$container){
                 //Create modal-content
-                var modalContentOptions = {
-
-                    //noVerticalPadding: true,
-                    //noHorizontalPadding: true,
-                    noShadow  : true,
-                    header: {
-                        icon: options.iconArray,
-                        text: options.text
-                    },
-                    onInfo     : options.onInfo,
-                    onWarning  : options.onWarning,
-                    icons      : {},
-                    content    : '',
-                    closeButton: false
-                };
+                    var modalContentOptions = {
+                        noShadow: true,
+                        scroll  : false,
+                        header: {
+                            icon: options.iconArray,
+                            text: options.text
+                        },
+                        onInfo     : options.onInfo,
+                        onWarning  : options.onWarning,
+                        icons      : {},
+                        content    : '',
+                        closeButton: false
+                    };
 
 
                 //The extended content can be 'normal' content and/or buttons/buttonList
@@ -3442,12 +3665,7 @@ leaflet-bootstrap-control-legend.js
                         content.push( this.$buttonContainer );
                     }
 
-                    modalContentOptions.extended = {
-                        //className           : 'text-right modal-footer',
-                        noVerticalPadding   : true,
-                        noHorizontalPadding : true,
-                        content             : content
-                    };
+                    modalContentOptions.extended = {content: content};
 
                     modalContentOptions.isExtended = true;
                     options.hasContent = true;
@@ -3484,7 +3702,7 @@ leaflet-bootstrap-control-legend.js
                 this.workingOff();
             }
 
-            this.$container.appendTo(this.parent.$modalBody);
+            this.$container.appendTo(this.parent.$modalContent);
 
         },
 

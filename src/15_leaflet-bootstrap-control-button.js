@@ -110,6 +110,9 @@ Create leaflet-control for jquery-bootstrap button-classes:
         initialize: function(options){
             L.Control.BsButton.prototype.initialize.call(this, options);
 
+            if (this.options.extendedButton)
+                this.hasRelativeHeight = false;
+
             //Set default onToggle-function
             this.onToggle = $.proxy(this.toggle, this);
             if (this.options.addOnClose){
@@ -243,12 +246,20 @@ Create leaflet-control for jquery-bootstrap button-classes:
                                 isExtended      : false, //Not the same as this.options.isExtended
                                 isMinimized     : false,
                                 width           : this.options.width || 100,
+                                parentContainerHeight: $.proxy(this._getMapHeight, this),
                             },
+
+                            //Standard relative height if the class has it
+                            this.hasRelativeHeight ? {
+                                relativeHeight      : 1,
+                                relativeHeightOffset: 0
+                            } : {},
+
+
                             this.options.content,
+
                             //Forced options
-                            {
-                                show: false,
-                            }
+                            {show: false}
                         );
 
                         //Add close icon to header (if any)
@@ -262,6 +273,11 @@ Create leaflet-control for jquery-bootstrap button-classes:
                             modalOptions.onClick = this.onToggle;
                         $contentContainer._bsModalContent(modalOptions);
                     }
+
+
+                    //To avoid resizing relative to window height the class 'modal-flex-height' is removed
+                    $contentContainer.bsModal.$modalContent.removeClass('modal-flex-height');
+
                 }
             } //end of if (this.options.extendedButton).. else {...
 
@@ -338,6 +354,14 @@ Create leaflet-control for jquery-bootstrap button-classes:
             };
         }(L.BsControl.prototype.setState),
 
+
+        _setMaxHeight: function(maxHeight/*, mapHeight*/){
+            maxHeight = Math.max(100, maxHeight-10); //TODO 100 and 10 as options
+            this.$contentContainer.bsModal.$modalContent.css({
+                'max-height': maxHeight+'px',
+                'height'    : maxHeight+'px'
+            });
+        }
     });
 
 

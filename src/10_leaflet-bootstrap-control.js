@@ -8,9 +8,11 @@ L.BsControl = extention of L.Control with
 (function ($, L, window, document, undefined) {
     "use strict";
 
-    var controlTooltipPane = 'controlTooltipPane';
+    var controlId = 0,
+        controlTooltipPane = 'controlTooltipPane';
 
     L.BsControl = L.Control.extend({
+        hasRelativeHeight: false,
         options: {
             show            : true,
 
@@ -35,6 +37,7 @@ L.BsControl = extention of L.Control with
 
         initialize: function ( options ) {
             options = $.extend(true, {}, this.options, options, this.forceOptions || {});
+            this.lbControlId = 'lbc_'+ controlId++;
             L.Util.setOptions(this, options);
         },
 
@@ -46,11 +49,32 @@ L.BsControl = extention of L.Control with
             return this._getTooltipElements(container) || $(container);
         },
 
+
+        _getMap: function(){
+            return this._map;
+        },
+
+        _map_lbOnResize: function(){
+            this._getMap()._lbOnResize(true);
+            return this;
+        },
+
+        _getMapHeight: function(){
+            return $(this._getMap()._container).innerHeight();
+        },
+
         addTo: function(map) {
             this._controlTooltipContent = [];
 
+            //Append the control to the maps list of controls
+            map.lbControls = map.lbControls || {};
+            map.lbControls[this.lbControlId] = this;
+
+
             var result = L.Control.prototype.addTo.apply(this, arguments);
+
             L.DomEvent.disableClickPropagation(this._container);
+
 
             //Create pane to contain tooltip for control inside the map's control-container
             if (!map.getPane(controlTooltipPane))
@@ -78,7 +102,7 @@ L.BsControl = extention of L.Control with
                 var controlContainer = map._controlContainer;
 
                 //Prevent event on control-container from map
-                L.DomEvent.on(controlContainer, 'contextmenu dblclick mousewheel', L.DomEvent.stop);
+                //L.DomEvent.on(controlContainer, 'contextmenu dblclick wheel mousewheel', L.DomEvent.stop);
 
                 //Close all popup on the map when contextmenu on any control
                 $(controlContainer).on('touchstart mousedown', $.proxy(map.closeAllPopup, map));
@@ -149,10 +173,28 @@ L.BsControl = extention of L.Control with
                 this._controlTooltipContent.push({icon: this.options.rightClickIcon, text: this.options.popupText});
             }
 
+
+            //Add common resize-event to the map to adjust any control that has size depending on the map size
+            if (this.hasRelativeHeight && !map.lbOnResizeAdded){
+                $(map.getContainer()).resize( $.proxy(map._lbOnResize, map) );
+                map.lbOnResizeAdded = true;
+                map._lbOnResize(true);
+            }
+
             this.options.show ? this.show() : this.hide();
             return result;
         },
 
+
+        remove: function() {
+            if (this._map){
+                //Remove the control from the maps list of controls
+                this._map.lbControls = this._map.lbControls || {};
+                delete this._map.lbControls[this.lbControlId];
+            }
+
+            return L.Control.prototype.remove.apply(this, arguments);
+        },
 
 
         show: function(){
@@ -172,6 +214,7 @@ L.BsControl = extention of L.Control with
 
             this.$container.css('visibility', this.options.show ? 'inherit' : 'hidden');
             this._onChange();
+
             return this;
         },
 
@@ -180,8 +223,11 @@ L.BsControl = extention of L.Control with
         },
 
         _onChange: function(){
+            this._map_lbOnResize();
+
             var state = this.getState();
             this.onChange(state);
+
             if (this.options.onChange)
                 this.options.onChange(state, this);
         },
@@ -309,6 +355,92 @@ L.BsControl = extention of L.Control with
                 this._controlTooltipVisible = false;
             }
         },
+
+
+
+        //_setMaxHeight(maxHeihgt, mapHeight) Adjust the height if the control har relative height
+        _setMaxHeight: function(/*maxHeight, mapHeight*/){
+            return this;
+        }
+
     });
+
+    /**********************************************************
+    Methods to handle size of controls when the map is resized
+
+    To avoid controls with relative-height to overlap other
+    controls the controls are divides into 3 sets of two groups of control-position:
+    topleft   + bottomleft
+    topcenter + bottomcenter
+    topright  + bottomright
+
+    In each set the controls with relative-height in each group is checked
+    against all other controls in the other group to ensure that the control
+    is not overlapping any other control.
+
+
+    **********************************************************/
+    L.Map.prototype._lbOnResize = function(force){
+        var _this = this,
+            height = $(this._container).innerHeight();
+
+        if (force || (height != this.lbHeight)){
+            this.lbHeight = height;
+
+            $.each(['left', 'center', 'right'], function(index, horizontal){
+
+                var topControlList = [],
+                    bottomControlList = [];
+                $.each(_this.lbControls, function(id, control){
+                    if ( !(control.options.show && $(control._container).is(':visible')) )
+                        return;
+
+                    if (control.options.position == 'top'+horizontal)    topControlList.push(control);
+                    if (control.options.position == 'bottom'+horizontal) bottomControlList.push(control);
+
+                    control.lbTop = 0;
+                    var elem = control._container;
+                    while (elem && (elem !== _this._container)){
+                        control.lbTop = control.lbTop + elem.offsetTop;
+                        elem = elem.offsetParent;
+                    }
+                    control.lbBottom = control.lbTop + $(control._container).outerHeight(false);// - parseInt($container.css('margin-bottom'));
+                });
+
+                //Find max bottom-position of no-relative-height controls at the top
+                //and max top-position of no-relative-height controls at the bottom
+                var maxBottom = 0,        //= max lbBottom of controls at top-position
+                    minTop    = height,  //= min lbTop of controls at bottom-position
+                    bottomHasRelativeControlList = [],  //=[] of Controls at the bottom with relative height
+                    topHasRelativeControlList    = [];  //=[] of Controls at the top with relative height
+
+                $.each(topControlList, function(index, control){
+                    if (control.hasRelativeHeight)
+                        topHasRelativeControlList.push(control);
+                    else
+                        if ((control.lbTop >= 0) && (control.lbBottom <= height))
+                            maxBottom = Math.max(maxBottom, control.lbBottom);
+                });
+                $.each(bottomControlList, function(index, control){
+                    if (control.hasRelativeHeight)
+                        bottomHasRelativeControlList.push(control);
+                    else
+                        if ((control.lbTop >= 0)/* && (control.lbBottom <= height)*/)
+                            minTop = Math.min(minTop, control.lbTop);
+                });
+
+
+                //Update all controls at top with new relative/max height
+                $.each(topHasRelativeControlList, function(index, control){
+                    control._setMaxHeight( minTop - control.lbTop, height );
+                });
+
+                //Update all controls at bottom with new relative/max height
+                $.each(bottomHasRelativeControlList, function(index, control){
+                    control._setMaxHeight( control.lbBottom - maxBottom, height );
+                });
+            });
+        }
+    };
 
 }(jQuery, L, this, document));

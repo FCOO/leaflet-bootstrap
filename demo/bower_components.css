@@ -1251,123 +1251,7 @@ STYLE FOR SPECIFIC TYPE
   margin-left: 0.75rem;
   margin-right: 0.75rem; }
 
-/*
- * Container style
- */
-.ps {
-  overflow: hidden !important;
-  overflow-anchor: none;
-  -ms-overflow-style: none;
-  touch-action: auto;
-  -ms-touch-action: auto;
-}
-
-/*
- * Scrollbar rail styles
- */
-.ps__rail-x {
-  display: none;
-  opacity: 0;
-  transition: background-color .2s linear, opacity .2s linear;
-  -webkit-transition: background-color .2s linear, opacity .2s linear;
-  height: 15px;
-  /* there must be 'bottom' or 'top' for ps__rail-x */
-  bottom: 0px;
-  /* please don't change 'position' */
-  position: absolute;
-}
-
-.ps__rail-y {
-  display: none;
-  opacity: 0;
-  transition: background-color .2s linear, opacity .2s linear;
-  -webkit-transition: background-color .2s linear, opacity .2s linear;
-  width: 15px;
-  /* there must be 'right' or 'left' for ps__rail-y */
-  right: 0;
-  /* please don't change 'position' */
-  position: absolute;
-}
-
-.ps--active-x > .ps__rail-x,
-.ps--active-y > .ps__rail-y {
-  display: block;
-  background-color: transparent;
-}
-
-.ps:hover > .ps__rail-x,
-.ps:hover > .ps__rail-y,
-.ps--focus > .ps__rail-x,
-.ps--focus > .ps__rail-y,
-.ps--scrolling-x > .ps__rail-x,
-.ps--scrolling-y > .ps__rail-y {
-  opacity: 0.6;
-}
-
-.ps .ps__rail-x:hover,
-.ps .ps__rail-y:hover,
-.ps .ps__rail-x:focus,
-.ps .ps__rail-y:focus,
-.ps .ps__rail-x.ps--clicking,
-.ps .ps__rail-y.ps--clicking {
-  background-color: #eee;
-  opacity: 0.9;
-}
-
-/*
- * Scrollbar thumb styles
- */
-.ps__thumb-x {
-  background-color: #aaa;
-  border-radius: 6px;
-  transition: background-color .2s linear, height .2s ease-in-out;
-  -webkit-transition: background-color .2s linear, height .2s ease-in-out;
-  height: 6px;
-  /* there must be 'bottom' for ps__thumb-x */
-  bottom: 2px;
-  /* please don't change 'position' */
-  position: absolute;
-}
-
-.ps__thumb-y {
-  background-color: #aaa;
-  border-radius: 6px;
-  transition: background-color .2s linear, width .2s ease-in-out;
-  -webkit-transition: background-color .2s linear, width .2s ease-in-out;
-  width: 6px;
-  /* there must be 'right' for ps__thumb-y */
-  right: 2px;
-  /* please don't change 'position' */
-  position: absolute;
-}
-
-.ps__rail-x:hover > .ps__thumb-x,
-.ps__rail-x:focus > .ps__thumb-x,
-.ps__rail-x.ps--clicking .ps__thumb-x {
-  background-color: #999;
-  height: 11px;
-}
-
-.ps__rail-y:hover > .ps__thumb-y,
-.ps__rail-y:focus > .ps__thumb-y,
-.ps__rail-y.ps--clicking .ps__thumb-y {
-  background-color: #999;
-  width: 11px;
-}
-
-/* MS supports */
-@supports (-ms-overflow-style: none) {
-  .ps {
-    overflow: auto !important;
-  }
-}
-
-@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-  .ps {
-    overflow: auto !important;
-  }
-}
-
+@charset "UTF-8";
 /***********************************************
     jquery-scroll-container.scss,
 
@@ -1376,126 +1260,73 @@ STYLE FOR SPECIFIC TYPE
     https://github.com/FCOO/jquery-scroll-container
     https://github.com/FCOO
 
-    USING MODIFIED VERSIONS OF THE STYLE FROM PERFECT-SCROLLBAR
-    https://github.com/mdbootstrap/perfect-scrollbar
-
 ************************************************/
 /***********************************************
-    _jquery-scroll-container-variables.scss,
+
+jquery-scroll-container-variables.scss
+
 ************************************************/
 /****************************************************
-Add adjustmnts to original PerfectScroll style
-
-
-.ps[.ps--focus][.ps--active-y][.ps--active-x][.ps--scrolling-y][.ps--scrolling-x]
-    .ps__rail-y[.ps--clicking].ps__rail
-        .ps__thumb-y
-    .ps__rail-x[.ps--clicking].ps__rail
-        .ps__thumb-x
-
-Class ps__rail added by jquery-scroll-container
+Style for default scrollbar
+Not part of standard, but supported på Chrome and Safari
+See https://developer.mozilla.org/en-US/docs/Web/CSS/::-webkit-scrollbar
+and https://css-tricks.com/custom-scrollbars-in-webkit/
+and https://www.w3schools.com/howto/howto_css_hide_scrollbars.asp
 ****************************************************/
-.ps .ps__rail-x {
-  height: 0.625rem !important; }
-
-.ps .ps__rail-y {
-  width: 0.625rem !important;
-  left: auto !important; }
-
-.ps .ps__rail {
-  opacity: 1 !important;
-  z-index: 100;
-  transition: background-color 0.2s linear !important;
-  -webkit-transition: background-color 0.2s linear !important; }
-
-.ps.no-touch.ps--focus > .ps__rail,
-.ps.no-touch > .ps__rail:hover,
-.ps.no-touch > .ps__rail:focus,
-.ps.no-touch.ps--scrolling-x > .ps__rail-x,
-.ps.no-touch.ps--scrolling-y > .ps__rail-y {
-  z-index: 102;
-  background-color: #f0f0f0 !important; }
-
-.ps .ps__thumb {
-  background-color: #cdcdcd;
-  border-radius: 0.1875rem;
-  transition: background-color 0.2s linear, margin 0.2s ease-in-out !important;
-  -webkit-transition: background-color 0.2s linear, margin 0.2s ease-in-out !important; }
-
-.ps.touch .ps__thumb {
-  background-color: #cdcdcd !important; }
-
-.ps .ps__thumb-x {
-  height: auto !important;
-  top: 0;
-  bottom: 0 !important;
-  margin-top: 0.125rem;
-  margin-bottom: 0.125rem; }
-
-.ps .ps__thumb-y {
-  width: auto !important;
-  left: 0;
-  right: 0 !important;
-  margin-left: 0.125rem;
-  margin-right: 0.125rem; }
-
-.ps.no-touch .ps__rail-x:hover > .ps__thumb-x,
-.ps.no-touch .ps__rail-x:focus > .ps__thumb-x,
-.ps.no-touch .ps__rail-x.ps--clicking .ps__thumb-x {
-  background-color: #a6a6a6;
-  margin-top: 0.0625rem;
-  margin-bottom: 0.0625rem; }
-
-.ps.no-touch .ps__rail-x.ps--clicking .ps__thumb-x {
-  background-color: #606060; }
-
-.ps.no-touch .ps__rail-y:hover > .ps__thumb-y,
-.ps.no-touch .ps__rail-y:focus > .ps__thumb-y,
-.ps.no-touch .ps__rail-y.ps--clicking .ps__thumb-y {
-  background-color: #a6a6a6;
-  margin-left: 0.0625rem;
-  margin-right: 0.0625rem; }
-
-.ps.no-touch .ps__rail-y.ps--clicking .ps__thumb-y {
-  background-color: #606060; }
-
-.ps.jq-scroll-container-horizontal {
-  padding-bottom: 0.625rem; }
-
-.ps.jq-scroll-container-vertical {
-  padding-right: 0.625rem; }
-  .ps.jq-scroll-container-vertical.jq-scroll-adjust-padding-left {
-    padding-left: 0.625rem; }
-
-.ps .jq-scroll-content {
-  position: relative;
-  z-index: 99;
-  background-color: transparent;
-  padding: 0;
-  margin: 0; }
+html.jq-scroll-default-css {
+  /* Size and color for Firefox */
+  /* Size and color for Chrome, Edge etc. */
+  /* Track */
+  /* Handle */
+  /* 'Hide scrollbar by setting all color and shadows */ }
+  html.jq-scroll-default-css * {
+    scrollbar-width: thin;
+    scrollbar-color: #cdcdcd white; }
+  html.jq-scroll-default-css ::-webkit-scrollbar {
+    width: 8px; }
+  html.jq-scroll-default-css ::-webkit-scrollbar:horizontal {
+    height: 8px; }
+  html.jq-scroll-default-css ::-webkit-scrollbar-track {
+    background-color: white;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    border-radius: 6px; }
+  html.jq-scroll-default-css ::-webkit-scrollbar-thumb {
+    background-color: #cdcdcd;
+    border-radius: 6px;
+    border: 1px solid white;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5); }
+    html.jq-scroll-default-css ::-webkit-scrollbar-thumb:hover {
+      background-color: #a6a6a6; }
+    html.jq-scroll-default-css ::-webkit-scrollbar-thumb:active {
+      background-color: #606060; }
+  html.jq-scroll-default-css .jq-scroll-none::-webkit-scrollbar-track {
+    background-color: white;
+    box-shadow: none !important; }
+  html.jq-scroll-default-css .jq-scroll-none::-webkit-scrollbar-thumb {
+    background-color: white;
+    box-shadow: none !important; }
 
 .jq-scroll-default.jq-scroll-container-horizontal {
-  overflow-x: auto;
+  overflow-x: scroll;
   overflow-y: hidden; }
-  .jq-scroll-default.jq-scroll-container-horizontal.jq-scroll-adjust-padding.no-scroll-at-start, .jq-scroll-default.jq-scroll-container-horizontal.jq-scroll-adjust-padding.no-scroll-at-end {
-    padding-bottom: 0 !important; }
 
 .jq-scroll-default.jq-scroll-container-vertical {
-  overflow-y: auto;
+  overflow-y: scroll;
   overflow-x: hidden; }
-  .jq-scroll-default.jq-scroll-container-vertical.jq-scroll-adjust-padding.no-scroll-at-start, .jq-scroll-default.jq-scroll-container-vertical.jq-scroll-adjust-padding.no-scroll-at-end {
-    padding-right: 0 !important; }
 
 .jq-scroll-default.jq-scroll-container-both {
   overflow-y: scroll;
   overflow-x: scroll; }
 
+/****************************************************************
+Add scroll-shadow - Not using mixin scroll-shadow-horizontal();
+*****************************************************************/
 .jq-scroll-shadow {
   position: sticky;
   position: -webkit-sticky;
   top: 0;
   left: 0;
-  z-index: 104;
+  z-index: 100;
   -webkit-backface-visibility: hidden; }
   .jq-scroll-shadow:before {
     content: '';
@@ -1524,19 +1355,25 @@ Class ps__rail added by jquery-scroll-container
       background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.4)) 0 100%;
       box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.4); }
 
+/* //Horizontal scroll - NOT WORKING
 .jq-scroll-container-horizontal .jq-scroll-shadow {
-  height: 100%;
-  width: 0; }
-  .jq-scroll-container-horizontal .jq-scroll-shadow:before {
-    width: 6px; }
-  .jq-scroll-container-horizontal .jq-scroll-shadow.top-left:before {
-    background: linear-gradient(to right, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)); }
-  .jq-scroll-container-horizontal .jq-scroll-shadow.bottom-right {
-    left: calc( 100% - 7px); }
-    .jq-scroll-container-horizontal .jq-scroll-shadow.bottom-right:before {
-      background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.4)) 100% 0;
-      box-shadow: 1px 0px 0px 0px rgba(0, 0, 0, 0.4); }
-
+    height: 100%;
+    width : 0;
+    &:before {
+        width: $scroll-shadow-size-px;
+    }
+    &.top-left {
+        &:before { background: $left-shadow ; }
+    }
+    &.bottom-right {
+        left: $offset;
+        &:before {
+            background: $right-shadow;
+            box-shadow: 1px 0px 0px 0px $shadow-color; //Bug fix for Edge
+        }
+    }
+}
+*/
 .scroll-at-start .jq-scroll-shadow.top-left,
 .scroll-at-end .jq-scroll-shadow.bottom-right {
   display: none; }
@@ -9286,7 +9123,9 @@ headers modal, popover, tables, buttons, list-items etc.
 VARIABLES
 ************************************************/
 /***********************************************
-    _jquery-scroll-container-variables.scss,
+
+jquery-scroll-container-variables.scss
+
 ************************************************/
 /************************************************************
 VARIABLES
@@ -10325,6 +10164,18 @@ BUTTON-GROUP
   padding-top: 3px; }
 
 .btn-group-vertical .btn-group-header {
+  /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
   display: flex;
   align-items: center;
   cursor: default;
@@ -10348,6 +10199,18 @@ BUTTON-GROUP
     padding-left: 0.625rem; }
 
 .btn-group-vertical.btn-group-sm .btn-group-header {
+  /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
   display: flex;
   align-items: center;
   cursor: default;
@@ -10368,6 +10231,18 @@ BUTTON-GROUP
     padding-left: 0.5rem; }
 
 .btn-group-vertical.btn-group-xs .btn-group-header {
+  /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
   display: flex;
   align-items: center;
   cursor: default;
@@ -10440,6 +10315,18 @@ POPOVER
   border-bottom: none; }
 
 .popover .popover-header-content {
+  /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
   display: flex;
   align-items: center;
   cursor: default;
@@ -10469,6 +10356,18 @@ POPOVER
   padding: 1px !important; }
 
 .popover .popover-footer {
+  /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
   display: flex;
   align-items: center;
   cursor: default;
@@ -10494,6 +10393,18 @@ POPOVER
     display: none !important; }
 
 .popover.popover-sm .popover-header-content {
+  /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
   display: flex;
   align-items: center;
   cursor: default;
@@ -10514,6 +10425,18 @@ POPOVER
     word-break: keep-all; }
 
 .popover.popover-sm .popover-footer {
+  /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
   display: flex;
   align-items: center;
   cursor: default;
@@ -10820,6 +10743,18 @@ bsSelectList
       color: rgba(81, 89, 97, 0.65);
       background: #f8f9fa linear-gradient(180deg, #f9fafb, #f8f9fa) repeat-x; }
   .dropdown-menu .dropdown-header, .selectList .dropdown-header {
+    /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
     display: flex;
     align-items: center;
     cursor: default;
@@ -10846,6 +10781,18 @@ bsSelectList
   border-radius: 0.1875rem; }
 
 .selectList.selectList-sm .dropdown-header, .dropdown-menu.dropdown-menu-sm .dropdown-header {
+  /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
   display: flex;
   align-items: center;
   cursor: default;
@@ -10870,6 +10817,18 @@ bsSelectList
   border-radius: 0.125rem; }
 
 .selectList.selectList-xs .dropdown-header, .dropdown-menu.dropdown-menu-xs .dropdown-header {
+  /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
   display: flex;
   align-items: center;
   cursor: default;
@@ -10940,7 +10899,7 @@ body.modal-open .modal {
     word-break: break-word;
     word-wrap: break-word; }
   .modal-dialog:not(.modal-flex-width) .modal-content .modal-body > .jquery-scroll-container {
-    width: calc( 100% - 2*1px - 2*0.625rem);
+    width: calc( 100% - 2*1px - 2*8px);
     margin-left: auto;
     margin-right: auto; }
   .modal-dialog.modal-flex-width .modal-content .modal-body > .jquery-scroll-container {
@@ -11066,6 +11025,18 @@ body.modal-open .modal {
   .modal-dialog .modal-content .modal-header {
     flex-shrink: 0;
     flex-grow: 0;
+    /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
     display: flex;
     align-items: center;
     cursor: default;
@@ -11137,6 +11108,18 @@ body.modal-open .modal {
   .modal-dialog .modal-content .modal-footer-header {
     flex-shrink: 0;
     flex-grow: 0;
+    /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
     display: flex;
     align-items: center;
     cursor: default;
@@ -11165,7 +11148,7 @@ body.modal-open .modal {
   .modal-dialog .modal-content .modal-footer {
     flex-shrink: 0;
     flex-grow: 0;
-    padding: 0.3125rem; }
+    padding: 0.25rem 0.3125rem; }
     .modal-dialog .modal-content .modal-footer:empty, .modal-dialog .modal-content .modal-footer.modal-footer-vertical:empty {
       display: none !important; }
   .modal-dialog .modal-content .modal-footer.vertical-buttons,
@@ -11189,6 +11172,18 @@ body.modal-open .modal {
     .mouse-hover .modal-dialog .modal-content:hover.modal-minimized.modal-minimized-clickable .modal-body.modal-body-semi-transparent, .mouse-hover .modal-dialog .modal-content:hover.modal-minimized.modal-minimized-clickable .modal-body-fixed.modal-body-semi-transparent, .mouse-hover .modal-dialog .modal-content:hover.modal-normal.modal-normal-clickable .modal-body.modal-body-semi-transparent, .mouse-hover .modal-dialog .modal-content:hover.modal-normal.modal-normal-clickable .modal-body-fixed.modal-body-semi-transparent, .mouse-hover .modal-dialog .modal-content:hover.modal-extended.modal-extended-clickable .modal-body.modal-body-semi-transparent, .mouse-hover .modal-dialog .modal-content:hover.modal-extended.modal-extended-clickable .modal-body-fixed.modal-body-semi-transparent {
       background: rgba(255, 255, 255, 0.75); }
   .modal-dialog.modal-dialog-sm .modal-content .modal-header {
+    /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
     display: flex;
     align-items: center;
     cursor: default;
@@ -11212,6 +11207,18 @@ body.modal-open .modal {
     padding: 0.1875rem 0.25rem;
     font-size: 0.875rem; }
   .modal-dialog.modal-dialog-sm .modal-content .modal-footer-header {
+    /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
     display: flex;
     align-items: center;
     cursor: default;
@@ -11235,7 +11242,21 @@ body.modal-open .modal {
       word-break: keep-all; }
     .modal-dialog.modal-dialog-sm .modal-content .modal-footer-header:empty {
       display: none !important; }
+  .modal-dialog.modal-dialog-sm .modal-content .modal-footer {
+    padding: 0.1875rem 0.25rem; }
   .modal-dialog.modal-dialog-xs .modal-content .modal-header {
+    /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
     display: flex;
     align-items: center;
     cursor: default;
@@ -11259,6 +11280,18 @@ body.modal-open .modal {
     padding: 0.125rem 0.1875rem;
     font-size: 0.75rem; }
   .modal-dialog.modal-dialog-xs .modal-content .modal-footer-header {
+    /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
     display: flex;
     align-items: center;
     cursor: default;
@@ -11283,18 +11316,18 @@ body.modal-open .modal {
     .modal-dialog.modal-dialog-xs .modal-content .modal-footer-header:empty {
       display: none !important; }
   .modal-dialog.modal-dialog-xs .modal-content .modal-footer {
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem; }
+    padding: 0.125rem 0.1875rem; }
 
 .modal-dialog .modal-body-fixed.scrollbar-vertical,
 .modal-dialog .modal-body.scrollbar-vertical, .modal-dialog.modal-dialog-sm .modal-body-fixed.scrollbar-vertical,
 .modal-dialog.modal-dialog-sm .modal-body.scrollbar-vertical, .modal-dialog.modal-dialog-xs .modal-body-fixed.scrollbar-vertical,
 .modal-dialog.modal-dialog-xs .modal-body.scrollbar-vertical {
-  padding-left: 0.625rem;
-  padding-right: 0.625rem; }
+  padding-left: 8px;
+  padding-right: 0; }
 
 .modal-dialog .modal-body.scrollbar-horizontal, .modal-dialog.modal-dialog-sm .modal-body.scrollbar-horizontal, .modal-dialog.modal-dialog-xs .modal-body.scrollbar-horizontal {
-  padding-bottom: 0.625rem; }
+  padding-top: 0;
+  padding-bottom: 0; }
 
 .modal-body-with-vertical-padding {
   /*
@@ -11330,6 +11363,18 @@ Style for elements used to display any file in a modal-window
   border: 0; }
 
 .file-view-header {
+  /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
   display: flex;
   align-items: center;
   cursor: default;
@@ -11814,6 +11859,18 @@ Adjustmernt to Bootstrap table
     width: inherit !important; }
   .table thead tr th {
     display: table-cell !important;
+    /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
     display: flex;
     align-items: center;
     cursor: default;
@@ -11919,6 +11976,18 @@ Adjust header and cell size when table is sm/xs or inside a sm/xs modal
 **************************************/
 .table.table-sm thead tr th,
 .modal-dialog-sm .table thead tr th {
+  /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
   display: flex;
   align-items: center;
   cursor: default;
@@ -11944,6 +12013,18 @@ Adjust header and cell size when table is sm/xs or inside a sm/xs modal
 
 .table.table-xs thead tr th,
 .modal-dialog-xs .table thead tr th {
+  /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
   display: flex;
   align-items: center;
   cursor: default;
@@ -11993,6 +12074,18 @@ Using Bootstrap Collapse to create accordion
   .accordion .card.show {
     border-color: #6c757d !important; }
   .accordion .card-header {
+    /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
     display: flex;
     align-items: center;
     cursor: default;
@@ -12045,6 +12138,18 @@ Using Bootstrap Collapse to create accordion
     font-size: 0.875rem;
     border-radius: 0.25rem; }
   .accordion .card-footer {
+    /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
     display: flex;
     align-items: center;
     cursor: default;
@@ -12088,6 +12193,18 @@ Using Bootstrap Collapse to create accordion
       border-top-right-radius: 0; }
 
 .modal-dialog-sm .accordion .card-header, .accordion-sm .card-header {
+  /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
   display: flex;
   align-items: center;
   cursor: default;
@@ -12109,6 +12226,18 @@ Using Bootstrap Collapse to create accordion
   font-size: 0.875rem; }
 
 .modal-dialog-sm .accordion .card-footer, .accordion-sm .card-footer {
+  /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
   display: flex;
   align-items: center;
   cursor: default;
@@ -12134,6 +12263,18 @@ Using Bootstrap Collapse to create accordion
     display: none !important; }
 
 .modal-dialog-xs .accordion .card-header, .accordion-xs .card-header {
+  /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
   display: flex;
   align-items: center;
   cursor: default;
@@ -12155,6 +12296,18 @@ Using Bootstrap Collapse to create accordion
   font-size: 0.75rem; }
 
 .modal-dialog-xs .accordion .card-footer, .accordion-xs .card-footer {
+  /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
   display: flex;
   align-items: center;
   cursor: default;
@@ -12298,6 +12451,18 @@ for noty is copyed and modified
   .noty_bar .noty-header {
     color: #495057;
     background-color: #f2f2f2;
+    /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
     display: flex;
     align-items: center;
     cursor: default;
@@ -12317,6 +12482,18 @@ for noty is copyed and modified
       overflow: visible;
       word-break: keep-all; }
     .noty_bar .noty-header.noty-header-sm {
+      /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
       display: flex;
       align-items: center;
       cursor: default;
@@ -12341,6 +12518,18 @@ for noty is copyed and modified
     padding: 0;
     margin: 0.25rem 0; }
   .noty_bar .noty-footer {
+    /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
     display: flex;
     align-items: center;
     cursor: default;
@@ -12494,10 +12683,10 @@ Adjustment to Bootstrap tabs
 ************************************************************/
 .nav-tabs {
   margin-top: 0.1875rem;
-  padding-left: 0.625rem;
+  padding-left: 8px;
   border-bottom-color: #6c757d; }
   .tab-inner-content .nav-tabs {
-    margin: 0 -0.625rem; }
+    margin: 0 -8px; }
   .nav-tabs a.nav-item.nav-link {
     position: relative;
     cursor: default;
@@ -12632,13 +12821,25 @@ Adjustment to Bootstrap tabs
     padding: 0.25rem 0.3125rem;
     font-size: 1rem;
     font-size: 0.875rem;
-    padding-left: 0.625rem;
-    padding-right: 0.625rem; }
+    padding-left: 8px;
+    padding-right: 8px; }
     .tab-content .tab-pane.active .tab-inner-content.scrollbar-vertical, .tab-content .tab-content .tab-pane.active .tab-inner-content {
       padding: 0; }
   .tab-content .tab-pane.active .tab-footer {
     flex-shrink: 0;
     flex-grow: 0;
+    /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
     display: flex;
     align-items: center;
     cursor: default;
@@ -12666,6 +12867,18 @@ Adjustment to Bootstrap tabs
       display: none; }
 
 .tab-content.tab-content-sm .tab-pane .tab-footer {
+  /*
+    $padding-x: $input-btn-padding-x;
+    $padding-y: $input-btn-padding-y;
+    @if $size == "sm" {
+        $padding-x: $input-btn-padding-x-sm;
+        $padding-y: $input-btn-padding-y-sm;
+    }
+    @if $size == "xs" {
+        $padding-x: $input-btn-padding-x-xs;
+        $padding-y: $input-btn-padding-y-xs;
+    }
+*/
   display: flex;
   align-items: center;
   cursor: default;

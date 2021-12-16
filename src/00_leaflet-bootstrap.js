@@ -133,11 +133,28 @@
     };
 
 
+    /**********************************************************
+    Overwrite ScrollWheelZoom.prototype._onWheelScroll to
+    prevent map zooming when mouse wheel on elements with scroll
+    **********************************************************/
+    L.Map.ScrollWheelZoom.prototype._onWheelScroll = function(_onWheelScroll){
+        return function(event){
+            var elem = event ? event.srcElement : null,
+                zoomMap = true,
+                className;
 
-
+            while (elem && zoomMap){
+                className = elem.className;
+                if ( (typeof className == 'string') && className.split(' ').includes('leaflet-control') )
+                    zoomMap = false;
+                else
+                    elem = elem.offsetParent;
+            }
+            return zoomMap ? _onWheelScroll.apply(this, arguments) : false;
+        };
+    }(L.Map.ScrollWheelZoom.prototype._onWheelScroll);
 
 
 }(jQuery, L, this, document));
-
 
 

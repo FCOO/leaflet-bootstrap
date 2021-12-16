@@ -8,6 +8,7 @@ leaflet-bootstrap-control-legend.js
     var legendCounter = 0;
 
     L.Control.BsLegend = L.Control.BsButtonBox.extend({
+        hasRelativeHeight: true,
         options: {
             position        : "topright",
             icon            : 'fa-list',
@@ -53,7 +54,7 @@ leaflet-bootstrap-control-legend.js
             this.options.content.maxHeight = this.options.maxHeight || this.options.content.maxHeight;
 
             var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map);
-            this.$modalBody       = this.$contentContainer.bsModal.$body;
+            this.$modalContent = this.$contentContainer.bsModal.$content;
 
             //Manually implement extend and diminish functionality
             var $header = this.$contentContainer.bsModal.$header;
@@ -64,7 +65,7 @@ leaflet-bootstrap-control-legend.js
             this.diminishIcon.on('click', $.proxy(this.diminishAll, this) );
 
             //Add the 'No layer' text
-            this.$noLayer = this.$modalBody.find('.no-layer')
+            this.$noLayer = this.$modalContent.find('.no-layer')
                     .i18n({da: 'Ingen ting...', en:'Nothing...'})
                     .addClass('text-center w-100 text-secondary');
 
@@ -94,11 +95,11 @@ leaflet-bootstrap-control-legend.js
 
             //Sort the list
             this.list.sort(function(item1,item2){ return item1.index - item2.index; });
-            var $body = this.$modalBody;
+            var $content = this.$modalContent;
             $.each(this.list, function(index, legend){
                 legend.indexInList = index;
                 legend.$container.detach();
-                $body.append( legend.$container );
+                $content.append( legend.$container );
             });
         },
 
@@ -211,8 +212,8 @@ leaflet-bootstrap-control-legend.js
             if (!this.$container){
                 //Create modal-content
                     var modalContentOptions = {
-                        noShadow  : true,
-scroll: false,
+                        noShadow: true,
+                        scroll  : false,
                         header: {
                             icon: options.iconArray,
                             text: options.text
@@ -294,7 +295,7 @@ scroll: false,
                 this.workingOff();
             }
 
-            this.$container.appendTo(this.parent.$modalBody);
+            this.$container.appendTo(this.parent.$modalContent);
 
         },
 

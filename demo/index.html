@@ -15,11 +15,11 @@
     <link  href="css/all.css" rel="stylesheet">
     <style>
         html, body {
-            padding: 0; margin: 0; width:100%; height:100%;
+            padding: 0; margin: 0; width:100%; height:100%; overflow: hidden;
         }
         #map1 {
-        margin: 2px !important;
-            padding: 0; margin: 0; _width:50%; width:100%; height:99%;
+        margin: 50px !important;
+            padding: 0; margin: 0; _width:50%; width:100%; height:80%;
         }
         #map2, #map3 {
         margin: 2px !important;
@@ -83,6 +83,7 @@
     var map1, map2, map3, first = true;
     $.each(['map1'/*, 'map2', 'map3'*/], function(index, id){
         var nextMap = L.map(id, {
+
             zoomControl: first,
             bsZoomControl: true, //first,
             bsZoomOptions: {
@@ -111,7 +112,8 @@
             },
             bsScaleControl: true,
             bsScaleOptions: {
-                position          : 'bottomleft',
+                //position          : 'bottomleft', 
+                position          : 'bottomright',  //1
                 isExtended: true,
                 tooltipOnButton: false,//!index,
                 selectFormat: first ? function(){ console.log(this); this.setMode(confirm('Use nautical?') ? 'NAUTICAL' : 'METRIC'); } : null,
@@ -121,11 +123,13 @@
             },
             bsLegendControl: true,
 			bsLegendOptions: {
+//position: 'bottomleft', //1
 				buttons: {icon:'fa-home', text:'Hej'},
-                height: 200,
+//maxHeight: 345,
                 semiTransparent   : true,
                 content: {
-                    semiTransparent: false
+                    semiTransparent: false,
+                    //maxHeight: 500,
                 },
 
 			},
@@ -146,6 +150,12 @@
             });
         });
 */
+
+nextMap.on('click', function(){
+    var $c = $( nextMap.getContainer() );
+    $c.height( $c.height() - 40);
+});
+
 
 nextMap.removeControl( nextMap.bsScaleControl );
 nextMap.addControl( nextMap.bsScaleControl );
@@ -427,7 +437,7 @@ content = {
                     {text:'klik2', onClick: function(){ console.log('klik2', arguments); }},
                     $.bsButton({icon:'fa-map', text: 'Kort', onClick: function(){ console.log('Kort', arguments); }}),
                     $.bsStandardCheckboxButton({
-                        id:'popup_radion_button', type:'radio', text: {da:'Vælg', en:'Select'}, selected: true,
+                        id:'popup_radion_button', type:'radio', text: {da:'Vælg', en:'Select'}, selected: true, small: true,
                         onChange: function(id, selected, _this, map, owner){ 
                             console.log('bsStandardCheckboxButton', id,selected, owner, map); 
                             console.log('theMap',owner.data('theMap') ); 
@@ -505,7 +515,7 @@ content = {
     //************************
     var buttonBox = L.control.bsButtonBox({
         position: 'bottomright',
-        icon: 'icon-leaflet-position-marker',
+        icon: 'fa-map', //'icon-leaflet-position-marker',
         square: true,
 
         content: {
@@ -545,17 +555,20 @@ content = {
     //************************
     var modalControl = L.control.bsModal({
             flex: true,
-            header: 'Header max h = 111/222',
+            header: 'height=111 / maxHeight=222',
 
             width: 222,
-            maxHeight: 111,
+            height: 111,
             content: 'w=222, dette er en test<br>Linie2<br>Linie3<br>Linie4<br>Linie5',
 
             isExtended: false,
             extended: {
                 width: 555,
                 maxHeight: 222,
+                _height: 222,
+                
                 scroll: true,
+                _content: 'Hej',
                 content: {
                     type: 'tabs',
                     hideNotSelectedText: true,
@@ -724,6 +737,7 @@ content = {
     map1.addControl( L.control.bsButton({
         icon:'fa-save',
         onClick: function(){
+            return;
 //            map1.bsPositionControl.toggleShowHide();
             state = map1.bsScaleControl.getState();
             state2 = map2.bsScaleControl.getState();
@@ -734,12 +748,21 @@ content = {
     map1.addControl( L.control.bsButton({
         icon:'fa-folder-open',
         onClick: function(){
+            return;
             console.log('load 1',state);
             console.log('load 2',state2);
             map1.bsScaleControl.setState(state);
             map2.bsScaleControl.setState(state2);
         }
     }) );
+
+    map1.addControl( L.control.bsButton({
+        icon:'fa-ruler-horizontal',
+        onClick: function(){
+            map1.bsScaleControl.toggleShowHide();
+        }
+    }) );
+
 
     //************************************************************
     function showPopup( mouseEvent ){

@@ -12,7 +12,8 @@ Create leaflet-control for jquery-bootstrap modal-content:
         _bsModal = common constructor for bsModal and bsForm as BsControl
         ***************************************************/
         var _bsModal = L.BsControl.extend({
-//        var _bsModal = L.Control.extend({
+hasRelativeHeight: true,
+
             options: {
                 position: 'topcenter',
                 show    : false
@@ -40,6 +41,12 @@ Create leaflet-control for jquery-bootstrap modal-content:
                         smallButtons: true,
                     }
                 );
+
+
+                //Set onChange to update height
+                this.options.onChange_user = this.options.onChange;
+                this.options.onChange = $.proxy(this._lbOnChange, this);
+
                 var show = this.options.show;
                 this.options.show = false;
 
@@ -58,14 +65,6 @@ Create leaflet-control for jquery-bootstrap modal-content:
                             .append( this.$modalContent )
                             .appendTo( $result );
 
-
-                //Prevent different events from propagating to the map
-                $modalContainer.on('contextmenu mousewheel', function( event ) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    return false;
-                });
-
                 //Add copy of _attachCloseHandler from select2 to close dropdown on mousedown on control
                 $result.on('mousedown', function( event ) {
                     var $select = $(event.target).closest('.select2');
@@ -81,7 +80,6 @@ Create leaflet-control for jquery-bootstrap modal-content:
                 this._createModal();
 
                 this.$modalContent = this.bsModal.bsModal.$modalContent;
-
                 $modalContainer.bsModal = this.bsModal.bsModal;
 
                 //'Move the container into the control
@@ -92,7 +90,7 @@ Create leaflet-control for jquery-bootstrap modal-content:
                 this.bsModal.show   = $.proxy(this.show, this);
                 this.bsModal._close = $.proxy(this.hide, this);
 
-                //ASdjust width and height
+                //Adjust width and height
                 $modalContainer._bsModalSetHeightAndWidth();
 
                 var result = $result.get(0);
@@ -103,6 +101,59 @@ Create leaflet-control for jquery-bootstrap modal-content:
                 this.options.show ? this.show() : this.hide();
                 return result;
             },
+
+            _lbOnChange: function(){
+                if (this.options.onChange_user)
+                    this.options.onChange_user.apply(this, arguments);
+
+                //To avoid resizing relative to window height the class 'modal-flex-height' is removed
+                if (this.$modalContent){
+                    this.$modalContent.removeClass('modal-flex-height');
+                    this._map_lbOnResize();
+                }
+            },
+
+
+            _setMaxHeight: function(maxHeight/*, mapHeight*/){
+                /*
+                Get the css for heights form the modal
+                The modal gets the following cssHeight:
+                    if (options.height)    return {height: options.height+'px'   maxHeight: null};
+                    if (options.maxHeight) return {height: 'auto'                maxHeight: options.maxHeight+'px', };
+                    else return null;
+                */
+                var cssHeight = this.bsModal.bsModal.cssHeight[ this.$modalContent._bsModalGetSize() ],
+                    modalHeight    = 'auto',
+                    modalMaxHeight = null,
+                    adjustMaxHeight = true;
+
+                if (!cssHeight)
+                    //Flex-height => adjust
+                    modalMaxHeight = maxHeight;
+                else
+                    if (cssHeight.maxHeight){
+                        //options.maxHeight given
+                        modalMaxHeight = parseInt(cssHeight.maxHeight);
+
+                    }
+                    else {
+                        //options.height given
+                        modalHeight = cssHeight.height;
+                        modalMaxHeight = parseInt(modalHeight);
+                        adjustMaxHeight = false;
+                    }
+
+                if (adjustMaxHeight){
+                    modalMaxHeight = Math.min(parseInt(modalMaxHeight), maxHeight);
+                    modalMaxHeight = Math.max(100, modalMaxHeight - 10); //TODO 100 and 10 as options
+                }
+
+                this.$modalContent.css({
+                    'height'    : modalHeight,
+                    'max-height': modalMaxHeight ? modalMaxHeight+'px' : null,
+                });
+            }
+
         });
 
         /***************************************************
