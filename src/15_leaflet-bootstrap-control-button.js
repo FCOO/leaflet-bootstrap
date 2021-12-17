@@ -359,7 +359,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
             maxHeight = Math.max(100, maxHeight-10); //TODO 100 and 10 as options
             this.$contentContainer.bsModal.$modalContent.css({
                 'max-height': maxHeight+'px',
-                'height'    : maxHeight+'px'
+                'height'    : 'auto' //Was maxHeight+'px'
             });
         }
     });
