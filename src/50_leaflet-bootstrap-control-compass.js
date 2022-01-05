@@ -40,7 +40,7 @@ leaflet-bootstrap-compass-device.js
                 noHorizontalPadding : false,
                 scroll              : false,
                 semiTransparent     : false, //true,
-                width               : 100,
+                width               : 300,
                 content             : '<div class="_no-layer">HER</div>',
             },
         },
@@ -109,8 +109,17 @@ leaflet-bootstrap-compass-device.js
             this.bsButton.css('transform', 'rotate('+ (orientation || 0) + 'deg)');
             this.bsButton.toggleClass('no-device-orientation', orientation === null);
 
+var orientation = (screen.orientation || {}).type || screen.mozOrientation || screen.msOrientation;
 
-this.$modalContent.html('>>> o='+window.orientation+' a='+event.alpha+' b='+event.beta);
+this.$modalContent.html(
+    'w.o= '+window.orientation +
+    '<br>w.s.ori= '+window.screen.orientation +
+    '<br>w.s.mozOri= '+window.screen.mozOrientation +
+    '<br>w.s.msOri= '+window.screen.msOrientation +
+
+    '<br>a= '+event.alpha +
+    '<br>b= '+event.beta
+);
 
             return this;
         },
