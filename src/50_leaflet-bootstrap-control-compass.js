@@ -110,7 +110,7 @@ leaflet-bootstrap-compass-device.js
             this.bsButton.toggleClass('no-device-orientation', orientation === null);
 
 
-this.$modalContent.html('>>> '+window.orientation+' '+event.beta);
+this.$modalContent.html('>>> o='+window.orientation+' a='+event.alpha+' b='+event.beta);
 
             return this;
         },
