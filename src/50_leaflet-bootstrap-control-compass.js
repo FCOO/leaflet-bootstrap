@@ -109,14 +109,15 @@ leaflet-bootstrap-compass-device.js
             this.bsButton.css('transform', 'rotate('+ (orientation || 0) + 'deg)');
             this.bsButton.toggleClass('no-device-orientation', orientation === null);
 
-var orientation = (screen.orientation || {}).type || screen.mozOrientation || screen.msOrientation;
+
+//var orientation = (screen.orientation || {}).type || screen.mozOrientation || screen.msOrientation;
 
 this.$modalContent.html(
-    'w.o= '+window.orientation +
-    '<br>w.s.ori.angle= ' + (window.screen.orientation?window.screen.orientation.angle:null) +
-    '<br>w.s.ori.type= ' + (window.screen.orientation?window.screen.orientation.type:null) +
-    '<br>w.s.mozOri= '+window.screen.mozOrientation +
-    '<br>w.s.msOri= '+window.screen.msOrientation +
+//HER    'w.o= '+window.orientation +
+//HER    '<br>w.s.ori.angle= ' + (window.screen.orientation?window.screen.orientation.angle:null) +
+//HER    '<br>w.s.ori.type= ' + (window.screen.orientation?window.screen.orientation.type:null) +
+//HER    '<br>w.s.mozOri= '+window.screen.mozOrientation +
+//HER    '<br>w.s.msOri= '+window.screen.msOrientation +
 
     '<br>a= '+event.alpha +
     '<br>b= '+event.beta +
