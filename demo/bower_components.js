@@ -31976,6 +31976,578 @@ return jQuery;
 
 ;
 /****************************************************************************
+geolocation-device-orientation.js
+
+Define global events to handle device orientation and calibration
+
+****************************************************************************/
+
+(function ($, window/*, document, undefined*/) {
+    "use strict";
+
+    //Create namespaces
+    var ns = window.geolocation = window.geolocation || {};
+
+    /***********************************************************
+    There are two events:
+        deviceorientation
+        compassneedscalibration - NOT USED FOR NOW
+
+    To add events-handler to these events use
+        window.geolocation.onDeviceorientation( fn: FUNCTION[, context: OBJECT] )
+        NOT IMPLEMENTED: window.geolocation.onCompassneedscalibration( fn: FUNCTION[, context: OBJECT] )
+
+    To remove events-handler to these events use
+        window.geolocation.offDeviceorientation( fn: FUNCTION[, context: OBJECT] )
+        NOT IMPLEMENTED: window.geolocation.offCompassneedscalibration( fn: FUNCTION[, context: OBJECT] )
+    ***********************************************************/
+    var lastId = 0;
+
+    function stamp(obj) {
+        /*eslint-disable */
+        obj._gldo_id = obj._gldo_id || ++lastId;
+        return obj._gldo_id;
+        /* eslint-enable */
+    }
+
+
+    var EventList = function(){
+            this.isActive = false;
+            this.lastEvent = {};
+            this.added = 0;
+            this.list = {};
+        };
+
+    EventList.prototype = {
+        add: function(fn, context){
+            var id = stamp(fn) + (context ? '_' + stamp(context) : '');
+            if (!this.list[id]){
+                this.added++;
+                this.list[id] = {fn: fn, context: context};
+            }
+
+            if (this.added == 1)
+                this.activate();
+            else
+                this.list[id].fn.call(this.list[id].context, this.lastEvent);
+        },
+
+        remove: function(fn, context){
+            var id = stamp(fn) + (context ? '_' + stamp(context) : '');
+            if (this.list[id]){
+                this.list[id] = null;
+                this.added--;
+                if (this.added == 0)
+                    this.deactivate();
+            }
+        },
+
+        trigger: function (event){
+            this.lastEvent = event;
+            $.each(this.list, function(id, fn_context){
+                if (fn_context)
+                    fn_context.fn.call(fn_context.context, event);
+            });
+        },
+
+        activate  : function(){},
+        deactivate: function(){}
+
+    };
+
+
+
+    /***********************************************************************
+    DEVICE ORIENTATION
+
+    Note:
+    Safari on iOS doesn't implement the spec correctly, because alpha is arbitrary instead of relative to true north.
+    Safari instead offers webkitCompassHeading`, which has the opposite sign to alpha and is also relative to magnetic north
+    instead of true north. (see details)
+    DeviceOrientationEvent.beta has values between -90 and 90 on mobile Safari and between 180 and -180 on Firefox.
+    DeviceOrientationEvent.gamma has values between -180 and 180 on mobile Safari and between 90 and -90 on Firefox.
+
+    Firefox, Chrome : https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent
+    Safari          : https://developer.apple.com/documentation/webkitjs/deviceorientationevent#//apple_ref/javascript/instp/DeviceOrientationEvent/beta
+
+
+    ***********************************************************************/
+    var deviceOrientationEventName =
+            'ondeviceorientationabsolute' in window ? 'deviceorientationabsolute' :
+            'ondeviceorientation' in window ? 'deviceorientation' :
+            null;
+
+    var onDeviceorientationList = new EventList();
+    $.extend(onDeviceorientationList, {
+        activate: function(){
+            if (deviceOrientationEventName){
+                var self_event_handler = this.self_event_handler = this.self_event_handler || $.proxy(this.onDeviceorientation, this),
+                    add_event_deviceorientation = function() {
+                        $(window).on(deviceOrientationEventName, self_event_handler);
+                    };
+
+                if (DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === 'function')
+                    DeviceOrientationEvent.requestPermission().then(function (permissionState) {
+                        if (permissionState === 'granted')
+                            add_event_deviceorientation();
+                    });
+                else
+                    add_event_deviceorientation();
+            }
+            else
+                this.trigger({});
+        },
+
+        deactivate: function(){
+            $(window).off(deviceOrientationEventName, this.self_event_handler);
+        },
+
+        onDeviceorientation: function(jquery_event) {
+            var event    = jquery_event.originalEvent,
+                newEvent = {},
+                deviceorientation = null;
+
+            if (event.webkitCompassHeading)
+                // iOS
+                deviceorientation = event.webkitCompassHeading;
+            else
+                if (event.absolute && event.alpha)
+                    // Android
+                    deviceorientation = 360 - parseInt(event.alpha);
+
+            event.deviceorientation = deviceorientation;
+
+            $.each(['absolute', 'deviceorientation', 'webkitCompassHeading', 'alpha', 'beta', 'gamma'], function(index, id){
+                newEvent[id] = typeof event[id] == 'number' ? Math.round(event[id]) : event[id];
+            });
+
+            this.trigger(newEvent);
+        }
+    });
+
+
+
+    ns.onDeviceorientation = function( fn, context ){
+        onDeviceorientationList.add( fn, context );
+    };
+
+    ns.offDeviceorientation = function( fn, context ){
+        onDeviceorientationList.remove( fn, context );
+    };
+
+
+    /*******************************************************************
+    COMPASS NEEDS CALIBRATION - NOT IMPLEMENTED
+    *******************************************************************/
+    /*
+    var onCompassneedscalibrationList = new EventList();
+    $.extend(onCompassneedscalibrationList, {
+        activate: function(){
+
+        },
+
+        deactivate: function(){
+
+        }
+    }
+
+    ns.offCompassneedscalibration = function( fn, context ){
+        onCompassneedscalibrationList.add( fn, context );
+    };
+    ns.onCompassneedscalibration = function( fn, context ){
+        onCompassneedscalibrationList.remove( fn, context );
+    };
+    */
+
+    //$(window).on('compassneedscalibration', function(event){
+    //    triggerList(onCompassneedscalibrationList, event);
+    //});
+
+
+}(jQuery, this/*, document*/));
+
+
+;
+/****************************************************************************
+geolocation-provider-handler.js
+
+The package contains definitions of two classes used to provide geo-positions and to handle this informations
+
+1: A 'Provider' gets the positions-info from a source and provides them for a geolocation-handler
+2: A 'Handlerø gets geolocation-info from a Provider and handles the data and errors
+
+********************************
+window.geolocation.GeolocationProvider:
+    Abstract class that provides position, heading, speed etc. from a source.
+    Different inherrited versions are created for geolocation, AIS, manual entering etc.
+
+    new window.geolocation.GeolocationProvider( options )
+    options = {
+        maximumAge: DOUBLE - Maximum age of last coords before a update with coords = {}NULL is called. Defalut = 0 => no coords are to old
+    }
+
+********************************
+window.geolocation.GeolocationHandler:
+    Abstract class that must contain the following methods:
+
+    setCoords         : function( coords )        - Called by the associated GeolocationProvider when the coordinates changeds
+    onGeolocationError: function( error, coords ) - Called by the associated GeolocationProvider when an error occur
+
+    coords = An extended version of GeolocationCoordinates (see https://developer.mozilla.org/en-US/docs/Web/API/GeolocationCoordinates) =
+    {
+        latitude         : Position's latitude in decimal degrees.
+        lat              : As latitude
+        longitude        : Position's longitude in decimal degrees.
+        lng              : As longitude
+        latLng           : Leaflet LatLng-object - only if Leaflet is included
+        altitude         : Position's altitude in meters, relative to sea level. This value can be null if the implementation cannot provide the data.
+        accuracy         : Accuracy of the latitude and longitude properties, expressed in meters.
+        altitudeAccuracy : Accuracy of the altitude expressed in meters. This value can be null.
+        heading          : Direction towards which the device is facing. This value, specified in degrees, indicates how far off from heading true north the device is.
+                           0 degrees represents true north, and the direction is determined clockwise (which means that east is 90 degrees and west is 270 degrees).
+                           If speed is 0, heading is NaN. If the device is unable to provide heading information, this value is null.
+        speed            : Velocity of the device in meters per second. This value can be null.
+
+        If the GeolocationProvider also detects device orientation the following values are included.
+        See src/geolocation-device-orientation-events.js and https://developers.google.com/web/fundamentals/native-hardware/device-orientation for details.
+        deviceOrientation: {
+            absolute            : BOOLEAN,
+            deviceorientation   : NUMBER or null,
+            webkitCompassHeading: NUMBER or null,
+            alpha               : NUMBER or null,
+            beta                : NUMBER or null,
+            gamma               : NUMBER or null
+        }
+
+
+    error = Must contain the following properties taken from GeolocationPositionError (see https://developer.mozilla.org/en-US/docs/Web/API/GeolocationPositionError)
+        code: Returns an unsigned short representing the error code. The following values are possible:
+            1   PERMISSION_DENIED       The acquisition of the geolocation information failed because the page didn't have the permission to do it.
+            2   POSITION_UNAVAILABLE    The acquisition of the geolocation failed because at least one internal source of position returned an internal error.
+            3   TIMEOUT                 The time allowed to acquire the geolocation was reached before the information was obtained.
+            4   OLD                     The last coordinates are now to old acoording to options.maximumAge
+
+        message: Returns a human-readable DOMString describing the details of the error
+
+****************************************************************************/
+
+(function ($, window/*, document, undefined*/) {
+    "use strict";
+
+    //Create namespaces and global id
+    var ns = window.geolocation = window.geolocation || {},
+        handlerId = 0;
+
+    /***********************************************************
+    GeolocationProvider
+    Obejct that provides position, heading, speed etc. from
+    a source. Differnet inherrited versions are created for
+    geolocation, AIS, manual entering etc.
+    Each GeolocationProvider has 0-N GeolocationHandler
+    that gets its coords from this
+    ***********************************************************/
+    var GeolocationProvider = ns.GeolocationProvider = function( options = {}){
+        this.options = options;
+        this.maximumAge = this.options.maximumAge === 0 ? 0 : this.options.maximumAge || 0;
+
+        //this.active = false;
+        this.updateNo = 0;
+        this.statusOk = true;
+
+        this.coords = {
+            latitude         : null,
+            lat              : null,
+            longitude        : null,
+            lng              : null,
+            latLng           : null,
+            altitude         : null,
+            accuracy         : null,
+            altitudeAccuracy : null,
+            heading          : null,
+            speed            : null,
+
+            deviceOrientation_absolute: null,
+            deviceOrientation_alpha   : null,
+            deviceOrientation_beta    : null,
+            deviceOrientation_gamma   : null
+        };
+
+        this.geolocationHandlers = {};
+        this.nrOfGeolocationHandlers = 0;
+    };
+
+    GeolocationProvider.prototype = {
+        activate  : function(){},
+        deactivate: function(){},
+
+
+        add: function( geolocationHandler ){
+            geolocationHandler.glh_id = geolocationHandler.glh_id || 'geolocationHandler' + handlerId++;
+
+            if (!this.geolocationHandlers[geolocationHandler.glh_id]){
+                this.geolocationHandlers[geolocationHandler.glh_id] = geolocationHandler;
+                this.nrOfGeolocationHandlers++;
+                if (this.nrOfGeolocationHandlers == 1){
+                    this.activate();
+
+                    //Set timeout to update coord every maximumAge
+                    if (this.maximumAge){
+                        this.timeoutId = window.setTimeout( $.proxy(this.timeout, this), this.maximumAge );
+                    }
+                }
+                else
+                    if (this.statusOk)
+                        this.update( null, geolocationHandler );
+                    else
+                        this.onError( null, geolocationHandler );
+
+            }
+            return this;
+        },
+
+        remove: function( geolocationHandler ){
+            if (geolocationHandler && geolocationHandler.glh_id && this.geolocationHandlers[geolocationHandler.glh_id]){
+                this.nrOfGeolocationHandlers--;
+                delete this.geolocationHandlers[geolocationHandler.glh_id];
+
+                if (this.nrOfGeolocationHandlers == 0){
+                    this.deactivate();
+
+                    if (this.timeoutId){
+                        window.clearTimeout(this.timeoutId);
+                        this.timeoutId = null;
+                    }
+                }
+            }
+            return this;
+        },
+
+
+        timeout: function(){
+            this.onError({
+                code   : 4,
+                message: 'The last coordinates are to old to be valid'
+            });
+        },
+
+
+        roundToDecimals: {
+            latitude        : 4, //Llatitude in decimal degrees.
+            longitude       : 4, //Longitude in decimal degrees.
+            altitude        : 0, //Altitude in meters
+            accuracy        : 0, //Accuracy of the latitude and longitude properties, expressed in meters.
+            altitudeAccuracy: 1, //Accuracy of the altitude expressed in meters. This value can be null.
+            heading         : 0, //Specified in degrees
+            speed           : 1  //Velocity of the device in meters per second.
+        },
+
+        update: function( coords = {}, onlyHandler ){
+            var _this = this;
+            if (coords){
+                this.statusOk = true;
+
+                //Prevent timeout form clearing coords
+                if (this.timeoutId){
+                    window.clearTimeout(this.timeoutId);
+                    this.timeoutId = null;
+                }
+
+
+                var lastCoords = this.lastCoords = this.coords,
+                    newCoords = this.coords = $.extend({}, coords),
+                    changed = false;
+
+                //Round all values
+                $.each(this.roundToDecimals, function(id, decimals){
+                    if (typeof newCoords[id] == 'number')
+                        newCoords[id] = +(Math.round(newCoords[id] + "e+"+decimals)  + "e-"+decimals);
+                });
+
+                //Check if any is changed
+                $.each(newCoords, function(id, value){
+                    if (lastCoords[id] !== value){
+                        changed = true;
+                        return false;
+                    }
+                });
+
+                if (changed)
+                    this.updateNo++;
+
+                //Update coords
+                newCoords.latitude = newCoords.latitude || newCoords.lat || null;
+                newCoords.lat      = newCoords.lat || newCoords.latitude || null;
+
+                newCoords.longitude = newCoords.longitude || newCoords.lng || null;
+                newCoords.lng       = newCoords.lng || newCoords.longitude || null;
+
+                if (window.L && window.L.LatLng && (newCoords.lat !== null) && (newCoords.lng !== null))
+                    newCoords.latLng = new window.L.LatLng(newCoords.lat, newCoords.lng);
+                else
+                    newCoords.latLng = null;
+
+
+                //TODO: Needed? - Update all values. Value of id X is only updated if the new coords set the value to undefined by having coords.X === null, else the value is not changed
+                /*
+                $.each(this.coords, function(id){
+                    if (coords[id] || (coords[id] === 0) || (coords[id] === null))
+                        _this.coords[id] = coords[id];
+                });
+                */
+            }
+
+            //Update all or given handler(s)
+            var handlers = onlyHandler ? [onlyHandler] : this.geolocationHandlers;
+
+            $.each(handlers, function(id, geolocationHandler) {
+                if (geolocationHandler.setCoords && (geolocationHandler.glh_updateNo != _this.updateNo)){
+                    geolocationHandler.glh_updateNo = _this.updateNo;
+                    geolocationHandler.setCoords( newCoords );
+                }
+            });
+
+            if (coords && this.maximumAge)
+                this.timeoutId = window.setTimeout( $.proxy(this.timeout, this), this.maximumAge );
+
+            return this;
+        },
+
+
+        onError: function( error, onlyHandler ){
+            if (error)
+                this.statusOk = false;
+
+            this.error = $.extend({
+                code                : 0,
+                message             : '',
+                PERMISSION_DENIED   : 1,
+                POSITION_UNAVAILABLE: 2,
+                TIMEOUT             : 3,
+                OLD                 : 4,
+            }, error || {});
+
+            var handlers = onlyHandler ? [onlyHandler] : this.geolocationHandlers,
+                nullCoords = {};
+
+            //Set all values of coords = null
+            $.each(this.coords, function(id){
+                nullCoords[id] = null;
+            });
+
+            $.each(handlers, function(id, geolocationHandler){
+                if (geolocationHandler.onGeolocationError)
+                    geolocationHandler.onGeolocationError( this.error, nullCoords );
+            });
+
+            return this;
+        }
+    };
+
+
+}(jQuery, this/*, document*/));
+
+
+;
+/****************************************************************************
+geolocation-standard.js
+
+Creates window.geolocation.provider = version of GeolocationProvider that
+provides location from the browser geolocation API
+
+****************************************************************************/
+
+(function ($, window/*, document, undefined*/) {
+    "use strict";
+
+    //Create namespaces
+    var ns = window.geolocation = window.geolocation || {};
+
+    var geolocationOptions = {
+        /* From https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition */
+
+        /*
+        maximumAge:
+            Is a positive long value indicating the maximum age in milliseconds of a possible cached position that is acceptable to return.
+            If set to 0, it means that the device cannot use a cached position and must attempt to retrieve the real current position.
+            If set to Infinity the device must return a cached position regardless of its age. Default: 0.
+        */
+        //maximumAge          : 10 * 1000, //Allow 10sec old position
+
+        /*
+        timeout:
+            Is a positive long value representing the maximum length of time (in milliseconds) the device is allowed to take in order to return a position.
+            The default value is Infinity, meaning that getCurrentPosition() won't return until the position is available.
+        */
+        //timeout             : 10 * 1000,
+
+        /*
+        enableHighAccuracy:
+            Is a boolean value that indicates the application would like to receive the best possible results.
+            If true and if the device is able to provide a more accurate position, it will do so.
+            Note that this can result in slower response times or increased power consumption (with a GPS chip on a mobile device for example).
+            On the other hand, if false, the device can take the liberty to save resources by responding more quickly and/or using less power. Default: false.
+        */
+        enableHighAccuracy  : true
+    };
+
+    /*
+    GeolocationPosition = {
+        coords   : GeolocationCoordinates
+        timestamp: Millisecond
+
+    From https://developer.mozilla.org/en-US/docs/Web/API/GeolocationCoordinates:
+    GeolocationCoordinates = {
+        latitude        : Position's latitude in decimal degrees.
+        longitude       : Position's longitude in decimal degrees.
+        altitude        : Position's altitude in meters, relative to sea level. This value can be null if the implementation cannot provide the data.
+        accuracy        : Accuracy of the latitude and longitude properties, expressed in meters.
+        altitudeAccuracy: Accuracy of the altitude expressed in meters. This value can be null.
+        heading         : Direction towards which the device is facing. This value, specified in degrees, indicates how far off from heading true north the device is. 0 degrees represents true north, and the direction is determined clockwise (which means that east is 90 degrees and west is 270 degrees). If speed is 0, heading is NaN. If the device is unable to provide heading information, this value is null.
+        speed           : Velocity of the device in meters per second. This value can be null.
+    }
+    All properties are double
+    */
+
+
+    var Provider = function(){
+            this.lastCoords = {};
+            ns.GeolocationProvider.call(this, geolocationOptions);
+        };
+
+    Provider.prototype = Object.create(ns.GeolocationProvider.prototype);
+
+
+    $.extend(Provider.prototype, {
+        activate: function(){
+            this._success = this._success || $.proxy(this.success, this);
+            this._error   = this._error   || $.proxy(this.onError, this);
+
+            if (navigator.geolocation)
+                navigator.geolocation.watchPosition(this._success, this._error, geolocationOptions);
+            else
+                this.onError(4);
+        },
+
+
+        deactivate: function(){
+            if (navigator.geolocation)
+                navigator.clearWatch();
+        },
+
+        success: function( GeolocationPosition ){
+            this.update( GeolocationPosition.coords );
+        },
+
+    });
+
+    //Create window.geolocation.provider
+    ns.provider = new Provider();
+
+}(jQuery, this/*, document*/));
+
+
+;
+/****************************************************************************
 	history.js,
 
 	(c) 2019, FCOO
@@ -40164,31 +40736,8 @@ if (typeof define === 'function' && define.amd) {
     if (Array.isArray(arr)) return arr;
   }
 
-  function _iterableToArrayLimit(arr, i) {
-    if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
-    var _arr = [];
-    var _n = true;
-    var _d = false;
-    var _e = undefined;
-
-    try {
-      for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
-        _arr.push(_s.value);
-
-        if (i && _arr.length === i) break;
-      }
-    } catch (err) {
-      _d = true;
-      _e = err;
-    } finally {
-      try {
-        if (!_n && _i["return"] != null) _i["return"]();
-      } finally {
-        if (_d) throw _e;
-      }
-    }
-
-    return _arr;
+  function _iterableToArray(iter) {
+    if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);
   }
 
   function _arrayLikeToArray(arr, len) {
@@ -40214,8 +40763,8 @@ if (typeof define === 'function' && define.amd) {
     throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
 
-  function _slicedToArray(arr, i) {
-    return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
+  function _toArray(arr) {
+    return _arrayWithHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableRest();
   }
 
   function ownKeys$4(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
@@ -40241,10 +40790,11 @@ if (typeof define === 'function' && define.amd) {
           if (!opt) return;
 
           var _opt$split = opt.split(':'),
-              _opt$split2 = _slicedToArray(_opt$split, 2),
+              _opt$split2 = _toArray(_opt$split),
               key = _opt$split2[0],
-              val = _opt$split2[1];
+              rest = _opt$split2.slice(1);
 
+          var val = rest.join(':');
           if (val.trim() === 'false') formatOptions[key.trim()] = false;
           if (val.trim() === 'true') formatOptions[key.trim()] = true;
           if (!isNaN(val.trim())) formatOptions[key.trim()] = parseInt(val.trim(), 10);
@@ -40741,7 +41291,10 @@ if (typeof define === 'function' && define.amd) {
 
         var defOpts = get();
         this.options = _objectSpread$6(_objectSpread$6(_objectSpread$6({}, defOpts), this.options), transformOptions(options));
-        this.options.interpolation = _objectSpread$6({}, this.options.interpolation);
+
+        if (this.options.compatibilityAPI !== 'v1') {
+          this.options.interpolation = _objectSpread$6(_objectSpread$6({}, defOpts.interpolation), this.options.interpolation);
+        }
 
         if (options.keySeparator !== undefined) {
           this.options.userDefinedKeySeparator = options.keySeparator;
@@ -69643,6 +70196,795 @@ module.exports = g;
 }(jQuery, this, document));
 ;
 /****************************************************************************
+    jquery-bootstrap.js,
+
+    (c) 2017, FCOO
+
+    https://github.com/fcoo/jquery-bootstrap
+    https://github.com/fcoo
+
+****************************************************************************/
+
+(function ($, i18next, window, document, undefined) {
+    "use strict";
+
+    /*
+
+    Almost all elements comes in two sizes: normal and small set by options.small: false/true
+
+    In jquery-bootstrap.scss sizing class-postfix -xs is added (from Bootstrap 3)
+
+    Elements to click or touch has a special implementation:
+    For device with 'touch' the Bootstrap size 'normal' and 'small' are used
+    For desktop (only mouse) we using smaller version (large = Bootstrap normal, normal = Bootstrap small, small = Bootstrap x-small)
+
+    The variable window.bsIsTouch must be overwriten with the correct value in the application
+
+    */
+
+    //Create namespace
+    var ns = window;
+
+    /*
+    Create $.BSASMODAL = record with {className: asModal-function} where className is added to any $element that have a asModal-function
+    Ex.:
+    $.BSASMODAL['BSTABLE'] = function(){ //Create bsModal for this }
+    var myTable = $.bsTable({...}); //Add 'BSTABLE' to class-name for  result
+    myTable.asModal({...});
+    */
+    $.BSASMODAL = $.BSASMODAL || {};
+    $.fn.asModal = function(options){
+        var _this   = this,
+            asModal = null;
+
+        $.each($.BSASMODAL, function(id, asModalFunc){
+            if (_this.hasClass(id)){
+                asModal = asModalFunc;
+                return false;
+            }
+        });
+        return asModal ? $.proxy(asModal, this)( options ) : null;
+    };
+
+    //Allow test-pages to set bsIsTouch to fixed value
+    ns.bsIsTouch = typeof ns.bsIsTouch == "boolean" ? ns.bsIsTouch : true;
+
+    $.EMPTY_TEXT = '___***EMPTY***___';
+
+    //FONTAWESOME_PREFIX = the classname-prefix used when non is given. Fontawesome 4.X: 'fa', Fontawesome 5: Free: 'fas' Pro: 'far' or 'fal'
+    $.FONTAWESOME_PREFIX = $.FONTAWESOME_PREFIX || 'fa';
+
+
+    //FONTAWESOME_PREFIX_STANDARD = the classname-prefix used for buttons in standard radio/checkbox-buttons and icons in modal header. Fontawesome 5: Free: 'far'
+    $.FONTAWESOME_PREFIX_STANDARD = $.FONTAWESOME_PREFIX_STANDARD || 'far';
+
+
+    //ICONFONT_PREFIXES = STRING or []STRING with regexp to match class-name setting font-icon class-name. Fontawesome 5: 'fa.?' accepts 'fas', 'far', etc. as class-names => will not add $.FONTAWESOME_PREFIX
+    $.ICONFONT_PREFIXES = 'fa.?';
+
+    /******************************************************
+    $divXXGroup
+    ******************************************************/
+    function $divXXGroup( groupTypeClass, options ){
+        return $('<div/>')
+                   ._bsAddBaseClassAndSize( $.extend({}, options, {
+                       baseClass   : groupTypeClass,
+                       useTouchSize: true
+                   }));
+    }
+
+    //$._bsAdjustIconAndText: Adjust options to fit with {icon"...", text:{da:"", en:".."}
+    // options == {da:"..", en:".."} => return {text: options}
+    // options == array of ??        => array of $._bsAdjustIconAndText( ??? )
+    // options == STRING             => return {text: options}
+
+    $._bsAdjustIconAndText = function( options ){
+        if (!options)
+            return options;
+        if ($.isArray( options )){
+            var result = [];
+            $.each( options, function(index, content){
+                result.push( $._bsAdjustIconAndText(content) );
+            });
+            return result;
+        }
+
+        if ($.type( options ) == "object"){
+            if (!options.icon && !options.text)
+                return {text: options };
+            else
+                return options;
+        }
+        else
+            //options == simple type (string, number etc.)
+            return {text: options };
+
+    };
+
+    //$._bsAdjustText: Adjust options to fit with {da:"...", en:"..."}
+    // options == {da:"..", en:".."} => return options
+    // options == STRING             => return {da: options}
+    $._bsAdjustText = function( options ){
+        if (!options)
+            return options;
+        if ($.type( options ) == "string")
+            return {da: options, en:options};
+        return options;
+    };
+
+    //$._bsAdjustOptions: Adjust options to allow text/name/header etc.
+    $._bsAdjustOptions = function( options, defaultOptions, forceOptions ){
+        //*********************************************************************
+        //adjustContentOptions: Adjust options for the content of elements
+        function adjustContentAndContextOptions( options, context ){
+            options.iconClass = options.iconClass || options.iconClassName;
+            options.textClass = options.textClass || options.textClassName;
+
+            //If context is given => convert all function to proxy
+            if (context)
+                $.each( options, function( id, value ){
+                    if ($.isFunction( value ))
+                        options[id] = $.proxy( value, context );
+                });
+
+            return options;
+        }
+        //*********************************************************************
+
+        options = $.extend( true, {}, defaultOptions || {}, options, forceOptions || {} );
+
+        $.each(['selected', 'checked', 'active', 'open', 'isOpen'], function(index, id){
+            if (options[id] !== undefined){
+                options.selected = !!options[id];
+                return false;
+            }
+        });
+
+        options.list = options.list || options.buttons || options.items || options.children;
+
+        options = adjustContentAndContextOptions( options, options.context );
+
+        //Adjust options.content
+        if (options.content){
+            if ($.isArray( options.content ) )
+                //Adjust each record in options.content
+                for (var i=0; i<options.content.length; i++ )
+                    options.content[i] = adjustContentAndContextOptions( options.content[i], options.context );
+            else
+                if ($.type( options.content ) == "object")
+                    options.content = adjustContentAndContextOptions( options.content, options.context );
+        }
+
+        //Sert context = null to avoid "double" proxy
+        options.context = null;
+
+        return options;
+    };
+
+
+    /****************************************************************************************
+    _bsGetSizeClass
+    baseClass: "BASE" useTouchSize: false
+        small: false => sizeClass = ''
+        small: true  => sizeClass = "BASE-sm"
+
+    baseClass: "BASE" useTouchSize: true
+        small: false => sizeClass = 'BASE-sm'
+        small: true  => sizeClass = "BASE-xs"
+    ****************************************************************************************/
+    $._bsGetSizeClass = function( options ){
+        var sizeClassPostfix = '';
+
+        if (options.useTouchSize){
+            if (ns.bsIsTouch)
+                sizeClassPostfix = options.small ? 'sm' : '';
+            else
+                sizeClassPostfix = options.small ? 'xs' : 'sm';
+        }
+        else
+            sizeClassPostfix = options.small ? 'sm' : '';
+
+        return sizeClassPostfix && options.baseClass ? options.baseClass + '-' + sizeClassPostfix : '';
+    };
+
+
+    /****************************************************************************************
+    $._bsCreateElement = internal method to create $-element
+    ****************************************************************************************/
+    $._bsCreateElement = function( tagName, link, title, textStyle, className, data ){
+        var $result;
+        if (link){
+            $result = $('<a/>');
+            if ($.isFunction( link ))
+                $result
+                    .prop('href', 'javascript:undefined')
+                    .on('click', link );
+            else
+                $result
+                    .i18n(link, 'href')
+                    .prop('target', '_blank');
+        }
+        else
+            $result = $('<'+tagName+'/>');
+
+        if (title)
+            $result.i18n(title, 'title');
+
+        $result._bsAddStyleClasses( textStyle || '' );
+
+        if (className)
+            $result.addClass( className );
+
+        if (data)
+            $result.data( data );
+
+        return $result;
+    };
+
+    /****************************************************************************************
+    $._bsCreateIcon = internal method to create $-icon
+    ****************************************************************************************/
+    var iconfontPrefixRegExp = null;
+    $._bsCreateIcon = function( options, $appendTo, title, className/*, insideStack*/ ){
+        if (!iconfontPrefixRegExp){
+            var prefixes = $.isArray($.ICONFONT_PREFIXES) ? $.ICONFONT_PREFIXES : [$.ICONFONT_PREFIXES];
+            iconfontPrefixRegExp = new window.RegExp('(\\s|^)(' + prefixes.join('|') + ')(\\s|$)', 'g');
+        }
+
+        var $icon;
+
+        if ($.type(options) == 'string')
+            options = {class: options};
+
+        if ($.isArray( options)){
+            //Create a stacked icon
+             $icon = $._bsCreateElement( 'div', null, title, null, 'container-stacked-icons ' + (className || '')  );
+
+            $.each( options, function( index, opt ){
+                $._bsCreateIcon( opt, $icon, null, 'stacked-icon' );
+            });
+
+            //If any of the stacked icons have class fa-no-margin => set if on the container
+            if ($icon.find('.fa-no-margin').length)
+                $icon.addClass('fa-no-margin');
+        }
+        else {
+            var allClassNames = options.icon || options.class || '';
+
+            //Append $.FONTAWESOME_PREFIX if icon don't contain fontawesome prefix ("fa?")
+            if (allClassNames.search(iconfontPrefixRegExp) == -1)
+                allClassNames = $.FONTAWESOME_PREFIX + ' ' + allClassNames;
+
+            allClassNames = allClassNames + ' ' + (className || '');
+
+            $icon = $._bsCreateElement( 'i', null, title, null, allClassNames );
+
+        }
+        $icon.appendTo( $appendTo );
+        return $icon;
+    };
+
+    /****************************************************************************************
+    $._isEqual(obj1, obj2 OR array)
+    Check if two objects or arrays are equal
+    (c) 2017 Chris Ferdinandi, MIT License, https://gomakethings.com
+    @param  {Object|Array|String}  value  The first object or array to compare
+    @param  {Object|Array|String}  other  The second object or array to compare
+    @return {Boolean}              Returns true if they're equal
+    ****************************************************************************************/
+    $._isEqual = function (value, other) {
+        // Get the value type
+        var type = Object.prototype.toString.call(value);
+
+        // If the two objects are not the same type, return false
+        if (type !== Object.prototype.toString.call(other)) return false;
+
+        // Compare the length of the length of the two items
+        var valueLen = type === '[object Array]' ? value.length : Object.keys(value).length;
+        var otherLen = type === '[object Array]' ? other.length : Object.keys(other).length;
+        if (valueLen !== otherLen) return false;
+
+        // Compare two items
+        var compare = function (item1, item2) {
+            // Get the object type
+            var itemType = Object.prototype.toString.call(item1);
+
+            // If an object or array, compare recursively
+            if (['[object Array]', '[object Object]'].indexOf(itemType) >= 0) {
+                if (!$._isEqual(item1, item2)) return false;
+            }
+            // Otherwise, do a simple comparison
+            else {
+                // If the two items are not the same type, return false
+                if (itemType !== Object.prototype.toString.call(item2)) return false;
+
+                // Else if it's a function, convert to a string and compare
+                // Otherwise, just compare
+                if (itemType === '[object Function]') {
+                    if (item1.toString() !== item2.toString())
+                        return false;
+                }
+                else {
+                    if (item1 !== item2) return false;
+                }
+            }
+        };
+
+        // Compare properties
+          if (type === '[object Array]'){
+               for (var i=0; i<valueLen; i++){
+                if (compare(value[i], other[i]) === false)
+                    return false;
+            }
+        }
+        else
+            if (type === '[object Object]'){
+                for (var key in value){
+                    if ( (value.hasOwnProperty(key)) && (compare(value[key], other[key]) === false))
+                        return false;
+                }
+            }
+            else
+                // If nothing failed, return simple comparison
+                return value == other;
+
+        return true;
+    };
+
+
+    //$.parentOptionsToInherit = []ID = id of options that modal-content can inherit from the modal itself
+    $.parentOptionsToInherit = ['small'];
+
+    $.fn.extend({
+        //_bsAddIdAndName
+        _bsAddIdAndName: function( options ){
+            this.attr('id', options.id || '');
+            this.attr('name', options.name || options.id || '');
+            return this;
+        },
+
+        /****************************************************************************************
+        _bsAddBaseClassAndSize
+
+        Add classes
+
+        options:
+            baseClass           [string]
+            baseClassPostfix    [string]
+            styleClass          [string]
+            class               [string]
+            textStyle           [string] or [object]. see _bsAddStyleClasses
+        ****************************************************************************************/
+        _bsAddBaseClassAndSize: function( options ){
+            var classNames = options.baseClass ? [options.baseClass + (options.baseClassPostfix || '')] : [];
+
+            classNames.push( $._bsGetSizeClass(options) );
+
+            if (options.styleClass)
+                classNames.push( options.styleClass );
+
+            if (options.class)
+                classNames.push( options.class );
+
+            this.addClass( classNames.join(' ') );
+
+            this._bsAddStyleClasses( options.textStyle );
+
+            return this;
+        },
+
+        /****************************************************************************************
+        _bsAddStyleClasses
+        Add classes for text-styel
+
+        options [string] or [object]
+            Style for the contents. String or object with part of the following
+            "left right center lowercase uppercase capitalize normal bold italic" or
+            {left: true, right: true, center: true, lowercase: true, uppercase: true, capitalize: true, normal: true, bold: true, italic: true}
+        ****************************************************************************************/
+        _bsAddStyleClasses: function( options = {}){
+            var _this = this,
+
+                bsStyleClass = {
+                    //Text color
+                    "primary"     : "text-primary",
+                    "secondary"   : "text-secondary",
+                    "success"     : "text-success",
+                    "danger"      : "text-danger",
+                    "warning"     : "text-warning",
+                    "info"        : "text-info",
+                    "light"       : "text-light",
+                    "dark"        : "text-dark",
+
+                    //Align
+                    "left"        : "text-left",
+                    "right"       : "text-right",
+                    "center"      : "text-center",
+
+                    //Case
+                    "lowercase"   : "text-lowercase",
+                    "uppercase"   : "text-uppercase",
+                    "capitalize"  : "text-capitalize",
+
+                    //Weight
+                    "normal"      : "font-weight-normal",
+                    "bold"        : "font-weight-bold",
+                    "italic"      : "font-italic"
+                };
+
+            $.each( bsStyleClass, function( style, className ){
+                if (
+                      ( (typeof options == 'string') && (options.indexOf(style) > -1 )  ) ||
+                      ( (typeof options == 'object') && (options[style]) )
+                    )
+                    _this.addClass( className );
+            });
+            return this;
+        },
+
+        /****************************************************************************************
+        _bsAddHtml
+        Internal methods to add innerHTML to button or other element
+        options: array of textOptions or textOptions
+        textOptions: {
+            icon     : String / {class, data, attr} or array of String / {className, data, attr}
+            text     : String or array of String
+            vfFormat : String or array of String
+            vfValue  : any type or array of any-type
+            vfOptions: JSON-object or array of JSON-object
+            textStyle: String or array of String
+            link     : String or array of String
+            title    : String or array of String
+            iconClass: string or array of String
+            textClass: string or array of String
+            textData : obj or array of obj
+        }
+        checkForContent: [Boolean] If true AND options.content exists => use options.content instead
+        ****************************************************************************************/
+
+        _bsAddHtml:  function( options, htmlInDiv, ignoreLink, checkForContent ){
+            //**************************************************
+            function getArray( input ){
+                return input ? $.isArray( input ) ? input : [input] : [];
+            }
+            //**************************************************
+            function isHtmlString( str ){
+                if (!htmlInDiv || ($.type(str) != 'string')) return false;
+
+                var isHtml = false,
+                    $str = null;
+                try       { $str = $(str); }
+                catch (e) { $str = null;   }
+
+                if ($str && $str.length){
+                    isHtml = true;
+                    $str.each( function( index, elem ){
+                        if (!elem.nodeType || (elem.nodeType != 1)){
+                            isHtml = false;
+                            return false;
+                        }
+                    });
+                }
+                return isHtml;
+            }
+
+            //**************************************************
+            options = options || '';
+
+            if (options.content && checkForContent)
+                return this._bsAddHtml(options.content, htmlInDiv, ignoreLink);
+
+
+            var _this = this;
+
+            //options = array => add each
+            if ($.isArray( options )){
+                $.each( options, function( index, textOptions ){
+                    _this._bsAddHtml( textOptions, htmlInDiv, ignoreLink );
+                });
+                return this;
+            }
+
+            this.addClass('container-icon-and-text');
+
+            //If the options is a jQuery-object: append it and return
+            if (options.jquery){
+                this.append( options );
+                return this;
+            }
+
+            //If the content is a string containing html-code => append it and return
+            if (isHtmlString(options)){
+                this.append( $(options) );
+                return this;
+            }
+
+            //Adjust icon and/or text if it is not at format-options
+            if (!options.vfFormat)
+                options = $._bsAdjustIconAndText( options );
+
+            //options = simple textOptions
+            var iconArray       = getArray( options.icon ),
+                textArray       = getArray( options.text ),
+                vfFormatArray   = getArray( options.vfFormat ),
+                vfValueArray    = getArray( options.vfValue ),
+                i18nextArray    = getArray( options.i18next ),
+                vfOptionsArray  = getArray( options.vfOptions ),
+                textStyleArray  = getArray( options.textStyle ),
+                linkArray       = getArray( ignoreLink ? [] : options.link || options.onClick ),
+                titleArray      = getArray( options.title ),
+                iconClassArray  = getArray( options.iconClass ),
+                textClassArray  = getArray( options.textClass ),
+                textDataArray   = getArray( options.textData );
+
+            //Add icons (optional)
+            $.each( iconArray, function( index, icon ){
+                $._bsCreateIcon( icon, _this, titleArray[ index ], iconClassArray[index] );
+            });
+
+            //Add color (optional)
+            if (options.color)
+                _this.addClass('text-'+ options.color);
+
+            //Add text
+
+            $.each( textArray, function( index, text ){
+                //If text ={da,en} and both da and is html-stirng => build inside div
+                var tagName = 'span';
+                if ( (text.hasOwnProperty('da') && isHtmlString(text.da)) || (text.hasOwnProperty('en') && isHtmlString(text.en)) )
+                    tagName = 'div';
+
+                var $text = $._bsCreateElement( tagName, linkArray[ index ], titleArray[ index ], textStyleArray[ index ], textClassArray[index], textDataArray[index] );
+                if ($.isFunction( text ))
+                    text( $text );
+                else
+                    if (text == $.EMPTY_TEXT)
+                        $text.html( '&nbsp;');
+                    else
+                        if (text != ""){
+                            //If text is a string and not a key to i18next => just add the text
+                            if ( ($.type( text ) == "string") && !i18next.exists(text) )
+                                $text.html( text );
+                            else
+                                $text.i18n( text, 'html', i18nextArray[ index ] );
+                        }
+
+                if (index < textClassArray.length)
+                    $text.addClass( textClassArray[index] );
+
+                $text.appendTo( _this );
+            });
+
+            //Add value-format content
+            $.each( vfFormatArray, function( index ){
+                $._bsCreateElement( 'span', linkArray[ index ], titleArray[ index ], textStyleArray[ index ], textClassArray[index] )
+                    .vfValueFormat(
+                        vfValueArray[index] || '',
+                        vfFormatArray[index],
+                        vfOptionsArray[index]
+                    )
+                    .appendTo( _this );
+            });
+
+            return this;
+        },
+
+        //_bsButtonOnClick
+        _bsButtonOnClick: function(){
+            var options = this.data('bsButton_options');
+            $.proxy( options.onClick, options.context )( options.id, null, this );
+            return options.returnFromClick || false;
+        },
+
+        /****************************************************************************************
+        _bsAppendContent( options, context, arg, parentOptions )
+        Create and append any content to this.
+        options can be $-element, function, json-object or array of same
+
+        If parentOptions is given => some options from parentOptions is used if they are not given in options
+
+
+        The default bootstrap structure used for elements in a form is
+        <div class="form-group">
+            <div class="input-group">
+                <div class="input-group-prepend">               //optional
+                    <button class="btn btn-standard">..</buton> //optional 1-N times
+                </div>                                          //optional
+
+                <label class="has-float-label">
+                    <input class="form-control form-control-with-label" type="text" placeholder="The placeholder...">
+                    <span>The label</span>
+                </label>
+
+                <div class="input-group-append">                //optional
+                    <button class="btn btn-standard">..</buton> //optional 1-N times
+                </div>                                          //optional
+            </div>
+        </div>
+        ****************************************************************************************/
+        _bsAppendContent: function( options, context, arg, parentOptions = {} ){
+
+            //Internal functions to create baseSlider and timeSlider
+            function buildSlider(options, constructorName, $parent){
+                var $sliderInput = $('<input/>').appendTo( $parent ),
+                    slider = $sliderInput[constructorName]( options ).data(constructorName),
+                    $element = slider.cache.$outerContainer || slider.cache.$container;
+
+                $element
+                    .attr('id', options.id)
+                    .data('slider', slider );
+            }
+            function buildBaseSlider(options, $parent){ buildSlider(options, 'baseSlider', $parent); }
+            function buildTimeSlider(options, $parent){ buildSlider(options, 'timeSlider', $parent); }
+
+            function buildTextBox( options ){
+                return $('<div/>')
+                        ._bsAddHtml( options );
+            }
+
+            function buildHidden( options ){
+                return $.bsInput( options ).css('display', 'none');
+            }
+
+            function buildInputGroup( options, $parent ){
+                return $parent
+                           .attr('id', options.id)
+                           .addClass('flex-column')
+                           ._bsAppendContent(options.content, null, null, options);
+            }
+
+
+            if (!options)
+                return this;
+
+            //Array of $-element, function etc
+            if ($.isArray( options )){
+                var _this = this;
+                $.each(options, function( index, opt){
+                    _this._bsAppendContent(opt, context, null, parentOptions );
+                });
+                return this;
+            }
+
+            //Function: Include arg (if any) in call to method (=options)
+            if ($.isFunction( options )){
+                arg = arg ? $.isArray(arg) ? arg : [arg] : [];
+                arg.unshift(this);
+                options.apply( context, arg );
+                return this;
+            }
+
+            if (!$.isPlainObject(options)){
+                //Assume it is a $-element or other object that can be appended directly
+                this.append( options );
+                return this;
+            }
+
+            //json-object with options to create bs-elements
+            var buildFunc = $.fn._bsAddHtml,
+                insideFormGroup   = false,
+                addBorder         = false,
+                buildInsideParent = false,
+                noValidation      = false;
+
+
+            //Set values fro parentOptions into options
+            $.each($.parentOptionsToInherit, function(index, id){
+                if (parentOptions.hasOwnProperty(id) && !options.hasOwnProperty(id))
+                    options[id] = parentOptions[id];
+            });
+
+
+            if (options.type){
+                var type = options.type.toLowerCase();
+                switch (type){
+                    case 'input'            :   buildFunc = $.bsInput;              insideFormGroup = true; break;
+                    case 'button'           :   buildFunc = $.bsButton;             break;
+                    case 'buttongroup'      :   buildFunc = $.bsButtonGroup;        break;
+                    case 'menu'             :   buildFunc = $.bsMenu;               break;
+                    case 'select'           :   buildFunc = $.bsSelectBox;          insideFormGroup = true; break;
+                    case 'selectlist'       :   buildFunc = $.bsSelectList;         break;
+                    case 'radiobuttongroup' :   buildFunc = $.bsRadioButtonGroup;   addBorder = true; insideFormGroup = true; break;
+                    case 'checkbox'         :   buildFunc = $.bsCheckbox;           insideFormGroup = true; break;
+                    case 'tabs'             :   buildFunc = $.bsTabs;               break;
+                    case 'table'            :   buildFunc = $.bsTable;              break;
+                    case 'list'             :   buildFunc = $.bsList;               break;
+                    case 'accordion'        :   buildFunc = $.bsAccordion;          break;
+                    case 'slider'           :   buildFunc = buildBaseSlider;        insideFormGroup = true; addBorder = true; buildInsideParent = true; break;
+                    case 'timeslider'       :   buildFunc = buildTimeSlider;        insideFormGroup = true; addBorder = true; buildInsideParent = true; break;
+                    case 'text'             :   buildFunc = $.bsText;               insideFormGroup = true; break;
+                    case 'textarea'         :   buildFunc = $.bsTextArea;           insideFormGroup = true; break;
+                    case 'textbox'          :   buildFunc = buildTextBox;           insideFormGroup = true; addBorder = true; noValidation = true; break;
+                    case 'fileview'         :   buildFunc = $.bsFileView;           break;
+                    case 'hidden'           :   buildFunc = buildHidden;            noValidation = true; break;
+                    case 'inputgroup'       :   buildFunc = buildInputGroup;        addBorder = true; insideFormGroup = true; buildInsideParent = true; break;
+//                    case 'xx'               :   buildFunc = $.bsXx;               break;
+
+                    default                 :   buildFunc = $.fn._bsAddHtml;        buildInsideParent = true;
+                }
+            }
+
+            //Overwrite insideFormGroup if value given in options
+            if ( $.type( options.insideFormGroup ) == "boolean")
+                insideFormGroup = options.insideFormGroup;
+
+            //Set the parent-element where to append to created element(s)
+            var $parent = this,
+                insideInputGroup = false;
+
+            if (insideFormGroup){
+                //Create outer form-group
+                insideInputGroup = true;
+                $parent = $divXXGroup('form-group', options).appendTo( $parent );
+                if (options.smallBottomPadding)
+                    $parent.addClass('small-bottom-padding');
+
+                if (options.lineBefore)
+                    $('<hr/>')
+                        .addClass('before')
+                        .toggleClass('above-label', !!options.label)
+                        .appendTo( $parent );
+
+                if (noValidation || options.noValidation)
+                    $parent.addClass('no-validation');
+            }
+            var $originalParent = $parent;
+            if (insideInputGroup || options.prepend || options.before || options.append || options.after){
+                //Create element inside input-group
+                var $inputGroup = $divXXGroup('input-group', options);
+                if (addBorder && !options.noBorder){
+                    //Add border and label (if any)
+                    $inputGroup.addClass('input-group-border');
+
+                    if (options.darkBorderlabel)
+                        $inputGroup.addClass('input-group-border-dark');
+
+                    if (options.label){
+                        $inputGroup.addClass('input-group-border-with-label');
+                        $('<span/>')
+                            .addClass('has-fixed-label')
+                            ._bsAddHtml( options.label )
+                            .appendTo( $inputGroup );
+                    }
+                }
+                $parent = $inputGroup.appendTo( $parent );
+            }
+
+            //Build the element. Build inside $parent or add to $parent after
+            if (buildInsideParent)
+                buildFunc.call( this, options, $parent );
+            else
+                buildFunc.call( this, options ).appendTo( $parent );
+
+            if (options.center)
+                $parent.addClass('justify-content-center text-center');
+
+            var prepend = options.prepend || options.before;
+            if (prepend)
+                $('<div/>')
+                    .addClass('input-group-prepend')
+                    ._bsAppendContent( prepend, options.contentContext, null, options  )
+                    .prependTo( $parent );
+            var append = options.append || options.after;
+            if (append)
+                $('<div/>')
+                    .addClass('input-group-append')
+                    ._bsAppendContent( append, options.contentContext, null, options  )
+                    .appendTo( $parent );
+
+            if (options.lineAfter)
+                $('<hr/>')
+                    .addClass('after')
+                    .appendTo( $originalParent );
+
+            return this;
+        }   //end of _bsAppendContent
+    }); //$.fn.extend
+
+
+}(jQuery, this.i18next, this, document));
+;
+/****************************************************************************
 	jquery-bootstrap-accordion.js,
 
 	(c) 2017, FCOO
@@ -69912,6 +71254,7 @@ module.exports = g;
                 transparentOnDark   : 'transparent-on-dark',
                 semiTransparent     : 'semi-transparent',
                 square              : 'square',
+                bigSquare           : 'square big-square',
                 bigIcon             : 'big-icon',
                 extraLargeIcon      : 'extra-large-icon',
                 selected            : 'active',
@@ -70027,14 +71370,14 @@ module.exports = g;
                     //Radio-button icons
                     [[
                         'fas fa-circle text-checked   icon-show-for-checked', //"Blue" background
-                        'far fa-dot-circle text-white icon-show-for-checked', //Dot marker
-                        'far fa-circle'                                       //Border
+                        $.FONTAWESOME_PREFIX_STANDARD + ' fa-dot-circle text-white icon-show-for-checked', //Dot marker
+                        $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle'                                       //Border
                     ]] :
                     //Checkbox-button icons
                     [[
                         'fas fa-square text-checked      icon-show-for-checked', //"Blue" background
-                        'far fa-check-square text-white  icon-show-for-checked', //Check marker
-                        'far fa-square'                                          //Border
+                        $.FONTAWESOME_PREFIX_STANDARD + ' fa-check-square text-white  icon-show-for-checked', //Check marker
+                        $.FONTAWESOME_PREFIX_STANDARD + ' fa-square'                                          //Border
                     ]];
 
 
@@ -70419,8 +71762,8 @@ module.exports = g;
             //*********************************************
             default:
                 $container._bsAddHtml({ text: {
-                    da: 'Klik på <i class="far fa-window-maximize"/> for at se dokumentet i et nyt vindue<br>Klik på <i class="fas ' + $.bsExternalLinkIcon + '"/> for at se dokumentet i en ny fane',
-                    en: 'Click on <i class="far fa-window-maximize"/> to see the document in a new window<br>Click on <i class="fas ' + $.bsExternalLinkIcon + '"/> to see the document in a new Tab Page'
+                    da: 'Klik på <i class="'+$.FONTAWESOME_PREFIX + ' fa-window-maximize"/> for at se dokumentet i et nyt vindue<br>Klik på <i class="' + $.FONTAWESOME_PREFIX + ' ' + $.bsExternalLinkIcon + '"/> for at se dokumentet i en ny fane',
+                    en: 'Click on <i class="'+$.FONTAWESOME_PREFIX + ' fa-window-maximize"/> to see the document in a new window<br>Click on <i class="' + $.FONTAWESOME_PREFIX + ' ' + $.bsExternalLinkIcon + '"/> to see the document in a new Tab Page'
                 }});
         }
 
@@ -70429,7 +71772,7 @@ module.exports = g;
             .addClass('modal-footer')
             .css('justify-content',  'center')
             ._bsAppendContent([
-                $.bsButton( {icon:'far fa-window-maximize',  text: {da:'Vis',  en:'Show'},   onClick: function(){ showFileInModal( fileName, options.header ); } } ),
+                $.bsButton( {icon: $.FONTAWESOME_PREFIX + ' fa-window-maximize',  text: {da:'Vis',  en:'Show'},   onClick: function(){ showFileInModal( fileName, options.header ); } } ),
                 $.bsButton( {icon: $.bsExternalLinkIcon, text: {da: 'Åbne', en: 'Open'}, link: fileName } )
             ])
             .appendTo($result);
@@ -70478,7 +71821,7 @@ module.exports = g;
                 ' ';
         var result = [
             'fas ' + className + colorClassName,
-            'far ' + className + borderColorClassName
+            $.FONTAWESOME_PREFIX + ' ' + className + borderColorClassName
         ];
 
         return options.partOfList ? result : [result];
@@ -71126,28 +72469,32 @@ module.exports = g;
 
     */
 
-    //$.bsHeaderIcons = class-names for the different icons on the header
-    $.bsHeaderIcons = {
-        back    : 'fa-chevron-left',
-        forward : 'fa-chevron-right',
+    //$.bsHeaderIcons = class-names for the different icons on the header. Set by function to allow updating $.FONTAWESOME_PREFIX_??
+    $.bsHeaderIcons = {};
+    $._set_bsHeaderIcons = function( forceOptions = {}){
 
-        pin     : ['fas fa-thumbtack fa-inside-circle', 'far fa-circle'],
-        unpin   : 'fa-thumbtack',
+        $.bsHeaderIcons = $.extend( $.bsHeaderIcons, {
+            back    : 'fa-chevron-left',
+            forward : 'fa-chevron-right',
 
-        extend  : 'fa-chevron-up',
-        diminish: 'fa-chevron-down',
+            pin     : ['fas fa-thumbtack fa-inside-circle', $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle'],
+            unpin   : 'fa-thumbtack',
 
-        new     : ['far fa-window-maximize fa-inside-circle2', 'far fa-circle'],
+            extend  : 'fa-chevron-up',
+            diminish: 'fa-chevron-down',
 
-        warning : [['fas fa-circle back text-warning', 'far fa-circle front'], 'fas fa-exclamation middle'],
+            new     : [$.FONTAWESOME_PREFIX_STANDARD + ' fa-window-maximize fa-inside-circle2', $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle'],
 
-        info    : 'fa-info-circle',
+            warning : [['fas fa-circle back text-warning', $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle front'], 'fas fa-exclamation middle'],
 
+            info    : /*$.FONTAWESOME_PREFIX_STANDARD + */'fas fa-info-circle', //fas-info-circle is not part of FA v5 free regulare
 
-        help    : 'far fa-question-circle',
+            help    : $.FONTAWESOME_PREFIX_STANDARD + ' fa-question-circle',
 
-        close   : ['fas fa-circle back', 'far fa-times-circle middle', 'far fa-circle front']
+            close   : ['fas fa-circle back', $.FONTAWESOME_PREFIX_STANDARD + ' fa-times-circle middle', $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle front']
+        }, forceOptions );
     };
+    $._set_bsHeaderIcons();
 
     //mandatoryHeaderIconClass = mandatory class-names and title for the different icons on the header
     var mandatoryHeaderIconClassAndTitle = {
@@ -71837,8 +73184,8 @@ options
             fileNameExt = window.url('fileext', theFileName),
             $content,
             footer = {
-                da: 'Hvis filen ikke kan vises, klik på <i class="fas ' + $.bsExternalLinkIcon + '"></i> for at se dokumentet i en ny fane',
-                en: 'If the file doesn\'t show correctly click on <i class="fas ' + $.bsExternalLinkIcon + '"></i> to see the document in a new Tab Page'
+                da: 'Hvis filen ikke kan vises, klik på <i class="' +           $.FONTAWESOME_PREFIX + ' ' + $.bsExternalLinkIcon + '"></i> for at se dokumentet i en ny fane',
+                en: 'If the file doesn\'t show correctly click on <i class="' + $.FONTAWESOME_PREFIX + ' ' + $.bsExternalLinkIcon + '"></i> to see the document in a new Tab Page'
             },
             fullWidth       = true,
             noPadding       = true,
@@ -71853,8 +73200,8 @@ options
                 $('<div/>')
                     .addClass('text-center')
                     ._bsAddHtml({text: {
-                        da: 'Denne browser understøtter ikke visning<br>af pdf-filer i popup-vinduer<br>Klik på <i class="fas ' + $.bsExternalLinkIcon + '"/> for at se dokumentet i en ny fane',
-                        en: 'This browser does not support<br>pdf-files in popup windows<br>Click on <i class="fas ' + $.bsExternalLinkIcon + '"/> to see the document<br>in a new Tab page'
+                        da: 'Denne browser understøtter ikke visning<br>af pdf-filer i popup-vinduer<br>Klik på <i class="' + $.FONTAWESOME_PREFIX + ' ' + $.bsExternalLinkIcon + '"/> for at se dokumentet i en ny fane',
+                        en: 'This browser does not support<br>pdf-files in popup windows<br>Click on <i class="' +            $.FONTAWESOME_PREFIX + ' ' + $.bsExternalLinkIcon + '"/> to see the document<br>in a new Tab page'
                     }});
             fullWidth       = false;
             footer          = null;
@@ -71895,11 +73242,29 @@ options
 
                     //Add the images to the iframe when the iframe is loaded into the DOM
                     setTimeout( function(){
-                        var $iFrameBody = $iframe.contents().find('body');
-                        $iFrameBody.on('mousewheel', $.proxy( zoomControl.mousewheel, zoomControl ) );
-                        $iFrameBody.append($img);
-                    }, 200);
+                        var contents = $iframe.contents(),
+                            $iframeBody = contents.find('body')/*,
+                            $iframeHead = contents.find('head')*/;
 
+                        $iframeBody.on('mousewheel', $.proxy( zoomControl.mousewheel, zoomControl ) );
+                        $iframeBody.append($img);
+
+                        /* Try to adjust style of iframe - Not working
+                        var style = document.createElement('style');
+                        style.type = 'text/css';
+                        style.innerHTML =
+                            'body { scrollbar-width: thin; scrollbar-color: #cdcdcd white;; }; ' +
+                            'html ::-webkit-scrollbar-thumb {background-color: #cdcdcd; border-radius: 6px; border: 1px solid white; box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5); }';
+                        $iframeHead.append(style);
+
+                        //Or by css-file
+                        var cssLink = document.createElement("link");
+                        cssLink.href = "style.css";
+                        cssLink.rel = "stylesheet";
+                        cssLink.type = "text/css";
+                        $iframeHead.append(cssLink);
+                        */
+                    }, 200);
 
                     $content = [
                         $iframe,
@@ -75172,790 +76537,6 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
     };
 
 }(jQuery, this, document));
-;
-/****************************************************************************
-    jquery-bootstrap.js,
-
-    (c) 2017, FCOO
-
-    https://github.com/fcoo/jquery-bootstrap
-    https://github.com/fcoo
-
-****************************************************************************/
-
-(function ($, i18next, window, document, undefined) {
-    "use strict";
-
-    /*
-
-    Almost all elements comes in two sizes: normal and small set by options.small: false/true
-
-    In jquery-bootstrap.scss sizing class-postfix -xs is added (from Bootstrap 3)
-
-    Elements to click or touch has a special implementation:
-    For device with 'touch' the Bootstrap size 'normal' and 'small' are used
-    For desktop (only mouse) we using smaller version (large = Bootstrap normal, normal = Bootstrap small, small = Bootstrap x-small)
-
-    The variable window.bsIsTouch must be overwriten with the correct value in the application
-
-    */
-
-    //Create namespace
-    var ns = window;
-
-    /*
-    Create $.BSASMODAL = record with {className: asModal-function} where className is added to any $element that have a asModal-function
-    Ex.:
-    $.BSASMODAL['BSTABLE'] = function(){ //Create bsModal for this }
-    var myTable = $.bsTable({...}); //Add 'BSTABLE' to class-name for  result
-    myTable.asModal({...});
-    */
-    $.BSASMODAL = $.BSASMODAL || {};
-    $.fn.asModal = function(options){
-        var _this   = this,
-            asModal = null;
-
-        $.each($.BSASMODAL, function(id, asModalFunc){
-            if (_this.hasClass(id)){
-                asModal = asModalFunc;
-                return false;
-            }
-        });
-        return asModal ? $.proxy(asModal, this)( options ) : null;
-    };
-
-    //Allow test-pages to set bsIsTouch to fixed value
-    ns.bsIsTouch = typeof ns.bsIsTouch == "boolean" ? ns.bsIsTouch : true;
-
-    $.EMPTY_TEXT = '___***EMPTY***___';
-
-    //FONTAWESOME_PREFIX = the classname-prefix used when non is given. Fontawesome 4.X: 'fa', Fontawesome 5: Free: 'fas' Pro: 'far' or 'fal'
-    $.FONTAWESOME_PREFIX = $.FONTAWESOME_PREFIX || 'fa';
-
-    //ICONFONT_PREFIXES = STRING or []STRING with regexp to match class-name setting font-icon class-name. Fontawesome 5: 'fa.?' accepts 'fas', 'far', etc. as class-names => will not add $.FONTAWESOME_PREFIX
-    $.ICONFONT_PREFIXES = 'fa.?';
-
-    /******************************************************
-    $divXXGroup
-    ******************************************************/
-    function $divXXGroup( groupTypeClass, options ){
-        return $('<div/>')
-                   ._bsAddBaseClassAndSize( $.extend({}, options, {
-                       baseClass   : groupTypeClass,
-                       useTouchSize: true
-                   }));
-    }
-
-    //$._bsAdjustIconAndText: Adjust options to fit with {icon"...", text:{da:"", en:".."}
-    // options == {da:"..", en:".."} => return {text: options}
-    // options == array of ??        => array of $._bsAdjustIconAndText( ??? )
-    // options == STRING             => return {text: options}
-
-    $._bsAdjustIconAndText = function( options ){
-        if (!options)
-            return options;
-        if ($.isArray( options )){
-            var result = [];
-            $.each( options, function(index, content){
-                result.push( $._bsAdjustIconAndText(content) );
-            });
-            return result;
-        }
-
-        if ($.type( options ) == "object"){
-            if (!options.icon && !options.text)
-                return {text: options };
-            else
-                return options;
-        }
-        else
-            //options == simple type (string, number etc.)
-            return {text: options };
-
-    };
-
-    //$._bsAdjustText: Adjust options to fit with {da:"...", en:"..."}
-    // options == {da:"..", en:".."} => return options
-    // options == STRING             => return {da: options}
-    $._bsAdjustText = function( options ){
-        if (!options)
-            return options;
-        if ($.type( options ) == "string")
-            return {da: options, en:options};
-        return options;
-    };
-
-    //$._bsAdjustOptions: Adjust options to allow text/name/header etc.
-    $._bsAdjustOptions = function( options, defaultOptions, forceOptions ){
-        //*********************************************************************
-        //adjustContentOptions: Adjust options for the content of elements
-        function adjustContentAndContextOptions( options, context ){
-            options.iconClass = options.iconClass || options.iconClassName;
-            options.textClass = options.textClass || options.textClassName;
-
-            //If context is given => convert all function to proxy
-            if (context)
-                $.each( options, function( id, value ){
-                    if ($.isFunction( value ))
-                        options[id] = $.proxy( value, context );
-                });
-
-            return options;
-        }
-        //*********************************************************************
-
-        options = $.extend( true, {}, defaultOptions || {}, options, forceOptions || {} );
-
-        $.each(['selected', 'checked', 'active', 'open', 'isOpen'], function(index, id){
-            if (options[id] !== undefined){
-                options.selected = !!options[id];
-                return false;
-            }
-        });
-
-        options.list = options.list || options.buttons || options.items || options.children;
-
-        options = adjustContentAndContextOptions( options, options.context );
-
-        //Adjust options.content
-        if (options.content){
-            if ($.isArray( options.content ) )
-                //Adjust each record in options.content
-                for (var i=0; i<options.content.length; i++ )
-                    options.content[i] = adjustContentAndContextOptions( options.content[i], options.context );
-            else
-                if ($.type( options.content ) == "object")
-                    options.content = adjustContentAndContextOptions( options.content, options.context );
-        }
-
-        //Sert context = null to avoid "double" proxy
-        options.context = null;
-
-        return options;
-    };
-
-
-    /****************************************************************************************
-    _bsGetSizeClass
-    baseClass: "BASE" useTouchSize: false
-        small: false => sizeClass = ''
-        small: true  => sizeClass = "BASE-sm"
-
-    baseClass: "BASE" useTouchSize: true
-        small: false => sizeClass = 'BASE-sm'
-        small: true  => sizeClass = "BASE-xs"
-    ****************************************************************************************/
-    $._bsGetSizeClass = function( options ){
-        var sizeClassPostfix = '';
-
-        if (options.useTouchSize){
-            if (ns.bsIsTouch)
-                sizeClassPostfix = options.small ? 'sm' : '';
-            else
-                sizeClassPostfix = options.small ? 'xs' : 'sm';
-        }
-        else
-            sizeClassPostfix = options.small ? 'sm' : '';
-
-        return sizeClassPostfix && options.baseClass ? options.baseClass + '-' + sizeClassPostfix : '';
-    };
-
-
-    /****************************************************************************************
-    $._bsCreateElement = internal method to create $-element
-    ****************************************************************************************/
-    $._bsCreateElement = function( tagName, link, title, textStyle, className, data ){
-        var $result;
-        if (link){
-            $result = $('<a/>');
-            if ($.isFunction( link ))
-                $result
-                    .prop('href', 'javascript:undefined')
-                    .on('click', link );
-            else
-                $result
-                    .i18n(link, 'href')
-                    .prop('target', '_blank');
-        }
-        else
-            $result = $('<'+tagName+'/>');
-
-        if (title)
-            $result.i18n(title, 'title');
-
-        $result._bsAddStyleClasses( textStyle || '' );
-
-        if (className)
-            $result.addClass( className );
-
-        if (data)
-            $result.data( data );
-
-        return $result;
-    };
-
-    /****************************************************************************************
-    $._bsCreateIcon = internal method to create $-icon
-    ****************************************************************************************/
-    var iconfontPrefixRegExp = null;
-    $._bsCreateIcon = function( options, $appendTo, title, className/*, insideStack*/ ){
-        if (!iconfontPrefixRegExp){
-            var prefixes = $.isArray($.ICONFONT_PREFIXES) ? $.ICONFONT_PREFIXES : [$.ICONFONT_PREFIXES];
-            iconfontPrefixRegExp = new window.RegExp('(\\s|^)(' + prefixes.join('|') + ')(\\s|$)', 'g');
-        }
-
-        var $icon;
-
-        if ($.type(options) == 'string')
-            options = {class: options};
-
-        if ($.isArray( options)){
-            //Create a stacked icon
-             $icon = $._bsCreateElement( 'div', null, title, null, 'container-stacked-icons ' + (className || '')  );
-
-            $.each( options, function( index, opt ){
-                $._bsCreateIcon( opt, $icon, null, 'stacked-icon' );
-            });
-
-            //If any of the stacked icons have class fa-no-margin => set if on the container
-            if ($icon.find('.fa-no-margin').length)
-                $icon.addClass('fa-no-margin');
-        }
-        else {
-            var allClassNames = options.icon || options.class || '';
-
-            //Append $.FONTAWESOME_PREFIX if icon don't contain fontawesome prefix ("fa?")
-            if (allClassNames.search(iconfontPrefixRegExp) == -1)
-                allClassNames = $.FONTAWESOME_PREFIX + ' ' + allClassNames;
-
-            allClassNames = allClassNames + ' ' + (className || '');
-
-            $icon = $._bsCreateElement( 'i', null, title, null, allClassNames );
-
-        }
-        $icon.appendTo( $appendTo );
-        return $icon;
-    };
-
-    /****************************************************************************************
-    $._isEqual(obj1, obj2 OR array)
-    Check if two objects or arrays are equal
-    (c) 2017 Chris Ferdinandi, MIT License, https://gomakethings.com
-    @param  {Object|Array|String}  value  The first object or array to compare
-    @param  {Object|Array|String}  other  The second object or array to compare
-    @return {Boolean}              Returns true if they're equal
-    ****************************************************************************************/
-    $._isEqual = function (value, other) {
-        // Get the value type
-        var type = Object.prototype.toString.call(value);
-
-        // If the two objects are not the same type, return false
-        if (type !== Object.prototype.toString.call(other)) return false;
-
-        // Compare the length of the length of the two items
-        var valueLen = type === '[object Array]' ? value.length : Object.keys(value).length;
-        var otherLen = type === '[object Array]' ? other.length : Object.keys(other).length;
-        if (valueLen !== otherLen) return false;
-
-        // Compare two items
-        var compare = function (item1, item2) {
-            // Get the object type
-            var itemType = Object.prototype.toString.call(item1);
-
-            // If an object or array, compare recursively
-            if (['[object Array]', '[object Object]'].indexOf(itemType) >= 0) {
-                if (!$._isEqual(item1, item2)) return false;
-            }
-            // Otherwise, do a simple comparison
-            else {
-                // If the two items are not the same type, return false
-                if (itemType !== Object.prototype.toString.call(item2)) return false;
-
-                // Else if it's a function, convert to a string and compare
-                // Otherwise, just compare
-                if (itemType === '[object Function]') {
-                    if (item1.toString() !== item2.toString())
-                        return false;
-                }
-                else {
-                    if (item1 !== item2) return false;
-                }
-            }
-        };
-
-        // Compare properties
-          if (type === '[object Array]'){
-               for (var i=0; i<valueLen; i++){
-                if (compare(value[i], other[i]) === false)
-                    return false;
-            }
-        }
-        else
-            if (type === '[object Object]'){
-                for (var key in value){
-                    if ( (value.hasOwnProperty(key)) && (compare(value[key], other[key]) === false))
-                        return false;
-                }
-            }
-            else
-                // If nothing failed, return simple comparison
-                return value == other;
-
-        return true;
-    };
-
-
-    //$.parentOptionsToInherit = []ID = id of options that modal-content can inherit from the modal itself
-    $.parentOptionsToInherit = ['small'];
-
-    $.fn.extend({
-        //_bsAddIdAndName
-        _bsAddIdAndName: function( options ){
-            this.attr('id', options.id || '');
-            this.attr('name', options.name || options.id || '');
-            return this;
-        },
-
-        /****************************************************************************************
-        _bsAddBaseClassAndSize
-
-        Add classes
-
-        options:
-            baseClass           [string]
-            baseClassPostfix    [string]
-            styleClass          [string]
-            class               [string]
-            textStyle           [string] or [object]. see _bsAddStyleClasses
-        ****************************************************************************************/
-        _bsAddBaseClassAndSize: function( options ){
-            var classNames = options.baseClass ? [options.baseClass + (options.baseClassPostfix || '')] : [];
-
-            classNames.push( $._bsGetSizeClass(options) );
-
-            if (options.styleClass)
-                classNames.push( options.styleClass );
-
-            if (options.class)
-                classNames.push( options.class );
-
-            this.addClass( classNames.join(' ') );
-
-            this._bsAddStyleClasses( options.textStyle );
-
-            return this;
-        },
-
-        /****************************************************************************************
-        _bsAddStyleClasses
-        Add classes for text-styel
-
-        options [string] or [object]
-            Style for the contents. String or object with part of the following
-            "left right center lowercase uppercase capitalize normal bold italic" or
-            {left: true, right: true, center: true, lowercase: true, uppercase: true, capitalize: true, normal: true, bold: true, italic: true}
-        ****************************************************************************************/
-        _bsAddStyleClasses: function( options = {}){
-            var _this = this,
-
-                bsStyleClass = {
-                    //Text color
-                    "primary"     : "text-primary",
-                    "secondary"   : "text-secondary",
-                    "success"     : "text-success",
-                    "danger"      : "text-danger",
-                    "warning"     : "text-warning",
-                    "info"        : "text-info",
-                    "light"       : "text-light",
-                    "dark"        : "text-dark",
-
-                    //Align
-                    "left"        : "text-left",
-                    "right"       : "text-right",
-                    "center"      : "text-center",
-
-                    //Case
-                    "lowercase"   : "text-lowercase",
-                    "uppercase"   : "text-uppercase",
-                    "capitalize"  : "text-capitalize",
-
-                    //Weight
-                    "normal"      : "font-weight-normal",
-                    "bold"        : "font-weight-bold",
-                    "italic"      : "font-italic"
-                };
-
-            $.each( bsStyleClass, function( style, className ){
-                if (
-                      ( (typeof options == 'string') && (options.indexOf(style) > -1 )  ) ||
-                      ( (typeof options == 'object') && (options[style]) )
-                    )
-                    _this.addClass( className );
-            });
-            return this;
-        },
-
-        /****************************************************************************************
-        _bsAddHtml
-        Internal methods to add innerHTML to button or other element
-        options: array of textOptions or textOptions
-        textOptions: {
-            icon     : String / {class, data, attr} or array of String / {className, data, attr}
-            text     : String or array of String
-            vfFormat : String or array of String
-            vfValue  : any type or array of any-type
-            vfOptions: JSON-object or array of JSON-object
-            textStyle: String or array of String
-            link     : String or array of String
-            title    : String or array of String
-            iconClass: string or array of String
-            textClass: string or array of String
-            textData : obj or array of obj
-        }
-        checkForContent: [Boolean] If true AND options.content exists => use options.content instead
-        ****************************************************************************************/
-
-        _bsAddHtml:  function( options, htmlInDiv, ignoreLink, checkForContent ){
-            //**************************************************
-            function getArray( input ){
-                return input ? $.isArray( input ) ? input : [input] : [];
-            }
-            //**************************************************
-            function isHtmlString( str ){
-                if (!htmlInDiv || ($.type(str) != 'string')) return false;
-
-                var isHtml = false,
-                    $str = null;
-                try       { $str = $(str); }
-                catch (e) { $str = null;   }
-
-                if ($str && $str.length){
-                    isHtml = true;
-                    $str.each( function( index, elem ){
-                        if (!elem.nodeType || (elem.nodeType != 1)){
-                            isHtml = false;
-                            return false;
-                        }
-                    });
-                }
-                return isHtml;
-            }
-
-            //**************************************************
-            options = options || '';
-
-            if (options.content && checkForContent)
-                return this._bsAddHtml(options.content, htmlInDiv, ignoreLink);
-
-
-            var _this = this;
-
-            //options = array => add each
-            if ($.isArray( options )){
-                $.each( options, function( index, textOptions ){
-                    _this._bsAddHtml( textOptions, htmlInDiv, ignoreLink );
-                });
-                return this;
-            }
-
-            this.addClass('container-icon-and-text');
-
-            //If the options is a jQuery-object: append it and return
-            if (options.jquery){
-                this.append( options );
-                return this;
-            }
-
-            //If the content is a string containing html-code => append it and return
-            if (isHtmlString(options)){
-                this.append( $(options) );
-                return this;
-            }
-
-            //Adjust icon and/or text if it is not at format-options
-            if (!options.vfFormat)
-                options = $._bsAdjustIconAndText( options );
-
-            //options = simple textOptions
-            var iconArray       = getArray( options.icon ),
-                textArray       = getArray( options.text ),
-                vfFormatArray   = getArray( options.vfFormat ),
-                vfValueArray    = getArray( options.vfValue ),
-                i18nextArray    = getArray( options.i18next ),
-                vfOptionsArray  = getArray( options.vfOptions ),
-                textStyleArray  = getArray( options.textStyle ),
-                linkArray       = getArray( ignoreLink ? [] : options.link || options.onClick ),
-                titleArray      = getArray( options.title ),
-                iconClassArray  = getArray( options.iconClass ),
-                textClassArray  = getArray( options.textClass ),
-                textDataArray   = getArray( options.textData );
-
-            //Add icons (optional)
-            $.each( iconArray, function( index, icon ){
-                $._bsCreateIcon( icon, _this, titleArray[ index ], iconClassArray[index] );
-            });
-
-            //Add color (optional)
-            if (options.color)
-                _this.addClass('text-'+ options.color);
-
-            //Add text
-
-            $.each( textArray, function( index, text ){
-                //If text ={da,en} and both da and is html-stirng => build inside div
-                var tagName = 'span';
-                if ( (text.hasOwnProperty('da') && isHtmlString(text.da)) || (text.hasOwnProperty('en') && isHtmlString(text.en)) )
-                    tagName = 'div';
-
-                var $text = $._bsCreateElement( tagName, linkArray[ index ], titleArray[ index ], textStyleArray[ index ], textClassArray[index], textDataArray[index] );
-                if ($.isFunction( text ))
-                    text( $text );
-                else
-                    if (text == $.EMPTY_TEXT)
-                        $text.html( '&nbsp;');
-                    else
-                        if (text != ""){
-                            //If text is a string and not a key to i18next => just add the text
-                            if ( ($.type( text ) == "string") && !i18next.exists(text) )
-                                $text.html( text );
-                            else
-                                $text.i18n( text, 'html', i18nextArray[ index ] );
-                        }
-
-                if (index < textClassArray.length)
-                    $text.addClass( textClassArray[index] );
-
-                $text.appendTo( _this );
-            });
-
-            //Add value-format content
-            $.each( vfFormatArray, function( index ){
-                $._bsCreateElement( 'span', linkArray[ index ], titleArray[ index ], textStyleArray[ index ], textClassArray[index] )
-                    .vfValueFormat(
-                        vfValueArray[index] || '',
-                        vfFormatArray[index],
-                        vfOptionsArray[index]
-                    )
-                    .appendTo( _this );
-            });
-
-            return this;
-        },
-
-        //_bsButtonOnClick
-        _bsButtonOnClick: function(){
-            var options = this.data('bsButton_options');
-            $.proxy( options.onClick, options.context )( options.id, null, this );
-            return options.returnFromClick || false;
-        },
-
-        /****************************************************************************************
-        _bsAppendContent( options, context, arg, parentOptions )
-        Create and append any content to this.
-        options can be $-element, function, json-object or array of same
-
-        If parentOptions is given => some options from parentOptions is used if they are not given in options
-
-
-        The default bootstrap structure used for elements in a form is
-        <div class="form-group">
-            <div class="input-group">
-                <div class="input-group-prepend">               //optional
-                    <button class="btn btn-standard">..</buton> //optional 1-N times
-                </div>                                          //optional
-
-                <label class="has-float-label">
-                    <input class="form-control form-control-with-label" type="text" placeholder="The placeholder...">
-                    <span>The label</span>
-                </label>
-
-                <div class="input-group-append">                //optional
-                    <button class="btn btn-standard">..</buton> //optional 1-N times
-                </div>                                          //optional
-            </div>
-        </div>
-        ****************************************************************************************/
-        _bsAppendContent: function( options, context, arg, parentOptions = {} ){
-
-            //Internal functions to create baseSlider and timeSlider
-            function buildSlider(options, constructorName, $parent){
-                var $sliderInput = $('<input/>').appendTo( $parent ),
-                    slider = $sliderInput[constructorName]( options ).data(constructorName),
-                    $element = slider.cache.$outerContainer || slider.cache.$container;
-
-                $element
-                    .attr('id', options.id)
-                    .data('slider', slider );
-            }
-            function buildBaseSlider(options, $parent){ buildSlider(options, 'baseSlider', $parent); }
-            function buildTimeSlider(options, $parent){ buildSlider(options, 'timeSlider', $parent); }
-
-            function buildTextBox( options ){
-                return $('<div/>')
-                        ._bsAddHtml( options );
-            }
-
-            function buildHidden( options ){
-                return $.bsInput( options ).css('display', 'none');
-            }
-
-            function buildInputGroup( options, $parent ){
-                return $parent
-                           .attr('id', options.id)
-                           .addClass('flex-column')
-                           ._bsAppendContent(options.content, null, null, options);
-            }
-
-
-            if (!options)
-                return this;
-
-            //Array of $-element, function etc
-            if ($.isArray( options )){
-                var _this = this;
-                $.each(options, function( index, opt){
-                    _this._bsAppendContent(opt, context, null, parentOptions );
-                });
-                return this;
-            }
-
-            //Function: Include arg (if any) in call to method (=options)
-            if ($.isFunction( options )){
-                arg = arg ? $.isArray(arg) ? arg : [arg] : [];
-                arg.unshift(this);
-                options.apply( context, arg );
-                return this;
-            }
-
-            if (!$.isPlainObject(options)){
-                //Assume it is a $-element or other object that can be appended directly
-                this.append( options );
-                return this;
-            }
-
-            //json-object with options to create bs-elements
-            var buildFunc = $.fn._bsAddHtml,
-                insideFormGroup   = false,
-                addBorder         = false,
-                buildInsideParent = false,
-                noValidation      = false;
-
-
-            //Set values fro parentOptions into options
-            $.each($.parentOptionsToInherit, function(index, id){
-                if (parentOptions.hasOwnProperty(id) && !options.hasOwnProperty(id))
-                    options[id] = parentOptions[id];
-            });
-
-
-            if (options.type){
-                var type = options.type.toLowerCase();
-                switch (type){
-                    case 'input'            :   buildFunc = $.bsInput;              insideFormGroup = true; break;
-                    case 'button'           :   buildFunc = $.bsButton;             break;
-                    case 'buttongroup'      :   buildFunc = $.bsButtonGroup;        break;
-                    case 'menu'             :   buildFunc = $.bsMenu;               break;
-                    case 'select'           :   buildFunc = $.bsSelectBox;          insideFormGroup = true; break;
-                    case 'selectlist'       :   buildFunc = $.bsSelectList;         break;
-                    case 'radiobuttongroup' :   buildFunc = $.bsRadioButtonGroup;   addBorder = true; insideFormGroup = true; break;
-                    case 'checkbox'         :   buildFunc = $.bsCheckbox;           insideFormGroup = true; break;
-                    case 'tabs'             :   buildFunc = $.bsTabs;               break;
-                    case 'table'            :   buildFunc = $.bsTable;              break;
-                    case 'list'             :   buildFunc = $.bsList;               break;
-                    case 'accordion'        :   buildFunc = $.bsAccordion;          break;
-                    case 'slider'           :   buildFunc = buildBaseSlider;        insideFormGroup = true; addBorder = true; buildInsideParent = true; break;
-                    case 'timeslider'       :   buildFunc = buildTimeSlider;        insideFormGroup = true; addBorder = true; buildInsideParent = true; break;
-                    case 'text'             :   buildFunc = $.bsText;               insideFormGroup = true; break;
-                    case 'textarea'         :   buildFunc = $.bsTextArea;           insideFormGroup = true; break;
-                    case 'textbox'          :   buildFunc = buildTextBox;           insideFormGroup = true; addBorder = true; noValidation = true; break;
-                    case 'fileview'         :   buildFunc = $.bsFileView;           break;
-                    case 'hidden'           :   buildFunc = buildHidden;            noValidation = true; break;
-                    case 'inputgroup'       :   buildFunc = buildInputGroup;        addBorder = true; insideFormGroup = true; buildInsideParent = true; break;
-//                    case 'xx'               :   buildFunc = $.bsXx;               break;
-
-                    default                 :   buildFunc = $.fn._bsAddHtml;        buildInsideParent = true;
-                }
-            }
-
-            //Overwrite insideFormGroup if value given in options
-            if ( $.type( options.insideFormGroup ) == "boolean")
-                insideFormGroup = options.insideFormGroup;
-
-            //Set the parent-element where to append to created element(s)
-            var $parent = this,
-                insideInputGroup = false;
-
-            if (insideFormGroup){
-                //Create outer form-group
-                insideInputGroup = true;
-                $parent = $divXXGroup('form-group', options).appendTo( $parent );
-                if (options.smallBottomPadding)
-                    $parent.addClass('small-bottom-padding');
-
-                if (options.lineBefore)
-                    $('<hr/>')
-                        .addClass('before')
-                        .toggleClass('above-label', !!options.label)
-                        .appendTo( $parent );
-
-                if (noValidation || options.noValidation)
-                    $parent.addClass('no-validation');
-            }
-            var $originalParent = $parent;
-            if (insideInputGroup || options.prepend || options.before || options.append || options.after){
-                //Create element inside input-group
-                var $inputGroup = $divXXGroup('input-group', options);
-                if (addBorder && !options.noBorder){
-                    //Add border and label (if any)
-                    $inputGroup.addClass('input-group-border');
-
-                    if (options.darkBorderlabel)
-                        $inputGroup.addClass('input-group-border-dark');
-
-                    if (options.label){
-                        $inputGroup.addClass('input-group-border-with-label');
-                        $('<span/>')
-                            .addClass('has-fixed-label')
-                            ._bsAddHtml( options.label )
-                            .appendTo( $inputGroup );
-                    }
-                }
-                $parent = $inputGroup.appendTo( $parent );
-            }
-
-            //Build the element. Build inside $parent or add to $parent after
-            if (buildInsideParent)
-                buildFunc.call( this, options, $parent );
-            else
-                buildFunc.call( this, options ).appendTo( $parent );
-
-            if (options.center)
-                $parent.addClass('justify-content-center text-center');
-
-            var prepend = options.prepend || options.before;
-            if (prepend)
-                $('<div/>')
-                    .addClass('input-group-prepend')
-                    ._bsAppendContent( prepend, options.contentContext, null, options  )
-                    .prependTo( $parent );
-            var append = options.append || options.after;
-            if (append)
-                $('<div/>')
-                    .addClass('input-group-append')
-                    ._bsAppendContent( append, options.contentContext, null, options  )
-                    .appendTo( $parent );
-
-            if (options.lineAfter)
-                $('<hr/>')
-                    .addClass('after')
-                    .appendTo( $originalParent );
-
-            return this;
-        }   //end of _bsAppendContent
-    }); //$.fn.extend
-
-
-}(jQuery, this.i18next, this, document));
 ;
 /****************************************************************************
     leaflet-bugfix.js,
