@@ -113,7 +113,8 @@ var orientation = (screen.orientation || {}).type || screen.mozOrientation || sc
 
 this.$modalContent.html(
     'w.o= '+window.orientation +
-    '<br>w.s.ori.angle= '+window.screen.orientation.angle +
+    '<br>w.s.ori.angle= ' + (window.screen.orientation?window.screen.orientation.angle:null) +
+    '<br>w.s.ori.type= ' + (window.screen.orientation?window.screen.orientation.type:null) +
     '<br>w.s.mozOri= '+window.screen.mozOrientation +
     '<br>w.s.msOri= '+window.screen.msOrientation +
 
