@@ -2,7 +2,7 @@
 leaflet-bootstrap-compass-device.js
 
 ****************************************************************************/
-(function ($, L, window, document, undefined) {
+(function ($, L, window/*, document, undefined*/) {
     "use strict";
 
     L.Control.BsCompass = L.Control.BsButtonBox.extend({
