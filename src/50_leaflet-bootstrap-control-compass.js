@@ -70,6 +70,7 @@ leaflet-bootstrap-compass-device.js
         onAdd: function(map) {
             var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map);
 
+            this.$modalContent = this.$contentContainer.bsModal.$content;
 
             window.geolocation.onDeviceorientation(this.update, this);
 
@@ -108,7 +109,8 @@ leaflet-bootstrap-compass-device.js
             this.bsButton.css('transform', 'rotate('+ (orientation || 0) + 'deg)');
             this.bsButton.toggleClass('no-device-orientation', orientation === null);
 
-this.$modalContent.html(window.orientation);
+
+this.$modalContent.html('>>>'+window.orientation);
 
             return this;
         },
