@@ -3900,13 +3900,8 @@ leaflet-bootstrap-compass-device.js
 
 this.$modalContent.html(
     'w.o= '+window.orientation +
-//HER    '<br>w.s.ori.angle= ' + (window.screen.orientation?window.screen.orientation.angle:null) +
-//HER    '<br>w.s.ori.type= ' + (window.screen.orientation?window.screen.orientation.type:null) +
-//HER    '<br>w.s.mozOri= '+window.screen.mozOrientation +
-//HER    '<br>w.s.msOri= '+window.screen.msOrientation +
-
-
-
+    '<br>angle= ' + event.angle +
+    '<br>type= ' + event.type +
     '<br>a= '+event.alpha +
     '<br>b= '+event.beta +
     '<br>g= '+event.gamma
