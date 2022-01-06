@@ -565,6 +565,38 @@ leaflet-bootstrap-control-legend.scss
   margin-right: 0.4rem; }
 
 /***********************************************
+leaflet-bootstrap-control-compass.scss
+************************************************/
+@media screen and (orientation: landscape) {
+  .compass-device-portrait {
+    visibility: hidden !important; }
+  .compass-device-landscape {
+    transform: rotate(-90deg) translateX(0.1em) scale(0.7) !important; }
+  .compass-arrow {
+    transform: rotate(-90deg) translateY(-0.5em) scale(0.7) !important; } }
+
+@media screen and (orientation: portrait) {
+  .compass-device-portrait {
+    transform: translateY(0em) scale(0.7) !important; }
+  .compass-device-landscape {
+    visibility: hidden !important; }
+  .compass-arrow {
+    transform: rotate(0deg) translateY(-0.55em) scale(0.7) !important; }
+  .compass-device {
+    transform: translateY(0.1em); } }
+
+.no-device-orientation-slash {
+  visibility: hidden;
+  transform: rotate(0deg); }
+
+.lb-compass-btn.no-device-orientation {
+  transform: rotate(0deg) !important; }
+  .lb-compass-btn.no-device-orientation .no-device-orientation-slash {
+    visibility: visible; }
+  .lb-compass-btn.no-device-orientation * i:not(.no-device-orientation-slash) {
+    opacity: .5; }
+
+/***********************************************
 leaflet-bootstrap-contextmenu.scss
 ************************************************/
 .leaflet-popup-contextmenu .modal-content {
