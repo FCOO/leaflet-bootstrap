@@ -48,7 +48,7 @@ leaflet-bootstrap-compass-device.js
                 //Adjust ther element displaying the orientation as text - Can be set by other
             },
             setOrientationNumber: function( orientation, $element/*, control */){
-                $element.html(orientation+'&deg;');
+                $element.html('>'+orientation+'&deg;');
             }
 
         },
@@ -153,6 +153,7 @@ leaflet-bootstrap-compass-device.js
         update: function( event = {}) {
 
             var orientation = event.deviceorientation || (event.deviceorientation === 0) ? event.deviceorientation : null,
+                //orientationPortrait  = (event.type || '').toUpperCase().includes("PORTRAIT"),
                 orientationSecondary = (event.type || '').toUpperCase().includes("SECONDARY");
 
             /* test
@@ -160,6 +161,12 @@ leaflet-bootstrap-compass-device.js
             orientationSecondary = true;
             */
 
+            /*
+            portrait-primary
+            portrait-secondary
+            landscape-primary
+            landscape-secondary
+            */
             $('html')
                 .toggleClass('orientation-primary',   !orientationSecondary)
                 .toggleClass('orientation-secondary',  orientationSecondary);
@@ -168,6 +175,16 @@ leaflet-bootstrap-compass-device.js
             this.$container.find('.rotate-compass').css('transform', 'rotate('+ -(orientation || 0) + 'deg)');
 
             this.bsButton.parent().toggleClass('no-device-orientation', orientation === null);
+
+            var offset = 0;
+            switch (event.type){
+                case 'portrait-primary'     : offset =   0; break;
+                case 'portrait-secondary'   : offset = 180; break;
+                case 'landscape-primary'    : offset =  90; break;
+                case 'landscape-secondary'  : offset = 270; break;
+            }
+
+            orientation = Math.abs(orientation + offset) % 360;
 
             this.options.setOrientationNumber(orientation, this.$orientation, this);
 
