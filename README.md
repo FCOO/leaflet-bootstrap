@@ -120,6 +120,17 @@ Create a `bsButtonBox ` with legends for different layers
 
 See `src/45_leaflet-bootstrap-control-legend.js` for more details
 
+### L.control.bsCompass(options)
+Create a `bsButtonBox` with the orientation of the device
+	
+	L.control.bsCompass({position: 'topleft'}).addTo(map)
+	//OR
+	var map = L.map('map',{
+		          bsCompassControl: true,
+        	      bsCompassOptions: {position: 'topleft'}
+			  });
+
+See `src/50_leaflet-bootstrap-control-compass.js` for more details
 
 ### Contextmenu on the map and on elements
 
