@@ -3797,12 +3797,12 @@ leaflet-bootstrap-compass-device.js
                 portrait : 'compass-device-portrait fa-portrait text-light',
                 arrow    : 'compass-arrow fa-caret-up'
             },
-
+            iconCompass: 'fa-arrow-alt-circle-up', //'fa-compass lb-compass-adjust',
 
             extraLargeIcon: true,
             bigSquare     : true,
 
-            class: 'lb-compass-btn no-device-orientation',
+            class: 'lb-compass-btn no-device-orientation rotate',
 
             //semiTransparent : true,
             transparent : true,
@@ -3821,9 +3821,17 @@ leaflet-bootstrap-compass-device.js
                 noHorizontalPadding : false,
                 scroll              : false,
                 semiTransparent     : false, //true,
-                width               : 300,
-                content             : '<div class="_no-layer">HER</div>',
+                width               : 140,
+                content             : '<div class="lb-conpass-content"></div><div class="lb-conpass-content-error" style="display:none; text-align:center"></div>',
             },
+
+            adjustOrientationElement: function(/* $element, control */){
+                //Adjust ther element displaying the orientation as text - Can be set by other
+            },
+            setOrientationNumber: function( orientation, $element/*, control */){
+                $element.html(orientation+'&deg;');
+            }
+
         },
 
         /*******************************************
@@ -3851,33 +3859,72 @@ leaflet-bootstrap-compass-device.js
         onAdd: function(map) {
             var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map);
 
-            this.$modalContent = this.$contentContainer.bsModal.$content;
+
+            /*
+            Create info-cont = 3x2 boxes with
+              |  Fixed device   |       Arrow       | Rotated device |
+              | Rotated compass | Direction as text | Fixed compas   |
+            */
+
+            var $modalContent =
+                    this.$contentContainer.bsModal.$content.find('.lb-conpass-content');
+
+            $modalContent.addClass('d-flex flex-row flex-wrap justify-content-center');
+
+            var $div;
+            function createDiv(){
+                $div = $('<div/>');
+                $div.appendTo($modalContent);
+            }
+
+            function createButton(icon, className = ''){
+                createDiv();
+                var $button = $.bsButton({
+                        bigIcon    : true,
+                        square     : true,
+                        noBorder   : true,
+                        noShadow   : true,
+                        transparent: true,
+                        class      : 'disabled show-as-normal ' + className,
+                        icon       : icon
+                    });
+                $div.append($button);
+                return $button;
+            }
+
+
+            //Fixed device
+            createButton(this.options.icon, 'lb-compass-btn fixed');
+
+            //Arrow
+            createButton(this.options.icons.arrow);
+
+            //Rotated device
+            createButton(this.options.icon, 'lb-compass-btn rotate');
+
+
+            //Rotated compass
+            createButton(this.options.iconCompass  + ' the-compass', 'rotate-compass');
+
+            //Direction as text
+            createDiv();
+            this.$orientation = $div;
+            this.options.adjustOrientationElement(this.$orientation, this);
+
+            //Fixed compas
+            createButton(this.options.iconCompass);
+
+
+            //Create error-info
+            this.$contentContainer.bsModal.$content.find('.lb-conpass-content-error')._bsAddHtml({
+                text: {
+                    da: 'Det var ikke muligt at bestemme din enheds orientering',
+                    en: 'It was not possible to detect the orientation of your device'
+                }
+            });
 
             window.geolocation.onDeviceorientation(this.update, this);
 
-//HER            var containerList = this.bsButton.find('.container-stacked-icons');
-
-//HERconsole.log(this);
-
-
-//HER            this.$modalContent = this.$contentContainer.bsModal.$content;
-
-/*
-            //Manually implement extend and diminish functionality
-            var $header = this.$contentContainer.bsModal.$header;
-            this.extendIcon = $header.find('[data-header-icon-id="extend"]');
-            this.extendIcon.on('click', $.proxy(this.extendAll, this) );
-
-            this.diminishIcon = $header.find('[data-header-icon-id="diminish"]');
-            this.diminishIcon.on('click', $.proxy(this.diminishAll, this) );
-
-            //Add the 'No layer' text
-            this.$noLayer = this.$modalContent.find('.no-layer')
-                    .i18n({da: 'Ingen ting...', en:'Nothing...'})
-                    .addClass('text-center w-100 text-secondary');
-
-            this.update();
-*/
             return result;
         },
 
@@ -3886,26 +3933,24 @@ leaflet-bootstrap-compass-device.js
         *******************************************/
         update: function( event = {}) {
 
-            var orientation = event.deviceorientation || (event.deviceorientation === 0) ? event.deviceorientation : null;
+            var orientation = event.deviceorientation || (event.deviceorientation === 0) ? event.deviceorientation : null,
+                orientationSecondary = (event.type || '').toUpperCase().includes("SECONDARY");
 
-            this.bsButton.css('transform', 'rotate('+ (orientation || 0) + 'deg)');
-            this.bsButton.toggleClass('no-device-orientation', orientation === null);
+            /* test
+            orientation = 160;
+            orientationSecondary = true;
+            */
 
-/*
-"portrait-primary"
-"portrait-secondary"
-"landscape-primary"
-"landscape-secondary"
-*/
+            $('html')
+                .toggleClass('orientation-primary',   !orientationSecondary)
+                .toggleClass('orientation-secondary',  orientationSecondary);
 
-this.$modalContent.html(
-    'w.o= '+window.orientation +
-    '<br>angle= ' + event.angle +
-    '<br>type= ' + event.type +
-    '<br>a= '+event.alpha +
-    '<br>b= '+event.beta +
-    '<br>g= '+event.gamma
-);
+            this.$container.find('.rotate').css('transform', 'rotate('+ (orientation || 0) + 'deg)');
+            this.$container.find('.rotate-compass').css('transform', 'rotate('+ -(orientation || 0) + 'deg)');
+
+            this.bsButton.parent().toggleClass('no-device-orientation', orientation === null);
+
+            this.options.setOrientationNumber(orientation, this.$orientation, this);
 
             return this;
         },
@@ -3925,12 +3970,7 @@ this.$modalContent.html(
         }
     });
 
-
 }(jQuery, L, this, document));
-
-
-
-
 ;
 /****************************************************************************
 leaflet-bootstrap-popup.js

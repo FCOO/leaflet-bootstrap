@@ -32121,6 +32121,11 @@ Define global events to handle device orientation and calibration
                 newEvent[id] = typeof event[id] == 'number' ? Math.round(event[id]) : event[id];
             });
 
+
+            var screenOrientation = window.o9n.getOrientation();
+            newEvent.angle = screenOrientation.angle;
+            newEvent.type  = screenOrientation.type;
+
             this.trigger(newEvent);
         }
     });
@@ -32207,18 +32212,6 @@ window.geolocation.GeolocationHandler:
                            0 degrees represents true north, and the direction is determined clockwise (which means that east is 90 degrees and west is 270 degrees).
                            If speed is 0, heading is NaN. If the device is unable to provide heading information, this value is null.
         speed            : Velocity of the device in meters per second. This value can be null.
-
-        If the GeolocationProvider also detects device orientation the following values are included.
-        See src/geolocation-device-orientation-events.js and https://developers.google.com/web/fundamentals/native-hardware/device-orientation for details.
-        deviceOrientation: {
-            absolute            : BOOLEAN,
-            deviceorientation   : NUMBER or null,
-            webkitCompassHeading: NUMBER or null,
-            alpha               : NUMBER or null,
-            beta                : NUMBER or null,
-            gamma               : NUMBER or null
-        }
-
 
     error = Must contain the following properties taken from GeolocationPositionError (see https://developer.mozilla.org/en-US/docs/Web/API/GeolocationPositionError)
         code: Returns an unsigned short representing the error code. The following values are possible:
@@ -71562,6 +71555,7 @@ module.exports = g;
                 extraLargeIcon      : 'extra-large-icon',
                 selected            : 'active',
                 noBorder            : 'no-border',
+                noShadow            : 'no-shadow',
                 focus               : 'init_focus'
             };
 

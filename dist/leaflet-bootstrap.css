@@ -568,33 +568,83 @@ leaflet-bootstrap-control-legend.scss
 leaflet-bootstrap-control-compass.scss
 ************************************************/
 @media screen and (orientation: landscape) {
-  .compass-device-portrait {
+  .lb-compass-btn .compass-device-portrait {
     visibility: hidden !important; }
-  .compass-device-landscape {
-    transform: rotate(-90deg) translateX(0.1em) scale(0.7) !important; }
-  .compass-arrow {
-    transform: rotate(-90deg) translateY(-0.5em) scale(0.7) !important; } }
+  .lb-compass-btn .compass-device-landscape {
+    transform: rotate(90deg) translateX(-0.1em) scale(0.7) !important; }
+    html.orientation-secondary .lb-compass-btn .compass-device-landscape {
+      transform: rotate(-90deg) translateX(0.1em) scale(0.7) !important; }
+  .lb-compass-btn .compass-arrow {
+    transform: rotate(90deg) translateY(-0.5em) scale(0.7) !important; }
+    html.orientation-secondary .lb-compass-btn .compass-arrow {
+      transform: rotate(-90deg) translateY(-0.5em) scale(0.7) !important; }
+  .lb-compass-btn .compass-device {
+    transform: rotate(0deg); }
+  .lb-compass-btn.fixed {
+    transform: rotate(-90deg) !important; }
+    html.orientation-secondary .lb-compass-btn.fixed {
+      transform: rotate(90deg) !important; }
+  .rotate-compass .the-compass {
+    transform: rotate(270deg) !important; }
+    html.orientation-secondary .rotate-compass .the-compass {
+      transform: rotate(90deg) !important; } }
 
 @media screen and (orientation: portrait) {
-  .compass-device-portrait {
-    transform: translateY(0em) scale(0.7) !important; }
-  .compass-device-landscape {
+  .lb-compass-btn .compass-device-landscape {
     visibility: hidden !important; }
-  .compass-arrow {
-    transform: rotate(0deg) translateY(-0.55em) scale(0.7) !important; }
-  .compass-device {
-    transform: translateY(0.1em); } }
+  .lb-compass-btn .compass-device-portrait {
+    transform: rotate(0deg) translateY(0em) scale(0.7) !important; }
+    html.orientation-secondary .lb-compass-btn .compass-device-portrait {
+      transform: rotate(180deg) translateY(0.2em) scale(0.7) !important; }
+  .lb-compass-btn .compass-arrow {
+    transform: rotate(0deg) translateY(-0.6em) scale(0.7) !important; }
+    html.orientation-secondary .lb-compass-btn .compass-arrow {
+      transform: rotate(180deg) translateY(-0.6em) scale(0.7) !important; }
+  .lb-compass-btn .compass-device {
+    transform: translateY(0.1em); }
+    html.orientation-secondary .lb-compass-btn .compass-device {
+      transform: translateY(-0.1em); }
+  html.orientation-secondary .lb-compass-btn.fixed {
+    transform: rotate(180deg) !important; }
+  .rotate-compass .the-compass {
+    transform: rotate(0deg) !important; }
+    html.orientation-secondary .rotate-compass .the-compass {
+      transform: rotate(180deg) !important; } }
 
 .no-device-orientation-slash {
   visibility: hidden;
   transform: rotate(0deg); }
 
-.lb-compass-btn.no-device-orientation {
+.lb-compass-adjust {
+  transform: rotate(-45deg); }
+
+.lb-conpass-content > div {
+  width: 2.65625rem;
+  height: 2.65625rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center; }
+  .lb-conpass-content > div:nth-child(2), .lb-conpass-content > div:nth-child(5) {
+    border-left: 1px solid #ced4da;
+    border-right: 1px solid #ced4da; }
+
+.no-device-orientation .lb-compass-btn {
   transform: rotate(0deg) !important; }
-  .lb-compass-btn.no-device-orientation .no-device-orientation-slash {
+  .no-device-orientation .lb-compass-btn .no-device-orientation-slash {
     visibility: visible; }
-  .lb-compass-btn.no-device-orientation * i:not(.no-device-orientation-slash) {
+  .no-device-orientation .lb-compass-btn .compass-device {
+    transform: none; }
+  .no-device-orientation .lb-compass-btn .compass-arrow, .no-device-orientation .lb-compass-btn .compass-device-landscape, .no-device-orientation .lb-compass-btn .compass-device-portrait {
+    visibility: hidden; }
+  .no-device-orientation .lb-compass-btn * i:not(.no-device-orientation-slash) {
     opacity: .5; }
+
+.no-device-orientation .lb-conpass-content {
+  display: none !important; }
+
+.no-device-orientation .lb-conpass-content-error {
+  display: block !important; }
 
 /***********************************************
 leaflet-bootstrap-contextmenu.scss

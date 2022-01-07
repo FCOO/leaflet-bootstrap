@@ -9965,6 +9965,9 @@ div.btn, div.list-group-item {
     opacity: 1; }
   .btn.btn-standard.no-border {
     border-color: transparent !important; }
+  .btn.btn-standard.no-shadow {
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important; }
   .btn.btn-standard.transparent {
     background: none;
     color: #515961;
@@ -10011,7 +10014,7 @@ div.btn, div.list-group-item {
       color: rgba(81, 89, 97, 0.65);
       background: rgba(0, 0, 0, 0) linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0)) repeat-x; }
   .btn.btn-standard.transparent-on-dark {
-    background: none;
+    background: none !important;
     color: #D4D4D4;
     background: rgba(0, 0, 0, 0) linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0)) repeat-x;
     border: 1px solid rgba(0, 0, 0, 0.1);
@@ -10056,7 +10059,7 @@ div.btn, div.list-group-item {
       color: rgba(212, 212, 212, 0.65);
       background: rgba(0, 0, 0, 0) linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0)) repeat-x; }
   .btn.btn-standard.semi-transparent {
-    background: none;
+    background: none !important;
     color: #515961;
     background: rgba(248, 249, 250, 0.5); }
     .mouse-hover .hover .btn.btn-standard.semi-transparent:not(:active):not(:disabled):not(.disabled),

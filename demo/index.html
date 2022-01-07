@@ -141,6 +141,16 @@
             bsAttributionControl: first,
             bsAttributionOptions: {
                 position: 'bottomright'
+            },
+
+            bsCompassOptions: {
+                content: { footer: 'Godt' },
+                adjustOrientationElement: function(/* $element, control */){
+                    //Adjust ther element displaying the orientation as text - Can be set by other
+                },
+                setOrientationNumber: function( orientation, $element/*, control */){
+                    $element.html(orientation+'&deg;');
+                }
             }
 
         }).setView([56.2, 11.5], 6);
