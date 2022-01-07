@@ -57,7 +57,7 @@
         window.bsIsTouch = true;
 
     i18next.init();
-    i18next.changeLanguage('en');
+    i18next.changeLanguage('da');
     i18next.options.fallbackLng = i18next.language == 'da' ? 'en' : 'da';
 
 
@@ -143,13 +143,14 @@
                 position: 'bottomright'
             },
 
+
             bsCompassOptions: {
                 content: { footer: 'Godt' },
                 adjustOrientationElement: function(/* $element, control */){
                     //Adjust ther element displaying the orientation as text - Can be set by other
                 },
                 setOrientationNumber: function( orientation, $element/*, control */){
-                    $element.html(orientation+'&deg;');
+                    $element.html('A'+orientation+'&deg;');
                 }
             }
 

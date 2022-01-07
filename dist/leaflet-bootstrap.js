@@ -3829,7 +3829,7 @@ leaflet-bootstrap-compass-device.js
                 //Adjust ther element displaying the orientation as text - Can be set by other
             },
             setOrientationNumber: function( orientation, $element/*, control */){
-                $element.html('>'+orientation+'&deg;');
+                $element.html(orientation+'&deg;');
             }
 
         },
@@ -3919,7 +3919,7 @@ leaflet-bootstrap-compass-device.js
             this.$contentContainer.bsModal.$content.find('.lb-conpass-content-error')._bsAddHtml({
                 text: {
                     da: 'Det var ikke muligt at bestemme din enheds orientering',
-                    en: 'It was not possible to detect the orientation of your device'
+                    en: 'It was not possible to detect the orientation of<br>your device'
                 }
             });
 
@@ -3934,13 +3934,8 @@ leaflet-bootstrap-compass-device.js
         update: function( event = {}) {
 
             var orientation = event.deviceorientation || (event.deviceorientation === 0) ? event.deviceorientation : null,
-                //orientationPortrait  = (event.type || '').toUpperCase().includes("PORTRAIT"),
+                orientationExists = orientation !== null,
                 orientationSecondary = (event.type || '').toUpperCase().includes("SECONDARY");
-
-            /* test
-            orientation = 160;
-            orientationSecondary = true;
-            */
 
             /*
             portrait-primary
@@ -3948,26 +3943,29 @@ leaflet-bootstrap-compass-device.js
             landscape-primary
             landscape-secondary
             */
-            $('html')
-                .toggleClass('orientation-primary',   !orientationSecondary)
-                .toggleClass('orientation-secondary',  orientationSecondary);
+            this.bsButton.parent().toggleClass('no-device-orientation', !orientationExists);
 
-            this.$container.find('.rotate').css('transform', 'rotate('+ (orientation || 0) + 'deg)');
-            this.$container.find('.rotate-compass').css('transform', 'rotate('+ -(orientation || 0) + 'deg)');
+            if (orientationExists){
 
-            this.bsButton.parent().toggleClass('no-device-orientation', orientation === null);
+                $('html')
+                    .toggleClass('orientation-primary',   !orientationSecondary)
+                    .toggleClass('orientation-secondary',  orientationSecondary);
 
-            var offset = 0;
-            switch (event.type){
-                case 'portrait-primary'     : offset =   0; break;
-                case 'portrait-secondary'   : offset = 180; break;
-                case 'landscape-primary'    : offset =  90; break;
-                case 'landscape-secondary'  : offset = 270; break;
+                this.$container.find('.rotate').css('transform', 'rotate('+ orientation + 'deg)');
+                this.$container.find('.rotate-compass').css('transform', 'rotate('+ -1*orientation + 'deg)');
+
+                var offset = 0;
+                switch (event.type){
+                    case 'portrait-primary'     : offset =   0; break;
+                    case 'portrait-secondary'   : offset = 180; break;
+                    case 'landscape-primary'    : offset =  90; break;
+                    case 'landscape-secondary'  : offset = 270; break;
+                }
+
+                orientation = (orientation + offset +360) % 360;
+
+                this.options.setOrientationNumber(orientation, this.$orientation, this);
             }
-
-            orientation = Math.abs(orientation + offset) % 360;
-
-            this.options.setOrientationNumber(orientation, this.$orientation, this);
 
             return this;
         },
