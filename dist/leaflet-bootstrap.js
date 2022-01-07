@@ -3962,7 +3962,7 @@ leaflet-bootstrap-compass-device.js
                     case 'landscape-secondary'  : offset = 270; break;
                 }
 
-                orientation = orientation+' '+offset +' '+( (orientation + offset +360) % 360 );
+                orientation = (orientation + offset +360) % 360;
 
                 this.options.setOrientationNumber(orientation, this.$orientation, this);
             }
