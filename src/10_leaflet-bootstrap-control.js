@@ -73,6 +73,13 @@ L.BsControl = extention of L.Control with
 
             var result = L.Control.prototype.addTo.apply(this, arguments);
 
+            if (this.options.prepend){
+                var $result = $(result._container),
+                    $parent = $result.parent();
+                $result.detach();
+                $parent.prepend( $result );
+            }
+
             L.DomEvent.disableClickPropagation(this._container);
 
 

@@ -272,6 +272,13 @@ L.BsControl = extention of L.Control with
 
             var result = L.Control.prototype.addTo.apply(this, arguments);
 
+            if (this.options.prepend){
+                var $result = $(result._container),
+                    $parent = $result.parent();
+                $result.detach();
+                $parent.prepend( $result );
+            }
+
             L.DomEvent.disableClickPropagation(this._container);
 
 
@@ -1271,7 +1278,8 @@ https://github.com/nerik/leaflet-graphicscale
             //Set popup-items - two different modes: With and without options.selectFormat
             var reticlePopup = {
                     id          : 'showReticle',
-                    icon        : 'fa-ruler-combined', text: {da:'Vis trådkors', en:'Show Reticle'},
+                    //icon        : 'fa-ruler-combined', Can't have both checkbox and icon
+                    text        : {da:'Vis trådkors', en:'Show Reticle'},
                     type        : 'checkbox',
                     closeOnClick: false,
                     selected    : this.options.showReticle,

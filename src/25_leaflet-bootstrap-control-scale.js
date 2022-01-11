@@ -49,7 +49,8 @@ https://github.com/nerik/leaflet-graphicscale
             //Set popup-items - two different modes: With and without options.selectFormat
             var reticlePopup = {
                     id          : 'showReticle',
-                    icon        : 'fa-ruler-combined', text: {da:'Vis trådkors', en:'Show Reticle'},
+                    //icon        : 'fa-ruler-combined', Can't have both checkbox and icon
+                    text        : {da:'Vis trådkors', en:'Show Reticle'},
                     type        : 'checkbox',
                     closeOnClick: false,
                     selected    : this.options.showReticle,
