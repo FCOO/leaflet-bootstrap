@@ -3949,7 +3949,7 @@ leaflet-bootstrap-compass-device.js
         *******************************************/
         update: function( event = {}) {
 
-            var orientation = 22, //event.deviceorientation || (event.deviceorientation === 0) ? event.deviceorientation : null,
+            var orientation = event.deviceorientation || (event.deviceorientation === 0) ? event.deviceorientation : null,
                 orientationExists = orientation !== null,
                 orientationSecondary = (event.type || '').toUpperCase().includes("SECONDARY");
 
