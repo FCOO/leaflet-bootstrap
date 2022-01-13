@@ -3058,7 +3058,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
             showSlider : false,
             showHistory: false,
             historyEnabled: true,
-            semiTransparent: false,
+            semiTransparent: true,
 
             tooltipDirection: 'top',
 
