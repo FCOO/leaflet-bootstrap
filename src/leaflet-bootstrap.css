@@ -256,6 +256,12 @@ Font-family for four icons used in leaflet-bootstrap
   content: "\ead6"; }
 
 /***********************************************
+Scale icons
+************************************************/
+.fa-scale-x-08 {
+  transform: scaleX(0.8); }
+
+/***********************************************
 leaflet-bootstrap-popup.scss,
 ************************************************/
 .leaflet-popup-content {

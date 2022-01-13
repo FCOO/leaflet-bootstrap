@@ -3683,7 +3683,7 @@ leaflet-bootstrap-control-legend.js
                 if (options.onRemove)
                     modalContentOptions.icons.close = {
                         //icon   : ['fas fa-home _back', 'far fa-home _middle', 'far fa-home _front'],
-                        icon   : ['fa-map', 'fa-slash'],
+                        icon   : ['fa-map fa-scale-x-08', 'fa-slash fa-scale-x-08'],
                         className: 'fa-map-margin-right',
                         title  : {da:'Skjul', en:'Hide'},
                         onClick: $.proxy(this.remove, this)
