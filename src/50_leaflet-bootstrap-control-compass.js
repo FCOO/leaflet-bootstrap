@@ -23,8 +23,8 @@ leaflet-bootstrap-compass-device.js
 
             class: 'lb-compass-btn no-device-orientation rotate',
 
-            //semiTransparent : true,
-            transparent : true,
+            semiTransparent : true,
+            //transparent : true,
 
             content: {
                 header          : {
