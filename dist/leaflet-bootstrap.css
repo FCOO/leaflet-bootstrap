@@ -639,7 +639,7 @@ leaflet-bootstrap-control-compass.scss
 .no-device-orientation .lb-compass-btn {
   transform: rotate(0deg) !important; }
   .no-device-orientation .lb-compass-btn .no-device-orientation-slash {
-    visibility: visible; }
+    visibility: inherit; }
   .no-device-orientation .lb-compass-btn .compass-device {
     transform: none; }
   .no-device-orientation .lb-compass-btn .compass-arrow, .no-device-orientation .lb-compass-btn .compass-device-landscape, .no-device-orientation .lb-compass-btn .compass-device-portrait {

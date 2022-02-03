@@ -4137,6 +4137,7 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
         //this._content can be 1: string or function, 2: object with the content, 3: Full popup-options.
         //If any of the contents are functions the functions must be function($body, popup, map)
         //Convert this._content into bsModal-options
+
         var contentAsModalOptions = ($.isPlainObject(this._content) && !!this._content.content) ? this._content : {content: this._content},
             contentArg = [this, this._map],
             modalOptions = $.extend(true, {
@@ -4179,7 +4180,10 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
 
         //Adjust options for bsModal
         if (modalOptions.extended){
-            modalOptions.extended.scroll = true;
+            //If no scroll-options is given => default = true
+            if (typeof modalOptions.extended.scroll !== 'boolean')
+                modalOptions.extended.scroll = true;
+
             //If no extended height or width is given => use same as not-extended
             if (!modalOptions.extended.height && !modalOptions.extended.maxHeight)
                 modalOptions.extended.height = true;
@@ -4187,6 +4191,7 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
             if (!modalOptions.extended.width && !modalOptions.extended.maxWidth)
                 modalOptions.extended.width = true;
         }
+
 
         //Save modal-options and content
         this.modalOptions = modalOptions;
