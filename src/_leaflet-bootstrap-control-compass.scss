@@ -131,7 +131,7 @@ leaflet-bootstrap-control-compass.scss
         transform: rotate(0deg) !important;
 
         .no-device-orientation-slash {
-            visibility: visible;
+            visibility: inherit;
             //transform: translateX(-3px) scaleX(.8);
         }
         .compass-device {
