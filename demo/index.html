@@ -835,7 +835,7 @@ content = {
     //************************************************************
 
     for (var i=0; i<10;i++){
-        var legend = map1.bsLegendControl.addLegend({
+        var legendOptions = {
                 icon: i != 4 ? [['fas fa-slash', 'fa-long-arrow-alt-up']] : ['far fa-square', 'far fa-heart'],
                 text: '| ' +i+'. header' + (i == 3 ? 'Dette er en meget lang title, der geren skulle blive forkortet, så den ikke løber over' : ''),
                 index: 100-i,
@@ -861,7 +861,10 @@ content = {
                 onInfo    : function(){ console.log('INFO');},
                 onWarning : function(){ console.log('WARNING');},
                 onRemove  : function(){ console.log('REMOVE');},
-            });
+            };
+
+        var legend = map1.bsLegendControl.addLegend(legendOptions);
+
 //HER	if ((i==1) || (i==4))
 //HER			legend.workingOn()
 		if (i==2)
@@ -871,6 +874,14 @@ content = {
             legend.hideIcon('info')
         else
             legend.hideIcon('warning')
+
+    
+        map1.bsLegendControl.removeLegend(legend);
+        legend = map1.bsLegendControl.addLegend(legendOptions);
+        map1.bsLegendControl.addLegend(legend);
+
+    
+
     }
 
 

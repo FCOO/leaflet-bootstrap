@@ -90,7 +90,7 @@
                 };
 
             if (options instanceof $){
-                $button = options;
+                $button = options.clone(true);
                 //If $button is a checkbox-button => overwrite onChange
                 var buttonOptions = $button.data('cbx_options');
                 if (buttonOptions){
@@ -109,6 +109,7 @@
             }
             else {
                 //Create the buttons and modify the click-event to call options.onClick(id, null, $button, map); map is added
+                options = $.extend(true, {}, options);
                 lbOptions = {
                     event           : options.onClick,
                     context         : options.context,
