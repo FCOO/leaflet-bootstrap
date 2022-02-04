@@ -844,12 +844,12 @@ content = {
                     {type:'text', label: {icon:'fa-home', text:'Header'}, text:' Dette er en linie tekst', small: true, center: true},
                     {type:'text', label: {icon:'fa-home', text:'Header'}, text:' Dette er en linie tekst'},
 
-                ] : null,
+                ] : ' ',
                 //noVerticalPadding: true,
                 //noHorizontalPadding: true,
 
                 buttons   : [
-                    {id:'button_'+i, icon:'fa-home', text:'click me', 
+                    {id:'button_'+i, icon:'fa-home', text:'click me #'+i, 
                         onClick: function(id, selected, button, map, legend){ console.log('click me:', id, map, legend); legend.updateContent('Skide godt do!'); } }, 
 
                     $.bsCheckboxButton({id:'checkbox_button_'+i, text: {da:'Vælg mig', en:'Select me'}, icon: ['fa-thumbs-down', 'fa-thumbs-up'], selected: false,
