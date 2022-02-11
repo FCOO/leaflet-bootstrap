@@ -40158,7 +40158,14 @@ if (typeof define === 'function' && define.amd) {
 
           res = this.extendTranslation(res, keys, options, resolved, lastKey);
           if (usedKey && res === key && this.options.appendNamespaceToMissingKey) res = "".concat(namespace, ":").concat(key);
-          if ((usedKey || usedDefault) && this.options.parseMissingKeyHandler) res = this.options.parseMissingKeyHandler(res);
+
+          if ((usedKey || usedDefault) && this.options.parseMissingKeyHandler) {
+            if (this.options.compatibilityAPI !== 'v1') {
+              res = this.options.parseMissingKeyHandler(key, usedDefault ? res : undefined);
+            } else {
+              res = this.options.parseMissingKeyHandler(res);
+            }
+          }
         }
 
         return res;
@@ -76968,9 +76975,14 @@ Base object-class for all type of markers
         xl: 42,
     };
 
-//new options: noInner:true or simple: true => no inner div and no icon, just ONE div
-
     ns.iconList = []; //[TYPE][SIZE] of L.divIcon or other icon
+    var lastSvgId = 0;
+    function stamp(obj) {
+        /*eslint-disable */
+        obj._lbm_svg_id = obj._lbm_svg_id || ++lastSvgId;
+        return obj._lbm_svg_id;
+        /* eslint-enable */
+    }
 
     //colorNameToColor = list of name:color.MUST match the list in src/_leaflet-bootstrap-marker-colors.scss
     var colorNameToColor = ns.colorNameToColor = {
@@ -77235,11 +77247,18 @@ Base object-class for all type of markers
         },
 
         /*****************************************************
+        _adjustAndSetOptions
+        *****************************************************/
+        _adjustAndSetOptions: function( options ){
+            $.extend(this.options, this._adjustOptions(options));
+        },
+
+        /*****************************************************
         initialize
         *****************************************************/
         initialize: function(latLng, options){
             L.Marker.prototype.initialize.call(this, latLng, options);
-            this.options = this._adjustOptions();
+            this._adjustAndSetOptions();
 
             //Create 'dummy' $icon to allow setColor etc. before the marker is added
             this.$icon = $('<div/>');
@@ -77377,8 +77396,14 @@ Base object-class for all type of markers
                     iconAnchor : point( width, height, this.options.iconAnchor  ),
                     popupAnchor: point( width, height, this.options.popupAnchor ),
                 },
-                //iconId = unique for the same inner-icon
-                iconId = sizeId + '_' + (this.options.iconClass || '') + '_' + (this.options.innerIconClass || '') + '_' + (this.options.scaleInner || '') + (this.options.round ? '_round' : ''),
+                //iconId = unique for the same inner-icon and svg
+                iconId =    sizeId + '_' +
+                            (this.options.iconClass || '') + '_' +
+                            (this.options.innerIconClass || '') + '_' +
+                            (this.options.scaleInner || '') + '_' +
+
+                            (this.options.svg ? stamp(this.options.svg) : '') + '_' +
+                            (this.options.round ? '_round' : ''),
                 result = iconList[iconId] = iconList[iconId] || this.createIcon(sizeId, iconOptions);
 
             //If the marker need individual creation of icon => just recreate the icon
@@ -77404,7 +77429,7 @@ Base object-class for all type of markers
         Update the marker regarding all options except size
         *****************************************************/
         updateIcon: function(options, forceColor){
-            this.options = this._adjustOptions(options);
+            this._adjustAndSetOptions(options);
 
             this.getElements();
 
@@ -77475,7 +77500,7 @@ Base object-class for all type of markers
                 $(tooltip._container).removeClass('leaflet-tooltip-icon-'+this.size);
 
             this.options.size = size || this.options.size;
-            this.options = this._adjustOptions();
+            this._adjustAndSetOptions();
             this.size = this.options.size;
 
             this.options.icon = this.getIcon( this.size );

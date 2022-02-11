@@ -133,7 +133,7 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
         //If any of the contents are functions the functions must be function($body, popup, map)
         //Convert this._content into bsModal-options
 
-        var contentAsModalOptions = ($.isPlainObject(this._content) && !!this._content.content) ? this._content : {content: this._content},
+        var contentAsModalOptions = $.isPlainObject(this._content) ? this._content : {content: this._content},
             contentArg = [this, this._map],
             modalOptions = $.extend(true, {
                 small         : true,

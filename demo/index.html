@@ -394,13 +394,14 @@ content = {
 };
 */
 
+
             marker.bindPopup({
                 header: 'Overskrift',
                 _semiTransparent: first, //true,
                 clickable: true,
 
-                isMinimized: true,
-                fixedContent: 'FIXED',
+                //isMinimized: true,
+                //fixedContent: 'FIXED',
                 minimized: {
                     fixedContent: true,
                     showTooltip: true,
@@ -410,17 +411,21 @@ content = {
                     center             : true,
                     showHeaderOnClick  : true,
                     dynamic            : true,
-                    content            : function($body){
+                    content: '',
+                    __content            : function($body){
                         $body.html( moment().format('HH:mm.ss'));
                     }
                 },
-                dynamic: true,
+                //dynamic: true,
                 showTooltip: true,
-                content: function($body){
+                verticalButtons: true,
+                scroll: false,
+
+                _content: '', 
+                _content: function($body){
                     $body.html( 'Normal ' + moment().format('HH:mm.ss'));
                 },
-                verticalButtons: true,
-                _content: {
+                content: {
                     type: 'buttongroup',
                     fullWidth: true,
                     vertical: true,
@@ -446,7 +451,7 @@ content = {
                 },
                 fixable: true,
                 _width: 321,
-                buttons: [
+                __buttons: [
                     {text:'klik', onClick: function(){ 
                         console.log('klik', arguments); 
                     }},
@@ -463,7 +468,7 @@ content = {
 
             })
 
-        marker.on('popupopen',  function(){ marker._popup.setSizeExtended(); });
+        //marker.on('popupopen',  function(){ marker._popup.setSizeExtended(); });
 
 
         marker.addContextmenuItems([
