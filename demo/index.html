@@ -841,15 +841,19 @@ content = {
 
     for (var i=0; i<10;i++){
         var legendOptions = {
-                icon: i != 4 ? [['fas fa-slash', 'fa-long-arrow-alt-up']] : ['far fa-square', 'far fa-heart'],
+                icon: 'fa-home', //i != 4 ? [['fas fa-slash', 'fa-long-arrow-alt-up']] : ['far fa-square', 'far fa-heart'],
                 text: '| ' +i+'. header' + (i == 3 ? 'Dette er en meget lang title, der geren skulle blive forkortet, så den ikke løber over' : ''),
                 index: 100-i,
-                content   : i % 2 ? [
+                content: 'Content',
+
+                showContent: i != 9,
+
+                __content   : i % 2 ? [
                     {type:'text', label: {icon:'fa-home', text:'Header'}, text:' Dette er en linie tekst'},
                     {type:'text', label: {icon:'fa-home', text:'Header'}, text:' Dette er en linie tekst', small: true, center: true},
                     {type:'text', label: {icon:'fa-home', text:'Header'}, text:' Dette er en linie tekst'},
 
-                ] : ' ',
+                ] : '',
                 //noVerticalPadding: true,
                 //noHorizontalPadding: true,
 
@@ -880,10 +884,9 @@ content = {
         else
             legend.hideIcon('warning')
 
-    
-        map1.bsLegendControl.removeLegend(legend);
-        legend = map1.bsLegendControl.addLegend(legendOptions);
-        map1.bsLegendControl.addLegend(legend);
+//HER        map1.bsLegendControl.removeLegend(legend);
+//HER        legend = map1.bsLegendControl.addLegend(legendOptions);
+//HER        map1.bsLegendControl.addLegend(legend);
 
     
 

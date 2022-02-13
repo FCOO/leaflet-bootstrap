@@ -54,10 +54,13 @@ leaflet-bootstrap-control-legend.js
             this.options.content.maxHeight = this.options.maxHeight || this.options.content.maxHeight;
 
             var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map);
-            this.$modalContent = this.$contentContainer.bsModal.$content;
+
+
+            this.bsModal = this.$contentContainer.bsModal;
+            this.$modalContent = this.bsModal.$content;
 
             //Manually implement extend and diminish functionality
-            var $header = this.$contentContainer.bsModal.$header;
+            var $header = this.bsModal.$header;
             this.extendIcon = $header.find('[data-header-icon-id="extend"]');
             this.extendIcon.on('click', $.proxy(this.extendAll, this) );
 
@@ -137,6 +140,38 @@ leaflet-bootstrap-control-legend.js
         },
 
         /*******************************************
+        showLegend
+        *******************************************/
+        showLegend: function( legendId, extended ){
+            if (this.legends[legendId])
+                this.legends[legendId].show(extended);
+        },
+
+        /*******************************************
+        hideLegend
+        *******************************************/
+        hideLegend: function( legendId ){
+            if (this.legends[legendId])
+                this.legends[legendId].hide();
+        },
+
+        /*******************************************
+        showLegendContent
+        *******************************************/
+        showLegendContent: function( legendId, extended ){
+            if (this.legends[legendId])
+                this.legends[legendId].showContent(extended);
+        },
+
+        /*******************************************
+        hideLegendContent
+        *******************************************/
+        hideLegendContent: function( legendId ){
+            if (this.legends[legendId])
+                this.legends[legendId].hideContent();
+        },
+
+        /*******************************************
         updateLegend
         *******************************************/
         updateLegend: function( legendId, options ){
@@ -177,7 +212,11 @@ leaflet-bootstrap-control-legend.js
     *******************************************************************
     ******************************************************************/
     L.BsLegend = function( options ){
-        this.options = options;
+        this.options = $.extend({
+                show       : true,
+                showContent: true,
+                isExtended : true
+            }, options);
         this.index = options.index;
     };
 
@@ -260,7 +299,7 @@ leaflet-bootstrap-control-legend.js
 
                     modalContentOptions.extended = {content: content};
 
-                    modalContentOptions.isExtended = true;
+                    modalContentOptions.isExtended = this.options.isExtended;
                     options.hasContent = true;
                 }
 
@@ -274,11 +313,12 @@ leaflet-bootstrap-control-legend.js
                         onClick: $.proxy(this.remove, this)
                     };
                 this.$container    = $('<div/>')._bsModalContent(modalContentOptions);
-                this.$modalContent = this.$container.bsModal.$modalContent;
+                this.bsModal = this.$container.bsModal;
+                this.$modalContent = this.bsModal.$modalContent;
 
 
                 //Find all header icons
-                this.stateIcons = this.$container.bsModal.$header.children();
+                this.stateIcons = this.bsModal.$header.children();
                 var $normalIcon = $(this.stateIcons[0]);
                 $normalIcon.addClass('fa-fw ' + (this.options.normalIconClass || ''));
                 if (normalIconIsStackedIcon)
@@ -289,9 +329,19 @@ leaflet-bootstrap-control-legend.js
                     _this.actionIcons[id] = _this.$container.find('[data-header-icon-id="'+id+'"]');
                 });
 
+                this.sizeIcons = {};
+                $.each(['extend', 'diminish'], function(index, id){
+                    _this.sizeIcons[id] = _this.$container.find('[data-header-icon-id="'+id+'"]');
+                });
+
                 this.$header = this.$container.find('.modal-header');
 
+
+                this.toggleContent( this.options.showContent );
+                this.toggle( this.options.show );
+
                 this.setStateNormal();
+
                 this.workingOff();
             }
 
@@ -333,7 +383,68 @@ leaflet-bootstrap-control-legend.js
 
 
         /*******************************************
-        Remove legend
+        show
+        *******************************************/
+        show: function( extended ){
+            return this.toggle(true, extended);
+        },
+
+        /*******************************************
+        hide
+        *******************************************/
+        hide: function(extended){
+            return this.toggle(false, extended);
+        },
+
+        /*******************************************
+        toggle
+        *******************************************/
+        toggle: function(show, extended){
+            this.$container.toggle(!!show);
+            this.isShown = !!show;
+
+            if (this.options.hasContent && (typeof extended == 'boolean')){
+                //For unknown reasons _bsModalExtend is needed first
+                this.$container._bsModalExtend();
+                if (!extended)
+                    this.$container._bsModalDiminish();
+            }
+            return this;
+        },
+
+        /*******************************************
+        showContent
+        *******************************************/
+        showContent: function( extended ){
+            return this.toggleContent(true, extended);
+        },
+
+        /*******************************************
+        hideContent
+        *******************************************/
+        hideContent: function( extended ){
+            return this.toggleContent(false, extended);
+        },
+
+        /*******************************************
+        toggleContent
+        *******************************************/
+        toggleContent: function( show, extended ){
+            show = show && this.options.hasContent;
+            $.each(this.sizeIcons, function(id, $icon){
+                $icon.css('visibility', show ? 'visible' : 'hidden');
+            });
+
+            if (this.options.hasContent){
+                this.bsModal.extended.$body.toggleClass('modal-body-no-content', !show);
+
+                if (typeof extended == 'boolean')
+                    this.toggle(this.isShown, extended);
+            }
+        },
+
+        /*******************************************
+        remove
         *******************************************/
         remove: function(){
             this.parent.removeLegend(this);
