@@ -3629,9 +3629,10 @@ leaflet-bootstrap-control-legend.js
     ******************************************************************/
     L.BsLegend = function( options ){
         this.options = $.extend({
-                show       : true,
-                showContent: true,
-                isExtended : true
+                show       : true,  //Show or hide the legend at init
+                showContent: true,  //Show or hide the content at init
+                showIcons  : true,  //Show or hide the icon-buttons t the header at init
+                isExtended : true   //Extend/diminish the legend at init
             }, options);
         this.index = options.index;
     };
@@ -3743,6 +3744,7 @@ leaflet-bootstrap-control-legend.js
                 this.actionIcons = {};
                 $.each(['warning', 'info', 'help', 'close'], function(index, id){
                     _this.actionIcons[id] = _this.$container.find('[data-header-icon-id="'+id+'"]');
+                    _this.actionIcons[id].toggle(_this.options.showIcons || (id == 'close'));
                 });
 
                 this.sizeIcons = {};
