@@ -398,7 +398,7 @@ content = {
             marker.bindPopup({
                 header: 'Overskrift',
                 _semiTransparent: first, //true,
-                clickable: true,
+                //clickable: true,
 
                 //isMinimized: true,
                 //fixedContent: 'FIXED',
@@ -422,18 +422,48 @@ content = {
                 scroll: false,
 
                 _content: '', 
-                _content: function($body){
+                content: function($body){
                     $body.html( 'Normal ' + moment().format('HH:mm.ss'));
                 },
-                content: {
+                __content: {
                     type: 'buttongroup',
                     fullWidth: true,
                     vertical: true,
                     list: [
                         {id:'test1', text: 'Test#1', onClick: function(){ console.log('CLICK ON test1') } },
-                        {id:'test2', text: 'Test#2', onClick: function(){ console.log('CLICK ON test2') } }
+                        {id:'test2', text: 'Test#2', onClick: function(){ console.log('CLICK ON test2') } },
+                        $.bsCheckboxButton({
+                            text: {da:'Vælg', en:'Select'},
+                            icon: ['fa-thumbs-down', 'fa-thumbs-up'],
+                            selected: false,
+                            returnFromClick: false,                                
+                            onChange: function(id, selected, _this){
+                                console.log(arguments);
+                            }
+                        })
                     ]
                 },
+
+                buttons: [
+//HER                    {id:'test1', text: 'Test#1', onClick: function(){ console.log('CLICK ON test1') } },
+//HER                    {id:'test2', text: 'Test#2', onClick: function(){ console.log('CLICK ON test2') } },
+//HER                    $.bsButton({
+//HER                        small: true,
+//HER                        text: {da:'Klik', en:'Click'},
+//HER                        onClick: function(id, selected, _this){
+//HER                            console.log('popup bsButton',id, selected, _this, arguments);
+//HER                        }
+//HER                    }),
+                    $.bsCheckboxButton({
+                        text: {da:'Vælg', en:'Select'},
+                        icon: ['fa-thumbs-down', 'fa-thumbs-up'],
+                        small: true,
+                        selected: false,
+                        onChange: function(id, selected, _this){
+                            console.log('popup bsCheckboxButton',id, selected, _this, arguments);
+                        }
+                    })
+                ],
 
                 isExtended: false,
                 extended: {
@@ -866,7 +896,14 @@ content = {
                         onChange: function(id, selected, _this, map){ console.log('bsCheckboxButton', id,selected, _this, map); }
                     }),
 
-                    {icon:'fa-home', text:'click me to'}
+                    {
+                        type:'checkboxbutton', icon:['fa-home', 'fa-map'], text:'Tra daa', selected: true, 
+                        onChange: function(id, selected, _this, map){ console.log('Tradaaa', id,selected, _this, map); }
+                    },
+                    {
+                        type:'standardcheckboxbutton', text:'Standard', selected: true, 
+                        onChange: function(id, selected, _this, map){ console.log('Standard', id,selected, _this, map); }
+                    }
                             ],
                 onInfo    : function(){ console.log('INFO');},
                 onWarning : function(){ console.log('WARNING');},

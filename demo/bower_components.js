@@ -49200,6 +49200,7 @@ if (typeof define === 'function' && define.amd) {
 
         _cbxCallOnChange: function(){
             var options = this.data('cbx_options');
+
             if (options.onChange)
                 $.proxy( options.onChange, options.context )(
                     options.id,
@@ -74548,7 +74549,9 @@ jquery-bootstrap-modal-promise.js
         var focusAdded = false;
         $.each( buttons, function( index, buttonOptions ){
             if (buttonOptions instanceof $){
+
                 buttonOptions.appendTo( $modalButtonContainer );
+console.log('buttonOptions ($button)',buttonOptions);
                 $modalButtons.push( buttonOptions );
             }
             else {

@@ -75,7 +75,7 @@
     onChange = function( id, selected, $button, map, owner )
     **********************************************************/
     function any_button_on_click(id, selected, $button){
-        var options = $button.data('lbOptions');
+        var options = $button.data('lbOptions') || {};
         if (options.event)
             $.proxy( options.event, options.context )( id, selected, $button, options.map, options.owner );
         return options.returnFromClick || false;
@@ -90,7 +90,14 @@
                 };
 
             if (options instanceof $){
+
+                /*
+                This is NOT working since some events are linked to the original button by $.proxy(METHOD, button)
+                witch is not cloned with $.fn.clone()
+                The fix is to remove this events and replace them with new ones wher context = the new cloned button
+                */
                 $button = options.clone(true);
+
                 //If $button is a checkbox-button => overwrite onChange
                 var buttonOptions = $button.data('cbx_options');
                 if (buttonOptions){
@@ -110,28 +117,44 @@
             else {
                 //Create the buttons and modify the click-event to call options.onClick(id, null, $button, map); map is added
                 options = $.extend(true, {}, options);
+                var type = options.type = options.type || 'button',
+                    isCheckboxButton = type != 'button';
+
                 lbOptions = {
-                    event           : options.onClick,
+                    event           : isCheckboxButton ? options.onChange : options.onClick,
                     context         : options.context,
                     returnFromClick : options.returnFromClick
                 };
-                options.type    = options.type || 'button';
+
                 options.small   = true;
-                options.onClick = any_button_on_click;
+                options[isCheckboxButton ? 'onChange' : 'onClick'] = any_button_on_click;
+
                 options.context = null;
 
-                $button = $.bsButton(options);
+                var constructor;
+                switch (type.toUpperCase()){
+                    case 'BUTTON'                : constructor = $.bsButton; break;
+                    case 'CHECKBOXBUTTON'        : constructor = $.bsCheckboxButton; break;
+                    case 'STANDARDCHECKBOXBUTTON': constructor = $.bsStandardCheckboxButton; break;
+                    case 'ICONCHECKBOXBUTTON'    : constructor = $.bsIconCheckboxButton; break;
+
+                    default:  constructor = $.bsButton;
+                }
+                $button = constructor(options);
             }
 
             lbOptions.owner = owner;
             lbOptions.map   = owner._map || (owner.parent ? owner.parent._map : null);
+
             $button.data('lbOptions', lbOptions);
+
             $buttonList.push( $button );
 
         });
 
         return $buttonList;
     };
+
 
 
     /**********************************************************
