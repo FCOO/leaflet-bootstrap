@@ -96,6 +96,9 @@
                 witch is not cloned with $.fn.clone()
                 The fix is to remove this events and replace them with new ones wher context = the new cloned button
                 */
+                $button = options;  //Only while it is not working
+
+            /*
                 $button = options.clone(true);
 
                 //If $button is a checkbox-button => overwrite onChange
@@ -113,6 +116,7 @@
                     $button.data('bsButton_options', buttonOptions);
                 }
                 lbOptions.context = buttonOptions.context;
+            */
             }
             else {
                 //Create the buttons and modify the click-event to call options.onClick(id, null, $button, map); map is added
@@ -131,16 +135,7 @@
 
                 options.context = null;
 
-                var constructor;
-                switch (type.toUpperCase()){
-                    case 'BUTTON'                : constructor = $.bsButton; break;
-                    case 'CHECKBOXBUTTON'        : constructor = $.bsCheckboxButton; break;
-                    case 'STANDARDCHECKBOXBUTTON': constructor = $.bsStandardCheckboxButton; break;
-                    case 'ICONCHECKBOXBUTTON'    : constructor = $.bsIconCheckboxButton; break;
-
-                    default:  constructor = $.bsButton;
-                }
-                $button = constructor(options);
+                $button = $._anyBsButton(options);
             }
 
             lbOptions.owner = owner;
