@@ -3714,7 +3714,7 @@ leaflet-bootstrap-control-legend.js
                                 .toggleClass('no-vertical-padding',   !!options.noVerticalPadding)
                                 .toggleClass('no-horizontal-padding', !!options.noHorizontalPadding);
 
-                        this.updateContent( options.content );
+                        this.updateContent();
 
                         content.push( this.$contentContainer );
                     }
@@ -3894,21 +3894,21 @@ leaflet-bootstrap-control-legend.js
         /*******************************************
         update
         *******************************************/
-        update: function( content ){
-            if (content){
-                this.options.content = content;
-                this.updateContent( content );
-            }
+        update: function( content, contentContext ){
+            this.updateContent(content, contentContext);
+
             if (this.options.onUpdate)
                 this.options.onUpdate(this);
         },
 
-        updateContent( content ){
+        updateContent( content, contentContext ){
+            this.options.content        = content        || this.options.content;
+            this.options.contentContext = contentContext || this.options.contentContext;
+
             this.$contentContainer
                 .empty()
-                ._bsAppendContent( content );
+                ._bsAppendContent( this.options.content, this.options.contentContext );
         }
-
 
     };
 
