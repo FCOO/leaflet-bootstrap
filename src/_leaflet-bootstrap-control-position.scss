@@ -17,10 +17,9 @@ leaflet-bootstrap-control-position.scss
 }
 
 //CONTROL
-//Adjust input-group inside a leaflet-control
-.leaflet-control-container .input-group .bsPosition-content {
+//Adjust input-group inside a leaflet-control (div.bsPosition-content needed to overwrite .form-control)
+.leaflet-control-container .input-group div.bsPosition-content {
     //Class for inner container with the info for the position
-    @include control-border-color( $incl-error: false );
     @include vertical-align-center();
     text-align : center;
     line-height: 1;

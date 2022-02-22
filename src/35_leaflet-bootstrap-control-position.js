@@ -142,6 +142,7 @@ Options for selectiong position-format and to activate context-menu
                     noValidation   : true,
                     noBorder       : true,
                     type           : 'textbox',
+
                     text           : function( $inner ){ $inner.addClass('cursor'); },
                     class          :'show-for-control-position-cursor',
                     before: {

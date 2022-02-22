@@ -71041,7 +71041,6 @@ module.exports = g;
                 _this.addClass('text-'+ options.color);
 
             //Add text
-
             $.each( textArray, function( index, text ){
                 //If text ={da,en} and both da and is html-stirng => build inside div
                 var tagName = 'span';
@@ -71131,10 +71130,22 @@ module.exports = g;
             function buildBaseSlider(options, $parent){ buildSlider(options, 'baseSlider', $parent); }
             function buildTimeSlider(options, $parent){ buildSlider(options, 'timeSlider', $parent); }
 
+            //buildTextBox - Simple multi-line text-box
             function buildTextBox( options ){
+//HERoptions.text = {da:''};
                 return $('<div/>')
-                        ._bsAddHtml( options );
+                        ._bsAddHtml( options )
+                        .addClass('input-group-with-text');
             }
+
+            //buildInlineTextBox - Inline (pre/post) with single line text
+            function buildInlineTextBox( options ){
+                return $('<div/>')
+                           ._bsAddHtml( options )
+                           .addClass('form-control-border form-control no-hover')
+                        ._wrapLabel(options);
+            }
+
 
             function buildHidden( options ){
                 return $.bsInput( options ).css('display', 'none');
@@ -71188,6 +71199,9 @@ module.exports = g;
                     options[id] = parentOptions[id];
             });
 
+
+            var hasPreOrPost = options.prepend || options.before || options.append || options.after;
+
             if (options.type){
                 var type = options.type.toLowerCase();
                 switch (type){
@@ -71209,9 +71223,19 @@ module.exports = g;
                     case 'accordion'        :   buildFunc = $.bsAccordion;          break;
                     case 'slider'           :   buildFunc = buildBaseSlider;        insideFormGroup = true; addBorder = true; buildInsideParent = true; break;
                     case 'timeslider'       :   buildFunc = buildTimeSlider;        insideFormGroup = true; addBorder = true; buildInsideParent = true; break;
-                    case 'text'             :   buildFunc = $.bsText;               insideFormGroup = true; break;
-                    case 'textarea'         :   buildFunc = $.bsTextArea;           insideFormGroup = true; break;
-                    case 'textbox'          :   buildFunc = buildTextBox;           insideFormGroup = true; addBorder = true; noValidation = true; break;
+
+                    case 'text'             ://REMOVED                        buildFunc = $.bsText;               insideFormGroup = true; break;
+                    case 'textarea'         ://REMOVED                        buildFunc = $.bsTextArea;           insideFormGroup = true; break;
+                    case 'textbox'          :   options.text = options.text || $.EMPTY_TEXT;
+                                                if (hasPreOrPost){
+                                                    buildFunc = buildInlineTextBox; insideFormGroup = true; break;
+                                                }
+                                                else {
+                                                    buildFunc = buildTextBox;       insideFormGroup = true; addBorder = true; noValidation = true;
+
+                                                }
+                                                break;
+
                     case 'fileview'         :   buildFunc = $.bsFileView;           break;
                     case 'hidden'           :   buildFunc = buildHidden;            noValidation = true; break;
 
@@ -71251,9 +71275,7 @@ module.exports = g;
             var $originalParent = $parent,
                 isInputGroupWithFloatLabel = !!options.label;
 
-            if (insideInputGroup || options.prepend || options.before || options.append || options.after){
-
-
+            if (insideInputGroup || hasPreOrPost /*options.prepend || options.before || options.append || options.after*/){
                 //Create element inside input-group
                 var $inputGroup = $divXXGroup('input-group', options);
                 if (addBorder && !options.noBorder){
@@ -71671,7 +71693,7 @@ module.exports = g;
     $.bsCheckboxButton = function( options ){
         //Clone options to avoid reflux
         options = $.extend({}, options);
-        options.class = 'allow-zero-selected';
+        options.class = 'allow-zero-selected' + (options.class ? ' '+options.class : '');
 
         //Use modernizr-mode and classes if icon and/or text containe two values
         if ($.isArray(options.icon) && (options.icon.length == 2)){
@@ -71713,7 +71735,7 @@ module.exports = g;
 
         //Clone options to avoid reflux
         options = $.extend({}, options, {
-            class    : 'allow-zero-selected',
+            class    : 'allow-zero-selected' + (options.class ? ' '+options.class : ''),
             modernizr: true,
         });
 
@@ -72977,23 +72999,25 @@ module.exports = g;
         $.bsText( options )
         Create a <div> with text inside a <label>
         ******************************************************/
+/* REMOVED. ALL TEXT-INPUTS ARE CREATED IN _bsAppendContent
         bsText: function( options ){
             return $('<div/>')
                        ._bsAddHtml( options )
                        .addClass('form-control-border form-control no-hover')
                        ._wrapLabel(options);
         },
-
+//*/
         /******************************************************
         $.bsTextArea( options )
         Create a <div> with text inside a <label>
         ******************************************************/
+/* REMOVED. ALL TEXT-INPUTS ARE CREATED IN _bsAppendContent
         bsTextArea: function( options ){
             var $result = $.bsText( options );
             $result.children('.form-control').css('height', 'auto');
             return $result;
         }
-
+//*/
     });
 
 
