@@ -11689,10 +11689,21 @@ form.form-validation .form-group {
   font-size: 0.75rem;
   border-radius: 0.125rem; }
 
+.input-group {
+  font-size: 1rem; }
+
+.input-group-sm {
+  font-size: 0.875rem; }
+
+.input-group-xs {
+  font-size: 0.75rem; }
+
 .input-group-with-float-label {
   padding-top: 0.25rem; }
-  .input-group-with-float-label.input-group-sm, .input-group-with-float-label.input-group-xs {
+  .input-group-with-float-label.input-group-sm {
     padding-top: 0.1875rem; }
+  .input-group-with-float-label.input-group-xs {
+    padding-top: 0.125rem; }
 
 .input-group-border {
   padding: 0.25rem 0.3125rem;
@@ -11700,15 +11711,19 @@ form.form-validation .form-group {
   border-radius: 0.25rem; }
   .input-group-border.input-group-border-dark {
     border-color: black; }
-  .input-group-border.input-group-sm, .input-group-border.input-group-xs {
+  .input-group-border.input-group-sm {
     padding: 0.1875rem 0.25rem;
     border-radius: 0.1875rem; }
+  .input-group-border.input-group-xs {
+    padding: 0.125rem 0.1875rem;
+    border-radius: 0.125rem; }
   .input-group-border.input-group-border-with-label {
     margin-top: 0.25em; }
 
 .input-group-with-text {
   cursor: default;
-  min-height: 1em; }
+  min-height: 1em;
+  margin: 0.25em 0; }
 
 /*
 Only for test: red labels

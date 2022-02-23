@@ -680,8 +680,9 @@ leaflet-bootstrap-control-position.scss
   text-align: center;
   line-height: 1;
   padding: 0 0.25rem;
-  padding-top: 1px;
-  font-size: 13px; }
+  padding-top: 1px; }
+  .leaflet-control-container .input-group div.bsPosition-content > * {
+    font-size: 13px; }
 
 .control-position-cursor .hide-for-control-position-cursor {
   display: none !important; }

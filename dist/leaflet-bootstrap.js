@@ -2514,8 +2514,14 @@ Options for selectiong position-format and to activate context-menu
 
             //Use the added class name to find the two containers for cursor- and map center position
             var contentClassName = 'hide-for-no-cursor-on-map bsPosition-content text-monospace justify-content-center align-items-center flex-grow-1';
-            this.$cursorPosition = this.$innerContentContainer.find('.cursor').parent().empty().addClass(contentClassName).html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
-            this.$centerPosition = this.$innerContentContainer.find('.center').parent().empty().addClass(contentClassName).html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
+
+
+            this.$cursorPositionSpan = this.$innerContentContainer.find('.cursor').empty().html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
+            this.$cursorPosition     = this.$cursorPositionSpan.parent().addClass(contentClassName);
+
+
+            this.$centerPositionSpan = this.$innerContentContainer.find('.center').empty().html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
+            this.$centerPosition     = this.$centerPositionSpan.parent().addClass(contentClassName);
 
             if (this.options.inclContextmenu){
                 //Remove tooltips from the two buttons to the right
@@ -2770,7 +2776,8 @@ Options for selectiong position-format and to activate context-menu
                 this.$contentContainer.modernizrToggle('cursor-on-map', !!latlng);
 
                 if ( latlng && (!fromOtherMap || this._map.getBounds().contains(latlng)) ){
-                    this.$cursorPosition.html( this._formatLatLng( latlng ) );
+                    this.$cursorPositionSpan.html( this._formatLatLng( latlng ) );
+
                     if (callOnMousePosition)
                         this.options.onMousePosition(mouseEvent.latlng, this.$cursorPosition, this);
 
@@ -2806,7 +2813,7 @@ Options for selectiong position-format and to activate context-menu
                 marker.setLatLng(position);
             });
 
-            this.$centerPosition.html( this._formatLatLng( position ) );
+            this.$centerPositionSpan.html( this._formatLatLng( position ) );
 
             if (this.options.onCenterPosition && this.options.isExtended && (this.options.mode == 'MAPCENTER'))
                 this.options.onCenterPosition(position, this.$centerPosition, this);
@@ -2954,7 +2961,9 @@ Options for selectiong position-format and to activate context-menu
                 noValidation   : true,
                 noBorder       : true,
                 type           : 'textbox',
-                text           : function( $inner ){ $inner.addClass(innerContainerClassName); },
+                text           : function( $inner ){
+                    $inner.addClass(innerContainerClassName + ' no-border');
+                },
                 class          : (options.className || ''),
                 before: {
                     type   : 'button',
@@ -3004,6 +3013,7 @@ Options for selectiong position-format and to activate context-menu
             var $parent = $('<div/>');
 
             $parent._bsAppendContent( this.boxOptions );
+
             this.$contentContainer  =
                 $parent.find('.' + this.innerContainerClassName).parent()
                     .addClass('d-flex bsPosition-content justify-content-center align-items-center flex-grow-1')
@@ -3012,8 +3022,9 @@ Options for selectiong position-format and to activate context-menu
             this.$container = this.$contentContainer.parent();
             this.$container.detach();
 
-            this.$contentContainer.empty()._bsAddHtml(this.options.content);
-
+            this.$contentContainer
+                .empty()
+                ._bsAddHtml(this.options.content);
         },
 
 

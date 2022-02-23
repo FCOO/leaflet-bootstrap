@@ -297,35 +297,33 @@ scroll: false,
         }).addTo(nextMap);
 
         //bb.disable();
-/*
-var testIB = nextMap.bsPositionControl.addInfoBox({
-    id: 'test', 
-    index: 4000,
-    class: 'text-monospace',
-    before: {
-        icon: 'fa-home'
-    },
-    content: 'MEGET&nbsp;LANG&nbsp;Davs&nbsp;4000'
-})
-testIB.$contentContainer.width('20em');
-*/
 
 
+        var testIB = nextMap.bsPositionControl.addInfoBox({
+            id: 'test', 
+            index: 4000,
+            class: 'text-monospace',
+            before: {
+                icon: 'fa-home'
+            },
+            content: 'MEGET&nbsp;LANG&nbsp;Davs&nbsp;4000'
+        })
+        testIB.$contentContainer.width('20em');
 
-/*
-nextMap.bsPositionControl.addInfoBox({
-    index: 3000,
-    before: {
-        icon: 'fa-map',
-        onClick: function(){ nextMap.bsPositionControl.addInfoBox(testIB); }
-    },
-    content: {icon: 'fa-sync', text: {da:'Dansk 3000', en:'Eng 3000'}},
-    after: {
-        icon: 'fa-eye-slash',
-        onClick: function(){ nextMap.bsPositionControl.removeInfoBox(testIB); }
-    }
-});
-*/        
+
+        nextMap.bsPositionControl.addInfoBox({
+            index: 3000,
+            before: {
+                icon: 'fa-map',
+                onClick: function(){ nextMap.bsPositionControl.addInfoBox(testIB); }
+            },
+            content: {icon: 'fa-sync', text: {da:'Dansk 3000', en:'Eng 3000'}},
+            after: {
+                icon: 'fa-eye-slash',
+                onClick: function(){ nextMap.bsPositionControl.removeInfoBox(testIB); }
+            }
+        });
+        
         window[id] = nextMap;
         first = false;
     });

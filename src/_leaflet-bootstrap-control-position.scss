@@ -25,7 +25,9 @@ leaflet-bootstrap-control-position.scss
     line-height: 1;
     padding    : 0 $content-padding-y-sm;
     padding-top: 1px; //Super adjustment :-)
-    font-size  : 13px;
+    & > * {
+        font-size  : 13px;
+    }
 }
 
 //Create Moderinzr classes for show/hide for different modes

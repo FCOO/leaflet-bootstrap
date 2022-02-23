@@ -71132,7 +71132,6 @@ module.exports = g;
 
             //buildTextBox - Simple multi-line text-box
             function buildTextBox( options ){
-//HERoptions.text = {da:''};
                 return $('<div/>')
                         ._bsAddHtml( options )
                         .addClass('input-group-with-text');
@@ -71140,10 +71139,12 @@ module.exports = g;
 
             //buildInlineTextBox - Inline (pre/post) with single line text
             function buildInlineTextBox( options ){
-                return $('<div/>')
+                var $inner =
+                        $('<div/>')
                            ._bsAddHtml( options )
-                           .addClass('form-control-border form-control no-hover')
-                        ._wrapLabel(options);
+                           .addClass('form-control-border form-control no-hover');
+
+                return options.label ? $inner._wrapLabel(options) : $inner;
             }
 
 
@@ -71226,7 +71227,8 @@ module.exports = g;
 
                     case 'text'             ://REMOVED                        buildFunc = $.bsText;               insideFormGroup = true; break;
                     case 'textarea'         ://REMOVED                        buildFunc = $.bsTextArea;           insideFormGroup = true; break;
-                    case 'textbox'          :   options.text = options.text || $.EMPTY_TEXT;
+                    case 'textbox'          :   if (!options.vfFormat)
+                                                    options.text = options.text || $.EMPTY_TEXT;
                                                 if (hasPreOrPost){
                                                     buildFunc = buildInlineTextBox; insideFormGroup = true; break;
                                                 }
@@ -71275,7 +71277,7 @@ module.exports = g;
             var $originalParent = $parent,
                 isInputGroupWithFloatLabel = !!options.label;
 
-            if (insideInputGroup || hasPreOrPost /*options.prepend || options.before || options.append || options.after*/){
+            if (insideInputGroup || hasPreOrPost){
                 //Create element inside input-group
                 var $inputGroup = $divXXGroup('input-group', options);
                 if (addBorder && !options.noBorder){
