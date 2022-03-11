@@ -219,7 +219,10 @@ L.BsControl = extention of L.Control with
             this.$container = this.$container || $(this._container);
             this.options.show = !!on;
 
-            this.$container.css('visibility', this.options.show ? 'inherit' : 'hidden');
+            this.$container
+                .css('visibility', this.options.show ? 'inherit' : 'hidden')
+                .toggleClass('leaflet-control-hidden', !on);
+
             this._onChange();
 
             return this;

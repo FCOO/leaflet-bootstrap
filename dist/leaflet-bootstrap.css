@@ -387,6 +387,9 @@ leaflet-bootstrap-control.scss
 .leaflet-container.has-control-attribution-bs .leaflet-control-container .leaflet-bottom:not(.has-control-attribution-bs) .leaflet-control:last-child {
   margin-bottom: 13px; }
 
+.leaflet-control.leaflet-control-hidden * {
+  visibility: hidden !important; }
+
 /***********************************************
 leaflet-bootstrap-control-attribution.scss
 ************************************************/

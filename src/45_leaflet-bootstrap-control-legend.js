@@ -48,7 +48,7 @@ leaflet-bootstrap-control-legend.js
         onAdd
         *******************************************/
         onAdd: function(map) {
-            //Adjust options for width and heigth
+            //Adjust options for width and height
             this.options.content.header    = this.options.header    || this.options.content.header;
             this.options.content.width     = this.options.width     || this.options.content.width;
             this.options.content.maxHeight = this.options.maxHeight || this.options.content.maxHeight;
@@ -471,9 +471,10 @@ leaflet-bootstrap-control-legend.js
             this.options.content        = content        || this.options.content;
             this.options.contentContext = contentContext || this.options.contentContext;
 
-            this.$contentContainer
-                .empty()
-                ._bsAppendContent( this.options.content, this.options.contentContext );
+            if (this.$contentContainer)
+                this.$contentContainer
+                    .empty()
+                    ._bsAppendContent( this.options.content, this.options.contentContext );
         }
 
     };

@@ -29,3 +29,9 @@ leaflet-bootstrap-control.scss
     }
 
 }
+
+
+//If a control is 'hidden' (visibility = hidden) all children get specific visibility = hidden to overwrite other class-ruels
+.leaflet-control.leaflet-control-hidden * {
+    visibility: hidden !important;
+}
