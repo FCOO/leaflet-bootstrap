@@ -3923,7 +3923,7 @@ leaflet-bootstrap-control-legend.js
             if (this.$contentContainer)
                 this.$contentContainer
                     .empty()
-                    ._bsAppendContent( this.options.content, this.options.contentContext );
+                    ._bsAppendContent( this.options.content, this.options.contentContext, this.options.contentArg );
         }
 
     };
@@ -4429,7 +4429,8 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
             this.bsModal.$body.empty();
             this.bsModal.$body._bsAppendContent(
                 this._content.content,
-                this._content.contentContext
+                this._content.contentContext,
+                this._content.contentArg
             );
 
             if (this.bsModal.minimized){
@@ -4437,7 +4438,8 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
                 this.bsModal.minimized.$body.empty();
                 this.bsModal.minimized.$body._bsAppendContent(
                     this._content.minimized.content,
-                    this._content.minimized.contentContext
+                    this._content.minimized.contentContext,
+                    this._content.minimized.contentArg
                 );
             }
 
@@ -4446,7 +4448,8 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
                 this.bsModal.extended.$body.empty();
                 this.bsModal.extended.$body._bsAppendContent(
                     this._content.extended.content,
-                    this._content.extended.contentContext
+                    this._content.extended.contentContext,
+                    this._content.extended.contentArg
                 );
             }
 

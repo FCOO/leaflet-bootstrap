@@ -474,7 +474,7 @@ leaflet-bootstrap-control-legend.js
             if (this.$contentContainer)
                 this.$contentContainer
                     .empty()
-                    ._bsAppendContent( this.options.content, this.options.contentContext );
+                    ._bsAppendContent( this.options.content, this.options.contentContext, this.options.contentArg );
         }
 
     };
