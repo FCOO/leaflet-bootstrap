@@ -3909,16 +3909,17 @@ leaflet-bootstrap-control-legend.js
         /*******************************************
         update
         *******************************************/
-        update: function( content, contentContext ){
-            this.updateContent(content, contentContext);
+        update: function( content, contentContext, contentArg ){
+            this.updateContent(content, contentContext, contentArg);
 
             if (this.options.onUpdate)
                 this.options.onUpdate(this);
         },
 
-        updateContent( content, contentContext ){
+        updateContent( content, contentContext, contentArg ){
             this.options.content        = content        || this.options.content;
             this.options.contentContext = contentContext || this.options.contentContext;
+            this.options.contentArg     = contentArg     || this.options.contentArg;
 
             if (this.$contentContainer)
                 this.$contentContainer

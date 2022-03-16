@@ -39278,17 +39278,11 @@ if (typeof define === 'function' && define.amd) {
   function _typeof(obj) {
     "@babel/helpers - typeof";
 
-    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-      _typeof = function _typeof(obj) {
-        return typeof obj;
-      };
-    } else {
-      _typeof = function _typeof(obj) {
-        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-      };
-    }
-
-    return _typeof(obj);
+    return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
+      return typeof obj;
+    } : function (obj) {
+      return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+    }, _typeof(obj);
   }
 
   function _classCallCheck(instance, Constructor) {
@@ -39310,6 +39304,9 @@ if (typeof define === 'function' && define.amd) {
   function _createClass(Constructor, protoProps, staticProps) {
     if (protoProps) _defineProperties(Constructor.prototype, protoProps);
     if (staticProps) _defineProperties(Constructor, staticProps);
+    Object.defineProperty(Constructor, "prototype", {
+      writable: false
+    });
     return Constructor;
   }
 
@@ -39342,12 +39339,17 @@ if (typeof define === 'function' && define.amd) {
         configurable: true
       }
     });
+    Object.defineProperty(subClass, "prototype", {
+      writable: false
+    });
     if (superClass) _setPrototypeOf(subClass, superClass);
   }
 
   function _possibleConstructorReturn(self, call) {
     if (call && (_typeof(call) === "object" || typeof call === "function")) {
       return call;
+    } else if (call !== void 0) {
+      throw new TypeError("Derived constructors may only return object or undefined");
     }
 
     return _assertThisInitialized(self);
@@ -40146,7 +40148,7 @@ if (typeof define === 'function' && define.amd) {
             if (this.options.saveMissing) {
               if (this.options.saveMissingPlurals && needsPluralHandling) {
                 lngs.forEach(function (language) {
-                  _this2.pluralResolver.getSuffixes(language).forEach(function (suffix) {
+                  _this2.pluralResolver.getSuffixes(language, options).forEach(function (suffix) {
                     send([language], key + suffix, options["defaultValue".concat(suffix)] || defaultValue);
                   });
                 });
@@ -41051,7 +41053,7 @@ if (typeof define === 'function' && define.amd) {
   }
 
   function _iterableToArray(iter) {
-    if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);
+    if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
   }
 
   function _arrayLikeToArray(arr, len) {
@@ -41109,10 +41111,10 @@ if (typeof define === 'function' && define.amd) {
               rest = _opt$split2.slice(1);
 
           var val = rest.join(':');
+          if (!formatOptions[key.trim()]) formatOptions[key.trim()] = val.trim();
           if (val.trim() === 'false') formatOptions[key.trim()] = false;
           if (val.trim() === 'true') formatOptions[key.trim()] = true;
           if (!isNaN(val.trim())) formatOptions[key.trim()] = parseInt(val.trim(), 10);
-          if (!formatOptions[key.trim()]) formatOptions[key.trim()] = val.trim();
         });
       }
     }
@@ -41789,7 +41791,10 @@ if (typeof define === 'function' && define.amd) {
             });
           }
 
-          this.services.backendConnector.load(toLoad, this.options.ns, usedCallback);
+          this.services.backendConnector.load(toLoad, this.options.ns, function (e) {
+            if (!e && !_this3.resolvedLanguage && _this3.language) _this3.setResolvedLanguage(_this3.language);
+            usedCallback(e);
+          });
         } else {
           usedCallback(null);
         }
@@ -41844,6 +41849,22 @@ if (typeof define === 'function' && define.amd) {
         return this;
       }
     }, {
+      key: "setResolvedLanguage",
+      value: function setResolvedLanguage(l) {
+        if (!l || !this.languages) return;
+        if (['cimode', 'dev'].indexOf(l) > -1) return;
+
+        for (var li = 0; li < this.languages.length; li++) {
+          var lngInLngs = this.languages[li];
+          if (['cimode', 'dev'].indexOf(lngInLngs) > -1) continue;
+
+          if (this.store.hasLanguageSomeTranslations(lngInLngs)) {
+            this.resolvedLanguage = lngInLngs;
+            break;
+          }
+        }
+      }
+    }, {
       key: "changeLanguage",
       value: function changeLanguage(lng, callback) {
         var _this4 = this;
@@ -41856,17 +41877,8 @@ if (typeof define === 'function' && define.amd) {
           _this4.language = l;
           _this4.languages = _this4.services.languageUtils.toResolveHierarchy(l);
           _this4.resolvedLanguage = undefined;
-          if (['cimode', 'dev'].indexOf(l) > -1) return;
 
-          for (var li = 0; li < _this4.languages.length; li++) {
-            var lngInLngs = _this4.languages[li];
-            if (['cimode', 'dev'].indexOf(lngInLngs) > -1) continue;
-
-            if (_this4.store.hasLanguageSomeTranslations(lngInLngs)) {
-              _this4.resolvedLanguage = lngInLngs;
-              break;
-            }
-          }
+          _this4.setResolvedLanguage(l);
         };
 
         var done = function done(err, l) {
@@ -71048,6 +71060,8 @@ module.exports = g;
                     tagName = 'div';
 
                 var $text = $._bsCreateElement( tagName, linkArray[ index ], titleArray[ index ], textStyleArray[ index ], textClassArray[index], textDataArray[index] );
+                $text.appendTo( _this );
+
                 if ($.isFunction( text ))
                     text( $text );
                 else
@@ -71065,7 +71079,6 @@ module.exports = g;
                 if (index < textClassArray.length)
                     $text.addClass( textClassArray[index] );
 
-                $text.appendTo( _this );
             });
 
             //Add value-format content
@@ -71130,6 +71143,31 @@ module.exports = g;
             function buildBaseSlider(options, $parent){ buildSlider(options, 'baseSlider', $parent); }
             function buildTimeSlider(options, $parent){ buildSlider(options, 'timeSlider', $parent); }
 
+
+            //buildCompactText - Compact box with label-icon to the left
+            function buildCompactText( options ){
+                var $result = $();
+                options.title = options.title || (options.label ? options.label.text : null);
+                $result = $result.add(
+                    $._bsCreateIcon(
+                        {icon: options.label ? options.label.icon : 'fas fa_'},
+                        null,
+                        options.title,
+                        'part-of-compact-text fa-fw text-center flex-grow-0 align-self-center'
+                    )
+                );
+
+                var $content = $('<div/>')
+                        ._bsAddHtml( options )
+                        .addClass('_input-group-with-text flex-grow-1');
+
+                if (options.title)
+                    $content.i18n(options.title, 'title');
+
+                return $result.add( $content );
+            }
+
+
             //buildTextBox - Simple multi-line text-box
             function buildTextBox( options ){
                 return $('<div/>')
@@ -71174,7 +71212,7 @@ module.exports = g;
 
             //Function: Include arg (if any) in call to method (=options)
             if ($.isFunction( options )){
-                arg = arg ? $.isArray(arg) ? arg : [arg] : [];
+                arg = arg ? ($.isArray(arg) ? arg.slice() : [arg]) : [];
                 arg.unshift(this);
                 options.apply( context, arg );
                 return this;
@@ -71225,6 +71263,12 @@ module.exports = g;
                     case 'slider'           :   buildFunc = buildBaseSlider;        insideFormGroup = true; addBorder = true; buildInsideParent = true; break;
                     case 'timeslider'       :   buildFunc = buildTimeSlider;        insideFormGroup = true; addBorder = true; buildInsideParent = true; break;
 
+
+                    case 'compact'          :
+                    case 'conpacttext'      :   buildFunc = buildCompactText;
+                                                options.noLabel = true; options.noVerticalPadding = true;
+                                                insideFormGroup = true; addBorder = true; noValidation = true; break;
+
                     case 'text'             ://REMOVED                        buildFunc = $.bsText;               insideFormGroup = true; break;
                     case 'textarea'         ://REMOVED                        buildFunc = $.bsTextArea;           insideFormGroup = true; break;
                     case 'textbox'          :   if (!options.vfFormat)
@@ -71233,8 +71277,14 @@ module.exports = g;
                                                     buildFunc = buildInlineTextBox; insideFormGroup = true; break;
                                                 }
                                                 else {
-                                                    buildFunc = buildTextBox;       insideFormGroup = true; addBorder = true; noValidation = true;
-
+                                                    if (options.compact){
+                                                        //Same as type="compacttext" but with outer padding
+                                                        buildFunc = buildCompactText;
+                                                        options.noLabel = true;
+                                                    }
+                                                    else
+                                                        buildFunc = buildTextBox;
+                                                    insideFormGroup = true; addBorder = true; noValidation = true;
                                                 }
                                                 break;
 
@@ -71265,6 +71315,10 @@ module.exports = g;
                 if (options.smallBottomPadding)
                     $parent.addClass('small-bottom-padding');
 
+                if (options.noVerticalPadding)
+                    $parent.addClass('no-vertical-padding');
+
+
                 if (options.lineBefore)
                     $('<hr/>')
                         .addClass('before')
@@ -71287,7 +71341,7 @@ module.exports = g;
                     if (options.darkBorderlabel)
                         $inputGroup.addClass('input-group-border-dark');
 
-                    if (options.label){
+                    if (options.label && !options.noLabel){
                         isInputGroupWithFloatLabel = false; //Correct padding is set via input-group-border-with-label
                         $inputGroup.addClass('input-group-border-with-label');
                         $('<span/>')
@@ -73913,7 +73967,7 @@ jquery-bootstrap-modal-promise.js
     as expected/needed
     Instead a resize-event is added to update the max-height of
     elements with the current value of window.innerHeight
-    Sets both max-height and height to allow always-max-heigth options
+    Sets both max-height and height to allow always-max-height options
     **********************************************************/
     function adjustModalMaxHeight( $modalContent ){
         var $modalContents = $modalContent || $('.modal-content.modal-flex-height');
@@ -77223,13 +77277,8 @@ Base object-class for all type of markers
 
             markerClassName: '', //Extra class added to the marker
 
-//HER            iconSize        : 0,         //0: normal, 1. larger with icon or number, 2: Very large (touch-mode)
-
             draggable       : false,     //Whether the marker is draggable with mouse/touch or not.
             autoPan         : true,      //Set to true if you want the map to do panning animation when marker hits the edges.
-
-//HER            useBigIcon      : false,     //True to make the icon big
-//HER            bigIconWhenTouch: false,     //True to make big icon when window.bsIsTouch == true and options.draggable == true
 
             useTouchSize    : false, //True to make size = large when window.bsIsTouch == true and options.draggable == true
 
@@ -77290,9 +77339,6 @@ Base object-class for all type of markers
         _adjustOptions: function( options ){
             options = options || this.options;
             options = ns._adjustOptions( options );
-
-            if ($.type(options.useTouchSize) !== 'boolean')
-                options.useTouchSize = !!options.bigIconWhenTouch;
 
             if (options.useTouchSize && options.draggable && window.bsIsTouch)
                 options.size = 'lg';
@@ -77482,7 +77528,7 @@ Base object-class for all type of markers
         updateIcon
         Update the marker regarding all options except size
         *****************************************************/
-        updateIcon: function(options, forceColor){
+        updateIcon: function( options ){
             this._adjustAndSetOptions(options);
 
             this.getElements();
@@ -77494,8 +77540,8 @@ Base object-class for all type of markers
                 _this.toggleOption(id, !!_this.options[id] );
             });
 
-            this.setColor(this.colorName || this.options.colorName, forceColor);
-            this.setBorderColor(this.borderColorName || this.options.borderColorName, forceColor);
+            this.setColor(this.options.colorName);
+            this.setBorderColor(this.options.borderColorName);
 
             if (this.options.number !== undefined)
                 this.setNumber(this.options.number);
@@ -77567,27 +77613,24 @@ Base object-class for all type of markers
             if (tooltip)
                 $(tooltip._container).addClass('leaflet-tooltip-icon-'+this.size);
 
-            this.updateIcon(null, true);
+            this.updateIcon();
             return this;
         },
 
         /*****************************************************
-        setColor( colorName, force )
+        setColor( colorName )
         *****************************************************/
-        setColor: function( colorName, force ){
-            if (colorName && ((colorName != this.colorName) || force)){
-                this._setAnyColor( 'colorName', colorName, 'lbm-color-', this.$background, this.options.setColor);
-                this._setInnerColor();
-            }
+        setColor: function( colorName ){
+            this._setAnyColor( 'colorName', colorName, 'lbm-color-', this.$background, this.options.setColor);
+            this._setInnerColor();
             return this;
         },
 
         /*****************************************************
-        setBorderColor( borderColorName, force )
+        setBorderColor( borderColorName )
         *****************************************************/
-        setBorderColor: function( borderColorName, force ){
-            if (borderColorName && ((borderColorName != this.borderColorName) || force))
-                this._setAnyColor( 'borderColorName', borderColorName, 'lbm-border-color-', this.$border, this.options.setBorderColor);
+        setBorderColor: function( borderColorName ){
+            this._setAnyColor( 'borderColorName', borderColorName, 'lbm-border-color-', this.$border, this.options.setBorderColor);
             return this;
         },
 
@@ -77600,9 +77643,9 @@ Base object-class for all type of markers
         },
 
         _setAnyColor: function( id, newColorName, classNamePrefix, $element, options = {}){
-            if (this[id])
-                this.removeClass(classNamePrefix + this[id]);
-            this[id] = newColorName;
+            if (this.options[id])
+                this.removeClass(classNamePrefix + this.options[id]);
+            this.options[id] = newColorName;
 
             this.addClass(classNamePrefix + newColorName);
             if (options.alsoAsCss && $element && $element.length)
@@ -77686,8 +77729,8 @@ Base object-class for all type of markers
         /*****************************************************
         setDirection( direction )
         *****************************************************/
-        setDirection: function( direction ){
-            this.options.direction = (direction || 0) % 360;
+        setDirection: function( direction = 0, relative){
+            this.options.direction = ((relative ? this.options.direction : 0) + direction) % 360;
             direction = (this.options.direction + this.options.directionOffset) % 360;
             this.setRotationAngle(direction);
             return this;
@@ -77707,7 +77750,7 @@ Base object-class for all type of markers
         jquery-bootstrap content-options (eq. as header)
         *****************************************************/
         asIcon: function(){
-            return L.bsMarkerAsIcon(this.colorName, this.borderColorName, this.options.faClassName);
+            return L.bsMarkerAsIcon(this.options.colorName, this.options.borderColorName, this.options.faClassName);
         },
 
         /*****************************************************

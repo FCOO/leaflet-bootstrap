@@ -11574,27 +11574,26 @@ The default bootstrap structure used for elements in a form is
       margin-top: 0.25rem;
       margin-bottom: 0; }
 
-.form-group.form-group-xs,
 .form-group.form-group-sm {
   padding-top: 0.1875rem;
   padding-bottom: 0.375rem; }
-  .form-group.form-group-xs.small-bottom-padding,
   .form-group.form-group-sm.small-bottom-padding {
     padding-bottom: 0.1875rem; }
-  .form-group.form-group-xs hr.above-label,
   .form-group.form-group-sm hr.above-label {
     margin-bottom: 0.5625rem; }
 
-/*
 .form-group.form-group-xs {
-    padding-top   :     $input-padding-y-xs;
-    padding-bottom: 2 * $input-padding-y-xs;
-    &.small-bottom-padding {
-        padding-bottom: $input-padding-y-xs;
-    }
-    hr.above-label { margin-bottom: 3 * $input-padding-y-xs; }
-}
-*/
+  padding-top: 0.125rem;
+  padding-bottom: 0.25rem; }
+  .form-group.form-group-xs.small-bottom-padding {
+    padding-bottom: 0.125rem; }
+  .form-group.form-group-xs hr.above-label {
+    margin-bottom: 0.375rem; }
+
+.form-group.no-vertical-padding {
+  padding-top: 0;
+  padding-bottom: 0; }
+
 /************************************************************
 Style for formValidation (via fcoo-form-validation)
 form-group inside a <form class="form-validation"> gets special style for validation-state and messages
@@ -11724,6 +11723,16 @@ form.form-validation .form-group {
   cursor: default;
   min-height: 1em;
   margin: 0.25em 0; }
+
+i.part-of-compact-text {
+  font-size: 1.25em;
+  width: 1.50em;
+  padding-right: inherit; }
+  i.part-of-compact-text + .container-icon-and-text {
+    cursor: default;
+    min-height: 1em;
+    padding-left: inherit;
+    border-left: 1px solid #ced4da; }
 
 /*
 Only for test: red labels
