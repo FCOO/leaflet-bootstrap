@@ -73,7 +73,24 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
 
     /*********************************************************
     Extend L.Popup._initLayout to create popup with Bootstrap-components
+    and add event onOpen and onClose
     *********************************************************/
+    function popup_onOpen(event){
+        var popup   = event.target,
+            options = popup.options,
+            arg     = options.onOpenArg ? options.onOpenArg.slice() : [];
+        arg.unshift(popup);
+        options.onOpen.apply(options.onOpenContext, arg);
+    }
+
+    function popup_onClose(event){
+        var popup   = event.target,
+            options = popup.options,
+            arg     = options.onCloseArg ? options.onCloseArg.slice() : [];
+        arg.unshift(popup);
+        options.onClose.apply(options.onCloseContext, arg);
+    }
+
     L.Popup.prototype._initLayout = function (_initLayout) {
         return function () {
             //Original function/method
@@ -92,6 +109,12 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
                 useTouchSize: true,
                 small       : true
             });
+
+            //Add onOpen and onClose events from options (if any)
+            if (this.options.onOpen)
+                this.on('add', popup_onOpen);
+            if (this.options.onClose)
+                this.on('remove', popup_onClose);
 
             //Close open popup and brint to front when "touched"
             L.DomEvent.on(this._contentNode, 'click', this._brintToFocus, this );
