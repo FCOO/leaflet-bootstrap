@@ -2834,7 +2834,13 @@ Options for selectiong position-format and to activate context-menu
                 visibility = [],
                 centerLatLng = this._map.getCenter(),
                 point = this._map.latLngToContainerPoint( centerLatLng ),
+                mapClientRect = this._map._container.getBoundingClientRect(),
                 _true = true; //Due to eslint test no-constant-condition
+
+
+            //Convert relative point to absolute point
+            point.x = point.x + mapClientRect.x;
+            point.y = point.y + mapClientRect.y;
 
             while (_true) {
                 var element = document.elementFromPoint(point.x, point.y);

@@ -19,7 +19,7 @@
         }
         #map1 {
         margin: 50px !important;
-            padding: 0; margin: 0; _width:50%; width:100%; height:80%;
+            padding: 0; margin: 0; width:50%; _width:100%; height:80%;
         }
         #map2, #map3 {
         margin: 2px !important;
@@ -32,7 +32,7 @@
 
 <body style="display:flex">
     <div id="map1" ></div>
-    <!-- <div id="map2"></div> -->
+    <div id="map2"></div>
     <!-- <div id="map3"></div> -->
     <script src="bower_components.js"></script>
     <script src="leaflet-polyline.js"></script>
@@ -82,7 +82,7 @@
         window.notyInfo('Auto changed to format id = '+ latLngFormat.options.formatId, { layout: 'center', timeout: 1500 } );
     }
     var map1, map2, map3, first = true;
-    $.each(['map1'/*, 'map2', 'map3'*/], function(index, id){
+    $.each(['map1', 'map2'/*, 'map3'*/], function(index, id){
         var nextMap = L.map(id, {
 
             zoomControl: first,
@@ -360,12 +360,18 @@ scroll: false,
     Add contextmenu to the map
     **********************************************/
     var first = null;
-    map1.setContextmenuHeader({icon:'fa-map', text:'MAP header'});
-
+    map1.setContextmenuHeader({icon:'fa-map', text:'MAP 1'});
     map1.addContextmenuItems([
-        {icon:'fa-home', text:{da:'Map#1 (w=180)'}, onClick: function(latlng){ console.log('MAP 1',this, latlng); }, width:180 },
-        {icon:'fa-map',  text:'Map#2 (dont close)', onClick: function(latlng){ console.log('MAP 2',this, latlng); }, closeOnClick: false }
+        {icon:'fa-home', text:{da:'Map#1 (w=180)'}, onClick: function(latlng){ console.log('MAP 1-1',this, latlng); }, width:180 },
+        {icon:'fa-map',  text:'Map#1 (dont close)', onClick: function(latlng){ console.log('MAP 1-2',this, latlng); }, closeOnClick: false }
     ]);
+
+    map2.setContextmenuHeader({icon:'fa-map', text:'MAP 2'});
+    map2.addContextmenuItems([
+        {icon:'fa-home', text:{da:'Map#2 (w=180)'}, onClick: function(latlng){ console.log('MAP 2-1',this, latlng); }, width:180 },
+        {icon:'fa-map',  text:'Map#2 (dont close)', onClick: function(latlng){ console.log('MAP 2-2',this, latlng); }, closeOnClick: false }
+    ]);
+
 
     map1.on('click', function( e ){
         var marker =
