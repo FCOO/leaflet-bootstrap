@@ -205,11 +205,21 @@
             //Create the list of items from the objects in objectList
             var _this = this,
                 list = [],
-                width = 0,
+                maxWidth = 0,
+                widthToUse = undefined,
                 nextId = 0;
+
+            function checkWidth( width ){
+                if (width && (parseInt(width) > maxWidth)){
+                    maxWidth = parseInt(width);
+                    widthToUse = width;
+                }
+            }
+
+
             $.each( objectList, function(index, obj){
                 var contextmenuOptions = obj.contextmenuOptions;
-                width = Math.max(width, contextmenuOptions.width || 0);
+                checkWidth( contextmenuOptions.width );
 
                 //If more than one object => add header (if any)
                 if ((objectList.length > 1) && contextmenuOptions.items.length && !!contextmenuOptions.header){
@@ -221,7 +231,7 @@
                 $.each( contextmenuOptions.items, function(index, item){
                     item = $.extend({closeOnClick: true}, item);
                     item.id = item.onClick ? item.id || 'itemId' + nextId++ : null;
-                    width = Math.max(width, item.width || 0);
+                checkWidth( item.width );
 
                     if (item.onClick){
                         //Create onClick for the item
@@ -257,7 +267,7 @@
                 .setLatLng(latlng)
                 .setContent({
                     content: $.bsMenu({fullWidth: true, list: list, small: true}),
-                    width  : width
+                    width  : widthToUse
                 });
 
             //Use object as source for popup if soucre has single latlng
