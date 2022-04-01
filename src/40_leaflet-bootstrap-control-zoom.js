@@ -92,14 +92,13 @@ Can be used as leaflet standard zoom control with Bootstrap style
 
             //Set popup-item(s)
             if (!window.bsIsTouch && this.options.historyEnabled){
-                this.options.popupList = [
+                this._adjustPopupList([
 /* SLIDER REMOVED FOR NOW. Waits for better slider-zoom in leaflet
                     {text: 'Zoom'},
-                    {type:'checkbox', text: {da:'Vis skylder', en:'Show slider'}, selected: this.options.showSlider, onChange: $.proxy(this._showSlider, this), closeOnClick: true},
+                    {type:'checkbox', text: {da:'Vis slider', en:'Show slider'}, selected: this.options.showSlider, onChange: $.proxy(this._showSlider, this), closeOnClick: true},
 //*/
                     {id: 'showHistory', type:'checkbox', text: {da:'Vis historik-knapper', en:'Show History Buttons'}, selected: this.options.showHistory, onChange: $.proxy(this._showHistory, this), closeOnClick: true},
-//                    {type:'content',  content: $historyContent,                   closeOnClick: false, lineBefore: true}
-                ];
+                ]);
             }
         },
 

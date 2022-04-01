@@ -81,7 +81,7 @@ L.BsControl = extention of L.Control with
             }
 
             L.DomEvent.disableClickPropagation(this._container);
-
+            L.DomEvent.on(this._container, 'contextmenu', L.DomEvent.stop);
 
             //Create pane to contain tooltip for control inside the map's control-container
             if (!map.getPane(controlTooltipPane))

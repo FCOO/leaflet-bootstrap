@@ -131,6 +131,7 @@
                 };
 
                 options.small   = true;
+
                 options[isCheckboxButton ? 'onChange' : 'onClick'] = any_button_on_click;
 
                 options.context = null;

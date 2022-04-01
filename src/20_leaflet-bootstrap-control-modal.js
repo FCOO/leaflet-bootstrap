@@ -12,8 +12,7 @@ Create leaflet-control for jquery-bootstrap modal-content:
         _bsModal = common constructor for bsModal and bsForm as BsControl
         ***************************************************/
         var _bsModal = L.BsControl.extend({
-hasRelativeHeight: true,
-
+            hasRelativeHeight: true,
             options: {
                 position: 'topcenter',
                 show    : false

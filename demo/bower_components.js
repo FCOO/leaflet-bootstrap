@@ -49159,13 +49159,10 @@ if (typeof define === 'function' && define.amd) {
                     }, options);
                 $this.data('cbx_options', _options );
 
+                if (options.getSelected)
+                    _options.selected = options.getSelected.apply( options.getSelectedContext, [this, _options] );
 
-                if (options.className_semi && options.semiSelected){
-                    _options.selected = true;
-                    $this.addClass(options.className_semi);
-                }
-
-                $this._cbxSet( _options.selected, true );
+                $this._cbxSet( _options.selected, true, options.className_semi && options.semiSelected );
 
                 $this.on('click', $.proxy( $this._cbxOnClick, $this ));
                 if (options.onDblClick)
@@ -49178,10 +49175,9 @@ if (typeof define === 'function' && define.amd) {
             return this.data('cbx_options').selected;
         },
 
-        _cbxSet: function( selected, dontCallOnChange ){
+        _cbxSet: function( selected, dontCallOnChange, semiSelected, semiSelectedValue ){
             var options = this.data('cbx_options');
             options.selected = !!selected;
-            this.data('cbx_options', options );
 
             var $elements = options.selector ? this.children( options.selector ) : this;
             $elements.each( function(){
@@ -49198,16 +49194,23 @@ if (typeof define === 'function' && define.amd) {
 
             });
 
-            if (!dontCallOnChange){
-                this.removeClass(options.className_semi);
-                this._cbxCallOnChange();
+            if (typeof semiSelected == 'boolean'){
+                this.toggleClass(options.className_semi, semiSelected);
+                options.semiSelected = semiSelected;
+                options.semiSelectedValue = semiSelectedValue || options.semiSelectedValue || 'SEMI-NILLER';
             }
+
+            this.data('cbx_options', options );
+
+            if (!dontCallOnChange)
+                this._cbxCallOnChange();
+
             return this;
         },
 
         _cbxOnClick: function(){
             var options = this.data('cbx_options');
-            return this._cbxSet( !options.selected );
+            return this._cbxSet( !options.selected, false, false );
         },
 
         _cbxCallOnChange: function(){
@@ -49333,9 +49336,9 @@ if (typeof define === 'function' && define.amd) {
                     childUnselected++;
             });
             //Update selected and semi-selectd state
-            this._cbxSet( childSelected == this._cbxChildList.length, true );
             var options = this.data('cbx_options'),
                 semiSelected = childSelected*childUnselected > 0;
+            this._cbxSet( childSelected == this._cbxChildList.length, true, semiSelected );
 
             if (options.prop_semi)
                 this.prop(options.prop_semi, semiSelected);
@@ -49431,13 +49434,15 @@ if (typeof define === 'function' && define.amd) {
 
         //getSelected: Return the id of the selected item (if any)
         getSelected: function(){
-            var $selectedChild = this._getSelectedChild();
-            return $selectedChild ? $selectedChild.data('cbx_options').id : null;
+            var $selectedChild = this._getSelectedChild(),
+                options        = $selectedChild ? $selectedChild.data('cbx_options') : null;
+
+            return options ? (options.semiSelected ? options.semiSelectedValue : options.id) : null;
         },
 
-        //setSelected: function(id, dontCallOnChange )
-        setSelected: function(id, dontCallOnChange ){
-            this.onChange(id, true, null, dontCallOnChange );
+        //setSelected: function(id, dontCallOnChange, semiSelected, semiSelectedValue )
+        setSelected: function(id, dontCallOnChange, semiSelected, semiSelectedValue ){
+            this.onChange(id, true, null, dontCallOnChange, semiSelected, semiSelectedValue );
         },
 
         //setUnselected: function(id, dontCallOnChange )
@@ -49445,8 +49450,8 @@ if (typeof define === 'function' && define.amd) {
             this.onChange(id, false, null, dontCallOnChange );
         },
 
-        //onChange: function(id, selected, dontCallOnChange )
-        onChange: function(id, selected, dummy, dontCallOnChange ){
+        //onChange: function(id, selected, dummy, dontCallOnChange, semiSelected, semiSelectedValue )
+        onChange: function(id, selected, dummy, dontCallOnChange, semiSelected, semiSelectedValue ){
             //Find clicked child and other selected child
             var $child = $.grep(this._cbxChildList, function($elem){ return $elem.data('cbx_options').id == id; })[0];
             if (!$child)
@@ -49458,14 +49463,14 @@ if (typeof define === 'function' && define.amd) {
 
             //Unselect the selected child
             if ($selectedChild){
-                $selectedChild._cbxSet( false, true );
+                $selectedChild._cbxSet( false, true, false );
                 if (this.options.allowZeroSelected)
                     selectedChildOptions.ownOnChange( selectedChildOptions.id, false, $selectedChild, this.options.radioGroupId );
             }
 
             //Only allow click on selected element if options.allowZeroSelected: true
             if (selected || this.options.allowZeroSelected){
-                $child._cbxSet( selected, true); //Update element
+                $child._cbxSet( selected, true, semiSelected, semiSelectedValue);//Update element
                 if (!dontCallOnChange){
                     childOptions.ownOnChange( childOptions.id, selected, $child, this.options.radioGroupId );
                     if (this.options.postOnChange)
@@ -49474,7 +49479,7 @@ if (typeof define === 'function' && define.amd) {
             }
             else
                 //Select again
-                $child._cbxSet( true, !this.options.allowReselect || dontCallOnChange);
+                $child._cbxSet( true, !this.options.allowReselect || dontCallOnChange, semiSelected, semiSelectedValue );
         }
     };
 
@@ -71669,7 +71674,9 @@ module.exports = g;
                 selected            : 'active',
                 noBorder            : 'no-border',
                 noShadow            : 'no-shadow',
-                focus               : 'init_focus'
+                focus               : 'init_focus',
+                fullWidth           : 'w-100'
+
             };
 
         //Add class-name corresponding to options
@@ -71885,6 +71892,13 @@ module.exports = g;
                         ._bsAddIdAndName( options )
                         ._bsAddBaseClassAndSize( options );
 
+        //Transfere generel button-options to buttonOptions
+        $.each(['square', 'bigSquare', 'bigIcon', 'extraLargeIcon'], function(index, id){
+            if ((options[id] !== undefined) && (options.buttonOptions[id] === undefined))
+                options.buttonOptions[id] = options[id];
+        });
+
+
         if (options.center)
             result.addClass( options.centerClass );
         else
@@ -71913,6 +71927,7 @@ module.exports = g;
             result.attr( options.attr );
 
         $.each( options.list, function(index, buttonOptions ){
+
             if (buttonOptions.id)
                 $._anyBsButton( $.extend({}, options.buttonOptions, buttonOptions ) )
                     .appendTo( result );
@@ -71934,7 +71949,6 @@ module.exports = g;
 	    allowZeroSelected: boolean. If true it is allowed to des-select a selected radio-button.
 	                       If allowZeroSelected=true onChange will also be called on the un-selected radio-input
         buttons          : as bsButtonGroup
-
     **********************************************************/
     $.bsRadioButtonGroup = function( options ){
         //Set options for RadioGroup
@@ -71951,7 +71965,8 @@ module.exports = g;
                     $.extend({}, options, {
                         radioGroupId     : options.id,
                         className        : 'active',
-                        allowZeroSelected: false
+                        className_semi   : 'semi-selected',
+                        allowZeroSelected: false,
                     })
                 );
 
@@ -72364,18 +72379,20 @@ module.exports = g;
         setValue
         *******************************************************/
         setValue: function(value, validate){
-            var $elem = this.getElement();
+            var $elem = this.getElement(),
+                isSemiSelected;
 
-            //Special case: If it is a element with possible semi-selected value and vaule is a string => the element get semi-selected mode (yellow background)
+            //Special case: If it is a element with possible semi-selected value and vaule is a string/array => the element get semi-selected mode (yellow background)
             if (this.canBeSemiSelected){
-                var isSemiSelected = (typeof value == 'string');
-                $elem.toggleClass('semi-selected', isSemiSelected);
+                var semiSelectedValue;
 
-                //Update options for the checkbox
-                var options = $elem.data('cbx_options');
-                options.className_semi = isSemiSelected ? 'semi-selected' : '';
-                options.semiSelectedValue = isSemiSelected ? value : '';
-                $elem.data('cbx_options', options );
+                isSemiSelected = ($.type(value) == this.semiSelectedValueType);
+                if ((isSemiSelected && this.semiSelectedValueType == 'array')){
+                    semiSelectedValue = value[1];
+                    value             = value[0];
+                }
+                else
+                    semiSelectedValue = value;
             }
 
             switch (this.options.type || 'input'){
@@ -72386,10 +72403,10 @@ module.exports = g;
 
                 case 'checkboxbutton'        :
                 case 'standardcheckboxbutton':
-                case 'iconcheckboxbutton'    : $elem._cbxSet(value, true);  break;
+                case 'iconcheckboxbutton'    : $elem._cbxSet(value, true, isSemiSelected, semiSelectedValue); break;
 
                 case 'selectlist'      : this.getRadioGroup().setSelected(value); break;
-                case 'radiobuttongroup': this.getRadioGroup().setSelected(value); break;
+                case 'radiobuttongroup': this.getRadioGroup().setSelected(value, false, isSemiSelected, semiSelectedValue); break;
 
                 case 'slider'    :
                 case 'timeslider': this.getSlider().setValue( value );  break;
@@ -72404,21 +72421,25 @@ module.exports = g;
         getResetValue: function(){
         *******************************************************/
         getResetValue: function(){
-            if (this.canBeSemiSelected)
-                return false;
-
             var result;
             switch (this.options.type || 'input'){
                 case 'input'            : result = '';    break;
                 case 'select'           : result = null;  break;
-                case 'checkbox'         : result = false; break;
-                case 'selectlist'       : result = this.getRadioGroup().options.list[0].id; break;
-                case 'radiobuttongroup' : result = this.getRadioGroup().options.list[0].id; break;
+
+                case 'checkbox'              :
+                case 'checkboxbutton'        :
+                case 'standardcheckboxbutton':
+                case 'iconcheckboxbutton'    : result = false; break;
+
+                case 'selectlist'       :
+                case 'radiobuttongroup' : result = this.getRadioGroup().options.items[0].id; break;
 
                 case 'slider'           :
                 case 'timeslider'       : result = this.getSlider().result.min; break;
-                case 'text'             : result = '';                          break;
+
+                case 'text'             :
                 case 'hidden'           : result = '';                          break;
+
                 default                 : result = false;
             }
             return result;
@@ -72447,7 +72468,6 @@ module.exports = g;
             var $elem = this.getElement(),
                 result = null;
 
-
             switch (this.options.type || 'input'){
                 case 'input'   : result = $elem.val();                    break;
                 case 'select'  : result = $elem.selectpicker('val');      break;
@@ -72467,15 +72487,6 @@ module.exports = g;
                 case 'text'      : result = ' ';                                 break;
                 case 'hidden'    : result = $elem.val();                         break;
             }
-
-
-            //Special case: If $elem is semi-selected: return special value from option
-            if (this.canBeSemiSelected){
-                var options = $elem.data('cbx_options');
-                if (result && options.semiSelectedValue && options.className_semi && $elem.hasClass(options.className_semi))
-                    result = options.semiSelectedValue;
-            }
-
 
             return result === null ? this.getResetValue() : result;
         },
@@ -72578,17 +72589,23 @@ module.exports = g;
         var typeList = ['button', 'checkboxbutton', 'standardcheckboxbutton', 'iconcheckboxbutton',
                         'input', 'select', 'selectlist', 'radiobuttongroup', 'checkbox', 'radio', 'table', 'slider', 'timeslider', 'hidden', 'inputgroup'],
 
-            //semiSelectedTypeList = []TYPE_Id that can have a semi-selected state/value
-            semiSelectedTypeList = ['checkboxbutton', 'standardcheckboxbutton', 'checkbox'];
-
-
+            //semiSelectedValueTypes = {TYPE_ID:TYPE} TYPE_ID = the types that accept a semi-selected value. TYPE = the $.type result that detect if the value of a element is semi-selected
+            semiSelectedValueTypes = {
+                checkboxbutton          : {type: 'string' },
+                standardcheckboxbutton  : {type: 'string' },
+                checkbox                : {type: 'string' },
+                radiobuttongroup        : {type: 'array',   addSemiSelectedClassToChild: true }
+            };
 
         function setId( dummy, obj ){
             if ($.isPlainObject(obj) && (obj.type !== undefined) && typeList.includes(obj.type) && obj.id){
                 var bsModalInput = new BsModalInput( obj, _this ),
-                    onChangingFunc = $.proxy( bsModalInput.onChanging, bsModalInput );
+                    onChangingFunc = $.proxy( bsModalInput.onChanging, bsModalInput ),
+                    ssvt = semiSelectedValueTypes[obj.type];
 
-                bsModalInput.canBeSemiSelected = semiSelectedTypeList.includes(obj.type);
+                var canBeSemiSelected = bsModalInput.canBeSemiSelected = !!ssvt;
+                bsModalInput.semiSelectedValueType       = canBeSemiSelected ? ssvt.type                        : null;
+                bsModalInput.addSemiSelectedClassToChild = canBeSemiSelected ? ssvt.addSemiSelectedClassToChild : null;
 
                 //Set options to call onChanging
                 switch (obj.type){
@@ -72683,13 +72700,13 @@ module.exports = g;
         /*******************************************************
         edit
         *******************************************************/
-        edit: function( values, tabIndexOrId ){
+        edit: function( values, tabIndexOrId, semiSelected ){
             this.$bsModal.show();
 
             if (tabIndexOrId !== undefined)
                 this.$bsModal.bsSelectTab(tabIndexOrId);
 
-            this.setValues( values, false, true );
+            this.setValues( values, false, true, semiSelected );
             this.originalValues = this.getValues();
 
             //Reset validation
@@ -72853,13 +72870,13 @@ module.exports = g;
         /*******************************************************
         setValues
         *******************************************************/
-        setValues: function(values, validate, restUndefined){
+        setValues: function(values, validate, resetUndefined){
             this._eachInput( function( input ){
                 var value = values[input.options.userId];
                 if ( value != undefined)
                     input.setValue(value, validate);
                 else
-                    if (restUndefined)
+                    if (resetUndefined)
                         input.resetValue();
             });
         },
@@ -72951,32 +72968,37 @@ module.exports = g;
     $._set_bsHeaderIcons = function( forceOptions = {}){
 
         $.bsHeaderIcons = $.extend( $.bsHeaderIcons, {
-            back    : 'fa-chevron-left',
-            forward : 'fa-chevron-right',
+            back    : 'fa-circle-chevron-left',
+            forward : 'fa-circle-chevron-right',
 
             pin     : ['fas fa-thumbtack fa-inside-circle', $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle'],
             unpin   : 'fa-thumbtack',
 
-            extend  : 'fa-chevron-up',
-            diminish: 'fa-chevron-down',
+            extend  : 'fa-chevron-circle-up',
+            diminish: 'fa-chevron-circle-down',
 
-            new     : [$.FONTAWESOME_PREFIX_STANDARD + ' fa-window-maximize fa-inside-circle2', $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle'],
 
-            warning : [['fas fa-circle back text-warning', $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle front'], 'fas fa-exclamation middle'],
+            new     : [ $.FONTAWESOME_PREFIX_STANDARD + ' fa-window-maximize fa-inside-circle2',
+                        $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle'  ],
 
-            info    : /*$.FONTAWESOME_PREFIX_STANDARD + */'fas fa-info-circle', //fas-info-circle is not part of FA v5 free regulare
+            warning : [ 'fas fa-circle back text-warning',
+                        $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle',
+                        'fas fa-exclamation fa-inside-circle-xmark'   ],
 
-            help    : $.FONTAWESOME_PREFIX_STANDARD + ' fa-question-circle',
+            info    : 'fa-circle-info',
+            help    : 'fa-circle-question',
 
-            close   : ['fas fa-circle back', $.FONTAWESOME_PREFIX_STANDARD + ' fa-times-circle middle', $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle front']
+            close   : [ 'fas fa-circle show-for-hover fa-hover-color-red',
+                        'fa-xmark fa-inside-circle-xmark fa-hover-color-white',
+                        $.FONTAWESOME_PREFIX_STANDARD+' fa-circle' ]
+
         }, forceOptions );
     };
     $._set_bsHeaderIcons();
 
     //mandatoryHeaderIconClass = mandatory class-names and title for the different icons on the header
     var mandatoryHeaderIconClassAndTitle = {
-        warning: {class:'header-icon-colored-background header-icon-warning', __title: {da:'Luk', en:'Close'}},
-        close  : {class:'header-icon-colored-background header-icon-close',   title: {da:'Luk', en:'Close'}},
+        close  : {/*class:'',*/ title: {da:'Luk', en:'Close'}},
     };
 
     /******************************************************

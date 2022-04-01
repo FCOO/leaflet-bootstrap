@@ -131,6 +131,7 @@
                 };
 
                 options.small   = true;
+
                 options[isCheckboxButton ? 'onChange' : 'onClick'] = any_button_on_click;
 
                 options.context = null;
@@ -299,7 +300,7 @@ L.BsControl = extention of L.Control with
             }
 
             L.DomEvent.disableClickPropagation(this._container);
-
+            L.DomEvent.on(this._container, 'contextmenu', L.DomEvent.stop);
 
             //Create pane to contain tooltip for control inside the map's control-container
             if (!map.getPane(controlTooltipPane))
@@ -1060,8 +1061,7 @@ Create leaflet-control for jquery-bootstrap modal-content:
         _bsModal = common constructor for bsModal and bsForm as BsControl
         ***************************************************/
         var _bsModal = L.BsControl.extend({
-hasRelativeHeight: true,
-
+            hasRelativeHeight: true,
             options: {
                 position: 'topcenter',
                 show    : false
@@ -3169,14 +3169,13 @@ Can be used as leaflet standard zoom control with Bootstrap style
 
             //Set popup-item(s)
             if (!window.bsIsTouch && this.options.historyEnabled){
-                this.options.popupList = [
+                this._adjustPopupList([
 /* SLIDER REMOVED FOR NOW. Waits for better slider-zoom in leaflet
                     {text: 'Zoom'},
-                    {type:'checkbox', text: {da:'Vis skylder', en:'Show slider'}, selected: this.options.showSlider, onChange: $.proxy(this._showSlider, this), closeOnClick: true},
+                    {type:'checkbox', text: {da:'Vis slider', en:'Show slider'}, selected: this.options.showSlider, onChange: $.proxy(this._showSlider, this), closeOnClick: true},
 //*/
                     {id: 'showHistory', type:'checkbox', text: {da:'Vis historik-knapper', en:'Show History Buttons'}, selected: this.options.showHistory, onChange: $.proxy(this._showHistory, this), closeOnClick: true},
-//                    {type:'content',  content: $historyContent,                   closeOnClick: false, lineBefore: true}
-                ];
+                ]);
             }
         },
 
