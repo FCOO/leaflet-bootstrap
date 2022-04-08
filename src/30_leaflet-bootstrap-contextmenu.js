@@ -156,6 +156,17 @@
         mapEventNames = ['mouseout', 'mousedown', 'movestart', 'zoomstart'];
 
 
+
+    function any_button_on_click_in_context_menu(id, selected, $button){
+        var options = $button.data('bsButton_options') || {};
+        if (options.event)
+            $.proxy( options.event, options.true_context )( id, options.latlng || selected, $button, options.map, options.owner );
+
+        if (options.closeOnClick)
+            this._hide();
+    }
+
+
     L.Map.ContextMenu = L.Handler.extend({
         contextmenuMarker: null,
 
@@ -233,7 +244,30 @@
                     item.id = item.onClick ? item.id || 'itemId' + nextId++ : null;
                 checkWidth( item.width );
 
-                    if (item.onClick){
+                    if (item.onClick || item.onChange){
+                        //Adjust options/item to have item.onClick called with (id, latLng, $button, map, owner). See comment in src/00_leaflet-bootstrap.js regarding L._adjustButtonList
+
+                        var type = item.type = item.type || 'button',
+                            isCheckboxButton = type != 'button';
+
+                        item.event = item.onClick || item.onChange;
+                        item[isCheckboxButton ? 'onChange' : 'onClick'] = any_button_on_click_in_context_menu;
+                        item[isCheckboxButton ? 'onClick' : 'onChange'] = null;
+
+//HER                        item.onClick = any_button_on_click_in_context_menu;
+//HER                        item.onChange = null;
+
+//HER                        item.onChange = any_button_on_click_in_context_menu;
+//HER                        item.onChange = null;
+
+                        item.true_context = item.context || this._map;
+                        item.context = _this;
+
+                        if (!item.type || (item.type == 'button'))
+                            //It is not a checkbox or radio => use 2. argument as latlng
+                            item.latlng = latlng;
+
+/*
                         //Create onClick for the item
                         var onClick = item.onClick;
                         item.onClick = $.proxy(
@@ -245,6 +279,7 @@
                             item.context || this._map,
                             item.closeOnClick
                         );
+*/
                     }
 
                     item.class = 'text-truncate';

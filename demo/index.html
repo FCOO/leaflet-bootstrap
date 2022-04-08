@@ -61,6 +61,9 @@
     i18next.options.fallbackLng = i18next.language == 'da' ? 'en' : 'da';
 
 
+    L.Renderer.prototype.options.padding = .5;
+
+
     //latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_UTM);
     //latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_MGRS);
     //latLngFormat.setFormat(window.latLngFormat.LATLNGFORMAT_NAC);
@@ -137,6 +140,9 @@
 			},
             zoomSnap: .25,
             worldCopyJump: true,
+
+
+
             attributionControl: false,
             bsAttributionControl: first,
             bsAttributionOptions: {
@@ -156,6 +162,7 @@
             }
 
         }).setView([56.2, 11.5], 6);
+
 
 /*TEST
         nextMap.on('click', function(){
@@ -361,10 +368,19 @@ scroll: false,
     **********************************************/
     var first = null;
     map1.setContextmenuHeader({icon:'fa-map', text:'MAP 1'});
-    map1.addContextmenuItems([
-        {icon:'fa-home', text:{da:'Map#1 (w=180)'}, onClick: function(latlng){ console.log('MAP 1-1',this, latlng); }, width:180 },
-        {icon:'fa-map',  text:'Map#1 (dont close)', onClick: function(latlng){ console.log('MAP 1-2',this, latlng); }, closeOnClick: false }
-    ]);
+    map1.addContextmenuItems([{
+        icon:'fa-home', text:{da:'Map#1 (w=180)'}, 
+        onClick: function(id, latlng){ 
+            console.log('MAP 1-1',latlng, arguments); 
+        }, 
+        width:180 
+    },{
+        icon:'fa-map',  text:'Map#1 (dont close)', type:'checkbox',
+        onClick: function(id, latlng){ 
+            console.log('CLICK, MAP 1-2',latlng, arguments); 
+        }, 
+        closeOnClick: false 
+    }]);
 
     map2.setContextmenuHeader({icon:'fa-map', text:'MAP 2'});
     map2.addContextmenuItems([
@@ -894,7 +910,7 @@ content = {
 
                 buttons   : [
                     {id:'button_'+i, icon:'fa-home', text:'click me #'+i, 
-                        onClick: function(id, selected, button, map, legend){ console.log('click me:', id, map, legend); legend.updateContent('Skide godt do!'); } }, 
+                        onClick: function(id, selected, button, map, legend){ console.log('click me:', id, map, legend, arguments); legend.updateContent('Skide godt do!'); } }, 
 
                     $.bsCheckboxButton({id:'checkbox_button_'+i, text: {da:'Vælg mig', en:'Select me'}, icon: ['fa-thumbs-down', 'fa-thumbs-up'], selected: false,
                         onChange: function(id, selected, _this, map){ console.log('bsCheckboxButton', id,selected, _this, map); }

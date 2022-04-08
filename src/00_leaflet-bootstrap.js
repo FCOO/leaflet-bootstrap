@@ -70,24 +70,28 @@
     /**********************************************************
     L._adjustButtonList(list, owner)
     Adjust buttons in list ($-elemnt or options) to have
-    map and 'owner' (bsLegend or popup or ...) annded to the arguments
-    onClick  = function( id, $button, map, owner )
+    map and 'owner' (bsLegend or popup or contextmenu) added to the arguments
+    bsLegend and popup:
+    onClick  = function( id, null,     $button, map, owner )
     onChange = function( id, selected, $button, map, owner )
+
+    contextmenu:
+    onClick  = function( id, latLng,   $button, map, owner )
+    onChange = function( id, selected, $button, map, owner )
+
+
     **********************************************************/
     function any_button_on_click(id, selected, $button){
-        var options = $button.data('lbOptions') || {};
+        var options = $button.data('bsButton_options') || {};
         if (options.event)
-            $.proxy( options.event, options.context )( id, selected, $button, options.map, options.owner );
+            $.proxy( options.event, options.true_context )( id, selected, $button, options.map, options.owner );
         return options.returnFromClick || false;
     }
 
     L._adjustButtonList = function(list, owner){
         var $buttonList = [];
         $.each(list, function(index, options){
-            var $button,
-                lbOptions = {
-                    returnFromClick: false
-                };
+            var $button;
 
             if (options instanceof $){
 
@@ -124,25 +128,21 @@
                 var type = options.type = options.type || 'button',
                     isCheckboxButton = type != 'button';
 
-                lbOptions = {
-                    event           : isCheckboxButton ? options.onChange : options.onClick,
-                    context         : options.context,
-                    returnFromClick : options.returnFromClick
-                };
-
                 options.small   = true;
-
+                options.event = options.onChange || options.onClick;
                 options[isCheckboxButton ? 'onChange' : 'onClick'] = any_button_on_click;
+                options[isCheckboxButton ? 'onClick' : 'onChange'] = null;
 
+                options.true_context = options.context;
                 options.context = null;
 
                 $button = $._anyBsButton(options);
             }
 
-            lbOptions.owner = owner;
-            lbOptions.map   = owner._map || (owner.parent ? owner.parent._map : null);
-
-            $button.data('lbOptions', lbOptions);
+            options = $button.data('bsButton_options');
+            options.owner = owner;
+            options.map   = owner._map || (owner.parent ? owner.parent._map : null);
+            $button.data('bsButton_options', options);
 
             $buttonList.push( $button );
 
