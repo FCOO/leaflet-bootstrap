@@ -60,11 +60,15 @@
             return this;
         },
 
-        addContextmenuItems: function ( items, prepend ) {
+        addContextmenuItems: function ( items, prepend, commonOptions = {} ) {
             this.setContextmenuOptions({});
             this.contextmenuOptions = this.contextmenuOptions || $.extend({}, contextmenuOptions);
 
             items = $.isArray(items) ? items : [items];
+
+            $.each(items, function(index, item){
+                $.extend(item, commonOptions);
+            });
             if (prepend)
                 this.contextmenuOptions.items = items.concat(this.contextmenuOptions.items);
             else
@@ -74,8 +78,8 @@
 
             return this;
         },
-        appendContextmenuItems : function( items ){ return this.addContextmenuItems( items, false ); },
-        prependContextmenuItems: function( items ){ return this.addContextmenuItems( items, true  ); },
+        appendContextmenuItems : function( items, commonOptions ){ return this.addContextmenuItems( items, false, commonOptions ); },
+        prependContextmenuItems: function( items, commonOptions ){ return this.addContextmenuItems( items, true,  commonOptions  ); },
 
         _addContextmenuEventsAndRef: function(){
             if (this.hasContextmenuEvent)
@@ -254,32 +258,13 @@
                         item[isCheckboxButton ? 'onChange' : 'onClick'] = any_button_on_click_in_context_menu;
                         item[isCheckboxButton ? 'onClick' : 'onChange'] = null;
 
-//HER                        item.onClick = any_button_on_click_in_context_menu;
-//HER                        item.onChange = null;
-
-//HER                        item.onChange = any_button_on_click_in_context_menu;
-//HER                        item.onChange = null;
-
-                        item.true_context = item.context || this._map;
+                        item.map = _this._map;
+                        item.true_context = item.context || _this._map;
                         item.context = _this;
 
                         if (!item.type || (item.type == 'button'))
                             //It is not a checkbox or radio => use 2. argument as latlng
                             item.latlng = latlng;
-
-/*
-                        //Create onClick for the item
-                        var onClick = item.onClick;
-                        item.onClick = $.proxy(
-                            function( close ){
-                                onClick( latlng, _this );
-                                if (close)
-                                    _this._hide();
-                            },
-                            item.context || this._map,
-                            item.closeOnClick
-                        );
-*/
                     }
 
                     item.class = 'text-truncate';
