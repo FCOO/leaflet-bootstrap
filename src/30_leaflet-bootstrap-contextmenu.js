@@ -162,7 +162,7 @@
 
 
     function any_button_on_click_in_context_menu(id, selected, $button){
-        var options = $button.data('bsButton_options') || {};
+        var options = $button ? $button.data('bsButton_options') || {} : {};
         if (options.event)
             $.proxy( options.event, options.true_context )( id, options.latlng || selected, $button, options.map, options.owner );
 

@@ -86,7 +86,7 @@
 
     **********************************************************/
     function any_button_on_click(id, selected, $button){
-        var options = $button.data('bsButton_options') || {};
+        var options = $button ? $button.data('bsButton_options') || {} : {};
         if (options.event)
             $.proxy( options.event, options.true_context )( id, selected, $button, options.map, options.owner );
         return options.returnFromClick || false;
@@ -130,26 +130,24 @@
         */
         }
         else {
+            if (!options.checkedBy_adjustButton){
+                //Create the buttons and modify the click-event to call options.onClick(id, null, $button, map); map is added
+                options = $.extend(true, {}, options);
+                var type = options.type = options.type || 'button',
+                    isCheckboxButton = type != 'button';
 
-if (!options.checkedByNiels){
-            //Create the buttons and modify the click-event to call options.onClick(id, null, $button, map); map is added
-            options = $.extend(true, {}, options);
-            var type = options.type = options.type || 'button',
-                isCheckboxButton = type != 'button';
+                options.small   = true;
+                options.event = options.onChange || options.onClick;
+                options[isCheckboxButton ? 'onChange' : 'onClick'] = any_button_on_click;
+                options[isCheckboxButton ? 'onClick' : 'onChange'] = null;
 
-            options.small   = true;
-            options.event = options.onChange || options.onClick;
-            options[isCheckboxButton ? 'onChange' : 'onClick'] = any_button_on_click;
-            options[isCheckboxButton ? 'onClick' : 'onChange'] = null;
+                options.true_context = options.context;
+                options.context = null;
 
-            options.true_context = options.context;
-            options.context = null;
-
-            options.owner = owner;
-            options.map   = owner._map || (owner.parent ? owner.parent._map : null);
-options.checkedByNiels = true;
-//console.log(options);
-}
+                options.owner = owner;
+                options.map   = owner._map || (owner.parent ? owner.parent._map : null);
+                options.checkedBy_adjustButton = true;
+            }
         }
 
         return options;
@@ -2197,7 +2195,7 @@ https://github.com/nerik/leaflet-graphicscale
 
 
     function any_button_on_click_in_context_menu(id, selected, $button){
-        var options = $button.data('bsButton_options') || {};
+        var options = $button ? $button.data('bsButton_options') || {} : {};
         if (options.event)
             $.proxy( options.event, options.true_context )( id, options.latlng || selected, $button, options.map, options.owner );
 
@@ -4384,10 +4382,24 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
             return opt;
         }
 
-        //Adjust buttons to include map in arguments for onClick/onChange
-        modalOptions = adjustButtons(modalOptions, this);
-        if (modalOptions.buttons)
-            modalOptions.buttons = L._adjustButtonList(modalOptions.buttons, this);
+        //Adjust buttons in content(s) and buttons to include map in arguments for onClick/onChange
+        $.each(['content', 'extended.content', 'minimized.content', 'buttons'], function(index, idStr){
+            var idList = idStr.split('.'),
+                lastId = idList.pop(),
+                parent = modalOptions,
+                exists = true;
+
+            $.each(idList, function(index, id){
+                if (parent[id])
+                    parent = parent[id];
+                else
+                    exists = false;
+            });
+
+            if (exists && parent[lastId])
+                parent[lastId] = adjustButtons( parent[lastId], _this );
+        });
+
 
         if (modalOptions.minimized)
             modalOptions.minimized.contentArg = contentArg;

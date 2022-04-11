@@ -191,10 +191,24 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
             return opt;
         }
 
-        //Adjust buttons to include map in arguments for onClick/onChange
-        modalOptions = adjustButtons(modalOptions, this);
-        if (modalOptions.buttons)
-            modalOptions.buttons = L._adjustButtonList(modalOptions.buttons, this);
+        //Adjust buttons in content(s) and buttons to include map in arguments for onClick/onChange
+        $.each(['content', 'extended.content', 'minimized.content', 'buttons'], function(index, idStr){
+            var idList = idStr.split('.'),
+                lastId = idList.pop(),
+                parent = modalOptions,
+                exists = true;
+
+            $.each(idList, function(index, id){
+                if (parent[id])
+                    parent = parent[id];
+                else
+                    exists = false;
+            });
+
+            if (exists && parent[lastId])
+                parent[lastId] = adjustButtons( parent[lastId], _this );
+        });
+
 
         if (modalOptions.minimized)
             modalOptions.minimized.contentArg = contentArg;

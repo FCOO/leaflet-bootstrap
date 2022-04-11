@@ -86,7 +86,7 @@
 
     **********************************************************/
     function any_button_on_click(id, selected, $button){
-        var options = $button.data('bsButton_options') || {};
+        var options = $button ? $button.data('bsButton_options') || {} : {};
         if (options.event)
             $.proxy( options.event, options.true_context )( id, selected, $button, options.map, options.owner );
         return options.returnFromClick || false;
@@ -130,26 +130,24 @@
         */
         }
         else {
+            if (!options.checkedBy_adjustButton){
+                //Create the buttons and modify the click-event to call options.onClick(id, null, $button, map); map is added
+                options = $.extend(true, {}, options);
+                var type = options.type = options.type || 'button',
+                    isCheckboxButton = type != 'button';
 
-if (!options.checkedByNiels){
-            //Create the buttons and modify the click-event to call options.onClick(id, null, $button, map); map is added
-            options = $.extend(true, {}, options);
-            var type = options.type = options.type || 'button',
-                isCheckboxButton = type != 'button';
+                options.small   = true;
+                options.event = options.onChange || options.onClick;
+                options[isCheckboxButton ? 'onChange' : 'onClick'] = any_button_on_click;
+                options[isCheckboxButton ? 'onClick' : 'onChange'] = null;
 
-            options.small   = true;
-            options.event = options.onChange || options.onClick;
-            options[isCheckboxButton ? 'onChange' : 'onClick'] = any_button_on_click;
-            options[isCheckboxButton ? 'onClick' : 'onChange'] = null;
+                options.true_context = options.context;
+                options.context = null;
 
-            options.true_context = options.context;
-            options.context = null;
-
-            options.owner = owner;
-            options.map   = owner._map || (owner.parent ? owner.parent._map : null);
-options.checkedByNiels = true;
-//console.log(options);
-}
+                options.owner = owner;
+                options.map   = owner._map || (owner.parent ? owner.parent._map : null);
+                options.checkedBy_adjustButton = true;
+            }
         }
 
         return options;
