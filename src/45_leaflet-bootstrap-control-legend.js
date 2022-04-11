@@ -287,13 +287,13 @@ leaflet-bootstrap-control-legend.js
 
                     if (options.buttons || options.buttonList){
                         //Convert button-list to content
-                        var $buttonList = L._adjustButtonList(options.buttons || options.buttonList, this );
+                        var buttonList = L._adjustButtonList(options.buttons || options.buttonList, this );
 
                         this.$buttonContainer =
                             $('<div/>')
                                 .addClass('text-right modal-footer')
                                 .css('padding', 0)
-                                ._bsAppendContent( $buttonList );
+                                ._bsAppendContent( buttonList );
 
                         content.push( this.$buttonContainer );
                     }

@@ -79,6 +79,10 @@
     onClick  = function( id, latLng,   $button, map, owner )
     onChange = function( id, selected, $button, map, owner )
 
+    *** NOTE ***
+    This DO NOT work for radio-groups. ONLY single types of buttons and checkbox-buttons
+    See L.Popup.prototype._updateContent in leaflet-bootstrap.js for the selection of
+    buttons to adjust in popups
 
     **********************************************************/
     function any_button_on_click(id, selected, $button){
@@ -89,66 +93,66 @@
     }
 
     L._adjustButtonList = function(list, owner){
-        var $buttonList = [];
+        var newList = [];
         $.each(list, function(index, options){
-            var $button;
+            newList.push( L._adjustButton(options, owner) );
+        });
+        return newList;
+    };
+    L._adjustButton = function(options, owner){
+        if (options instanceof $){
+            /*
+            This is NOT working since some events are linked to the original button by $.proxy(METHOD, button)
+            witch is not cloned with $.fn.clone()
+            The fix is to remove this events and replace them with new ones wher context = the new cloned button
+            */
 
-            if (options instanceof $){
-
-                /*
-                This is NOT working since some events are linked to the original button by $.proxy(METHOD, button)
-                witch is not cloned with $.fn.clone()
-                The fix is to remove this events and replace them with new ones wher context = the new cloned button
-                */
-                $button = options;  //Only while it is not working
+            return options;
 
             /*
-                $button = options.clone(true);
+            $button = options.clone(true);
 
-                //If $button is a checkbox-button => overwrite onChange
-                var buttonOptions = $button.data('cbx_options');
-                if (buttonOptions){
-                    lbOptions.event = buttonOptions.onChange;
-                    buttonOptions.onChange = any_button_on_click;
-                    $button.data('cbx_options', buttonOptions);
-                }
-                else {
-                    //$button is a normal button => overwrite onClick
-                    buttonOptions = $button.data('bsButton_options');
-                    lbOptions.event = buttonOptions.onClick;
-                    buttonOptions.onClick = any_button_on_click;
-                    $button.data('bsButton_options', buttonOptions);
-                }
-                lbOptions.context = buttonOptions.context;
-            */
+            //If $button is a checkbox-button => overwrite onChange
+            var buttonOptions = $button.data('cbx_options');
+            if (buttonOptions){
+                lbOptions.event = buttonOptions.onChange;
+                buttonOptions.onChange = any_button_on_click;
+                $button.data('cbx_options', buttonOptions);
             }
             else {
-                //Create the buttons and modify the click-event to call options.onClick(id, null, $button, map); map is added
-                options = $.extend(true, {}, options);
-                var type = options.type = options.type || 'button',
-                    isCheckboxButton = type != 'button';
-
-                options.small   = true;
-                options.event = options.onChange || options.onClick;
-                options[isCheckboxButton ? 'onChange' : 'onClick'] = any_button_on_click;
-                options[isCheckboxButton ? 'onClick' : 'onChange'] = null;
-
-                options.true_context = options.context;
-                options.context = null;
-
-                $button = $._anyBsButton(options);
+                //$button is a normal button => overwrite onClick
+                buttonOptions = $button.data('bsButton_options');
+                lbOptions.event = buttonOptions.onClick;
+                buttonOptions.onClick = any_button_on_click;
+                $button.data('bsButton_options', buttonOptions);
             }
+            lbOptions.context = buttonOptions.context;
+        */
+        }
+        else {
 
-            options = $button.data('bsButton_options');
+if (!options.checkedByNiels){
+            //Create the buttons and modify the click-event to call options.onClick(id, null, $button, map); map is added
+            options = $.extend(true, {}, options);
+            var type = options.type = options.type || 'button',
+                isCheckboxButton = type != 'button';
+
+            options.small   = true;
+            options.event = options.onChange || options.onClick;
+            options[isCheckboxButton ? 'onChange' : 'onClick'] = any_button_on_click;
+            options[isCheckboxButton ? 'onClick' : 'onChange'] = null;
+
+            options.true_context = options.context;
+            options.context = null;
+
             options.owner = owner;
             options.map   = owner._map || (owner.parent ? owner.parent._map : null);
-            $button.data('bsButton_options', options);
+options.checkedByNiels = true;
+//console.log(options);
+}
+        }
 
-            $buttonList.push( $button );
-
-        });
-
-        return $buttonList;
+        return options;
     };
 
 
@@ -3771,13 +3775,13 @@ leaflet-bootstrap-control-legend.js
 
                     if (options.buttons || options.buttonList){
                         //Convert button-list to content
-                        var $buttonList = L._adjustButtonList(options.buttons || options.buttonList, this );
+                        var buttonList = L._adjustButtonList(options.buttons || options.buttonList, this );
 
                         this.$buttonContainer =
                             $('<div/>')
                                 .addClass('text-right modal-footer')
                                 .css('padding', 0)
-                                ._bsAppendContent( $buttonList );
+                                ._bsAppendContent( buttonList );
 
                         content.push( this.$buttonContainer );
                     }
@@ -4363,7 +4367,25 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
             },
             contentAsModalOptions );
 
+
+        function adjustButtons( opt, owner ){
+
+            if ( $.isPlainObject(opt) &&
+                 ( opt.onClick ||    //Default button without type
+                   (opt.type && ['button', 'checkboxbutton', 'standardcheckboxbutton', 'iconcheckboxbutton', 'checkbox'].includes(opt.type))
+                 )
+               )
+                return L._adjustButton(opt, owner);
+
+            if ($.isPlainObject(opt) || $.isArray(opt))
+                $.each(opt, function(idOrIndex, subOpt){
+                    opt[idOrIndex] = adjustButtons(subOpt, owner);
+                });
+            return opt;
+        }
+
         //Adjust buttons to include map in arguments for onClick/onChange
+        modalOptions = adjustButtons(modalOptions, this);
         if (modalOptions.buttons)
             modalOptions.buttons = L._adjustButtonList(modalOptions.buttons, this);
 

@@ -195,12 +195,22 @@ nextMap.addControl( nextMap.bsScaleControl );
             .addTo(nextMap)
             .bindTooltip({icon:'fa-home', text:'Godt'}, {delay:2000})
             .bindPopup({
+                asContextmenu: true, 
                 showTooltip: true, 
                 header: {icon:'fa-home', text:'Header'},
-                buttons: [{icon:'fa-home', text:'Davs'}], 
+                buttons: [{icon:'fa-home', text:'Davs', 
+                            onClick: function(){
+                                console.log('test af asContextmenu', arguments.length, 'map=', arguments[3]);
+                            }
+                }], 
                 width: 300,
 scroll: false,
                 content: [{
+                    type: 'button', fullWidth: true, text: 'Check af asContextmenu',  onClick: function(){
+                                console.log('test af asContextmenu', arguments.length, 'map=', arguments[3]);
+                            }
+                    
+                },{
                     type: 'textbox', label: {icon:'fa-map-marker', text:'Text small:undefined'},
                     text: 'Text - Dette er en enkel linie'
                 },{
@@ -249,26 +259,18 @@ scroll: false,
                 extended: {
 scroll: false,
                     content: [{
-                        type: 'text', label: {icon:'fa-map-marker', text:'Text small:undefined'},
-                        text: 'Text - Dette er en enkel linie'
-                    },{
-                        type: 'text', label: {icon:'fa-map', text:'Text small:true'},
-                        text: 'Text - Dette er en enkel linie', small: true
-                    },{
-                        type: 'text', label: {icon:'fa-map', text:'Text small:false'},
-                        text: 'Text - Dette er en enkel linie', small: false,
-                    },{
-                        type: 'textbox', label: {icon:'fa-map', text:'TextBox small'},
-                        text: 'TextBox - Dette er en lang linie med mange ord', center: false, small: true
-                    },{
-                        type: 'textbox', label: {icon:'fa-map', text:'TextBox'},
-                        text: 'TextBox - Dette er en lang linie med mange ord', center: false
-                    },{
-                        type: 'textarea', label: {icon:'fa-map', text:'TextArea small'},
-                        text: 'TextArea - Dette er en lang linie med mange ord', center: false, small: true
-                    },{
-                        type: 'textarea', label: {icon:'fa-map', text:'TextArea'},
-                        text: {da:'TextArea - Dette er en lang linie med mange ord', en:'Short'}
+                        type: 'menu', 
+                        list: [                            
+                            {type:'radio', id:'test1', radioGroupId: 'test', list: [{id:'test1', text:'Test1'}, {id:'test2', text:'Test2'}],
+                            onChange: function(){ console.log('Map ikke forventet', arguments.length, arguments); }},
+
+                            {icon:'fa-map', text:'Text #2', onClick: function(){ console.log('test af asContextmenu', arguments.length, 'map=', arguments[3]); }},
+                            {icon:'fa-map', text:'Text #3', onClick: function(){ console.log('test af asContextmenu', arguments.length, 'map=', arguments[3]); }},
+                            {icon:'fa-map', text:'Text #4', onClick: function(){ console.log('test af asContextmenu', arguments.length, 'map=', arguments[3]); }},
+                            {icon:'fa-map', text:'Text #5', onClick: function(){ console.log('test af asContextmenu', arguments.length, 'map=', arguments[3]); }},
+                            {icon:'fa-map', text:'Text #6', onClick: function(){ console.log('test af asContextmenu', arguments.length, 'map=', arguments[3]); }},
+                            {icon:'fa-map', text:'Text #7', onClick: function(){ console.log('test af asContextmenu', arguments.length, 'map=', arguments[3]); }},
+                        ]
                     }]
                 }
                 
@@ -910,19 +912,28 @@ content = {
 
                 buttons   : [
                     {id:'button_'+i, icon:'fa-home', text:'click me #'+i, 
-                        onClick: function(id, selected, button, map, legend){ console.log('click me:', id, map, legend, arguments); legend.updateContent('Skide godt do!'); } }, 
+                        onClick: function(id, selected, button, map, legend){ 
+                            console.log('click me:', id, map, legend, arguments); legend.updateContent('Skide godt do!'); 
+                        } 
+                    }, 
 
                     $.bsCheckboxButton({id:'checkbox_button_'+i, text: {da:'Vælg mig', en:'Select me'}, icon: ['fa-thumbs-down', 'fa-thumbs-up'], selected: false,
-                        onChange: function(id, selected, _this, map){ console.log('bsCheckboxButton', id,selected, _this, map); }
+                        onChange: function(id, selected, $button, _this, map){ 
+                            console.log('bsCheckboxButton', arguments.length, id,selected, _this, 'map=null',map); 
+                        }
                     }),
 
                     {
                         type:'checkboxbutton', icon:['fa-home', 'fa-map'], text:'Tra daa', selected: true, 
-                        onChange: function(id, selected, _this, map){ console.log('Tradaaa', id,selected, _this, map); }
+                        onChange: function(id, selected, _this, map){ 
+                            console.log('Tradaaa', id,selected, _this, 'map',map); 
+                        }
                     },
                     {
                         type:'standardcheckboxbutton', text:'Standard', selected: true, 
-                        onChange: function(id, selected, _this, map){ console.log('Standard', id,selected, _this, map); }
+                        onChange: function(id, selected, _this, map){ 
+                            console.log('Standard', id,selected, _this, map); 
+                        }
                     }
                             ],
                 onInfo    : function(){ console.log('INFO');},

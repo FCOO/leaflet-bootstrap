@@ -174,7 +174,25 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
             },
             contentAsModalOptions );
 
+
+        function adjustButtons( opt, owner ){
+
+            if ( $.isPlainObject(opt) &&
+                 ( opt.onClick ||    //Default button without type
+                   (opt.type && ['button', 'checkboxbutton', 'standardcheckboxbutton', 'iconcheckboxbutton', 'checkbox'].includes(opt.type))
+                 )
+               )
+                return L._adjustButton(opt, owner);
+
+            if ($.isPlainObject(opt) || $.isArray(opt))
+                $.each(opt, function(idOrIndex, subOpt){
+                    opt[idOrIndex] = adjustButtons(subOpt, owner);
+                });
+            return opt;
+        }
+
         //Adjust buttons to include map in arguments for onClick/onChange
+        modalOptions = adjustButtons(modalOptions, this);
         if (modalOptions.buttons)
             modalOptions.buttons = L._adjustButtonList(modalOptions.buttons, this);
 
