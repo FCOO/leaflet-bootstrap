@@ -87,8 +87,14 @@
     **********************************************************/
     function any_button_on_click(id, selected, $button){
         var options = $button ? $button.data('bsButton_options') || {} : {};
+
         if (options.event)
             $.proxy( options.event, options.true_context )( id, selected, $button, options.map, options.owner );
+
+
+        if (options.owner && options.postClickMethod && options.owner[options.postClickMethod])
+            options.owner[options.postClickMethod]( id, selected, $button, options.map, options.owner );
+
         return options.returnFromClick || false;
     }
 
@@ -136,7 +142,7 @@
                 var type = options.type = options.type || 'button',
                     isCheckboxButton = type != 'button';
 
-                options.small   = true;
+                options.small = (typeof options.small == 'boolean') ? options.small : true;
                 options.event = options.onChange || options.onClick;
                 options[isCheckboxButton ? 'onChange' : 'onClick'] = any_button_on_click;
                 options[isCheckboxButton ? 'onClick' : 'onChange'] = null;

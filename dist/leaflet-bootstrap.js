@@ -87,8 +87,14 @@
     **********************************************************/
     function any_button_on_click(id, selected, $button){
         var options = $button ? $button.data('bsButton_options') || {} : {};
+
         if (options.event)
             $.proxy( options.event, options.true_context )( id, selected, $button, options.map, options.owner );
+
+
+        if (options.owner && options.postClickMethod && options.owner[options.postClickMethod])
+            options.owner[options.postClickMethod]( id, selected, $button, options.map, options.owner );
+
         return options.returnFromClick || false;
     }
 
@@ -136,7 +142,7 @@
                 var type = options.type = options.type || 'button',
                     isCheckboxButton = type != 'button';
 
-                options.small   = true;
+                options.small = (typeof options.small == 'boolean') ? options.small : true;
                 options.event = options.onChange || options.onClick;
                 options[isCheckboxButton ? 'onChange' : 'onClick'] = any_button_on_click;
                 options[isCheckboxButton ? 'onClick' : 'onChange'] = null;
@@ -2062,36 +2068,43 @@ https://github.com/nerik/leaflet-graphicscale
     var contextmenuOptions = {
             items : [],
             header: '',
-            excludeMapContextmenu: false, //If true the mapss contxtmenu-items isn't shown
-            parent: null, //Object witches contextmenu-items are also shown
+            excludeMapContextmenu: false, //If true the map's contxtmenu-items isn't shown
+            alsoAsPopup          : false, //If true the items in the contextmenu are also added as a menu i a popup. Map are not included
+            parent               : null,  //Object witches contextmenu-items are also shown
         };
 
     ns.contextmenuInclude = {
         setContextmenuOptions: function(options){
             this.contextmenuOptions = this.contextmenuOptions || $.extend({}, contextmenuOptions);
             $.extend(this.contextmenuOptions, options );
+            this._updatePopupWithContentmenuItems();
             return this;
         },
 
         setContextmenuHeader: function(header){
             this.setContextmenuOptions( {header: header} );
+            this._updatePopupWithContentmenuItems();
             return this;
         },
 
         setContextmenuWidth: function(width){
             this.setContextmenuOptions({width: width});
+            this._updatePopupWithContentmenuItems();
             return this;
         },
 
         setContextmenuParent: function(parent){
             this.setContextmenuOptions({parent: parent});
+            this._updatePopupWithContentmenuItems();
             return this;
         },
 
         excludeMapContextmenu: function(){
             this.contextmenuOptions.excludeMapContextmenu = true;
+            this._updatePopupWithContentmenuItems();
             return this;
         },
+
 
         addContextmenuItems: function ( items, prepend, commonOptions = {} ) {
             this.setContextmenuOptions({});
@@ -2107,12 +2120,36 @@ https://github.com/nerik/leaflet-graphicscale
             else
                 this.contextmenuOptions.items = this.contextmenuOptions.items.concat(items);
 
-             this._addContextmenuEventsAndRef();
+            this._addContextmenuEventsAndRef();
+
+            this._updatePopupWithContentmenuItems();
 
             return this;
         },
         appendContextmenuItems : function( items, commonOptions ){ return this.addContextmenuItems( items, false, commonOptions ); },
         prependContextmenuItems: function( items, commonOptions ){ return this.addContextmenuItems( items, true,  commonOptions  ); },
+
+        _updatePopupWithContentmenuItems: function(){
+            //If the contextmenus also are used as popup => add or update popup
+            if (this.contextmenuOptions.alsoAsPopup && this.bindPopup){
+                var popupContent =
+                        this._map && this._map.contextmenu ?
+                        this._map.contextmenu._popupContent(this, this.contextmenuOptions.header, true, this ) :
+                        null;
+
+                if (!popupContent) return;
+
+                if (this._popup)
+                    this._popup.setContent(popupContent);
+                else
+                    this.bindPopup(popupContent);
+            }
+
+
+
+
+        },
+
 
         _addContextmenuEventsAndRef: function(){
             if (this.hasContextmenuEvent)
@@ -2137,6 +2174,7 @@ https://github.com/nerik/leaflet-graphicscale
             //Create ref from dom-element to to this
             var getElemFunc = this.getElement || this.getContainer,
                 element     = getElemFunc ? $.proxy(getElemFunc, this)() : null;
+
             if (element)
                 $(element).data('bsContentmenuOwner', this);
         },
@@ -2192,18 +2230,6 @@ https://github.com/nerik/leaflet-graphicscale
                                 'mousedown',
         mapEventNames = ['mouseout', 'mousedown', 'movestart', 'zoomstart'];
 
-
-
-    function any_button_on_click_in_context_menu(id, selected, $button){
-        var options = $button ? $button.data('bsButton_options') || {} : {};
-        if (options.event)
-            $.proxy( options.event, options.true_context )( id, options.latlng || selected, $button, options.map, options.owner );
-
-        if (options.closeOnClick)
-            this._hide();
-    }
-
-
     L.Map.ContextMenu = L.Handler.extend({
         contextmenuMarker: null,
 
@@ -2222,6 +2248,82 @@ https://github.com/nerik/leaflet-graphicscale
         },
 
         /***********************************************************
+        _popupContent
+        Return the {header, content,...} to create the content of a popup
+        ***********************************************************/
+        _popupContent: function(object, header, isNormalPopup, _this, _map){
+            var objectList = [], //List of objects with iterms for the contextmenu
+                nextObj = object;
+            while (nextObj){
+                if (nextObj.contextmenuOptions){
+                    objectList.push(nextObj);
+                    nextObj = nextObj.contextmenuOptions.parent;
+                }
+                else
+                    nextObj = null;
+            }
+
+            if (_map)
+                objectList.push(_map);
+
+            var isContextmenuPopup = !isNormalPopup,
+                result = {
+                    header : header && isNormalPopup ? header : null,
+                    content: {
+                        type     : 'menu',
+                        fullWidth: true,
+                        list     : [],
+                        small    : true
+                    }
+                },
+                list       = result.content.list,
+                maxWidth   = 0,
+                widthToUse = undefined,
+                nextId     = 0;
+
+            function checkWidth( width ){
+                if (width && (parseInt(width) > maxWidth)){
+                    maxWidth = parseInt(width);
+                    widthToUse = width;
+                }
+            }
+
+            $.each( objectList, function(index, obj){
+                var contextmenuOptions = obj.contextmenuOptions;
+                checkWidth( contextmenuOptions.width );
+
+                //If no header is given and there are more than one object => add header (if any)
+                if (!header && (objectList.length > 1) && contextmenuOptions.items.length && !!contextmenuOptions.header){
+                    var headerOptions = $._bsAdjustIconAndText(contextmenuOptions.header);
+                    headerOptions.lineBefore = true;
+                    list.push(headerOptions);
+                }
+
+                $.each( contextmenuOptions.items, function(index, item){
+                    //Set default options
+                    item = $.extend(
+                               isContextmenuPopup ? {closeOnClick: true} : {},
+                               item
+                           );
+                    item.id = item.onClick ? item.id || 'itemId' + nextId++ : null;
+                    checkWidth( item.width );
+                    if (item.onClick || item.onChange)
+
+                    if (isContextmenuPopup){
+                        if (item.closeOnClick)
+                            item.postClickMethod = '_hide';
+                        item.class = 'text-truncate';
+                    }
+                    list.push(item);
+                });
+            });
+
+            result.width = widthToUse;
+
+            return result;
+        },
+
+        /***********************************************************
         _show - display the contextmenu
         ***********************************************************/
         _show: function(event){
@@ -2235,81 +2337,19 @@ https://github.com/nerik/leaflet-graphicscale
                 //Fired on an object => use object own single latlng (if any) else use cursor position on map
                 latlng = source.getLatLng ? source.getLatLng() : latlng;
 
-
-            var objectList = [], //List of objects with iterms for the contextmenu
-                nextObj = source;
-            while (nextObj){
-                if (nextObj.contextmenuOptions){
-                    objectList.push(nextObj);
-                    nextObj = nextObj.contextmenuOptions.parent;
-                }
-                else
-                    nextObj = null;
-            }
-
+            var mapToInclude = null;
             if (!firedOnMap && !source.contextmenuOptions.excludeMapContextmenu && this._map.contextmenuOptions)
-                objectList.push(this._map);
+                mapToInclude = this._map;
 
-            //Create the list of items from the objects in objectList
-            var _this = this,
-                list = [],
-                maxWidth = 0,
-                widthToUse = undefined,
-                nextId = 0;
-
-            function checkWidth( width ){
-                if (width && (parseInt(width) > maxWidth)){
-                    maxWidth = parseInt(width);
-                    widthToUse = width;
-                }
-            }
-
-
-            $.each( objectList, function(index, obj){
-                var contextmenuOptions = obj.contextmenuOptions;
-                checkWidth( contextmenuOptions.width );
-
-                //If more than one object => add header (if any)
-                if ((objectList.length > 1) && contextmenuOptions.items.length && !!contextmenuOptions.header){
-                    var headerOptions = $._bsAdjustIconAndText(contextmenuOptions.header);
-                    headerOptions.lineBefore = true;
-                    list.push(headerOptions);
-                }
-
-                $.each( contextmenuOptions.items, function(index, item){
-                    item = $.extend({closeOnClick: true}, item);
-                    item.id = item.onClick ? item.id || 'itemId' + nextId++ : null;
-                checkWidth( item.width );
-
-                    if (item.onClick || item.onChange){
-                        //Adjust options/item to have item.onClick called with (id, latLng, $button, map, owner). See comment in src/00_leaflet-bootstrap.js regarding L._adjustButtonList
-
-                        var type = item.type = item.type || 'button',
-                            isCheckboxButton = type != 'button';
-
-                        item.event = item.onClick || item.onChange;
-                        item[isCheckboxButton ? 'onChange' : 'onClick'] = any_button_on_click_in_context_menu;
-                        item[isCheckboxButton ? 'onClick' : 'onChange'] = null;
-
-                        item.map = _this._map;
-                        item.true_context = item.context || _this._map;
-                        item.context = _this;
-
-                        if (!item.type || (item.type == 'button'))
-                            //It is not a checkbox or radio => use 2. argument as latlng
-                            item.latlng = latlng;
-                    }
-
-                    item.class = 'text-truncate';
-                    list.push(item);
-                });
-            });
+            //Create popup-content from the objects in objectList
+            var popupContent = this._popupContent(source, false, false, this, mapToInclude),
+                itemExists = popupContent.content.list.length > 0;
 
             this.contextmenuMarker = this.contextmenuMarker || L.bsMarkerRedCross(this._map.getCenter(), {pane: 'overlayPane'}).addTo( this._map );
             this.contextmenuMarker.setLatLng(latlng);
-            this.contextmenuMarker.setOpacity(showRedCross && list.length ? 100 : 0);
+            this.contextmenuMarker.setOpacity(showRedCross && itemExists ? 100 : 0);
 
-            if (!list.length)
+            if (!itemExists)
                 return false;
 
             //Create the popup
@@ -2318,10 +2358,7 @@ https://github.com/nerik/leaflet-graphicscale
             //Update popup content
             this.popup
                 .setLatLng(latlng)
-                .setContent({
-                    content: $.bsMenu({fullWidth: true, list: list, small: true}),
-                    width  : widthToUse
-                });
+                .setContent( popupContent );
 
             //Use object as source for popup if soucre has single latlng
             this.popup._source = firedOnMap ? null :
