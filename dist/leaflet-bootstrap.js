@@ -89,8 +89,7 @@
         var options = $button ? $button.data('bsButton_options') || {} : {};
 
         if (options.event)
-            $.proxy( options.event, options.true_context )( id, selected, $button, options.map, options.owner );
-
+            $.proxy( options.event, options.true_context )( id, options.latlng || selected, $button, options.map, options.owner );
 
         if (options.owner && options.postClickMethod && options.owner[options.postClickMethod])
             options.owner[options.postClickMethod]( id, selected, $button, options.map, options.owner );
@@ -2251,7 +2250,7 @@ https://github.com/nerik/leaflet-graphicscale
         _popupContent
         Return the {header, content,...} to create the content of a popup
         ***********************************************************/
-        _popupContent: function(object, header, isNormalPopup, _this, _map){
+        _popupContent: function(object, header, isNormalPopup, _this, _map, latlng){
             var objectList = [], //List of objects with iterms for the contextmenu
                 nextObj = object;
             while (nextObj){
@@ -2312,6 +2311,11 @@ https://github.com/nerik/leaflet-graphicscale
                     if (isContextmenuPopup){
                         if (item.closeOnClick)
                             item.postClickMethod = '_hide';
+
+                        if (!item.type || (item.type == 'button'))
+                            //It is not a checkbox or radio => use 2. argument as latlng
+                            item.latlng = latlng;
+
                         item.class = 'text-truncate';
                     }
                     list.push(item);
@@ -2342,7 +2346,7 @@ https://github.com/nerik/leaflet-graphicscale
                 mapToInclude = this._map;
 
             //Create popup-content from the objects in objectList
-            var popupContent = this._popupContent(source, false, false, this, mapToInclude),
+            var popupContent = this._popupContent(source, false, false, this, mapToInclude, latlng),
                 itemExists = popupContent.content.list.length > 0;
 
             this.contextmenuMarker = this.contextmenuMarker || L.bsMarkerRedCross(this._map.getCenter(), {pane: 'overlayPane'}).addTo( this._map );

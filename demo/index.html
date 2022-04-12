@@ -584,7 +584,7 @@ content = {
         .setContextmenuOptions({alsoAsPopup: true})
         .setContextmenuHeader({da: 'Grøn polygon', en:'Green polygon'})
         .addContextmenuItems([
-            {icon:'fa-home', text:{da:'GREEN Poly 1'}, width: '10em', onClick: function(latlng){ console.log('GREEN Poly 1',this, latlng); }},
+            {icon:'fa-home', text:{da:'GREEN Poly 1'}, width: '10em', onClick: function(id, latlng){ console.log('GREEN Poly 1',arguments); }},
             {icon:'fa-map',  text:'GREEN Poly 2', onClick: function(latlng){ console.log('GREEN Poly 2',this, latlng); }},
         ]);
 
