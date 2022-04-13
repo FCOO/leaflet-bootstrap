@@ -93,24 +93,14 @@
         _updatePopupWithContentmenuItems: function(){
             //If the contextmenus also are used as popup => add or update popup
             if (this.contextmenuOptions.alsoAsPopup && this.bindPopup){
-                var popupContent =
-                        this._map && this._map.contextmenu ?
-                        this._map.contextmenu._popupContent(this, this.contextmenuOptions.header, true, this ) :
-                        null;
-
-                if (!popupContent) return;
+                var popupContent = ns._popupContent(this, this.contextmenuOptions.header, true, this );
 
                 if (this._popup)
                     this._popup.setContent(popupContent);
                 else
                     this.bindPopup(popupContent);
             }
-
-
-
-
         },
-
 
         _addContextmenuEventsAndRef: function(){
             if (this.hasContextmenuEvent)
@@ -141,6 +131,90 @@
         },
     };
 
+    /***********************************************************
+    _popupContent
+    Return the {header, content,...} to create the content of a popup
+    ***********************************************************/
+    ns._popupContent = function(object, header, isNormalPopup, _this, _map, latlng){
+        var objectList = [], //List of objects with iterms for the contextmenu
+            nextObj = object;
+        while (nextObj){
+            if (nextObj.contextmenuOptions){
+                objectList.push(nextObj);
+                nextObj = nextObj.contextmenuOptions.parent;
+            }
+            else
+                nextObj = null;
+        }
+
+        if (_map)
+            objectList.push(_map);
+
+        var isContextmenuPopup = !isNormalPopup,
+            result = {
+                header : header && isNormalPopup ? header : null,
+                content: {
+                    type     : 'menu',
+                    fullWidth: true,
+                    list     : [],
+                    small    : true
+                }
+            },
+            list       = result.content.list,
+            maxWidth   = 0,
+            widthToUse = undefined,
+            nextId     = 0;
+
+        function checkWidth( width ){
+            if (width && (parseInt(width) > maxWidth)){
+                maxWidth = parseInt(width);
+                widthToUse = width;
+            }
+        }
+
+        $.each( objectList, function(index, obj){
+            var contextmenuOptions = obj.contextmenuOptions,
+                lineBefore         = false;
+
+            checkWidth( contextmenuOptions.width );
+
+            //If no header is given and there are more than one object => add header (if any)
+            if (!header && (objectList.length > 1) && contextmenuOptions.items.length && !!contextmenuOptions.header){
+                var headerOptions = $._bsAdjustIconAndText(contextmenuOptions.header);
+                headerOptions.lineBefore = true;
+                list.push(headerOptions);
+            }
+            lineBefore = true;
+
+            $.each( contextmenuOptions.items, function(index, item){
+                //Set default options
+                item = $.extend(
+                    isContextmenuPopup ? {closeOnClick: true} : {lineBefore: lineBefore},
+                    item
+                );
+                lineBefore = false;
+                item.id = item.onClick ? item.id || 'itemId' + nextId++ : null;
+                checkWidth( item.width );
+                if (item.onClick || item.onChange)
+
+                if (isContextmenuPopup){
+                    if (item.closeOnClick)
+                        item.postClickMethod = '_hide';
+
+                    if (!item.type || (item.type == 'button'))
+                        //It is not a checkbox or radio => use 2. argument as latlng
+                        item.latlng = latlng;
+
+                    item.class = 'text-truncate';
+                }
+                list.push(item);
+            });
+        });
+
+        result.width = widthToUse;
+
+        return result;
+    };
 
     /***********************************************************
     Extend L.Layer
@@ -208,90 +282,6 @@
             $.each(mapEventNames, function(index, eventName){ _this._map.off(eventName, _this._hide, _this); });
         },
 
-        /***********************************************************
-        _popupContent
-        Return the {header, content,...} to create the content of a popup
-        ***********************************************************/
-        _popupContent: function(object, header, isNormalPopup, _this, _map, latlng){
-            var objectList = [], //List of objects with iterms for the contextmenu
-                nextObj = object;
-            while (nextObj){
-                if (nextObj.contextmenuOptions){
-                    objectList.push(nextObj);
-                    nextObj = nextObj.contextmenuOptions.parent;
-                }
-                else
-                    nextObj = null;
-            }
-
-            if (_map)
-                objectList.push(_map);
-
-            var isContextmenuPopup = !isNormalPopup,
-                result = {
-                    header : header && isNormalPopup ? header : null,
-                    content: {
-                        type     : 'menu',
-                        fullWidth: true,
-                        list     : [],
-                        small    : true
-                    }
-                },
-                list       = result.content.list,
-                maxWidth   = 0,
-                widthToUse = undefined,
-                nextId     = 0;
-
-            function checkWidth( width ){
-                if (width && (parseInt(width) > maxWidth)){
-                    maxWidth = parseInt(width);
-                    widthToUse = width;
-                }
-            }
-
-            $.each( objectList, function(index, obj){
-                var contextmenuOptions = obj.contextmenuOptions,
-                    lineBefore         = false;
-
-                checkWidth( contextmenuOptions.width );
-
-                //If no header is given and there are more than one object => add header (if any)
-                if (!header && (objectList.length > 1) && contextmenuOptions.items.length && !!contextmenuOptions.header){
-                    var headerOptions = $._bsAdjustIconAndText(contextmenuOptions.header);
-                    headerOptions.lineBefore = true;
-                    list.push(headerOptions);
-                }
-                lineBefore = true;
-
-                $.each( contextmenuOptions.items, function(index, item){
-                    //Set default options
-                    item = $.extend(
-                        isContextmenuPopup ? {closeOnClick: true} : {lineBefore: lineBefore},
-                        item
-                    );
-                    lineBefore = false;
-                    item.id = item.onClick ? item.id || 'itemId' + nextId++ : null;
-                    checkWidth( item.width );
-                    if (item.onClick || item.onChange)
-
-                    if (isContextmenuPopup){
-                        if (item.closeOnClick)
-                            item.postClickMethod = '_hide';
-
-                        if (!item.type || (item.type == 'button'))
-                            //It is not a checkbox or radio => use 2. argument as latlng
-                            item.latlng = latlng;
-
-                        item.class = 'text-truncate';
-                    }
-                    list.push(item);
-                });
-            });
-
-            result.width = widthToUse;
-
-            return result;
-        },
 
         /***********************************************************
         _show - display the contextmenu
@@ -312,7 +302,7 @@
                 mapToInclude = this._map;
 
             //Create popup-content from the objects in objectList
-            var popupContent = this._popupContent(source, false, false, this, mapToInclude, latlng),
+            var popupContent = ns._popupContent(source, false, false, this, mapToInclude, latlng),
                 itemExists = popupContent.content.list.length > 0;
 
             this.contextmenuMarker = this.contextmenuMarker || L.bsMarkerRedCross(this._map.getCenter(), {pane: 'overlayPane'}).addTo( this._map );

@@ -404,8 +404,7 @@ scroll: false,
                 shadow: false,
                 tooltipHideWhenPopupOpen: true,
                 tooltip: 'TOOLTIP____________________________________!'
-            })
-            .addTo(map1);
+            });
 
 /*
 content = {
@@ -420,7 +419,7 @@ content = {
 };
 */
 
-
+        if (!first)
             marker.bindPopup({
                 header: 'Overskrift',
                 _semiTransparent: first, //true,
@@ -527,7 +526,7 @@ content = {
         //marker.on('popupopen',  function(){ marker._popup.setSizeExtended(); });
 
 
-        marker.setContextmenuOptions(first ? {alsoAsPopup: true} : {} );
+        marker.setContextmenuOptions(first ? {alsoAsPopup: first} : {} );
 
         marker.setContextmenuHeader(first ? {text:'Blue markers'} : {text:{da:'RED Markers'}});
         marker.addContextmenuItems([
@@ -537,6 +536,9 @@ content = {
         if (first)
             marker.excludeMapContextmenu();
         marker.setContextmenuParent(first);
+
+        marker.addTo(map1);
+
 
         first = first || marker;
     });
