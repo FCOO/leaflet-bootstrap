@@ -250,7 +250,9 @@
             }
 
             $.each( objectList, function(index, obj){
-                var contextmenuOptions = obj.contextmenuOptions;
+                var contextmenuOptions = obj.contextmenuOptions,
+                    lineBefore         = false;
+
                 checkWidth( contextmenuOptions.width );
 
                 //If no header is given and there are more than one object => add header (if any)
@@ -259,13 +261,15 @@
                     headerOptions.lineBefore = true;
                     list.push(headerOptions);
                 }
+                lineBefore = true;
 
                 $.each( contextmenuOptions.items, function(index, item){
                     //Set default options
                     item = $.extend(
-                               isContextmenuPopup ? {closeOnClick: true} : {},
-                               item
-                           );
+                        isContextmenuPopup ? {closeOnClick: true} : {lineBefore: lineBefore},
+                        item
+                    );
+                    lineBefore = false;
                     item.id = item.onClick ? item.id || 'itemId' + nextId++ : null;
                     checkWidth( item.width );
                     if (item.onClick || item.onChange)

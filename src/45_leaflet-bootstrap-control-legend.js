@@ -16,7 +16,7 @@ leaflet-bootstrap-control-legend.js
             semiTransparent : true,
             content: {
                 header          : {
-                    icon: 'fa-list',
+                    icon: 'fas fa-list',
                     text: {da: 'Signaturforklaring', en:'Legend'}
                 },
                 icons: {
@@ -212,17 +212,26 @@ leaflet-bootstrap-control-legend.js
     *******************************************************************
     ******************************************************************/
     L.BsLegend = function( options ){
-        this.options = $.extend({
-                show       : true,  //Show or hide the legend at init
-                showContent: true,  //Show or hide the content at init
-                showIcons  : true,  //Show or hide the icon-buttons t the header at init
-                isExtended : true   //Extend/diminish the legend at init
-            }, options);
+        this.options = $.extend(this.options, options);
         this.index = options.index;
     };
 
     //Extend the prototype
     L.BsLegend.prototype = {
+        options: {
+            show       : true,  //Show or hide the legend at init
+            showContent: true,  //Show or hide the content at init
+            showIcons  : true,  //Show or hide the icon-buttons t the header at init
+            isExtended : true,  //Extend/diminish the legend at init
+
+            //closeIconOptions = options for the close-icon in the header that removes the layer
+            closeIconOptions: {
+                icon     : ['fa-map fa-scale-x-08', 'fa-slash fa-scale-x-08'],
+                className: 'fa-map-margin-right',
+                title    : {da:'Skjul', en:'Hide'},
+            }
+        },
+
         /*******************************************
         addTo
         *******************************************/
@@ -306,13 +315,10 @@ leaflet-bootstrap-control-legend.js
 
                 options.onRemove = options.onRemove || options.onClose;
                 if (options.onRemove)
-                    modalContentOptions.icons.close = {
-                        //icon   : ['fas fa-home _back', 'far fa-home _middle', 'far fa-home _front'],
-                        icon   : ['fa-map fa-scale-x-08', 'fa-slash fa-scale-x-08'],
-                        className: 'fa-map-margin-right',
-                        title  : {da:'Skjul', en:'Hide'},
-                        onClick: $.proxy(this.remove, this)
-                    };
+                    modalContentOptions.icons.close = $.extend(
+                        {onClick: $.proxy(this.remove, this)},
+                        options.closeIconOptions
+                    );
                 this.$container    = $('<div/>')._bsModalContent(modalContentOptions);
                 this.bsModal = this.$container.bsModal;
                 this.$modalContent = this.bsModal.$modalContent;
@@ -479,7 +485,6 @@ leaflet-bootstrap-control-legend.js
         }
 
     };
-
 
 }(jQuery, L, this, document));
 
