@@ -91,8 +91,8 @@
         if (options.event)
             $.proxy( options.event, options.true_context )( id, options.latlng || selected, $button, options.map, options.owner );
 
-        if (options.owner && options.postClickMethod && options.owner[options.postClickMethod])
-            options.owner[options.postClickMethod]( id, selected, $button, options.map, options.owner );
+        if (options.postClick)
+            options.postClick.bind(options.postClickContext)( id, selected, $button, options.map, options.owner );
 
         return options.returnFromClick || false;
     }
@@ -2236,8 +2236,10 @@ https://github.com/nerik/leaflet-graphicscale
                 if (item.onClick || item.onChange)
 
                 if (isContextmenuPopup){
-                    if (item.closeOnClick)
-                        item.postClickMethod = '_hide';
+                    if (item.closeOnClick){
+                        item.postClick        = _map.contextmenu._hide;
+                        item.postClickContext = _map.contextmenu;
+                    }
 
                     if (!item.type || (item.type == 'button'))
                         //It is not a checkbox or radio => use 2. argument as latlng

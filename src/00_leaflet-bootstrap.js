@@ -91,8 +91,8 @@
         if (options.event)
             $.proxy( options.event, options.true_context )( id, options.latlng || selected, $button, options.map, options.owner );
 
-        if (options.owner && options.postClickMethod && options.owner[options.postClickMethod])
-            options.owner[options.postClickMethod]( id, selected, $button, options.map, options.owner );
+        if (options.postClick)
+            options.postClick.bind(options.postClickContext)( id, selected, $button, options.map, options.owner );
 
         return options.returnFromClick || false;
     }

@@ -198,8 +198,10 @@
                 if (item.onClick || item.onChange)
 
                 if (isContextmenuPopup){
-                    if (item.closeOnClick)
-                        item.postClickMethod = '_hide';
+                    if (item.closeOnClick){
+                        item.postClick        = _map.contextmenu._hide;
+                        item.postClickContext = _map.contextmenu;
+                    }
 
                     if (!item.type || (item.type == 'button'))
                         //It is not a checkbox or radio => use 2. argument as latlng
