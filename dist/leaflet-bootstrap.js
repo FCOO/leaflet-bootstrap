@@ -2131,7 +2131,13 @@ https://github.com/nerik/leaflet-graphicscale
         _updatePopupWithContentmenuItems: function(){
             //If the contextmenus also are used as popup => add or update popup
             if (this.contextmenuOptions.alsoAsPopup && this.bindPopup){
-                var popupContent = ns._popupContent(this, this.contextmenuOptions.header, true, this );
+                var popupContent = ns._popupContent({
+                        object       : this,
+                        header       : this.contextmenuOptions.header,
+                        isNormalPopup: true,
+                        map          : this._map,
+                        includeMap   : false
+                    });
 
                 if (this._popup)
                     this._popup.setContent(popupContent);
@@ -2172,10 +2178,20 @@ https://github.com/nerik/leaflet-graphicscale
     /***********************************************************
     _popupContent
     Return the {header, content,...} to create the content of a popup
+    options = {
+        object       : The object with the context-menu
+        isNormalPopup: BOOLEAN, true if the content are for a normal popup
+        header       : The header for popup-version (isNormalPopup == true)
+        map          : The map where the contextmenu/object is located
+        includeMap   : BOOLEAN, if true the contextmenus of _map are included
+        latlng       : The position where the contextmenu was trigged
+    }
     ***********************************************************/
-    ns._popupContent = function(object, header, isNormalPopup, _this, _map, latlng){
-        var objectList = [], //List of objects with iterms for the contextmenu
-            nextObj = object;
+    ns._popupContent = function(options){
+        var o = options,
+            objectList = [], //List of objects with iterms for the contextmenu
+            nextObj = o.object;
+
         while (nextObj){
             if (nextObj.contextmenuOptions){
                 objectList.push(nextObj);
@@ -2185,12 +2201,12 @@ https://github.com/nerik/leaflet-graphicscale
                 nextObj = null;
         }
 
-        if (_map)
-            objectList.push(_map);
+        if (o.includeMap && o.map)
+            objectList.push(o.map);
 
-        var isContextmenuPopup = !isNormalPopup,
+        var isContextmenuPopup = !o.isNormalPopup,
             result = {
-                header : header && isNormalPopup ? header : null,
+                header : o.header && o.isNormalPopup ? o.header : null,
                 content: {
                     type     : 'menu',
                     fullWidth: true,
@@ -2217,7 +2233,7 @@ https://github.com/nerik/leaflet-graphicscale
             checkWidth( contextmenuOptions.width );
 
             //If no header is given and there are more than one object => add header (if any)
-            if (!header && (objectList.length > 1) && contextmenuOptions.items.length && !!contextmenuOptions.header){
+            if (!o.header && (objectList.length > 1) && contextmenuOptions.items.length && !!contextmenuOptions.header){
                 var headerOptions = $._bsAdjustIconAndText(contextmenuOptions.header);
                 headerOptions.lineBefore = true;
                 list.push(headerOptions);
@@ -2237,13 +2253,13 @@ https://github.com/nerik/leaflet-graphicscale
 
                 if (isContextmenuPopup){
                     if (item.closeOnClick){
-                        item.postClick        = _map.contextmenu._hide;
-                        item.postClickContext = _map.contextmenu;
+                        item.postClick        = o.map.contextmenu._hide;
+                        item.postClickContext = o.map.contextmenu;
                     }
 
                     if (!item.type || (item.type == 'button'))
                         //It is not a checkbox or radio => use 2. argument as latlng
-                        item.latlng = latlng;
+                        item.latlng = o.latlng;
 
                     item.class = 'text-truncate';
                 }
@@ -2337,12 +2353,15 @@ https://github.com/nerik/leaflet-graphicscale
                 //Fired on an object => use object own single latlng (if any) else use cursor position on map
                 latlng = source.getLatLng ? source.getLatLng() : latlng;
 
-            var mapToInclude = null;
-            if (!firedOnMap && !source.contextmenuOptions.excludeMapContextmenu && this._map.contextmenuOptions)
-                mapToInclude = this._map;
-
             //Create popup-content from the objects in objectList
-            var popupContent = ns._popupContent(source, false, false, this, mapToInclude, latlng),
+            var popupContent = ns._popupContent({
+                    object       : source,
+                    isNormalPopup: false,
+                    header       : null,
+                    map          : this._map,
+                    includeMap   : !firedOnMap && !source.contextmenuOptions.excludeMapContextmenu && this._map.contextmenuOptions,
+                    latlng       : latlng
+                }),
                 itemExists = popupContent.content.list.length > 0;
 
             this.contextmenuMarker = this.contextmenuMarker || L.bsMarkerRedCross(this._map.getCenter(), {pane: 'overlayPane'}).addTo( this._map );
@@ -3302,7 +3321,6 @@ Can be used as leaflet standard zoom control with Bootstrap style
                             {id:'history_forward', icon: 'fa-angle-right'   , bigIcon: true, onClick: $.proxy(this.historyList.goForward, this.historyList) },
                         ]} )
                     )
-//HER                        .css('margin-right', '2px')
                         .find('.btn')
                             .addClass('disabled')
                             .css({

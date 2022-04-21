@@ -166,7 +166,6 @@ Can be used as leaflet standard zoom control with Bootstrap style
                             {id:'history_forward', icon: 'fa-angle-right'   , bigIcon: true, onClick: $.proxy(this.historyList.goForward, this.historyList) },
                         ]} )
                     )
-//HER                        .css('margin-right', '2px')
                         .find('.btn')
                             .addClass('disabled')
                             .css({
