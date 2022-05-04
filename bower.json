@@ -1,6 +1,6 @@
 {
   "name": "leaflet-bootstrap",
-  "version": "3.24.3",
+  "version": "3.25.0",
   "homepage": "https://github.com/FCOO/leaflet-bootstrap",
   "authors": [
     "Niels Holt"
@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "jquery": "latest",
-    "leaflet-bower-bugfix-switches": "fcoo/leaflet-bower-bugfix-switches#latest",
+    "leaflet-bower-bugfix-switches": "fcoo/leaflet-bower-bugfix-switches#^2.0.2",
     "jquery-bootstrap": "fcoo/jquery-bootstrap#^2.5.0",
     "leaflet-control-topcenter": "FCOO/leaflet-control-topcenter#^2.0.1",
     "javascript-utilities": "fcoo/javascript-utilities#^1.1.0",

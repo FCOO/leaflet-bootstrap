@@ -2372,12 +2372,14 @@ https://github.com/nerik/leaflet-graphicscale
                 return false;
 
             //Create the popup
+            var firstTime = !this.popup;
             this.popup = this.popup || L.popup();
 
             //Update popup content
             this.popup
                 .setLatLng(latlng)
                 .setContent( popupContent );
+
 
             //Use object as source for popup if soucre has single latlng
             this.popup._source = firedOnMap ? null :
@@ -2389,6 +2391,11 @@ https://github.com/nerik/leaflet-graphicscale
             this.popup
                 .openOn(this._map)
                 .bringToFront();
+
+            //Prevent "mousedownEventName" on the popup from closing the popup
+            if (firstTime)
+                L.DomEvent.on(this.popup._container, mousedownEventName, L.DomEvent.stopPropagation);
+
         },
 
         /***********************************************************
@@ -4298,7 +4305,7 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
     Adjust Popup._close and Popup._onCloseButtonClick
     to only close popup if it isn't pinned or it is closed from close-button
     *********************************************************/
-    L.Popup.prototype._close = function (_close) {
+    L.Popup.prototype.close = function (close) {
         return function () {
             if (!this._pinned || this._closeViaCloseButton){
                 this._closeViaCloseButton = false;
@@ -4310,17 +4317,16 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
 //                    this._source.closeTooltip();
                     this._source.getTooltip().options.pane = 'tooltipPane';
                 }
-                _close.apply(this, arguments);
+                close.apply(this, arguments);
             }
         };
-    } (L.Popup.prototype._close);
+    } (L.Popup.prototype.close);
 
-    L.Popup.prototype._onCloseButtonClick = function (_onCloseButtonClick) {
-        return function () {
-            this._closeViaCloseButton = true;
-            _onCloseButtonClick.apply(this, arguments);
-        };
-    } (L.Popup.prototype._onCloseButtonClick);
+    L.Popup.prototype._onCloseButtonClick = function() {
+        this._closeViaCloseButton = true;
+        this.close();
+    };
+
 
     /*********************************************************
     Extend L.Popup._initLayout to create popup with Bootstrap-components
@@ -4664,7 +4670,7 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
     *********************************************************/
     L.Map.prototype.closeAllPopup = function() {
         $(this.getPane('popupPane')).find('.leaflet-popup').each(function(){
-            $(this).data('popup')._close();
+            $(this).data('popup').close();
         });
     };
 

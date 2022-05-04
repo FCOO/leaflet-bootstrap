@@ -47,7 +47,7 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
     Adjust Popup._close and Popup._onCloseButtonClick
     to only close popup if it isn't pinned or it is closed from close-button
     *********************************************************/
-    L.Popup.prototype._close = function (_close) {
+    L.Popup.prototype.close = function (close) {
         return function () {
             if (!this._pinned || this._closeViaCloseButton){
                 this._closeViaCloseButton = false;
@@ -59,17 +59,16 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
 //                    this._source.closeTooltip();
                     this._source.getTooltip().options.pane = 'tooltipPane';
                 }
-                _close.apply(this, arguments);
+                close.apply(this, arguments);
             }
         };
-    } (L.Popup.prototype._close);
+    } (L.Popup.prototype.close);
 
-    L.Popup.prototype._onCloseButtonClick = function (_onCloseButtonClick) {
-        return function () {
-            this._closeViaCloseButton = true;
-            _onCloseButtonClick.apply(this, arguments);
-        };
-    } (L.Popup.prototype._onCloseButtonClick);
+    L.Popup.prototype._onCloseButtonClick = function() {
+        this._closeViaCloseButton = true;
+        this.close();
+    };
+
 
     /*********************************************************
     Extend L.Popup._initLayout to create popup with Bootstrap-components
@@ -413,7 +412,7 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
     *********************************************************/
     L.Map.prototype.closeAllPopup = function() {
         $(this.getPane('popupPane')).find('.leaflet-popup').each(function(){
-            $(this).data('popup')._close();
+            $(this).data('popup').close();
         });
     };
 

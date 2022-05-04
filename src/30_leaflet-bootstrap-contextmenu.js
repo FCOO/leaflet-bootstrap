@@ -334,12 +334,14 @@
                 return false;
 
             //Create the popup
+            var firstTime = !this.popup;
             this.popup = this.popup || L.popup();
 
             //Update popup content
             this.popup
                 .setLatLng(latlng)
                 .setContent( popupContent );
+
 
             //Use object as source for popup if soucre has single latlng
             this.popup._source = firedOnMap ? null :
@@ -351,6 +353,11 @@
             this.popup
                 .openOn(this._map)
                 .bringToFront();
+
+            //Prevent "mousedownEventName" on the popup from closing the popup
+            if (firstTime)
+                L.DomEvent.on(this.popup._container, mousedownEventName, L.DomEvent.stopPropagation);
+
         },
 
         /***********************************************************
