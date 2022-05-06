@@ -454,9 +454,12 @@ leaflet-bootstrap-control-legend.js
         /*******************************************
         remove
         *******************************************/
-        remove: function(){
+        remove: function(e){
+            //Since this.parent.removeLegend removed DOM-elements the event must stop propagation
+            L.DomEvent.stopPropagation(e);
             this.parent.removeLegend(this);
         },
+
         onRemove: function(){
             if (this.$container)
                 this.$container.detach();

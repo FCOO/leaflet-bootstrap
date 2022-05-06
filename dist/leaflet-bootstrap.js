@@ -957,7 +957,6 @@ Create leaflet-control for jquery-bootstrap button-classes:
                         $contentContainer._bsModalContent(modalOptions);
                     }
 
-
                     //To avoid resizing relative to window height the class 'modal-flex-height' is removed
                     $contentContainer.bsModal.$modalContent.removeClass('modal-flex-height');
 
@@ -4002,9 +4001,12 @@ leaflet-bootstrap-control-legend.js
         /*******************************************
         remove
         *******************************************/
-        remove: function(){
+        remove: function(e){
+            //Since this.parent.removeLegend removed DOM-elements the event must stop propagation
+            L.DomEvent.stopPropagation(e);
             this.parent.removeLegend(this);
         },
+
         onRemove: function(){
             if (this.$container)
                 this.$container.detach();

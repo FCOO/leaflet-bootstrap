@@ -274,7 +274,6 @@ Create leaflet-control for jquery-bootstrap button-classes:
                         $contentContainer._bsModalContent(modalOptions);
                     }
 
-
                     //To avoid resizing relative to window height the class 'modal-flex-height' is removed
                     $contentContainer.bsModal.$modalContent.removeClass('modal-flex-height');
 
