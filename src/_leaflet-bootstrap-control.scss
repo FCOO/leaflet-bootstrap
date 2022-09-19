@@ -2,7 +2,7 @@
 leaflet-bootstrap-control.scss
 ************************************************/
 //In Leaflet 1.? (>1.7) <a> inside .leaflet-container got new color - this is reset
-.leaflet-control-container a {
+.leaflet-container a {
     color: var(--bs-btn-color);
 }
 

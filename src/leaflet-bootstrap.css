@@ -388,7 +388,7 @@ leaflet-bootstrap-tooltip.scss,
 /***********************************************
 leaflet-bootstrap-control.scss
 ************************************************/
-.leaflet-control-container a {
+.leaflet-container a {
   color: var(--bs-btn-color);
 }
 
