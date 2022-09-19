@@ -107,6 +107,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
             //Create default leaflet zoom-control
             this.zoom = L.control.zoom({zoomInTitle: '', zoomOutTitle: '', position: this.options.position });
 
+
             //Overwrite default _updateDisabled
             this.zoom._updateDisabled = $.proxy(this._updateDisabled, this);
 
@@ -232,6 +233,19 @@ Can be used as leaflet standard zoom control with Bootstrap style
 
             this._showSlider('', this.options.showSlider);
 //*/
+
+            //Need to cache contextmenu on leaflet-buttons and call contextmenu on container
+            var _this         = this,
+                onContextmenu = function(e){
+                    e.preventDefault();
+                    _this.$popupElements.contextmenu();
+                };
+
+            $.each(['_zoomInButton', '_zoomOutButton'], function( index, id ){
+                if (_this.zoom[id])
+                    $(_this.zoom[id]).on('contextmenu', onContextmenu);
+            });
+
             map.whenReady(this._onLoad, this);
 
             return result;
