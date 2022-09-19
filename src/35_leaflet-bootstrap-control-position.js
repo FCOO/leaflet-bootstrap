@@ -141,6 +141,7 @@ Options for selectiong position-format and to activate context-menu
                     insideFormGroup: false,
                     noValidation   : true,
                     noBorder       : true,
+noPadding: true,
                     type           : 'textbox',
 
                     text           : function( $inner ){ $inner.addClass('cursor'); },
@@ -188,7 +189,7 @@ Options for selectiong position-format and to activate context-menu
                 ._bsAppendContent( mapCenterOptions );
 
             //Use the added class name to find the two containers for cursor- and map center position
-            var contentClassName = 'hide-for-no-cursor-on-map bsPosition-content text-monospace justify-content-center align-items-center flex-grow-1';
+            var contentClassName = 'hide-for-no-cursor-on-map bsPosition-content text-monospace justify-content-center d-flex align-items-center flex-grow-1';
 
 
             this.$cursorPositionSpan = this.$innerContentContainer.find('.cursor').empty().html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
@@ -638,11 +639,12 @@ Options for selectiong position-format and to activate context-menu
         var innerContainerClassName = this.innerContainerClassName = 'info-box-'+options.index;
 
         var boxOptions = this.boxOptions = {
-                insideFormGroup: false,
-                noValidation   : true,
-                noBorder       : true,
-                type           : 'textbox',
-                text           : function( $inner ){
+                insideFormGroup : false,
+                noValidation    : true,
+                noBorder        : true,
+                noPadding       : true,
+                type            : 'textbox',
+                text            : function( $inner ){
                     $inner.addClass(innerContainerClassName + ' no-border');
                 },
                 class          : (options.className || ''),

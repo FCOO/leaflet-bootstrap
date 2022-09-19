@@ -21,8 +21,8 @@ $slider-handle-height-half: $slider-handle-height / 2;
         top   : -1 * $slider-handle-height-half;
 
         left  : calc(50% - #{$slider-width / 2});
-        border-left: 1px solid $control-border-color;
-        border-right: 1px solid $control-border-color;
+        border-left: 1px solid $leaflet-border-color;
+        border-right: 1px solid $leaflet-border-color;
 
         border-radius: 0 !important;
         * { border-radius: 0 !important }
@@ -37,7 +37,7 @@ $slider-handle-height-half: $slider-handle-height / 2;
 
         hr {
             border: none;
-            border-bottom: 6px double $control-color;
+            border-bottom: 6px double $gray-600;
             height: 25%;
             width : 50%;
         }

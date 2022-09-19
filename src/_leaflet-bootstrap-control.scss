@@ -1,6 +1,11 @@
 /***********************************************
 leaflet-bootstrap-control.scss
 ************************************************/
+//In Leaflet 1.? (>1.7) <a> inside .leaflet-container got new color - this is reset
+.leaflet-control-container a {
+    color: var(--bs-btn-color);
+}
+
 
 //If there are NO bsAttribution-control on the map => controls gets normal leaflet control margin
 .leaflet-container:not(.has-control-attribution-bs) .leaflet-control-container {

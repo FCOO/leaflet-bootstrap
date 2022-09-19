@@ -20,10 +20,9 @@ leaflet-bootstrap-control-position.scss
 //Adjust input-group inside a leaflet-control (div.bsPosition-content needed to overwrite .form-control)
 .leaflet-control-container .input-group div.bsPosition-content {
     //Class for inner container with the info for the position
-    @include vertical-align-center();
     text-align : center;
     line-height: 1;
-    padding    : 0 $content-padding-y-sm;
+    padding    : 0 $jb-padding-x-sm;
     padding-top: 1px; //Super adjustment :-)
     & > * {
         font-size  : 13px;

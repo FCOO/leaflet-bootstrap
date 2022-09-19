@@ -288,7 +288,7 @@ L.BsControl = extention of L.Control with
         },
 
         hidePopup: function(){
-            if (this.$popupElements)
+            if (this.$popupElements && this.$popupElements.popover)
                 this.$popupElements.popover('hide');
         },
 

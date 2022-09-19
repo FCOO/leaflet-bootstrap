@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /***********************************************
 	leaflet-bootstrap.scss,
 
@@ -13,63 +14,138 @@ INCLUDE-JQUERY-BOOTSTRAP-VARIABLES
 USED IN FOR OTHER PACKAGES TO INCLUDE ALL SCSS-FILES NEEDED
 TO HAVE ACCESS TO ALL BOOTSTRAP AND FCOO/JQUERY-BOOTSTRAP SCSS-VARIABLES
 ************************************************************/
-/***********************************************
-JQUERY-BOOTSTRAP: Set and adjust bootstrap default values
-************************************************/
 /************************************************************
-BOOTSTRAP-VARIABLES
+FUNCTIONS
 ************************************************************/
 /***********************************************
 FUNCTIONS TO CONVETRT FROM PX TO REM
 To make it easier to design and calculate dimensions
 the function rem defined
 ************************************************/
+/************************************************************
+HEADER, TITLE, AND FOOTER PADDING AND FONT-SIZE
+Padding are set to button y-padding (moving text to the left)
+************************************************************/
+/************************************************************
+BOOTSTRAP_COLORSTEXT
+
+A copy of the colorws defined in bootstrap/scss_variables.scss
+************************************************************/
+/************************************************************
+VARIABLES-BOOTSTRAP
+Adjust Bootstrap 5 variables default values
+
+Variables should follow the `$component-state-property-size` formula for
+consistent naming. Ex: $nav-link-disabled-color and $modal-content-box-shadow-xs.
+
+All non-Bootstrap variables are prefixed with $jb-
+
+
+************************************************************/
 /***********************************************
-ADJUST BOOTSTRAP DEFAULT VALUES
+Customize Bootstrap
+See https://getbootstrap.com/docs/5.2/customize/options/ for description
+/star star/ = Differnet from default
 ************************************************/
+/**/
+/**/
+/***********************************************
+OPACITY
+************************************************/
+/***********************************************
+TEXT-COLOR
+************************************************/
+/***********************************************
+BACKGROUND-COLOR
+************************************************/
+/***********************************************
+BORDER-COLOR
+************************************************/
+/***********************************************
+CHECKBOX, RADIO, AND SELECT
+text-color and bg-color for selected item in <select> varies for different browsers.
+text-color = rgb(255, 255, 255)   for all
+    Browser     bg-color
+    Chrome      rgb( 30, 144, 255)
+    Firefox     rgb(  0, 120, 215)
+    Safari      rgb( 30, 144, 255)
+    Edge        rgb(195, 195, 195)  = gray
+
+For checkbox and radio default Bootstrap uses:
+text-color  = $form-check-input-checked-color    = $component-active-color = $white   = rgb(255, 25, 255);
+bg-color    = $form-check-input-checked-bg-color = $component-active-bg    = $primary = rgb(13, 110, 253);
+
+** BUT JQUERY-BOOTSTRAP USES SAME COLORS AS <SELECT> IN CHROME AND SAFARI **
+************************************************/
+/*
+indeterminate colors = checkbox or checkbox-button with semi-selected state
+Use $orange as bg-color and same bg-image as selected and standard border-color
+*/
+/***********************************************
+PADDING AND FONT-SIZE
+Padding and font-size for different sizes of
+    buttons,
+    accordion-, modal-, popup-, and tooltip-header/footer
+************************************************/
+/************************************************************
+Modal and popover header and content
+Bootstrap default = normal size
+************************************************************/
+/***********************************************
+Accordion
+***********************************************/
+/***********************************************
+Card
+***********************************************/
+/***********************************************
+Toast
+***********************************************/
+/***********************************************
+Tables
+For some (unknown) reason the padding of table cells
+are done by scss-variables instead of var(...) ???
+***********************************************/
+/***********************************************
+Nav, Pills and Tabs
+***********************************************/
+/***********************************************
+BUTTONS
+************************************************
+SYNTAX AND RELATIONS IN BOOTSTRAP
+    $input-btn-padding-x[-sm|-lg] = A Value
+    $input-btn-padding-y[-sm|-lg] = A Value
+    $input-btn-font-size[-sm|-lg] = A Value
+    $border-radius[-sm|-lg]       = A Value
+
+Used for button:
+    $btn-padding-y[-sm|-lg]      : $input-btn-padding-y[-sm|-lg] !default;
+    $btn-padding-x[-sm|-lg]      : $input-btn-padding-x[-sm|-lg] !default;
+    $btn-font-size[-sm|-lg]      : $input-btn-font-size[-sm|-lg] !default;
+    $btn-border-radius[-sm|-lg]  : $border-radius[-sm|-lg]       !default;
+
+Used for input
+    $input-padding-y[-sm|-lg]    : $input-btn-padding-y[-sm|-lg] !default;
+    $input-padding-x[-sm|-lg]    : $input-btn-padding-x[-sm|-lg] !default;
+    $input-font-size[-sm|-lg]    : $input-btn-font-size[-sm|-lg] !default;
+    $input-border-radius[-sm|-lg]: $border-radius[-sm|-lg]       !default;
+
+BOOTSTRAP 5 DEFAULT
+    $input-btn-line-height  : 1.5
+*/
+/************************************************************
+Including "size" xs as in Bootstrap 5
+************************************************************/
 /***********************************************
 Adjust bootstrap-variables to only have dimensions
 in integer px from rem
 ************************************************/
-/*Not used. No lg-buttons
-$input-btn-padding-y-lg: .75rem;
-$input-btn-padding-x-lg: $input-btn-padding-y-lg;
-
-Syntax and relations:
-In Bootstrap
-    $input-btn-padding(-x|-y)[-sm|-lg] = A Value
-    $btn-padding(-x|-y)[-sm|-lg] = $input-btn-padding(-x|-y)[-sm|-lg]
-
-
-
-In jquery-bootstrap
-    $input-btn-padding-x-sm = 3px
-    $input-btn-padding-y-sm = 4px
-
-    xs-versions added
-    $input-btn-padding-x-xs = 2px
-    $input-btn-padding-y-xs = 3px
-
-*/
 /************************************************************
-Including "size" xs as in Bootstrap 4
-************************************************************/
-/************************************************************
-Add line-heights for xs
-************************************************************/
-/************************************************************
-Border-colors
+Other adjustments
 ************************************************************/
 /************************************************************
 Make all font-size and margin for header (<h1>, <h2>,...<h6>)
 releative to container (rem -> em)
-************************************************************/
-/* Defalut not changed:
-$font-size-base         : 1rem !default;
-$spacer                 : 1rem !default;
-*/
-/************************************************************
-Set margin for buttons in block
+Default (not changed): $font-size-base = $spacer = 1rem
 ************************************************************/
 /************************************************************
 Adjust dropdown-menu
@@ -78,127 +154,39 @@ Adjust dropdown-menu
 Adjust modal
 ************************************************************/
 /***********************************************
-BOOTSTRAP: scss variables
-************************************************/
-/***********************************************
-JQUERY-BOOTSTRAP: Background-color and text color and Variables
-************************************************/
-/************************************************************
-COLOR
 
-background-color and text-color for
-headers modal, popover, tables, buttons, list-items etc.
+jquery-scroll-container-variables.scss
 
-"$header-" is used for header to modal-windows and popover
-"$title-" is used for headers on content - table, accordion etc.
-"$control-" is used for buttons, list-items etc.
-************************************************************/
+************************************************/
 /************************************************************
 VARIABLES
+
+Defines scss-variables used in jquery-bootstrap
+Some of these variables are based on Bootstrap variables
 ************************************************************/
 /***********************************************
-DEFINE BOOTSTRAP BUTTON STYLE
-$btn-style-name MUST correspond with ns.bsButtonClass
-in src/jquery-bootstrap-button.js
+Checkbox
 ************************************************/
-/************************************************************
-Variables bassed on bootstrop variables
-************************************************************/
-/************************************************************
-HEADER
-Font-sizes for headers are one 'size' smaller than normal font
-$font-size-lg  : 1.25rem    20px
-$font-size-base: 1rem       16px
-$font-size-sm  : .875rem;   14px
-$font-size-xs  : .75rem     12px
-************************************************************/
-/************************************************************
-BUTTON AND MODAL
+/***********************************************
+Button
+************************************************/
+/***********************************************
+Modal
+************************************************/
+/***********************************************
+Button And Modal
 Opacity for semi-transparent and transparent content
-************************************************************/
-/************************************************************
-SQUARE BUTTONS
-Dimentions for square buttons with only icons
-************************************************************/
-/************************************************************
-LABEL
-Font-sizes for labels are same size as header but incl a xxs-size
-************************************************************/
-/************************************************************
-CONTENT
-Unifies padding and font-size for content of modal, accordion, popup etc.
-Using same font-size and vertical/horizontal padding as buttons
-NOTE: For sm and xs y-padding = x-padding
-************************************************************/
-/************************************************************
-MARGIN-BOTTOM
-All elements in modal-windows get same margin-bottom
-************************************************************/
+************************************************/
 /************************************************************
 MIXIN
 ************************************************************/
 /************************************************************
-RIGHT-SIDE-ICON
-Add style to <i> to place it to the right and vertical center
-NOTE: Parent element MUST have @include vertical-align-center();
+PROPERTY-VARIANT
+Varients of different properties
 ************************************************************/
 /************************************************************
-FOCUS
-All elements get same outline when they have focus:
-No outline
-border-color = light blue
-************************************************************/
-/************************************************************
-CONTENT
-Unifies padding for modal, accordion, popup etc.
-************************************************************/
-/************************************************************
-CONTROL-CONTAINER
-Style for div with controls inside modal.
-Must have tabindex:"-1" to work with focus
-************************************************************/
-/************************************************************
-CONTROL BORDER-COLOR
-All control elements get same border-color when normal, hover, active and error
-************************************************************/
-/************************************************************
-CONTROL-COLORS
-Sets all color for text, background, border for normal, :hover, :focus,  :active and .active
-************************************************************/
-/************************************************************
-TYPE-COLOR
-Bg-color and color for different 'type' (warning, alert, info, error, success)
-Used in Noty and Modal
-************************************************************/
-/************************************************************
-HEADER AND TITLE BACKGROUND-COLOR AND COLOR
-Headers for modal, popover, popup etc.
-************************************************************/
-/************************************************************
-color-hover - Background-color and text-color for 'normal' and hover
-************************************************************/
-/************************************************************
-header-colors - Colors for headers
-************************************************************/
-/************************************************************
-title-color - create colors for headers for table and accordion etc.
-************************************************************/
-/************************************************************
-HEADER, TITLE, AND FOOTER PADDING AND FONT-SIZE
-Padding are set to button y-padding (moving text to the left)
-************************************************************/
-/************************************************************
-header-variant
-************************************************************/
-/************************************************************
-title-variant - as header but with same font-size as siblings
-************************************************************/
-/************************************************************
-footer-variant
-************************************************************/
-/************************************************************
-MARGIN-BOTTOM FOR ELEMENTS IN MODAL
-All elements in modal-windows get same margin-bottom
+HEADER and FOOTER-VARIANT
+Adjust padding and font-size for header and footer
 ************************************************************/
 /***********************************************
 leaflet-bootstrap-variables.scss
@@ -211,22 +199,23 @@ leaflet-bootstrap-fonts.scss
 Use same font-family as Bootstrap via fcoo/jqury-bootstrap
 ************************************************/
 .leaflet-container {
-  font: inherit !important; }
+  font: inherit !important;
+}
 
 /***********************************************
 Font-family for four icons used in leaflet-bootstrap
 ************************************************/
 @font-face {
-  font-family: 'leaflet-bootstrap';
+  font-family: "leaflet-bootstrap";
   src: url("fonts/leaflet-bootstrap.eot?jxmi9r");
   src: url("fonts/leaflet-bootstrap.eot?jxmi9r#iefix") format("embedded-opentype"), url("fonts/leaflet-bootstrap.ttf?jxmi9r") format("truetype"), url("fonts/leaflet-bootstrap.woff?jxmi9r") format("woff"), url("fonts/leaflet-bootstrap.svg?jxmi9r#icomoon") format("svg");
   font-weight: normal;
   font-style: normal;
-  font-display: block; }
-
-[class^="fa-lb-"], [class*=" fa-lb-"] {
+  font-display: block;
+}
+[class^=fa-lb-], [class*=" fa-lb-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: 'leaflet-bootstrap' !important;
+  font-family: "leaflet-bootstrap" !important;
   speak: none;
   font-style: normal;
   font-weight: normal;
@@ -235,66 +224,74 @@ Font-family for four icons used in leaflet-bootstrap
   line-height: 1;
   /* Better Font Rendering =========== */
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale; }
+  -moz-osx-font-smoothing: grayscale;
+}
 
 .fa-lb-center-marker:before {
-  content: "\e900"; }
+  content: "";
+}
 
 .fa-lb-mouse-left:before {
-  content: "\ea6e"; }
+  content: "";
+}
 
 .fa-lb-mouse-right:before {
-  content: "\ea6f"; }
+  content: "";
+}
 
 [class*=" fa-lb-mouse-"] {
   font-size: 1.2em;
   line-height: 0.8333333333em !important;
-  vertical-align: -.0667em;
-  margin-right: 0 !important; }
+  vertical-align: -0.0667em;
+  margin-right: 0 !important;
+}
 
 .fa-lb-contextmenu:before {
-  content: "\ead6"; }
+  content: "";
+}
 
 /***********************************************
 Scale icons
 ************************************************/
 .fa-scale-x-08 {
-  transform: scaleX(0.8); }
+  transform: scaleX(0.8);
+}
 
 /***********************************************
 leaflet-bootstrap-popup.scss,
 ************************************************/
 .leaflet-popup-content {
-  width: 100px; }
+  width: 100px;
+}
 
 .modal-wrapper.leaflet-popup-content-wrapper {
   background: transparent;
   padding: 0;
-  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2); }
-  .modal-wrapper.leaflet-popup-content-wrapper .leaflet-popup-content {
-    margin: 0;
-    display: flex; }
-  .modal-wrapper.leaflet-popup-content-wrapper + .leaflet-popup-tip-container {
-    margin-top: -1px; }
-    .modal-wrapper.leaflet-popup-content-wrapper + .leaflet-popup-tip-container .leaflet-popup-tip {
-      box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
-      width: 13px;
-      height: 13px;
-      margin: -6px auto 0;
-      border: 2px solid #868e96; }
-  .mouse-hover .modal-wrapper.leaflet-popup-content-wrapper.clickable:hover + .leaflet-popup-tip-container .leaflet-popup-tip,
-  .mouse-hover .modal-wrapper.leaflet-popup-content-wrapper.hover + .leaflet-popup-tip-container .leaflet-popup-tip {
-    cursor: default;
-    background: #e9ecef linear-gradient(180deg, #eceff2, #e9ecef) repeat-x; }
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+.modal-wrapper.leaflet-popup-content-wrapper .leaflet-popup-content {
+  margin: 0;
+  display: flex;
+}
+.modal-wrapper.leaflet-popup-content-wrapper + .leaflet-popup-tip-container {
+  margin-top: -1px;
+}
+.modal-wrapper.leaflet-popup-content-wrapper + .leaflet-popup-tip-container .leaflet-popup-tip {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  width: 13px;
+  height: 13px;
+  margin: -6px auto 0;
+  border: 2px solid var(--bs-border-color-translucent);
+}
 
 /***********************************************
 leaflet-bootstrap-tooltip.scss,
 ************************************************/
 .leaflet-tooltip {
-  padding: 0.125rem 0.1875rem;
+  padding: 0.125rem 0.25rem;
   background-color: #fff;
-  border: 1px solid #868e96;
-  border-radius: 0.25rem;
+  border: 1px solid var(--bs-border-color-translucent);
+  border-radius: 0.375rem;
   color: #212529;
   white-space: nowrap;
   -webkit-user-select: none;
@@ -302,93 +299,113 @@ leaflet-bootstrap-tooltip.scss,
   -ms-user-select: none;
   user-select: none;
   pointer-events: none;
-  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
   font-size: 0.6875rem;
-  opacity: 0.9; }
+  opacity: 0.9;
+}
 
 .leaflet-tooltip-top:before,
 .leaflet-tooltip-bottom:before,
 .leaflet-tooltip-left:before,
 .leaflet-tooltip-right:before {
-  display: none; }
+  display: none;
+}
 
 .leaflet-tooltip-bottom {
-  margin-top: 10px; }
+  margin-top: 10px;
+}
 
 .leaflet-tooltip-top {
-  margin-top: -10px; }
+  margin-top: -10px;
+}
 
 .leaflet-tooltip-left {
-  margin-left: -10px; }
+  margin-left: -10px;
+}
 
 .leaflet-tooltip-right {
-  margin-left: 10px; }
+  margin-left: 10px;
+}
 
 .leaflet-tooltip-icon-0.leaflet-tooltip-bottom {
-  margin-top: 10px; }
-
+  margin-top: 10px;
+}
 .leaflet-tooltip-icon-0.leaflet-tooltip-top {
-  margin-top: -10px; }
-
+  margin-top: -10px;
+}
 .leaflet-tooltip-icon-0.leaflet-tooltip-left {
-  margin-left: -10px; }
-
+  margin-left: -10px;
+}
 .leaflet-tooltip-icon-0.leaflet-tooltip-right {
-  margin-left: 10px; }
+  margin-left: 10px;
+}
 
 .leaflet-tooltip-icon-1.leaflet-tooltip-bottom {
-  margin-top: 13px; }
-
+  margin-top: 13px;
+}
 .leaflet-tooltip-icon-1.leaflet-tooltip-top {
-  margin-top: -13px; }
-
+  margin-top: -13px;
+}
 .leaflet-tooltip-icon-1.leaflet-tooltip-left {
-  margin-left: -13px; }
-
+  margin-left: -13px;
+}
 .leaflet-tooltip-icon-1.leaflet-tooltip-right {
-  margin-left: 13px; }
+  margin-left: 13px;
+}
 
 .leaflet-tooltip-icon-2.leaflet-tooltip-bottom {
-  margin-top: 15px; }
-
+  margin-top: 15px;
+}
 .leaflet-tooltip-icon-2.leaflet-tooltip-top {
-  margin-top: -15px; }
-
+  margin-top: -15px;
+}
 .leaflet-tooltip-icon-2.leaflet-tooltip-left {
-  margin-left: -15px; }
-
+  margin-left: -15px;
+}
 .leaflet-tooltip-icon-2.leaflet-tooltip-right {
-  margin-left: 15px; }
+  margin-left: 15px;
+}
 
 .no-mouse-hover .leaflet-tooltip:not(.leaflet-tooltip-permanent) {
-  display: none; }
+  display: none;
+}
 
 .leaflet-dragging .leaflet-tooltip.leaflet-tooltip-hide-when-dragging:not(.leaflet-tooltip-permanent) {
-  display: none; }
+  display: none;
+}
 
 .leaflet-control-container .leaflet-pane {
-  z-index: 1000; }
+  z-index: 1000;
+}
 
 /***********************************************
 	leaflet-bootstrap-modal.scss
 ************************************************/
 .leaflet-control .modal-dialog {
-  margin: 0; }
+  margin: 0;
+}
 
 /***********************************************
 leaflet-bootstrap-control.scss
 ************************************************/
+.leaflet-control-container a {
+  color: var(--bs-btn-color);
+}
+
 .leaflet-container:not(.has-control-attribution-bs) .leaflet-control-container .leaflet-bottom .leaflet-control {
-  margin-bottom: 10px; }
+  margin-bottom: 10px;
+}
 
 .leaflet-container.has-control-attribution-bs .leaflet-control-container .leaflet-bottom.has-control-attribution-bs .leaflet-control:nth-last-child(2) {
-  margin-bottom: 2px; }
-
+  margin-bottom: 2px;
+}
 .leaflet-container.has-control-attribution-bs .leaflet-control-container .leaflet-bottom:not(.has-control-attribution-bs) .leaflet-control:last-child {
-  margin-bottom: 13px; }
+  margin-bottom: 13px;
+}
 
 div.leaflet-control.leaflet-control-hidden * {
-  display: none !important; }
+  display: none !important;
+}
 
 /***********************************************
 leaflet-bootstrap-control-attribution.scss
@@ -399,18 +416,22 @@ leaflet-bootstrap-control-attribution.scss
   height: 11px;
   margin: 0 !important;
   cursor: default;
-  background: rgba(255, 255, 255, 0.5); }
-  .mouse-hover .leaflet-control-container .leaflet-control-attribution.leaflet-control-attribution-bs:hover {
-    background: rgba(255, 255, 255, 0.75); }
+  background: rgba(255, 255, 255, 0.5);
+}
+.mouse-hover .leaflet-control-container .leaflet-control-attribution.leaflet-control-attribution-bs:hover {
+  background: rgba(255, 255, 255, 0.75);
+}
 
 /***********************************************
 leaflet-bootstrap-control-button.scss
 ************************************************/
 .leaflet-control.leaflet-button-box.extended .hide-for-extended {
-  display: none !important; }
+  display: none !important;
+}
 
 .leaflet-control.leaflet-button-box.no-extended .show-for-extended {
-  display: none !important; }
+  display: none !important;
+}
 
 /***********************************************
 leaflet-bootstrap-control-scale.scss
@@ -427,92 +448,118 @@ leaflet-bootstrap-control-scale.scss
 
 */
 .leaflet-button-box-scale {
-  margin-bottom: 0 !important; }
+  margin-bottom: 0 !important;
+}
 
 .leaflet-bottom:not(.has-control-attribution-bs) .leaflet-button-box-scale {
-  min-height: calc(2.125rem + 10px); }
-
+  min-height: calc(2.375rem + 10px );
+}
 .leaflet-bottom:not(.has-control-attribution-bs) .leaflet-button-box-scale-sm {
-  min-height: calc(1.8125rem + 10px); }
+  min-height: calc(1.9375rem + 10px );
+}
 
 .leaflet-bottom.has-control-attribution-bs .leaflet-button-box-scale {
-  min-height: calc(2.125rem + 13px); }
-
+  min-height: calc(2.375rem + 13px );
+}
 .leaflet-bottom.has-control-attribution-bs .leaflet-button-box-scale-sm {
-  min-height: calc(1.8125rem + 13px); }
+  min-height: calc(1.9375rem + 13px );
+}
 
 .leaflet-bootstrap-control-scale {
-  overflow: hidden; }
-  .leaflet-bootstrap-control-scale .modal-body {
-    padding: 2px !important; }
+  overflow: hidden;
+}
+.leaflet-bootstrap-control-scale .modal-body {
+  padding: 2px !important;
+}
 
 .leaflet-control-singlescale {
   position: relative;
-  z-index: 1; }
-  .leaflet-control-singlescale.hidden {
-    display: none; }
-  .leaflet-control-singlescale .leaflet-control-singlescale-inner {
-    font-size: 6px;
-    line-height: 1;
-    margin-top: 0;
-    margin-bottom: 0;
-    margin-left: 5px;
-    margin-right: 0; }
-  .leaflet-control-singlescale .leaflet-control-singlescale-inner .units {
-    display: inline-block; }
-  .leaflet-control-singlescale .leaflet-control-singlescale-inner .label {
-    width: 80px;
-    text-align: center;
-    position: absolute;
-    opacity: 1;
-    font-size: 10px;
-    line-height: 1;
-    transition: opacity .4s linear; }
-  .leaflet-control-singlescale .leaflet-control-singlescale-inner.labelPlacement-top {
-    margin-top: 10px; }
-    .leaflet-control-singlescale .leaflet-control-singlescale-inner.labelPlacement-top .label {
-      bottom: 6px; }
-  .leaflet-control-singlescale .leaflet-control-singlescale-inner.labelPlacement-bottom {
-    margin-bottom: 10px; }
-  .leaflet-control-singlescale .leaflet-control-singlescale-inner .divisionLabel {
-    right: 0;
-    margin-right: -40px; }
-  .leaflet-control-singlescale .leaflet-control-singlescale-inner .zeroLabel {
-    left: 0;
-    margin-left: -40px; }
-  .leaflet-control-singlescale .leaflet-control-singlescale-inner .division {
-    display: inline-block;
-    position: relative;
-    width: 40px;
-    transition: width 0.4s ease-in-out; }
-    .leaflet-control-singlescale .leaflet-control-singlescale-inner .division .line, .leaflet-control-singlescale .leaflet-control-singlescale-inner .division .line2 {
-      border-style: solid;
-      position: relative; }
-    .leaflet-control-singlescale .leaflet-control-singlescale-inner .division .line2 {
-      height: 0;
-      border-width: 0; }
-    .leaflet-control-singlescale .leaflet-control-singlescale-inner .division .line {
-      height: 6px;
-      border-width: 1px 1px 1px 0; }
-  .leaflet-control-singlescale .leaflet-control-singlescale-inner .units .division:first-child .line {
-    border-left-width: 1px; }
-  .leaflet-control-singlescale .leaflet-control-singlescale-inner .fill, .leaflet-control-singlescale .leaflet-control-singlescale-inner .fill2 {
-    position: absolute;
-    top: 1px;
-    left: 1px;
-    right: 1px;
-    bottom: 1px; }
-  .leaflet-control-singlescale .leaflet-control-singlescale-inner .fill {
-    background-color: #000; }
-  .leaflet-control-singlescale .leaflet-control-singlescale-inner .fill2 {
-    background-color: #fff; }
-  .leaflet-control-singlescale .leaflet-control-singlescale-inner .division.hidden {
-    width: 0; }
-    .leaflet-control-singlescale .leaflet-control-singlescale-inner .division.hidden .line, .leaflet-control-singlescale .leaflet-control-singlescale-inner .division.hidden .line2 {
-      height: 0;
-      border-width: 0; }
-    .leaflet-control-singlescale .leaflet-control-singlescale-inner .division.hidden .label {
-      opacity: 0; }
+  z-index: 1;
+}
+.leaflet-control-singlescale.hidden {
+  display: none;
+}
+.leaflet-control-singlescale .leaflet-control-singlescale-inner {
+  font-size: 6px;
+  line-height: 1;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 5px;
+  margin-right: 0;
+}
+.leaflet-control-singlescale .leaflet-control-singlescale-inner .units {
+  display: inline-block;
+}
+.leaflet-control-singlescale .leaflet-control-singlescale-inner .label {
+  width: 80px;
+  text-align: center;
+  position: absolute;
+  opacity: 1;
+  font-size: 10px;
+  line-height: 1;
+  transition: opacity 0.4s linear;
+}
+.leaflet-control-singlescale .leaflet-control-singlescale-inner.labelPlacement-top {
+  margin-top: 10px;
+}
+.leaflet-control-singlescale .leaflet-control-singlescale-inner.labelPlacement-top .label {
+  bottom: 6px;
+}
+.leaflet-control-singlescale .leaflet-control-singlescale-inner.labelPlacement-bottom {
+  margin-bottom: 10px;
+}
+.leaflet-control-singlescale .leaflet-control-singlescale-inner .divisionLabel {
+  right: 0;
+  margin-right: -40px;
+}
+.leaflet-control-singlescale .leaflet-control-singlescale-inner .zeroLabel {
+  left: 0;
+  margin-left: -40px;
+}
+.leaflet-control-singlescale .leaflet-control-singlescale-inner .division {
+  display: inline-block;
+  position: relative;
+  width: 40px;
+  transition: width 0.4s ease-in-out;
+}
+.leaflet-control-singlescale .leaflet-control-singlescale-inner .division .line, .leaflet-control-singlescale .leaflet-control-singlescale-inner .division .line2 {
+  border-style: solid;
+  position: relative;
+}
+.leaflet-control-singlescale .leaflet-control-singlescale-inner .division .line2 {
+  height: 0;
+  border-width: 0;
+}
+.leaflet-control-singlescale .leaflet-control-singlescale-inner .division .line {
+  height: 6px;
+  border-width: 1px 1px 1px 0;
+}
+.leaflet-control-singlescale .leaflet-control-singlescale-inner .units .division:first-child .line {
+  border-left-width: 1px;
+}
+.leaflet-control-singlescale .leaflet-control-singlescale-inner .fill, .leaflet-control-singlescale .leaflet-control-singlescale-inner .fill2 {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  right: 1px;
+  bottom: 1px;
+}
+.leaflet-control-singlescale .leaflet-control-singlescale-inner .fill {
+  background-color: #000;
+}
+.leaflet-control-singlescale .leaflet-control-singlescale-inner .fill2 {
+  background-color: #fff;
+}
+.leaflet-control-singlescale .leaflet-control-singlescale-inner .division.hidden {
+  width: 0;
+}
+.leaflet-control-singlescale .leaflet-control-singlescale-inner .division.hidden .line, .leaflet-control-singlescale .leaflet-control-singlescale-inner .division.hidden .line2 {
+  height: 0;
+  border-width: 0;
+}
+.leaflet-control-singlescale .leaflet-control-singlescale-inner .division.hidden .label {
+  opacity: 0;
+}
 
 /********************************************************************************
 L.Control.Reticle
@@ -522,7 +569,8 @@ Modified version of leaflet-reticle
 https://github.com/rwev/leaflet-reticle by https://github.com/rwev
 ********************************************************************************/
 .leaflet-zoom-anim .icon-reticle {
-  display: none !important; }
+  display: none !important;
+}
 
 /***********************************************
 leaflet-bootstrap-control-zoom.scss
@@ -534,184 +582,239 @@ Overwrite style for bootstrap-slider
   width: 100%;
   height: 120px;
   margin-top: 10px;
-  margin-bottom: 10px; }
-  .slider.slider-vertical .slider-track {
-    width: 6px;
-    height: calc(100% + 20px);
-    top: -10px;
-    left: calc(50% - 3px);
-    border-left: 1px solid #ced4da;
-    border-right: 1px solid #ced4da;
-    border-radius: 0 !important; }
-    .slider.slider-vertical .slider-track * {
-      border-radius: 0 !important; }
-  .slider.slider-vertical .slider-handle {
-    position: absolute !important;
-    margin-top: -10px;
-    width: 100%;
-    height: 20px !important; }
-    .slider.slider-vertical .slider-handle hr {
-      border: none;
-      border-bottom: 6px double #515961;
-      height: 25%;
-      width: 50%; }
+  margin-bottom: 10px;
+}
+.slider.slider-vertical .slider-track {
+  width: 6px;
+  height: calc(100% + 20px);
+  top: -10px;
+  left: calc(50% - 3px);
+  border-left: 1px solid var(--jb-structure-border-color);
+  border-right: 1px solid var(--jb-structure-border-color);
+  border-radius: 0 !important;
+}
+.slider.slider-vertical .slider-track * {
+  border-radius: 0 !important;
+}
+.slider.slider-vertical .slider-handle {
+  position: absolute !important;
+  margin-top: -10px;
+  width: 100%;
+  height: 20px !important;
+}
+.slider.slider-vertical .slider-handle hr {
+  border: none;
+  border-bottom: 6px double #6c757d;
+  height: 25%;
+  width: 50%;
+}
 
 .history .hide-for-history {
-  display: none !important; }
+  display: none !important;
+}
 
 .no-history .show-for-history {
-  display: none !important; }
+  display: none !important;
+}
 
 /***********************************************
 leaflet-bootstrap-control-legend.scss
 ************************************************/
 .modal-header.bsl-working .hide-for-bsl-working {
-  display: none !important; }
+  display: none !important;
+}
 
 .modal-header.no-bsl-working .show-for-bsl-working {
-  display: none !important; }
+  display: none !important;
+}
 
 .fa-map-margin-right {
-  margin-right: 0.4rem; }
+  margin-right: 0.4rem;
+}
 
 /***********************************************
 leaflet-bootstrap-control-compass.scss
 ************************************************/
 @media screen and (orientation: landscape) {
   .lb-compass-btn .compass-device-portrait {
-    visibility: hidden !important; }
+    visibility: hidden !important;
+  }
   .lb-compass-btn .compass-device-landscape {
-    transform: rotate(90deg) translateX(-0.1em) scale(0.7) !important; }
-    html.orientation-secondary .lb-compass-btn .compass-device-landscape {
-      transform: rotate(-90deg) translateX(0.1em) scale(0.7) !important; }
+    transform: rotate(90deg) translateX(-0.1em) scale(0.7) !important;
+  }
+  html.orientation-secondary .lb-compass-btn .compass-device-landscape {
+    transform: rotate(-90deg) translateX(0.1em) scale(0.7) !important;
+  }
   .lb-compass-btn .compass-arrow {
-    transform: rotate(90deg) translateY(-0.5em) scale(0.7) !important; }
-    html.orientation-secondary .lb-compass-btn .compass-arrow {
-      transform: rotate(-90deg) translateY(-0.5em) scale(0.7) !important; }
+    transform: rotate(90deg) translateY(-0.5em) scale(0.7) !important;
+  }
+  html.orientation-secondary .lb-compass-btn .compass-arrow {
+    transform: rotate(-90deg) translateY(-0.5em) scale(0.7) !important;
+  }
   .lb-compass-btn .compass-device {
-    transform: rotate(0deg); }
+    transform: rotate(0deg);
+  }
   .lb-compass-btn.fixed {
-    transform: rotate(-90deg) !important; }
-    html.orientation-secondary .lb-compass-btn.fixed {
-      transform: rotate(90deg) !important; }
-  .rotate-compass .the-compass {
-    transform: rotate(270deg) !important; }
-    html.orientation-secondary .rotate-compass .the-compass {
-      transform: rotate(90deg) !important; } }
+    transform: rotate(-90deg) !important;
+  }
+  html.orientation-secondary .lb-compass-btn.fixed {
+    transform: rotate(90deg) !important;
+  }
 
+  .rotate-compass .the-compass {
+    transform: rotate(270deg) !important;
+  }
+  html.orientation-secondary .rotate-compass .the-compass {
+    transform: rotate(90deg) !important;
+  }
+}
 @media screen and (orientation: portrait) {
   .lb-compass-btn .compass-device-landscape {
-    visibility: hidden !important; }
+    visibility: hidden !important;
+  }
   .lb-compass-btn .compass-device-portrait {
-    transform: rotate(0deg) translateY(0em) scale(0.7) !important; }
-    html.orientation-secondary .lb-compass-btn .compass-device-portrait {
-      transform: rotate(180deg) translateY(0.2em) scale(0.7) !important; }
+    transform: rotate(0deg) translateY(0em) scale(0.7) !important;
+  }
+  html.orientation-secondary .lb-compass-btn .compass-device-portrait {
+    transform: rotate(180deg) translateY(0.2em) scale(0.7) !important;
+  }
   .lb-compass-btn .compass-arrow {
-    transform: rotate(0deg) translateY(-0.6em) scale(0.7) !important; }
-    html.orientation-secondary .lb-compass-btn .compass-arrow {
-      transform: rotate(180deg) translateY(-0.6em) scale(0.7) !important; }
+    transform: rotate(0deg) translateY(-0.6em) scale(0.7) !important;
+  }
+  html.orientation-secondary .lb-compass-btn .compass-arrow {
+    transform: rotate(180deg) translateY(-0.6em) scale(0.7) !important;
+  }
   .lb-compass-btn .compass-device {
-    transform: translateY(0.1em); }
-    html.orientation-secondary .lb-compass-btn .compass-device {
-      transform: translateY(-0.1em); }
+    transform: translateY(0.1em);
+  }
+  html.orientation-secondary .lb-compass-btn .compass-device {
+    transform: translateY(-0.1em);
+  }
   html.orientation-secondary .lb-compass-btn.fixed {
-    transform: rotate(180deg) !important; }
-  .rotate-compass .the-compass {
-    transform: rotate(0deg) !important; }
-    html.orientation-secondary .rotate-compass .the-compass {
-      transform: rotate(180deg) !important; } }
+    transform: rotate(180deg) !important;
+  }
 
+  .rotate-compass .the-compass {
+    transform: rotate(0deg) !important;
+  }
+  html.orientation-secondary .rotate-compass .the-compass {
+    transform: rotate(180deg) !important;
+  }
+}
 .no-device-orientation-slash {
   visibility: hidden;
-  transform: rotate(0deg); }
+  transform: rotate(0deg);
+}
 
 .lb-compass-adjust {
-  transform: rotate(-45deg); }
+  transform: rotate(-45deg);
+}
 
 .lb-conpass-content > div {
-  width: 2.65625rem;
-  height: 2.65625rem;
+  width: 2.96875rem;
+  height: 2.96875rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center; }
-  .lb-conpass-content > div:nth-child(2), .lb-conpass-content > div:nth-child(5) {
-    border-left: 1px solid #ced4da;
-    border-right: 1px solid #ced4da; }
+  text-align: center;
+}
+.lb-conpass-content > div:nth-child(2), .lb-conpass-content > div:nth-child(5) {
+  border-left: 1px solid var(--jb-structure-border-color);
+  border-right: 1px solid var(--jb-structure-border-color);
+}
 
 .no-device-orientation .lb-compass-btn {
-  transform: rotate(0deg) !important; }
-  .no-device-orientation .lb-compass-btn .no-device-orientation-slash {
-    visibility: inherit; }
-  .no-device-orientation .lb-compass-btn .compass-device {
-    transform: none; }
-  .no-device-orientation .lb-compass-btn .compass-arrow, .no-device-orientation .lb-compass-btn .compass-device-landscape, .no-device-orientation .lb-compass-btn .compass-device-portrait {
-    visibility: hidden; }
-  .no-device-orientation .lb-compass-btn * i:not(.no-device-orientation-slash) {
-    opacity: .5; }
-
+  transform: rotate(0deg) !important;
+}
+.no-device-orientation .lb-compass-btn .no-device-orientation-slash {
+  visibility: inherit;
+}
+.no-device-orientation .lb-compass-btn .compass-device {
+  transform: none;
+}
+.no-device-orientation .lb-compass-btn .compass-arrow, .no-device-orientation .lb-compass-btn .compass-device-landscape, .no-device-orientation .lb-compass-btn .compass-device-portrait {
+  visibility: hidden;
+}
+.no-device-orientation .lb-compass-btn * i:not(.no-device-orientation-slash) {
+  opacity: 0.5;
+}
 .no-device-orientation .lb-conpass-content {
-  display: none !important; }
-
+  display: none !important;
+}
 .no-device-orientation .lb-conpass-content-error {
-  display: block !important; }
+  display: block !important;
+}
 
 /***********************************************
 leaflet-bootstrap-contextmenu.scss
 ************************************************/
 .leaflet-popup-contextmenu .modal-content {
-  padding: 0 !important; }
-  .leaflet-popup-contextmenu .modal-content .modal-body {
-    padding: 1px !important; }
-  .leaflet-popup-contextmenu .modal-content .modal-footer:empty {
-    display: none !important; }
+  padding: 0 !important;
+}
+.leaflet-popup-contextmenu .modal-content .modal-body {
+  padding: 1px !important;
+}
+.leaflet-popup-contextmenu .modal-content .modal-footer:empty {
+  display: none !important;
+}
 
 /***********************************************
 leaflet-bootstrap-control-position.scss
 ************************************************/
 .leaflet-position-marker {
   background: url(images/leaflet-position-marker.svg) 50% 50% no-repeat;
-  content: ''; }
-  .leaflet-position-marker.inside-other-map {
-    opacity: .5; }
-  .leaflet-zoom-anim .leaflet-position-marker, .hide-control-position-map-center .leaflet-position-marker {
-    display: none !important; }
+  content: "";
+}
+.leaflet-position-marker.inside-other-map {
+  opacity: 0.5;
+}
+.leaflet-zoom-anim .leaflet-position-marker, .hide-control-position-map-center .leaflet-position-marker {
+  display: none !important;
+}
 
 .leaflet-control-container .input-group div.bsPosition-content {
-  display: flex;
-  align-items: center;
   text-align: center;
   line-height: 1;
   padding: 0 0.25rem;
-  padding-top: 1px; }
-  .leaflet-control-container .input-group div.bsPosition-content > * {
-    font-size: 13px; }
+  padding-top: 1px;
+}
+.leaflet-control-container .input-group div.bsPosition-content > * {
+  font-size: 13px;
+}
 
 .control-position-cursor .hide-for-control-position-cursor {
-  display: none !important; }
-
+  display: none !important;
+}
 .control-position-cursor .show-for-no-control-position-cursor {
-  display: none !important; }
+  display: none !important;
+}
 
 .no-control-position-cursor .show-for-control-position-cursor {
-  display: none !important; }
-
+  display: none !important;
+}
 .no-control-position-cursor .hide-for-no-control-position-cursor {
-  display: none !important; }
+  display: none !important;
+}
 
 .control-position-map-center .hide-for-control-position-map-center {
-  display: none !important; }
-
+  display: none !important;
+}
 .control-position-map-center .show-for-no-control-position-map-center {
-  display: none !important; }
+  display: none !important;
+}
 
 .no-control-position-map-center .show-for-control-position-map-center {
-  display: none !important; }
-
+  display: none !important;
+}
 .no-control-position-map-center .hide-for-no-control-position-map-center {
-  display: none !important; }
+  display: none !important;
+}
 
 .control-position-cursor .no-cursor-on-map .hide-for-no-cursor-on-map {
-  color: transparent; }
-  .control-position-cursor .no-cursor-on-map .hide-for-no-cursor-on-map > *:not(.show-for-no-cursor-on-map) {
-    visibility: hidden !important; }
+  color: transparent;
+}
+.control-position-cursor .no-cursor-on-map .hide-for-no-cursor-on-map > *:not(.show-for-no-cursor-on-map) {
+  visibility: hidden !important;
+}
+
+/*# sourceMappingURL=leaflet-bootstrap.css.map */

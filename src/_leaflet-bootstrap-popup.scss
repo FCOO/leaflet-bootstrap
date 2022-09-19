@@ -34,11 +34,5 @@ leaflet-bootstrap-popup.scss,
             border: 2px solid $popover-border-color;
         }
     }
-    .mouse-hover &.clickable:hover + .leaflet-popup-tip-container .leaflet-popup-tip,
-    .mouse-hover &.hover + .leaflet-popup-tip-container .leaflet-popup-tip {
-        cursor: default;
-        //hover background = hover background for buttons
-        @include gradient-bg( darken($control-bg-color, $darken-hover-percent) );
-    }
 }
 
