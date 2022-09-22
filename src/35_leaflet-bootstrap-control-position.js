@@ -138,11 +138,12 @@ Options for selectiong position-format and to activate context-menu
 
             //Create two sets of button-input-button
             var cursorOptions = {
-                    insideFormGroup: false,
-                    noValidation   : true,
-                    noBorder       : true,
-noPadding: true,
-                    type           : 'textbox',
+                    insideFormGroup  : true,
+                    noValidation     : true,
+                    noBorder         : true,
+                    noVerticalPadding: true,
+                    noPadding        : true,
+                    type             : 'textbox',
 
                     text           : function( $inner ){ $inner.addClass('cursor'); },
                     class          :'show-for-control-position-cursor',
@@ -639,9 +640,11 @@ noPadding: true,
         var innerContainerClassName = this.innerContainerClassName = 'info-box-'+options.index;
 
         var boxOptions = this.boxOptions = {
-                insideFormGroup : false,
+                insideFormGroup : true,
+
                 noValidation    : true,
                 noBorder        : true,
+                noVerticalPadding: true,
                 noPadding       : true,
                 type            : 'textbox',
                 text            : function( $inner ){
@@ -699,11 +702,13 @@ noPadding: true,
 
             this.$contentContainer  =
                 $parent.find('.' + this.innerContainerClassName).parent()
-                    .addClass('d-flex bsPosition-content justify-content-center align-items-center flex-grow-1')
+                    .addClass('d-flex bsPosition-content justify-content-center align-items-center flex-grow-1 text-nowrap')
                     .toggleClass('hide-for-no-cursor-on-map', !this.options.alwaysVisible);
 
             this.$container = this.$contentContainer.parent();
-            this.$container.detach();
+            this.$container
+                .addClass('flex-nowrap')
+                .detach();
 
             this.$contentContainer
                 .empty()
@@ -728,7 +733,7 @@ noPadding: true,
         remove: function(){
             if (!this.bsPositionControl) return this;
 
-            this.$container.detach(); //remove();
+            this.$container.detach();
 
             this.bsPositionControl = null;
             return this;
