@@ -514,7 +514,7 @@ L.BsControl = extention of L.Control with
         },
 
         hidePopup: function(){
-            if (this.$popupElements)
+            if (this.$popupElements && this.$popupElements.popover)
                 this.$popupElements.popover('hide');
         },
 
@@ -2560,10 +2560,12 @@ Options for selectiong position-format and to activate context-menu
 
             //Create two sets of button-input-button
             var cursorOptions = {
-                    insideFormGroup: false,
-                    noValidation   : true,
-                    noBorder       : true,
-                    type           : 'textbox',
+                    insideFormGroup  : true,
+                    noValidation     : true,
+                    noBorder         : true,
+                    noVerticalPadding: true,
+                    noPadding        : true,
+                    type             : 'textbox',
 
                     text           : function( $inner ){ $inner.addClass('cursor'); },
                     class          :'show-for-control-position-cursor',
@@ -2610,7 +2612,7 @@ Options for selectiong position-format and to activate context-menu
                 ._bsAppendContent( mapCenterOptions );
 
             //Use the added class name to find the two containers for cursor- and map center position
-            var contentClassName = 'hide-for-no-cursor-on-map bsPosition-content text-monospace justify-content-center align-items-center flex-grow-1';
+            var contentClassName = 'hide-for-no-cursor-on-map bsPosition-content text-monospace justify-content-center d-flex align-items-center flex-grow-1';
 
 
             this.$cursorPositionSpan = this.$innerContentContainer.find('.cursor').empty().html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
@@ -3060,11 +3062,14 @@ Options for selectiong position-format and to activate context-menu
         var innerContainerClassName = this.innerContainerClassName = 'info-box-'+options.index;
 
         var boxOptions = this.boxOptions = {
-                insideFormGroup: false,
-                noValidation   : true,
-                noBorder       : true,
-                type           : 'textbox',
-                text           : function( $inner ){
+                insideFormGroup : true,
+
+                noValidation    : true,
+                noBorder        : true,
+                noVerticalPadding: true,
+                noPadding       : true,
+                type            : 'textbox',
+                text            : function( $inner ){
                     $inner.addClass(innerContainerClassName + ' no-border');
                 },
                 class          : (options.className || ''),
@@ -3119,11 +3124,13 @@ Options for selectiong position-format and to activate context-menu
 
             this.$contentContainer  =
                 $parent.find('.' + this.innerContainerClassName).parent()
-                    .addClass('d-flex bsPosition-content justify-content-center align-items-center flex-grow-1')
+                    .addClass('d-flex bsPosition-content justify-content-center align-items-center flex-grow-1 text-nowrap')
                     .toggleClass('hide-for-no-cursor-on-map', !this.options.alwaysVisible);
 
             this.$container = this.$contentContainer.parent();
-            this.$container.detach();
+            this.$container
+                .addClass('flex-nowrap')
+                .detach();
 
             this.$contentContainer
                 .empty()
@@ -3148,7 +3155,7 @@ Options for selectiong position-format and to activate context-menu
         remove: function(){
             if (!this.bsPositionControl) return this;
 
-            this.$container.detach(); //remove();
+            this.$container.detach();
 
             this.bsPositionControl = null;
             return this;
@@ -3267,6 +3274,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
         onAdd: function(map){
             //Create default leaflet zoom-control
             this.zoom = L.control.zoom({zoomInTitle: '', zoomOutTitle: '', position: this.options.position });
+
 
             //Overwrite default _updateDisabled
             this.zoom._updateDisabled = $.proxy(this._updateDisabled, this);
@@ -3393,6 +3401,19 @@ Can be used as leaflet standard zoom control with Bootstrap style
 
             this._showSlider('', this.options.showSlider);
 //*/
+
+            //Need to cache contextmenu on leaflet-buttons and call contextmenu on container
+            var _this         = this,
+                onContextmenu = function(e){
+                    e.preventDefault();
+                    _this.$popupElements.contextmenu();
+                };
+
+            $.each(['_zoomInButton', '_zoomOutButton'], function( index, id ){
+                if (_this.zoom[id])
+                    $(_this.zoom[id]).on('contextmenu', onContextmenu);
+            });
+
             map.whenReady(this._onLoad, this);
 
             return result;
