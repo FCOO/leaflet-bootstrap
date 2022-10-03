@@ -190,7 +190,7 @@ Options for selectiong position-format and to activate context-menu
                 ._bsAppendContent( mapCenterOptions );
 
             //Use the added class name to find the two containers for cursor- and map center position
-            var contentClassName = 'hide-for-no-cursor-on-map bsPosition-content text-monospace justify-content-center d-flex align-items-center flex-grow-1';
+            var contentClassName = 'hide-for-no-cursor-on-map bsPosition-content font-monospace justify-content-center d-flex align-items-center flex-grow-1';
 
 
             this.$cursorPositionSpan = this.$innerContentContainer.find('.cursor').empty().html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
