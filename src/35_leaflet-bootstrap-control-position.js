@@ -448,9 +448,15 @@ Options for selectiong position-format and to activate context-menu
 
             if (force || ((this.mouseEvent ? this.mouseEvent.latlng : null) != (mouseEvent ? mouseEvent.latlng : null))){
                 var callOnMousePosition = this.options.onMousePosition && this.options.isExtended && (this.options.mode == 'CURSOR'),
-                    latlng = mouseEvent ? mouseEvent.latlng : null;
+                    latlng = mouseEvent ? mouseEvent.latlng : null,
+                    modernizr_CursorOnMap = !!latlng;
 
-                this.$contentContainer.modernizrToggle('cursor-on-map', !!latlng);
+                    //If the latLng is from another map: Check if the position is inside this
+                    if (fromOtherMap && this._map && latlng)
+                        modernizr_CursorOnMap = this._map.getBounds().contains( latlng );
+
+                this.$contentContainer.modernizrToggle('cursor-on-map', modernizr_CursorOnMap);
+
 
                 if ( latlng && (!fromOtherMap || this._map.getBounds().contains(latlng)) ){
                     this.$cursorPositionSpan.html( this._formatLatLng( latlng ) );

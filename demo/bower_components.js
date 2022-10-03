@@ -59,7 +59,7 @@
 
 ;
 /* @preserve
- * Leaflet 1.8.0, a JS library for interactive maps. https://leafletjs.com
+ * Leaflet 1.9.1, a JS library for interactive maps. https://leafletjs.com
  * (c) 2010-2022 Vladimir Agafonkin, (c) 2010-2011 CloudMade
  */
 
@@ -69,7 +69,7 @@
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.leaflet = {}));
 })(this, (function (exports) { 'use strict';
 
-  var version = "1.8.0";
+  var version = "1.9.1";
 
   /*
    * @namespace Util
@@ -565,35 +565,30 @@
   	},
 
   	// attach listener (without syntactic sugar now)
-  	_on: function (type, fn, context) {
+  	_on: function (type, fn, context, _once) {
   		if (typeof fn !== 'function') {
   			console.warn('wrong listener type: ' + typeof fn);
   			return;
   		}
-  		this._events = this._events || {};
 
-  		/* get/init listeners for type */
-  		var typeListeners = this._events[type];
-  		if (!typeListeners) {
-  			typeListeners = [];
-  			this._events[type] = typeListeners;
+  		// check if fn already there
+  		if (this._listens(type, fn, context) !== false) {
+  			return;
   		}
 
   		if (context === this) {
   			// Less memory footprint.
   			context = undefined;
   		}
-  		var newListener = {fn: fn, ctx: context},
-  		    listeners = typeListeners;
 
-  		// check if fn already there
-  		for (var i = 0, len = listeners.length; i < len; i++) {
-  			if (listeners[i].fn === fn && listeners[i].ctx === context) {
-  				return;
-  			}
+  		var newListener = {fn: fn, ctx: context};
+  		if (_once) {
+  			newListener.once = true;
   		}
 
-  		listeners.push(newListener);
+  		this._events = this._events || {};
+  		this._events[type] = this._events[type] || [];
+  		this._events[type].push(newListener);
   	},
 
   	_off: function (type, fn, context) {
@@ -601,10 +596,11 @@
   		    i,
   		    len;
 
-  		if (!this._events) { return; }
+  		if (!this._events) {
+  			return;
+  		}
 
   		listeners = this._events[type];
-
   		if (!listeners) {
   			return;
   		}
@@ -622,32 +618,24 @@
   			return;
   		}
 
-  		if (context === this) {
-  			context = undefined;
-  		}
-
   		if (typeof fn !== 'function') {
   			console.warn('wrong listener type: ' + typeof fn);
   			return;
   		}
+
   		// find fn and remove it
-  		for (i = 0, len = listeners.length; i < len; i++) {
-  			var l = listeners[i];
-  			if (l.ctx !== context) { continue; }
-  			if (l.fn === fn) {
-  				if (this._firingCount) {
-  					// set the removed listener to noop so that's not called if remove happens in fire
-  					l.fn = falseFn;
+  		var index = this._listens(type, fn, context);
+  		if (index !== false) {
+  			var listener = listeners[index];
+  			if (this._firingCount) {
+  				// set the removed listener to noop so that's not called if remove happens in fire
+  				listener.fn = falseFn;
 
-  					/* copy array in case events are being fired */
-  					this._events[type] = listeners = listeners.slice();
-  				}
-  				listeners.splice(i, 1);
-
-  				return;
+  				/* copy array in case events are being fired */
+  				this._events[type] = listeners = listeners.slice();
   			}
+  			listeners.splice(index, 1);
   		}
-  		console.warn('listener not found');
   	},
 
   	// @method fire(type: String, data?: Object, propagate?: Boolean): this
@@ -665,12 +653,16 @@
 
   		if (this._events) {
   			var listeners = this._events[type];
-
   			if (listeners) {
   				this._firingCount = (this._firingCount + 1) || 1;
   				for (var i = 0, len = listeners.length; i < len; i++) {
   					var l = listeners[i];
-  					l.fn.call(l.ctx || this, event);
+  					// off overwrites l.fn, so we need to copy fn to a var
+  					var fn = l.fn;
+  					if (l.once) {
+  						this.off(type, fn, l.ctx);
+  					}
+  					fn.call(l.ctx || this, event);
   				}
 
   				this._firingCount--;
@@ -686,45 +678,85 @@
   	},
 
   	// @method listens(type: String, propagate?: Boolean): Boolean
+  	// @method listens(type: String, fn: Function, context?: Object, propagate?: Boolean): Boolean
   	// Returns `true` if a particular event type has any listeners attached to it.
   	// The verification can optionally be propagated, it will return `true` if parents have the listener attached to it.
-  	listens: function (type, propagate) {
+  	listens: function (type, fn, context, propagate) {
   		if (typeof type !== 'string') {
   			console.warn('"string" type argument expected');
   		}
+
+  		// we don't overwrite the input `fn` value, because we need to use it for propagation
+  		var _fn = fn;
+  		if (typeof fn !== 'function') {
+  			propagate = !!fn;
+  			_fn = undefined;
+  			context = undefined;
+  		}
+
   		var listeners = this._events && this._events[type];
-  		if (listeners && listeners.length) { return true; }
+  		if (listeners && listeners.length) {
+  			if (this._listens(type, _fn, context) !== false) {
+  				return true;
+  			}
+  		}
 
   		if (propagate) {
   			// also check parents for listeners if event propagates
   			for (var id in this._eventParents) {
-  				if (this._eventParents[id].listens(type, propagate)) { return true; }
+  				if (this._eventParents[id].listens(type, fn, context, propagate)) { return true; }
   			}
   		}
   		return false;
+  	},
+
+  	// returns the index (number) or false
+  	_listens: function (type, fn, context) {
+  		if (!this._events) {
+  			return false;
+  		}
+
+  		var listeners = this._events[type] || [];
+  		if (!fn) {
+  			return !!listeners.length;
+  		}
+
+  		if (context === this) {
+  			// Less memory footprint.
+  			context = undefined;
+  		}
+
+  		for (var i = 0, len = listeners.length; i < len; i++) {
+  			if (listeners[i].fn === fn && listeners[i].ctx === context) {
+  				return i;
+  			}
+  		}
+  		return false;
+
   	},
 
   	// @method once(…): this
   	// Behaves as [`on(…)`](#evented-on), except the listener will only get fired once and then removed.
   	once: function (types, fn, context) {
 
+  		// types can be a map of types/handlers
   		if (typeof types === 'object') {
   			for (var type in types) {
-  				this.once(type, types[type], fn);
+  				// we don't process space-separated events here for performance;
+  				// it's a hot path since Layer uses the on(obj) syntax
+  				this._on(type, types[type], fn, true);
   			}
-  			return this;
+
+  		} else {
+  			// types can be a string of space-separated words
+  			types = splitWords(types);
+
+  			for (var i = 0, len = types.length; i < len; i++) {
+  				this._on(types[i], fn, context, true);
+  			}
   		}
 
-  		var handler = bind(function () {
-  			this
-  			    .off(types, fn, context)
-  			    .off(types, handler, context);
-  		}, this);
-
-  		// add a listener that's executed once and removed after that
-  		return this
-  		    .on(types, fn, context)
-  		    .on(types, handler, context);
+  		return this;
   	},
 
   	// @method addEventParent(obj: Evented): this
@@ -1040,21 +1072,36 @@
   Bounds.prototype = {
   	// @method extend(point: Point): this
   	// Extends the bounds to contain the given point.
-  	extend: function (point) { // (Point)
-  		point = toPoint(point);
+
+  	// @alternative
+  	// @method extend(otherBounds: Bounds): this
+  	// Extend the bounds to contain the given bounds
+  	extend: function (obj) {
+  		var min2, max2;
+  		if (!obj) { return this; }
+
+  		if (obj instanceof Point || typeof obj[0] === 'number' || 'x' in obj) {
+  			min2 = max2 = toPoint(obj);
+  		} else {
+  			obj = toBounds(obj);
+  			min2 = obj.min;
+  			max2 = obj.max;
+
+  			if (!min2 || !max2) { return this; }
+  		}
 
   		// @property min: Point
   		// The top left corner of the rectangle.
   		// @property max: Point
   		// The bottom right corner of the rectangle.
   		if (!this.min && !this.max) {
-  			this.min = point.clone();
-  			this.max = point.clone();
+  			this.min = min2.clone();
+  			this.max = max2.clone();
   		} else {
-  			this.min.x = Math.min(point.x, this.min.x);
-  			this.max.x = Math.max(point.x, this.max.x);
-  			this.min.y = Math.min(point.y, this.min.y);
-  			this.max.y = Math.max(point.y, this.max.y);
+  			this.min.x = Math.min(min2.x, this.min.x);
+  			this.max.x = Math.max(max2.x, this.max.x);
+  			this.min.y = Math.min(min2.y, this.min.y);
+  			this.max.y = Math.max(max2.y, this.max.y);
   		}
   		return this;
   	},
@@ -1062,7 +1109,7 @@
   	// @method getCenter(round?: Boolean): Point
   	// Returns the center point of the bounds.
   	getCenter: function (round) {
-  		return new Point(
+  		return toPoint(
   		        (this.min.x + this.max.x) / 2,
   		        (this.min.y + this.max.y) / 2, round);
   	},
@@ -1070,13 +1117,13 @@
   	// @method getBottomLeft(): Point
   	// Returns the bottom-left point of the bounds.
   	getBottomLeft: function () {
-  		return new Point(this.min.x, this.max.y);
+  		return toPoint(this.min.x, this.max.y);
   	},
 
   	// @method getTopRight(): Point
   	// Returns the top-right point of the bounds.
   	getTopRight: function () { // -> Point
-  		return new Point(this.max.x, this.min.y);
+  		return toPoint(this.max.x, this.min.y);
   	},
 
   	// @method getTopLeft(): Point
@@ -1156,9 +1203,40 @@
   		return xOverlaps && yOverlaps;
   	},
 
+  	// @method isValid(): Boolean
+  	// Returns `true` if the bounds are properly initialized.
   	isValid: function () {
   		return !!(this.min && this.max);
-  	}
+  	},
+
+
+  	// @method pad(bufferRatio: Number): Bounds
+  	// Returns bounds created by extending or retracting the current bounds by a given ratio in each direction.
+  	// For example, a ratio of 0.5 extends the bounds by 50% in each direction.
+  	// Negative values will retract the bounds.
+  	pad: function (bufferRatio) {
+  		var min = this.min,
+  		max = this.max,
+  		heightBuffer = Math.abs(min.x - max.x) * bufferRatio,
+  		widthBuffer = Math.abs(min.y - max.y) * bufferRatio;
+
+
+  		return toBounds(
+  			toPoint(min.x - heightBuffer, min.y - widthBuffer),
+  			toPoint(max.x + heightBuffer, max.y + widthBuffer));
+  	},
+
+
+  	// @method equals(otherBounds: Bounds, maxMargin?: Number): Boolean
+  	// Returns `true` if the rectangle is equivalent (within a small margin of error) to the given bounds. The margin of error can be overridden by setting `maxMargin` to a small number.
+  	equals: function (bounds) {
+  		if (!bounds) { return false; }
+
+  		bounds = toBounds(bounds);
+
+  		return this.min.equals(bounds.getTopLeft()) &&
+  			this.max.equals(bounds.getBottomRight());
+  	},
   };
 
 
@@ -2066,6 +2144,13 @@
   	}
   }());
 
+
+  // @property mac: Boolean; `true` when the browser is running in a Mac platform
+  var mac = navigator.platform.indexOf('Mac') === 0;
+
+  // @property mac: Boolean; `true` when the browser is running in a Linux platform
+  var linux = navigator.platform.indexOf('Linux') === 0;
+
   function userAgentContains(str) {
   	return navigator.userAgent.toLowerCase().indexOf(str) >= 0;
   }
@@ -2104,7 +2189,9 @@
   	canvas: canvas$1,
   	svg: svg$1,
   	vml: vml,
-  	inlineSvg: inlineSvg
+  	inlineSvg: inlineSvg,
+  	mac: mac,
+  	linux: linux
   };
 
   /*
@@ -2244,6 +2331,25 @@
   		if (e.pointerType === 'mouse' ||
   			(e.sourceCapabilities && !e.sourceCapabilities.firesTouchEvents)) {
 
+  			return;
+  		}
+
+  		// When clicking on an <input>, the browser generates a click on its
+  		// <label> (and vice versa) triggering two clicks in quick succession.
+  		// This ignores clicks on elements which are a label with a 'for'
+  		// attribute (or children of such a label), but not children of
+  		// a <input>.
+  		var path = getPropagationPath(e);
+  		if (path.some(function (el) {
+  			return el instanceof HTMLLabelElement && el.attributes.for;
+  		}) &&
+  			!path.some(function (el) {
+  				return (
+  					el instanceof HTMLInputElement ||
+  					el instanceof HTMLSelectElement
+  				);
+  			})
+  		) {
   			return;
   		}
 
@@ -2868,6 +2974,26 @@
   	return this;
   }
 
+  // @function getPropagationPath(ev: DOMEvent): Array
+  // Compatibility polyfill for [`Event.composedPath()`](https://developer.mozilla.org/en-US/docs/Web/API/Event/composedPath).
+  // Returns an array containing the `HTMLElement`s that the given DOM event
+  // should propagate to (if not stopped).
+  function getPropagationPath(ev) {
+  	if (ev.composedPath) {
+  		return ev.composedPath();
+  	}
+
+  	var path = [];
+  	var el = ev.target;
+
+  	while (el) {
+  		path.push(el);
+  		el = el.parentNode;
+  	}
+  	return path;
+  }
+
+
   // @function getMousePosition(ev: DOMEvent, container?: HTMLElement): Point
   // Gets normalized mouse position from a DOM event relative to the
   // `container` (border excluded) or to the whole page if not specified.
@@ -2887,12 +3013,15 @@
   	);
   }
 
-  // Chrome on Win scrolls double the pixels as in other platforms (see #4538),
-  // and Firefox scrolls device pixels, not CSS pixels
-  var wheelPxFactor =
-  	(Browser.win && Browser.chrome) ? 2 * window.devicePixelRatio :
-  	Browser.gecko ? window.devicePixelRatio : 1;
 
+  //  except , Safari and
+  // We need double the scroll pixels (see #7403 and #4538) for all Browsers
+  // except OSX (Mac) -> 3x, Chrome running on Linux 1x
+
+  var wheelPxFactor =
+  	(Browser.linux && Browser.chrome) ? window.devicePixelRatio :
+  	Browser.mac ? window.devicePixelRatio * 3 :
+  	window.devicePixelRatio > 0 ? 2 * window.devicePixelRatio : 1;
   // @function getWheelDelta(ev: DOMEvent): Number
   // Gets normalized wheel delta from a wheel DOM event, in vertical
   // pixels scrolled (negative if scrolling down).
@@ -2936,6 +3065,7 @@
     disableClickPropagation: disableClickPropagation,
     preventDefault: preventDefault,
     stop: stop,
+    getPropagationPath: getPropagationPath,
     getMousePosition: getMousePosition,
     getWheelDelta: getWheelDelta,
     isExternalTarget: isExternalTarget,
@@ -2951,8 +3081,21 @@
    *
    * @example
    * ```js
-   * var fx = new L.PosAnimation();
-   * fx.run(el, [300, 500], 0.5);
+   * var myPositionMarker = L.marker([48.864716, 2.294694]).addTo(map);
+   *
+   * myPositionMarker.on("click", function() {
+   * 	var pos = map.latLngToLayerPoint(myPositionMarker.getLatLng());
+   * 	pos.y -= 25;
+   * 	var fx = new L.PosAnimation();
+   *
+   * 	fx.once('end',function() {
+   * 		pos.y += 25;
+   * 		fx.run(myPositionMarker._icon, pos, 0.8);
+   * 	});
+   *
+   * 	fx.run(myPositionMarker._icon, pos, 0.3);
+   * });
+   *
    * ```
    *
    * @constructor L.PosAnimation()
@@ -3232,7 +3375,7 @@
   		}
 
   		// animation didn't start, just reset the map view
-  		this._resetView(center, zoom);
+  		this._resetView(center, zoom, options.pan && options.pan.noMoveStart);
 
   		return this;
   	},
@@ -3475,11 +3618,13 @@
   	setMaxBounds: function (bounds) {
   		bounds = toLatLngBounds(bounds);
 
+  		if (this.listens('moveend', this._panInsideMaxBounds)) {
+  			this.off('moveend', this._panInsideMaxBounds);
+  		}
+
   		if (!bounds.isValid()) {
   			this.options.maxBounds = null;
-  			return this.off('moveend', this._panInsideMaxBounds);
-  		} else if (this.options.maxBounds) {
-  			this.off('moveend', this._panInsideMaxBounds);
+  			return this;
   		}
 
   		this.options.maxBounds = bounds;
@@ -3849,7 +3994,7 @@
   		this._checkIfLoaded();
 
   		if (this._lastCenter && !this._moved()) {
-  			return this._lastCenter;
+  			return this._lastCenter.clone();
   		}
   		return this.layerPointToLatLng(this._getCenterLayerPoint());
   	},
@@ -4198,7 +4343,7 @@
   	// private methods that modify map state
 
   	// @section Map state change events
-  	_resetView: function (center, zoom) {
+  	_resetView: function (center, zoom, noMoveStart) {
   		setPosition(this._mapPane, new Point(0, 0));
 
   		var loading = !this._loaded;
@@ -4209,7 +4354,7 @@
 
   		var zoomChanged = this._zoom !== zoom;
   		this
-  			._moveStart(zoomChanged, false)
+  			._moveStart(zoomChanged, noMoveStart)
   			._move(center, zoom)
   			._moveEnd(zoomChanged);
 
@@ -4406,7 +4551,7 @@
   	},
 
   	_isClickDisabled: function (el) {
-  		while (el !== this._container) {
+  		while (el && el !== this._container) {
   			if (el['_leaflet_disable_click']) { return true; }
   			el = el.parentNode;
   		}
@@ -5632,7 +5777,7 @@
   	return new Scale(options);
   };
 
-  var ukrainianFlag = '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12" height="8"><path fill="#4C7BE1" d="M0 0h12v4H0z"/><path fill="#FFD500" d="M0 4h12v3H0z"/><path fill="#E0BC00" d="M0 7h12v1H0z"/></svg>';
+  var ukrainianFlag = '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" class="leaflet-attribution-flag"><path fill="#4C7BE1" d="M0 0h12v4H0z"/><path fill="#FFD500" d="M0 4h12v3H0z"/><path fill="#E0BC00" d="M0 7h12v1H0z"/></svg>';
 
 
   /*
@@ -5701,7 +5846,7 @@
   	},
 
   	// @method addAttribution(text: String): this
-  	// Adds an attribution text (e.g. `'Vector data &copy; Mapbox'`).
+  	// Adds an attribution text (e.g. `'&copy; OpenStreetMap contributors'`).
   	addAttribution: function (text) {
   		if (!text) { return this; }
 
@@ -6293,6 +6438,55 @@
   	return isFlat(latlngs);
   }
 
+  /* @function polylineCenter(latlngs: LatLng[], crs: CRS): LatLng
+   * Returns the center ([centroid](http://en.wikipedia.org/wiki/Centroid)) of the passed LatLngs (first ring) from a polyline.
+   */
+  function polylineCenter(latlngs, crs) {
+  	var i, halfDist, segDist, dist, p1, p2, ratio, center;
+
+  	if (!latlngs || latlngs.length === 0) {
+  		throw new Error('latlngs not passed');
+  	}
+
+  	if (!isFlat(latlngs)) {
+  		console.warn('latlngs are not flat! Only the first ring will be used');
+  		latlngs = latlngs[0];
+  	}
+
+  	var points = [];
+  	for (var j in latlngs) {
+  		points.push(crs.project(toLatLng(latlngs[j])));
+  	}
+
+  	var len = points.length;
+
+  	for (i = 0, halfDist = 0; i < len - 1; i++) {
+  		halfDist += points[i].distanceTo(points[i + 1]) / 2;
+  	}
+
+  	// The line is so small in the current view that all points are on the same pixel.
+  	if (halfDist === 0) {
+  		center = points[0];
+  	} else {
+  		for (i = 0, dist = 0; i < len - 1; i++) {
+  			p1 = points[i];
+  			p2 = points[i + 1];
+  			segDist = p1.distanceTo(p2);
+  			dist += segDist;
+
+  			if (dist > halfDist) {
+  				ratio = (dist - halfDist) / segDist;
+  				center = [
+  					p2.x - ratio * (p2.x - p1.x),
+  					p2.y - ratio * (p2.y - p1.y)
+  				];
+  				break;
+  			}
+  		}
+  	}
+  	return crs.unproject(toPoint(center));
+  }
+
   var LineUtil = {
     __proto__: null,
     simplify: simplify,
@@ -6303,7 +6497,8 @@
     _getBitCode: _getBitCode,
     _sqClosestPointOnSegment: _sqClosestPointOnSegment,
     isFlat: isFlat,
-    _flat: _flat
+    _flat: _flat,
+    polylineCenter: polylineCenter
   };
 
   /*
@@ -6360,9 +6555,53 @@
   	return points;
   }
 
+  /* @function polygonCenter(latlngs: LatLng[] crs: CRS): LatLng
+   * Returns the center ([centroid](http://en.wikipedia.org/wiki/Centroid)) of the passed LatLngs (first ring) from a polygon.
+   */
+  function polygonCenter(latlngs, crs) {
+  	var i, j, p1, p2, f, area, x, y, center;
+
+  	if (!latlngs || latlngs.length === 0) {
+  		throw new Error('latlngs not passed');
+  	}
+
+  	if (!isFlat(latlngs)) {
+  		console.warn('latlngs are not flat! Only the first ring will be used');
+  		latlngs = latlngs[0];
+  	}
+
+  	var points = [];
+  	for (var k in latlngs) {
+  		points.push(crs.project(toLatLng(latlngs[k])));
+  	}
+
+  	var len = points.length;
+  	area = x = y = 0;
+
+  	// polygon centroid algorithm;
+  	for (i = 0, j = len - 1; i < len; j = i++) {
+  		p1 = points[i];
+  		p2 = points[j];
+
+  		f = p1.y * p2.x - p2.y * p1.x;
+  		x += (p1.x + p2.x) * f;
+  		y += (p1.y + p2.y) * f;
+  		area += f * 3;
+  	}
+
+  	if (area === 0) {
+  		// Polygon is so small that all points are on same pixel.
+  		center = points[0];
+  	} else {
+  		center = [x / area, y / area];
+  	}
+  	return crs.unproject(toPoint(center));
+  }
+
   var PolyUtil = {
     __proto__: null,
-    clipPolygon: clipPolygon
+    clipPolygon: clipPolygon,
+    polygonCenter: polygonCenter
   };
 
   /*
@@ -8321,38 +8560,7 @@
   		if (!this._map) {
   			throw new Error('Must add layer to map before using getCenter()');
   		}
-
-  		var i, halfDist, segDist, dist, p1, p2, ratio,
-  		    points = this._rings[0],
-  		    len = points.length;
-
-  		if (!len) { return null; }
-
-  		// polyline centroid algorithm; only uses the first ring if there are multiple
-
-  		for (i = 0, halfDist = 0; i < len - 1; i++) {
-  			halfDist += points[i].distanceTo(points[i + 1]) / 2;
-  		}
-
-  		// The line is so small in the current view that all points are on the same pixel.
-  		if (halfDist === 0) {
-  			return this._map.layerPointToLatLng(points[0]);
-  		}
-
-  		for (i = 0, dist = 0; i < len - 1; i++) {
-  			p1 = points[i];
-  			p2 = points[i + 1];
-  			segDist = p1.distanceTo(p2);
-  			dist += segDist;
-
-  			if (dist > halfDist) {
-  				ratio = (dist - halfDist) / segDist;
-  				return this._map.layerPointToLatLng([
-  					p2.x - ratio * (p2.x - p1.x),
-  					p2.y - ratio * (p2.y - p1.y)
-  				]);
-  			}
-  		}
+  		return polylineCenter(this._defaultShape(), this._map.options.crs);
   	},
 
   	// @method getBounds(): LatLngBounds
@@ -8594,39 +8802,14 @@
   		return !this._latlngs.length || !this._latlngs[0].length;
   	},
 
+  	// @method getCenter(): LatLng
+  	// Returns the center ([centroid](http://en.wikipedia.org/wiki/Centroid)) of the Polygon.
   	getCenter: function () {
   		// throws error when not yet added to map as this center calculation requires projected coordinates
   		if (!this._map) {
   			throw new Error('Must add layer to map before using getCenter()');
   		}
-
-  		var i, j, p1, p2, f, area, x, y, center,
-  		    points = this._rings[0],
-  		    len = points.length;
-
-  		if (!len) { return null; }
-
-  		// polygon centroid algorithm; only uses the first ring if there are multiple
-
-  		area = x = y = 0;
-
-  		for (i = 0, j = len - 1; i < len; j = i++) {
-  			p1 = points[i];
-  			p2 = points[j];
-
-  			f = p1.y * p2.x - p2.y * p1.x;
-  			x += (p1.x + p2.x) * f;
-  			y += (p1.y + p2.y) * f;
-  			area += f * 3;
-  		}
-
-  		if (area === 0) {
-  			// Polygon is so small that all points are on same pixel.
-  			center = points[0];
-  		} else {
-  			center = [x / area, y / area];
-  		}
-  		return this._map.layerPointToLatLng(center);
+  		return polygonCenter(this._defaultShape(), this._map.options.crs);
   	},
 
   	_convertLatLngs: function (latlngs) {
@@ -8911,14 +9094,24 @@
 
   	case 'GeometryCollection':
   		for (i = 0, len = geometry.geometries.length; i < len; i++) {
-  			var layer = geometryToLayer({
+  			var geoLayer = geometryToLayer({
   				geometry: geometry.geometries[i],
   				type: 'Feature',
   				properties: geojson.properties
   			}, options);
 
-  			if (layer) {
-  				layers.push(layer);
+  			if (geoLayer) {
+  				layers.push(geoLayer);
+  			}
+  		}
+  		return new FeatureGroup(layers);
+
+  	case 'FeatureCollection':
+  		for (i = 0, len = geometry.features.length; i < len; i++) {
+  			var featureLayer = geometryToLayer(geometry.features[i], options);
+
+  			if (featureLayer) {
+  				layers.push(featureLayer);
   			}
   		}
   		return new FeatureGroup(layers);
@@ -8977,8 +9170,9 @@
   	var coords = [];
 
   	for (var i = 0, len = latlngs.length; i < len; i++) {
+  		// Check for flat arrays required to ensure unbalanced arrays are correctly converted in recursion
   		coords.push(levelsDeep ?
-  			latLngsToCoords(latlngs[i], levelsDeep - 1, closed, precision) :
+  			latLngsToCoords(latlngs[i], isFlat(latlngs[i]) ? 0 : levelsDeep - 1, closed, precision) :
   			latLngToCoords(latlngs[i], precision));
   	}
 
@@ -9587,13 +9781,25 @@
 
   		// @option pane: String = undefined
   		// `Map pane` where the overlay will be added.
-  		pane: undefined
+  		pane: undefined,
+
+  		// @option content: String|HTMLElement|Function = ''
+  		// Sets the HTML content of the overlay while initializing. If a function is passed the source layer will be
+  		// passed to the function. The function should return a `String` or `HTMLElement` to be used in the overlay.
+  		content: ''
   	},
 
   	initialize: function (options, source) {
-  		setOptions(this, options);
-
-  		this._source = source;
+  		if (options && (options instanceof L.LatLng || isArray(options))) {
+  			this._latlng = toLatLng(options);
+  			setOptions(this, source);
+  		} else {
+  			setOptions(this, options);
+  			this._source = source;
+  		}
+  		if (this.options.content) {
+  			this._content = this.options.content;
+  		}
   	},
 
   	// @method openOn(map: Map): this
@@ -9905,12 +10111,18 @@
    * marker.bindPopup(popupContent).openPopup();
    * ```
    * Path overlays like polylines also have a `bindPopup` method.
-   * Here's a more complicated way to open a popup on a map:
+   *
+   * A popup can be also standalone:
    *
    * ```js
    * var popup = L.popup()
    * 	.setLatLng(latlng)
    * 	.setContent('<p>Hello world!<br />This is a nice popup.</p>')
+   * 	.openOn(map);
+   * ```
+   * or
+   * ```js
+   * var popup = L.popup(latlng, {content: '<p>Hello world!<br />This is a nice popup.</p>')
    * 	.openOn(map);
    * ```
    */
@@ -9941,6 +10153,8 @@
   		// @option maxHeight: Number = null
   		// If set, creates a scrollable container of the given height
   		// inside a popup if its content exceeds it.
+  		// The scrollable container can be styled using the
+  		// `leaflet-popup-scrolled` CSS class selector.
   		maxHeight: null,
 
   		// @option autoPan: Boolean = true
@@ -10086,7 +10300,10 @@
   			closeButton.href = '#close';
   			closeButton.innerHTML = '<span aria-hidden="true">&#215;</span>';
 
-  			on(closeButton, 'click', this.close, this);
+  			on(closeButton, 'click', function (ev) {
+  				preventDefault(ev);
+  				this.close();
+  			}, this);
   		}
   	},
 
@@ -10180,6 +10397,9 @@
   // @namespace Popup
   // @factory L.popup(options?: Popup options, source?: Layer)
   // Instantiates a `Popup` object given an optional `options` object that describes its appearance and location and an optional `source` object that is used to tag the popup with a reference to the Layer to which it refers.
+  // @alternative
+  // @factory L.popup(latlng: LatLng, options?: Popup options)
+  // Instantiates a `Popup` object given `latlng` where the popup will open and an optional `options` object that describes its appearance and location.
   var popup = function (options, source) {
   	return new Popup(options, source);
   };
@@ -10363,10 +10583,28 @@
    * Used to display small texts on top of map layers.
    *
    * @example
+   * If you want to just bind a tooltip to marker:
    *
    * ```js
    * marker.bindTooltip("my tooltip text").openTooltip();
    * ```
+   * Path overlays like polylines also have a `bindTooltip` method.
+   *
+   * A tooltip can be also standalone:
+   *
+   * ```js
+   * var tooltip = L.tooltip()
+   * 	.setLatLng(latlng)
+   * 	.setContent('Hello world!<br />This is a nice tooltip.')
+   * 	.addTo(map);
+   * ```
+   * or
+   * ```js
+   * var tooltip = L.tooltip(latlng, {content: 'Hello world!<br />This is a nice tooltip.'})
+   * 	.addTo(map);
+   * ```
+   *
+   *
    * Note about tooltip offset. Leaflet takes two options in consideration
    * for computing tooltip offsetting:
    * - the `offset` Tooltip option: it defaults to [0, 0], and it's specific to one tooltip.
@@ -10467,6 +10705,9 @@
   		    className = prefix + ' ' + (this.options.className || '') + ' leaflet-zoom-' + (this._zoomAnimated ? 'animated' : 'hide');
 
   		this._contentNode = this._container = create$1('div', className);
+
+  		this._container.setAttribute('role', 'tooltip');
+  		this._container.setAttribute('id', 'leaflet-tooltip-' + stamp(this));
   	},
 
   	_updateLayout: function () {},
@@ -10547,7 +10788,10 @@
 
   // @namespace Tooltip
   // @factory L.tooltip(options?: Tooltip options, source?: Layer)
-  // Instantiates a Tooltip object given an optional `options` object that describes its appearance and location and an optional `source` object that is used to tag the tooltip with a reference to the Layer to which it refers.
+  // Instantiates a `Tooltip` object given an optional `options` object that describes its appearance and location and an optional `source` object that is used to tag the tooltip with a reference to the Layer to which it refers.
+  // @alternative
+  // @factory L.tooltip(latlng: LatLng, options?: Tooltip options)
+  // Instantiates a `Tooltip` object given `latlng` where the tooltip will open and an optional `options` object that describes its appearance and location.
   var tooltip = function (options, source) {
   	return new Tooltip(options, source);
   };
@@ -10635,6 +10879,11 @@
   			events.mouseover = this._openTooltip;
   			events.mouseout = this.closeTooltip;
   			events.click = this._openTooltip;
+  			if (this._map) {
+  				this._addFocusListeners();
+  			} else {
+  				events.add = this._addFocusListeners;
+  			}
   		} else {
   			events.add = this._openTooltip;
   		}
@@ -10651,6 +10900,12 @@
   		if (this._tooltip && this._tooltip._prepareOpen(latlng)) {
   			// open the tooltip on the map
   			this._tooltip.openOn(this._map);
+
+  			if (this.getElement) {
+  				this._setAriaDescribedByOnLayer(this);
+  			} else if (this.eachLayer) {
+  				this.eachLayer(this._setAriaDescribedByOnLayer, this);
+  			}
   		}
   		return this;
   	},
@@ -10692,6 +10947,27 @@
   	getTooltip: function () {
   		return this._tooltip;
   	},
+
+  	_addFocusListeners: function () {
+  		if (this.getElement) {
+  			this._addFocusListenersOnLayer(this);
+  		} else if (this.eachLayer) {
+  			this.eachLayer(this._addFocusListenersOnLayer, this);
+  		}
+  	},
+
+  	_addFocusListenersOnLayer: function (layer) {
+  		on(layer.getElement(), 'focus', function () {
+  			this._tooltip._source = layer;
+  			this.openTooltip();
+  		}, this);
+  		on(layer.getElement(), 'blur', this.closeTooltip, this);
+  	},
+
+  	_setAriaDescribedByOnLayer: function (layer) {
+  		layer.getElement().setAttribute('aria-describedby', this._tooltip._container.id);
+  	},
+
 
   	_openTooltip: function (e) {
   		if (!this._tooltip || !this._map || (this._map.dragging && this._map.dragging.moving())) {
@@ -11711,7 +11987,7 @@
    * @example
    *
    * ```js
-   * L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}', {foo: 'bar', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
+   * L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}', {foo: 'bar', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
    * ```
    *
    * @section URL template
@@ -11798,13 +12074,19 @@
 
   			if (!options.zoomReverse) {
   				options.zoomOffset++;
-  				options.maxZoom--;
+  				options.maxZoom = Math.max(options.minZoom, options.maxZoom - 1);
   			} else {
   				options.zoomOffset--;
-  				options.minZoom++;
+  				options.minZoom = Math.min(options.maxZoom, options.minZoom + 1);
   			}
 
   			options.minZoom = Math.max(0, options.minZoom);
+  		} else if (!options.zoomReverse) {
+  			// make sure maxZoom is gte minZoom
+  			options.maxZoom = Math.max(options.minZoom, options.maxZoom);
+  		} else {
+  			// make sure minZoom is lte maxZoom
+  			options.minZoom = Math.min(options.maxZoom, options.minZoom);
   		}
 
   		if (typeof options.subdomains === 'string') {
@@ -11851,17 +12133,11 @@
   			tile.referrerPolicy = this.options.referrerPolicy;
   		}
 
-  		/*
-  		 Alt tag is set to empty string to keep screen readers from reading URL and for compliance reasons
-  		 https://www.w3.org/TR/WCAG20-TECHS/H67
-  		*/
+  		// The alt attribute is set to the empty string,
+  		// allowing screen readers to ignore the decorative image tiles.
+  		// https://www.w3.org/WAI/tutorials/images/decorative/
+  		// https://www.w3.org/TR/html-aria/#el-img-empty-alt
   		tile.alt = '';
-
-  		/*
-  		 Set role="presentation" to force screen readers to ignore this
-  		 https://www.w3.org/TR/wai-aria/roles#textalternativecomputation
-  		*/
-  		tile.setAttribute('role', 'presentation');
 
   		tile.src = this.getTileUrl(coords);
 
@@ -14055,7 +14331,7 @@
 
   		cancelAnimFrame(this._animRequest);
 
-  		var moveFn = bind(map._move, map, this._center, this._zoom, {pinch: true, round: false});
+  		var moveFn = bind(map._move, map, this._center, this._zoom, {pinch: true, round: false}, undefined);
   		this._animRequest = requestAnimFrame(moveFn, this, true);
 
   		preventDefault(e);
@@ -14094,6 +14370,109 @@
   Map.ScrollWheelZoom = ScrollWheelZoom;
   Map.TapHold = TapHold;
   Map.TouchZoom = TouchZoom;
+
+  var L$1 = {
+    __proto__: null,
+    version: version,
+    Control: Control,
+    control: control,
+    Class: Class,
+    Handler: Handler,
+    extend: extend,
+    bind: bind,
+    stamp: stamp,
+    setOptions: setOptions,
+    Browser: Browser,
+    Evented: Evented,
+    Mixin: Mixin,
+    Util: Util,
+    PosAnimation: PosAnimation,
+    Draggable: Draggable,
+    DomEvent: DomEvent,
+    DomUtil: DomUtil,
+    Point: Point,
+    point: toPoint,
+    Bounds: Bounds,
+    bounds: toBounds,
+    Transformation: Transformation,
+    transformation: toTransformation,
+    LineUtil: LineUtil,
+    PolyUtil: PolyUtil,
+    LatLng: LatLng,
+    latLng: toLatLng,
+    LatLngBounds: LatLngBounds,
+    latLngBounds: toLatLngBounds,
+    CRS: CRS,
+    Projection: index,
+    Layer: Layer,
+    LayerGroup: LayerGroup,
+    layerGroup: layerGroup,
+    FeatureGroup: FeatureGroup,
+    featureGroup: featureGroup,
+    ImageOverlay: ImageOverlay,
+    imageOverlay: imageOverlay,
+    VideoOverlay: VideoOverlay,
+    videoOverlay: videoOverlay,
+    SVGOverlay: SVGOverlay,
+    svgOverlay: svgOverlay,
+    DivOverlay: DivOverlay,
+    Popup: Popup,
+    popup: popup,
+    Tooltip: Tooltip,
+    tooltip: tooltip,
+    icon: icon,
+    DivIcon: DivIcon,
+    divIcon: divIcon,
+    Marker: Marker,
+    marker: marker,
+    Icon: Icon,
+    GridLayer: GridLayer,
+    gridLayer: gridLayer,
+    TileLayer: TileLayer,
+    tileLayer: tileLayer,
+    Renderer: Renderer,
+    Canvas: Canvas,
+    canvas: canvas,
+    Path: Path,
+    CircleMarker: CircleMarker,
+    circleMarker: circleMarker,
+    Circle: Circle,
+    circle: circle,
+    Polyline: Polyline,
+    polyline: polyline,
+    Polygon: Polygon,
+    polygon: polygon,
+    Rectangle: Rectangle,
+    rectangle: rectangle,
+    SVG: SVG,
+    svg: svg,
+    GeoJSON: GeoJSON,
+    geoJSON: geoJSON,
+    geoJson: geoJson,
+    Map: Map,
+    map: createMap
+  };
+
+  var globalL = extend(L$1, {noConflict: noConflict});
+
+  var globalObject = getGlobalObject();
+  var oldL = globalObject.L;
+
+  globalObject.L = globalL;
+
+  function noConflict() {
+  	globalObject.L = oldL;
+  	return globalL;
+  }
+
+  function getGlobalObject() {
+  	if (typeof globalThis !== 'undefined') { return globalThis; }
+  	if (typeof self !== 'undefined') { return self; }
+  	if (typeof window !== 'undefined') { return window; }
+  	if (typeof global !== 'undefined') { return global; }
+
+  	throw new Error('Unable to locate global object.');
+  }
 
   exports.Bounds = Bounds;
   exports.Browser = Browser;
@@ -14146,6 +14525,7 @@
   exports.circle = circle;
   exports.circleMarker = circleMarker;
   exports.control = control;
+  exports["default"] = globalL;
   exports.divIcon = divIcon;
   exports.extend = extend;
   exports.featureGroup = featureGroup;
@@ -14159,6 +14539,7 @@
   exports.layerGroup = layerGroup;
   exports.map = createMap;
   exports.marker = marker;
+  exports.noConflict = noConflict;
   exports.point = toPoint;
   exports.polygon = polygon;
   exports.polyline = polyline;
@@ -14173,14 +14554,6 @@
   exports.transformation = toTransformation;
   exports.version = version;
   exports.videoOverlay = videoOverlay;
-
-  var oldL = window.L;
-  exports.noConflict = function() {
-  	window.L = oldL;
-  	return this;
-  }
-  // Always export us to window global (see #2364)
-  window.L = exports;
 
 }));
 //# sourceMappingURL=leaflet-src.js.map
@@ -25098,7 +25471,7 @@ return jQuery;
 
 ;
 /*!
-  * Bootstrap v5.2.1 (https://getbootstrap.com/)
+  * Bootstrap v5.2.2 (https://getbootstrap.com/)
   * Copyright 2011-2022 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
   */
@@ -25110,7 +25483,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): util/index.js
+   * Bootstrap (v5.2.2): util/index.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -25425,7 +25798,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): dom/event-handler.js
+   * Bootstrap (v5.2.2): dom/event-handler.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -25694,7 +26067,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): dom/data.js
+   * Bootstrap (v5.2.2): dom/data.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -25746,7 +26119,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): dom/manipulator.js
+   * Bootstrap (v5.2.2): dom/manipulator.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -25816,7 +26189,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): util/config.js
+   * Bootstrap (v5.2.2): util/config.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -25877,7 +26250,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): base-component.js
+   * Bootstrap (v5.2.2): base-component.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -25885,7 +26258,7 @@ return jQuery;
    * Constants
    */
 
-  const VERSION = '5.2.1';
+  const VERSION = '5.2.2';
   /**
    * Class definition
    */
@@ -25956,7 +26329,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): util/component-functions.js
+   * Bootstrap (v5.2.2): util/component-functions.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -25982,7 +26355,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): alert.js
+   * Bootstrap (v5.2.2): alert.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -26062,7 +26435,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): button.js
+   * Bootstrap (v5.2.2): button.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -26124,7 +26497,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): dom/selector-engine.js
+   * Bootstrap (v5.2.2): dom/selector-engine.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -26195,7 +26568,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): util/swipe.js
+   * Bootstrap (v5.2.2): util/swipe.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -26331,7 +26704,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): carousel.js
+   * Bootstrap (v5.2.2): carousel.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -26779,7 +27152,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): collapse.js
+   * Bootstrap (v5.2.2): collapse.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -28915,7 +29288,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): dropdown.js
+   * Bootstrap (v5.2.2): dropdown.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -28987,7 +29360,7 @@ return jQuery;
       this._parent = this._element.parentNode; // dropdown wrapper
       // todo: v6 revert #37011 & change markup https://getbootstrap.com/docs/5.2/forms/input-group/
 
-      this._menu = SelectorEngine.next(this._element, SELECTOR_MENU)[0] || SelectorEngine.prev(this._element, SELECTOR_MENU)[0];
+      this._menu = SelectorEngine.next(this._element, SELECTOR_MENU)[0] || SelectorEngine.prev(this._element, SELECTOR_MENU)[0] || SelectorEngine.findOne(SELECTOR_MENU, this._parent);
       this._inNavbar = this._detectNavbar();
     } // Getters
 
@@ -29305,7 +29678,7 @@ return jQuery;
 
       event.preventDefault(); // todo: v6 revert #37011 & change markup https://getbootstrap.com/docs/5.2/forms/input-group/
 
-      const getToggleButton = this.matches(SELECTOR_DATA_TOGGLE$3) ? this : SelectorEngine.prev(this, SELECTOR_DATA_TOGGLE$3)[0] || SelectorEngine.next(this, SELECTOR_DATA_TOGGLE$3)[0];
+      const getToggleButton = this.matches(SELECTOR_DATA_TOGGLE$3) ? this : SelectorEngine.prev(this, SELECTOR_DATA_TOGGLE$3)[0] || SelectorEngine.next(this, SELECTOR_DATA_TOGGLE$3)[0] || SelectorEngine.findOne(SELECTOR_DATA_TOGGLE$3, event.delegateTarget.parentNode);
       const instance = Dropdown.getOrCreateInstance(getToggleButton);
 
       if (isUpOrDownEvent) {
@@ -29347,7 +29720,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): util/scrollBar.js
+   * Bootstrap (v5.2.2): util/scrollBar.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -29466,7 +29839,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): util/backdrop.js
+   * Bootstrap (v5.2.2): util/backdrop.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -29612,7 +29985,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): util/focustrap.js
+   * Bootstrap (v5.2.2): util/focustrap.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -29721,7 +30094,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): modal.js
+   * Bootstrap (v5.2.2): modal.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -29933,9 +30306,9 @@ return jQuery;
         }
       });
       EventHandler.on(this._element, EVENT_MOUSEDOWN_DISMISS, event => {
+        // a bad trick to segregate clicks that may start inside dialog but end outside, and avoid listen to scrollbar clicks
         EventHandler.one(this._element, EVENT_CLICK_DISMISS, event2 => {
-          // a bad trick to segregate clicks that may start inside dialog but end outside, and avoid listen to scrollbar clicks
-          if (this._dialog.contains(event.target) || this._dialog.contains(event2.target)) {
+          if (this._element !== event.target || this._element !== event2.target) {
             return;
           }
 
@@ -30097,7 +30470,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): offcanvas.js
+   * Bootstrap (v5.2.2): offcanvas.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -30371,7 +30744,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): util/sanitizer.js
+   * Bootstrap (v5.2.2): util/sanitizer.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -30476,7 +30849,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): util/template-factory.js
+   * Bootstrap (v5.2.2): util/template-factory.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -30634,7 +31007,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): tooltip.js
+   * Bootstrap (v5.2.2): tooltip.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -30732,6 +31105,10 @@ return jQuery;
       this.tip = null;
 
       this._setListeners();
+
+      if (!this._config.selector) {
+        this._fixTitle();
+      }
     } // Getters
 
 
@@ -30760,24 +31137,12 @@ return jQuery;
       this._isEnabled = !this._isEnabled;
     }
 
-    toggle(event) {
+    toggle() {
       if (!this._isEnabled) {
         return;
       }
 
-      if (event) {
-        const context = this._initializeOnDelegatedTarget(event);
-
-        context._activeTrigger.click = !context._activeTrigger.click;
-
-        if (context._isWithActiveTrigger()) {
-          context._enter();
-        } else {
-          context._leave();
-        }
-
-        return;
-      }
+      this._activeTrigger.click = !this._activeTrigger.click;
 
       if (this._isShown()) {
         this._leave();
@@ -30796,8 +31161,8 @@ return jQuery;
         this.tip.remove();
       }
 
-      if (this._config.originalTitle) {
-        this._element.setAttribute('title', this._config.originalTitle);
+      if (this._element.getAttribute('data-bs-original-title')) {
+        this._element.setAttribute('title', this._element.getAttribute('data-bs-original-title'));
       }
 
       this._disposePopper();
@@ -30990,7 +31355,7 @@ return jQuery;
     }
 
     _getTitle() {
-      return this._resolvePossibleFunction(this._config.title) || this._config.originalTitle;
+      return this._resolvePossibleFunction(this._config.title) || this._element.getAttribute('data-bs-original-title');
     } // Private
 
 
@@ -31076,7 +31441,11 @@ return jQuery;
 
       for (const trigger of triggers) {
         if (trigger === 'click') {
-          EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK$1), this._config.selector, event => this.toggle(event));
+          EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK$1), this._config.selector, event => {
+            const context = this._initializeOnDelegatedTarget(event);
+
+            context.toggle();
+          });
         } else if (trigger !== TRIGGER_MANUAL) {
           const eventIn = trigger === TRIGGER_HOVER ? this.constructor.eventName(EVENT_MOUSEENTER) : this.constructor.eventName(EVENT_FOCUSIN$1);
           const eventOut = trigger === TRIGGER_HOVER ? this.constructor.eventName(EVENT_MOUSELEAVE) : this.constructor.eventName(EVENT_FOCUSOUT$1);
@@ -31104,19 +31473,10 @@ return jQuery;
       };
 
       EventHandler.on(this._element.closest(SELECTOR_MODAL), EVENT_MODAL_HIDE, this._hideModalHandler);
-
-      if (this._config.selector) {
-        this._config = { ...this._config,
-          trigger: 'manual',
-          selector: ''
-        };
-      } else {
-        this._fixTitle();
-      }
     }
 
     _fixTitle() {
-      const title = this._config.originalTitle;
+      const title = this._element.getAttribute('title');
 
       if (!title) {
         return;
@@ -31125,6 +31485,9 @@ return jQuery;
       if (!this._element.getAttribute('aria-label') && !this._element.textContent.trim()) {
         this._element.setAttribute('aria-label', title);
       }
+
+      this._element.setAttribute('data-bs-original-title', title); // DO NOT USE IT. Is only for backwards compatibility
+
 
       this._element.removeAttribute('title');
     }
@@ -31197,8 +31560,6 @@ return jQuery;
         };
       }
 
-      config.originalTitle = this._element.getAttribute('title') || '';
-
       if (typeof config.title === 'number') {
         config.title = config.title.toString();
       }
@@ -31217,10 +31578,12 @@ return jQuery;
         if (this.constructor.Default[key] !== this._config[key]) {
           config[key] = this._config[key];
         }
-      } // In the future can be replaced with:
+      }
+
+      config.selector = false;
+      config.trigger = 'manual'; // In the future can be replaced with:
       // const keysWithDifferentValues = Object.entries(this._config).filter(entry => this.constructor.Default[entry[0]] !== this._config[entry[0]])
       // `Object.fromEntries(keysWithDifferentValues)`
-
 
       return config;
     }
@@ -31260,7 +31623,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): popover.js
+   * Bootstrap (v5.2.2): popover.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -31343,7 +31706,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): scrollspy.js
+   * Bootstrap (v5.2.2): scrollspy.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -31634,7 +31997,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): tab.js
+   * Bootstrap (v5.2.2): tab.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -31662,7 +32025,6 @@ return jQuery;
   const CLASS_DROPDOWN = 'dropdown';
   const SELECTOR_DROPDOWN_TOGGLE = '.dropdown-toggle';
   const SELECTOR_DROPDOWN_MENU = '.dropdown-menu';
-  const SELECTOR_DROPDOWN_ITEM = '.dropdown-item';
   const NOT_SELECTOR_DROPDOWN_TOGGLE = ':not(.dropdown-toggle)';
   const SELECTOR_TAB_PANEL = '.list-group, .nav, [role="tablist"]';
   const SELECTOR_OUTER = '.nav-item, .list-group-item';
@@ -31741,7 +32103,6 @@ return jQuery;
           return;
         }
 
-        element.focus();
         element.removeAttribute('tabindex');
         element.setAttribute('aria-selected', true);
 
@@ -31797,6 +32158,9 @@ return jQuery;
       const nextActiveElement = getNextActiveElement(this._getChildren().filter(element => !isDisabled(element)), event.target, isNext, true);
 
       if (nextActiveElement) {
+        nextActiveElement.focus({
+          preventScroll: true
+        });
         Tab.getOrCreateInstance(nextActiveElement).show();
       }
     }
@@ -31872,7 +32236,6 @@ return jQuery;
 
       toggle(SELECTOR_DROPDOWN_TOGGLE, CLASS_NAME_ACTIVE);
       toggle(SELECTOR_DROPDOWN_MENU, CLASS_NAME_SHOW$1);
-      toggle(SELECTOR_DROPDOWN_ITEM, CLASS_NAME_ACTIVE);
       outerElem.setAttribute('aria-expanded', open);
     }
 
@@ -31947,7 +32310,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): toast.js
+   * Bootstrap (v5.2.2): toast.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -32098,13 +32461,17 @@ return jQuery;
       switch (event.type) {
         case 'mouseover':
         case 'mouseout':
-          this._hasMouseInteraction = isInteracting;
-          break;
+          {
+            this._hasMouseInteraction = isInteracting;
+            break;
+          }
 
         case 'focusin':
         case 'focusout':
-          this._hasKeyboardInteraction = isInteracting;
-          break;
+          {
+            this._hasKeyboardInteraction = isInteracting;
+            break;
+          }
       }
 
       if (isInteracting) {
@@ -32164,7 +32531,7 @@ return jQuery;
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.2.1): index.umd.js
+   * Bootstrap (v5.2.2): index.umd.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -69756,9 +70123,9 @@ module.exports = g;
                     "capitalize"  : "text-capitalize",
 
                     //Weight
-                    "normal"      : "font-weight-normal",
-                    "bold"        : "font-weight-bold",
-                    "italic"      : "font-italic"
+                    "normal"      : "fw-normal",
+                    "bold"        : "fw-bold",
+                    "italic"      : "fst-italic"
                 };
 
             $.each( bsStyleClass, function( style, className ){
@@ -70139,7 +70506,7 @@ module.exports = g;
                         .toggleClass('line-before',          !!options.lineBefore)
                         .toggleClass('line-after',           !!options.lineAfter)
 
-                        .toggleClass('no-validation',        !!(noValidation || options.noValidation))
+                        .toggleClass('no-validation',        !!(noValidation || options.noValidation))  //HER skal den bruges hvis der bruges tooltips til validation errors?
 
                         .appendTo( $parent );
             }
@@ -71177,7 +71544,16 @@ module.exports = g;
         this.options.id = 'bsInputId' + inputId++;
     }
 
-    BsModalInput.prototype = {
+
+    /*******************************************************
+    Export to jQuery
+    *******************************************************/
+    $.BsModalInput = BsModalInput;
+    $.bsModalInput = function( options ){
+        return new $.BsModalInput( options );
+    };
+
+    $.BsModalInput.prototype = {
         /*******************************************************
         getElement
         *******************************************************/
@@ -71219,7 +71595,7 @@ module.exports = g;
         /*******************************************************
         setValue
         *******************************************************/
-        setValue: function(value, validate){
+        setValue: function(value){
             var $elem = this.getElement(),
                 isSemiSelected;
 
@@ -71255,7 +71631,7 @@ module.exports = g;
                 case 'hidden'    : $elem.val( value );                  break;
             }
             this.onChanging();
-            return validate ? this.validate() : this;
+            return this;
         },
 
         /*******************************************************
@@ -71290,7 +71666,6 @@ module.exports = g;
         resetValue
         *******************************************************/
         resetValue: function( onlyResetValidation ){
-            this.modalForm._resetInputValidation( this );
             if (!onlyResetValidation)
                 return this.setValue( this.getResetValue() );
         },
@@ -71330,21 +71705,6 @@ module.exports = g;
             }
 
             return result === null ? this.getResetValue() : result;
-        },
-
-        /*******************************************************
-        addValidation - Add the validations
-        *******************************************************/
-        addValidation: function(){
-            this.modalForm._addInputValidation( this );
-        },
-
-        /*******************************************************
-        validate
-        *******************************************************/
-        validate: function(){
-            this.modalForm._validateInput( this );
-            return this;
         },
 
         /*******************************************************
@@ -71393,12 +71753,11 @@ module.exports = g;
                     this.getInputGroupContainer().css('visibility', show ? 'visible' : 'hidden');
 
                 this.getElement().prop('disabled', !show);
-
-                this.modalForm._enableInputValidation( this, show );
             }
             return this;
-        },
+        }
     }; //End of BsModalInput.prototype
+
 
     /************************************************************************
     *************************************************************************
@@ -71421,6 +71780,7 @@ module.exports = g;
         this.options.id = this.options.id || 'bsModalFormId' + formId++;
 
         this.options.onClose_user = this.options.onClose || function(){};
+        this.options.onShow = $.proxy( this.onShow, this );
         this.options.onClose = $.proxy( this.onClose, this );
 
         //this.input = simple object with all input-elements. Also convert element-id to unique id for input-element
@@ -71483,24 +71843,21 @@ module.exports = g;
         this.options.show = false; //Only show using method edit(...)
 
         //Create the form
-        this.$form = $('<form/>');
+        var $form = this.$form = $('<form novalidate/>');
         if (this.options.extended && this.options.useExtended){
-            this.$form._bsAppendContent( this.options.extended.content, this.options.contentContext, null, this.options );
-            this.options.extended.content = this.$form;
+            $form._bsAppendContent( this.options.extended.content, this.options.contentContext, null, this.options );
+            this.options.extended.content = $form;
         }
         else {
-            this.$form._bsAppendContent( this.options.content, this.options.contentContext, null, this.options );
-            this.options.content = this.$form;
+            $form._bsAppendContent( this.options.content, this.options.contentContext, null, this.options );
+            this.options.content = $form;
         }
-
-        if (this.options.formValidation)
-            this.$form.addClass('form-validation');
 
         //Create the modal
         this.$bsModal = $.bsModal( this.options );
 
         //Append the hidden submit-button the the form
-        this.$form.append( $hiddenSubmitButton );
+        $form.append( $hiddenSubmitButton );
 
         //Get the button used to submit the form
         var bsModalDialog = this.$bsModal.data('bsModalDialog'),
@@ -71508,16 +71865,17 @@ module.exports = g;
 
         this.$submitButton = $buttons[$buttons.length-1];
 
-        //Add the validator
-        this._addValidation();
 
         //Add the validations
         this._eachInput( function( input ){
-            input.addValidation();
+            if (input.options.validators){
+                input.addValidation();
+                $form.addClass('needs-validation form-validation');
+            }
         });
 
         //Add onSubmit
-        this._addOnSubmit( $.proxy(this.onSubmit, this) );
+        $form.on('submit', $.proxy(this.onSubmit, this) );
 
         return this;
     }
@@ -71546,12 +71904,11 @@ module.exports = g;
             if (tabIndexOrId !== undefined)
                 this.$bsModal.bsSelectTab(tabIndexOrId);
 
-            this.setValues( values, false, true, semiSelected );
+            this.setValues( values, true, semiSelected );
             this.originalValues = this.getValues();
 
             //Reset validation
             this.$bsModal.find(':disabled').prop('disabled', false );
-            this._resetValidation();
 
             this.showOrHide( null );
             this.isCreated = true;
@@ -71574,6 +71931,13 @@ module.exports = g;
             });
 
             return result;
+        },
+
+        /*******************************************************
+        onShow
+        *******************************************************/
+        onShow: function(){
+            this.$form.removeClass('was-validated');
         },
 
         /*******************************************************
@@ -71633,50 +71997,6 @@ module.exports = g;
 
 
         /*******************************************************
-        _addOnSubmit (*)
-        *******************************************************/
-        _addOnSubmit: function( onSubmitFunc ){
-            this.$form.on('submit', onSubmitFunc );
-        },
-
-        /*******************************************************
-        _addValidation (*)
-        *******************************************************/
-        _addValidation: function(){
-        },
-
-        /*******************************************************
-        _resetValidation (*)
-        *******************************************************/
-        _resetValidation: function(){
-        },
-
-        /*******************************************************
-        _addInputValidation (*)
-        *******************************************************/
-        _addInputValidation: function( /*bsModalInput*/ ){
-        },
-
-        /*******************************************************
-        _validateInput (*)
-        *******************************************************/
-        _validateInput: function( /*bsModalInput*/ ){
-        },
-
-        /*******************************************************
-        _resetInputValidation (*)
-        *******************************************************/
-        _resetInputValidation: function( /*bsModalInput*/ ){
-        },
-
-        /*******************************************************
-        _enableInputValidation (*)
-        *******************************************************/
-        _enableInputValidation: function( /*bsModalInput, enabled*/ ){
-        },
-
-
-        /*******************************************************
         _eachInput
         *******************************************************/
         _eachInput: function( func ){
@@ -71710,11 +72030,11 @@ module.exports = g;
         /*******************************************************
         setValues
         *******************************************************/
-        setValues: function(values, validate, resetUndefined){
+        setValues: function(values, resetUndefined){
             this._eachInput( function( input ){
                 var value = values[input.options.userId];
                 if ( value != undefined)
-                    input.setValue(value, validate);
+                    input.setValue(value);
                 else
                     if (resetUndefined)
                         input.resetValue();
@@ -71763,19 +72083,182 @@ module.exports = g;
         onSubmit = called when the form is valid and submitted
         *******************************************************/
         onSubmit: function( event/*, data*/ ){
-            this.options.onSubmit ? this.options.onSubmit( this.getValues() ) : null;
+            var form = this.$form.get(0);
 
-            this.$bsModal._close();
-            this.options.onClose_user();
-
-            event.preventDefault();
+            if (form.checkValidity()) {
+                this.options.onSubmit ? this.options.onSubmit( this.getValues() ) : null;
+                this.$bsModal._close();
+                this.options.onClose_user();
+                event.preventDefault();
+            }
+            else {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            this.$form.addClass('was-validated');
             return false;
         },
 
-    };
+    };  //end of $.BsModalForm.prototype
 }(jQuery, this, document));
 
 
+;
+/****************************************************************************
+jquery-bootstrap-form-validation.js
+
+Sets up default validation
+See
+https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation
+https://getbootstrap.com/docs/5.2/forms/validation/
+
+****************************************************************************/
+(function ($, i18next, window, document, undefined) {
+	"use strict";
+
+
+    /********************************************************************************
+    In the options for BsModalForm each input can have options.validators =
+        STRING or OBJ or []STRING/OBJ
+    OBJ = {type: STRING, OPTIONS}
+
+    type        OPTIONS
+    required
+    notEmpty
+
+    range       min: NUMBER, max: NUMBER //one or two given
+    length      min: NUMBER, max: NUMBER //one or two given
+    TODO: type        type: STRING
+    TODO: pattern     pattern: STRING
+
+    If a input has more than one validatior the error contains info on all validators
+    Eq. "The field is required - Must be between 1 and 10"
+
+    ********************************************************************************/
+
+    //Extend $.BsModalInput.prototype with methods to add validation to input-elements
+    $.extend($.BsModalInput.prototype, {
+        addValidation: function(){
+            var validators          = this.options.validators,
+                validatorList       = $.isArray(validators) ? validators : [validators],
+                $element            = this.getElement(),
+                $validationTooltip  = this.$validationTooltip =
+                    $('<div/>')
+                        .addClass('invalid-tooltip')
+                        .insertAfter($element);
+
+
+            var errorList   = [],
+                firstError  = {},
+                nextError   = {},
+                prop        = {},
+                attr        = {};
+
+
+            function range(validator, postfix, minText, maxText, minMaxText, exactlyText){
+                var min = validator.min,
+                    max = validator.max;
+                nextError =
+                    min === undefined ? maxText :
+                    max === undefined ? minText :
+                    min == max ? exactlyText :
+                    minMaxText;
+                i18next.languages.forEach(function(lang){
+                    nextError[lang] = nextError[lang] ? nextError[lang].replace('%min', min).replace('%max', max) : '';
+                });
+
+                if (min !== undefined){
+                    attr['min'+postfix] = min;
+                    prop.required = true;
+                }
+
+                if (max !== undefined)
+                    attr['max'+postfix] = max;
+            }
+
+            validatorList.forEach(function(validator){
+                validator = typeof validator == 'string' ? {type: validator} : validator;
+                nextError = '';
+                switch (validator.type.toUpperCase()){
+                    case 'REQUIRED':
+                    case 'NOTEMPTY' :
+                        prop.required = true;
+                        firstError = {da: "Feltet skal udfyldes", en: "The field is required"};
+                        break;
+
+                    case 'RANGE' :
+                         range(validator, '',
+                            {da: 'Skal mindst være %min',         en:'No less that %min'},              //minText
+                            {da: 'Må højest være %max',           en:'No more than %max'},              //maxText
+                            {da: 'Skal være mellem %min og %max', en:'Must be between %min and %max'},  //minMaxText
+                            {da: 'Skal være præcis %min',         en:'Must be exactly %min'}            //exactlyText
+                         );
+                        break;
+
+                    case 'LENGTH' :
+                        range(validator, 'length',
+                            {da: 'Skal mindst være %min tegn lang',         en:'No less that %min char long'},                  //minText
+                            {da: 'Må højest være %max tegn lang',           en:'No more than %max char long'},                  //maxText
+                            {da: 'Skal være mellem %min og %max tegn lang', en:'Must be between %min and %max characters long'},//minMaxText
+                            {da: 'Skal være præcis %min tegn lang',         en:'Must be exactly %mincharacters long'}           //exactlyText
+                        );
+                        break;
+                }
+                if (nextError)
+                    errorList.push(nextError);
+            });
+
+            $element.prop(prop);
+            $element.attr(attr);
+
+            if (firstError)
+                errorList.unshift(firstError);
+            var errorText = {};
+            errorList.forEach(function(error){
+                i18next.languages.forEach(function(lang){
+                    var langText = errorText[lang] || '';
+                    if (error[lang])
+                        langText = langText + (langText.length ? '&nbsp;- ' : '') + error[lang];
+                    errorText[lang] = langText;
+                });
+            });
+            $validationTooltip._bsAddHtml({text: errorText});
+        },
+    });
+
+}(jQuery, this.i18next, this, document));
+
+/*
+required                : Specifies whether a form field needs to be filled in before the form can be submitted.
+minlength and maxlength : Specifies the minimum and maximum length of textual data (strings).
+min and max             : Specifies the minimum and maximum values of numerical input types.
+type                    : Specifies whether the data needs to be a number, an email address, or some other specific preset type.
+pattern                 : Specifies a regular expression that defines a pattern the entered data needs to follow.
+
+
+The following error-messages are taken from form-validation (not used anymore)
+between     : {default: "Please enter a value between %s and %s", notInclusive: "Please enter a value between %s and %s strictly"}
+callback    : {default: "Please enter a valid value"}
+choice      : {default: "Please enter a valid value", less: "Please choose %s options at minimum", more: "Please choose %s options at maximum", between: "Please choose %s - %s options"}
+color       : {default: "Please enter a valid color"}
+creditCard  : {default: "Please enter a valid credit card number"}
+date        : {default: "Please enter a valid date", min: "Please enter a date after %s", max: "Please enter a date before %s", range: "Please enter a date in the range %s - %s"}
+different   : {default: "Please enter a different value"}
+digits      : {default: "Please enter only digits"}
+emailAddress: {default: "Please enter a valid email address"}
+file        : {default: "Please choose a valid file"}
+greaterThan : {default: "Please enter a value greater than or equal to %s", notInclusive: "Please enter a value greater than %s"}
+identical   : {default: "Please enter the same value"}
+integer     : {default: "Please enter a valid number"}
+lessThan    : {default: "Please enter a value less than or equal to %s", notInclusive: "Please enter a value less than %s"}
+notEmpty    : {default: "Please enter a value"}
+numeric     : {default: "Please enter a valid float number"}
+promise     : {default: "Please enter a valid value"}
+regexp      : {default: "Please enter a value matching the pattern"}
+remote      : {default: "Please enter a valid value"}
+stringLength: {default: "Please enter a value with valid length", less: "Please enter less than %s characters", more: "Please enter more than %s characters", between: "Please enter value between %s and %s characters long"}
+uri         : {default: "Please enter a valid URI"}
+*/
 ;
 /****************************************************************************
 	jquery-bootstrap-header.js,
@@ -71889,8 +72372,11 @@ module.exports = g;
                     classAndTitle = mandatoryHeaderIconClassAndTitle[id] || {};
 
                 if (iconOptions && iconOptions.onClick){
+                    var icon = iconOptions.icon || $.bsHeaderIcons[id];
+                    icon = $.isArray(icon) ? icon : [icon];
+
                     $._bsCreateIcon(
-                        iconOptions.icon || $.bsHeaderIcons[id],
+                        icon,
                         $iconContainer,
                         iconOptions.title || classAndTitle.title || '',
                         (iconOptions.className || '') + ' header-icon ' + (classAndTitle.class || '')
@@ -72336,7 +72822,7 @@ options
 (function ($, window/*, document, undefined*/) {
 	"use strict";
 
-    $.bsZIndexModalBackdrop = 1040; // zindexModalBackdrop = 1040, //MUST be equal to $zindex-modal-backdrop in bootstrap/scss/_variables.scss
+    $.bsZIndexModalBackdrop = 1050; //MUST be equal to $zindex-modal-backdrop in bootstrap/scss/_variables.scss
 
     var zindexAllwaysOnTop  = 9999,
         modalBackdropLevels = 0,
@@ -73957,7 +74443,6 @@ jquery-bootstrap-modal-promise.js
     Noty.overrideDefaults({
         theme: 'jquery-bootstrap'
     });
-
 
     var defaultNotyOptions = {
         layout   : 'topCenter',
