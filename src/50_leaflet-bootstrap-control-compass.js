@@ -40,7 +40,7 @@ leaflet-bootstrap-compass-device.js
                 noHorizontalPadding : false,
                 scroll              : false,
                 semiTransparent     : false, //true,
-                width               : 140,
+                width               : 156,
                 content             : '<div class="lb-conpass-content"></div><div class="lb-conpass-content-error" style="display:none; text-align:center"></div>',
             },
 

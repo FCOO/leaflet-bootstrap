@@ -1,6 +1,6 @@
 {
   "name": "leaflet-bootstrap",
-  "version": "3.27.2",
+  "version": "3.27.3",
   "homepage": "https://github.com/FCOO/leaflet-bootstrap",
   "authors": [
     "Niels Holt"
@@ -29,7 +29,8 @@
     "leaflet-bootstrap-marker": "fcoo/leaflet-bootstrap-marker#^3.0.0",
     "modernizr-javascript": "fcoo/modernizr-javascript#^1.1.2",
     "modernizr-scss": "fcoo/modernizr-scss#^2.3.0",
-    "geolocation": "fcoo/geolocation#^1.0.0"
+    "geolocation": "fcoo/geolocation#^1.0.0",
+    "fulltilt": "^0.5.3"
   },
   "devDependencies": {
     "modernizr-scss": "FCOO/modernizr-scss#^2.1.2",

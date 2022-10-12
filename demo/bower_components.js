@@ -32556,6 +32556,1480 @@ return jQuery;
 //# sourceMappingURL=bootstrap.bundle.js.map
 
 ;
+/**
+ *
+ * FULL TILT
+ * http://github.com/richtr/Full-Tilt
+ *
+ * A standalone DeviceOrientation + DeviceMotion JavaScript library that
+ * normalises orientation sensor input, applies relevant screen orientation
+ * transforms, returns Euler Angle, Quaternion and Rotation
+ * Matrix representations back to web developers and provides conversion
+ * between all supported orientation representation types.
+ *
+ * Copyright: 2014 Rich Tibbett
+ * License:   MIT
+ *
+ */
+
+(function ( window ) {
+
+// Only initialize the FULLTILT API if it is not already attached to the DOM
+if ( window.FULLTILT !== undefined && window.FULLTILT !== null ) {
+	return;
+}
+
+var M_PI   = Math.PI;
+var M_PI_2 = M_PI / 2;
+var M_2_PI = 2 * M_PI;
+
+// Degree to Radian conversion
+var degToRad = M_PI / 180;
+var radToDeg = 180 / M_PI;
+
+// Internal device orientation + motion variables
+var sensors = {
+	"orientation": {
+		active:    false,
+		callbacks: [],
+		data:      undefined
+	},
+	"motion": {
+		active:    false,
+		callbacks: [],
+		data:      undefined
+	}
+};
+var screenActive = false;
+
+// Internal screen orientation variables
+var hasScreenOrientationAPI = window.screen && window.screen.orientation && window.screen.orientation.angle !== undefined && window.screen.orientation.angle !== null ? true : false;
+var screenOrientationAngle = ( hasScreenOrientationAPI ? window.screen.orientation.angle : ( window.orientation || 0 ) ) * degToRad;
+
+var SCREEN_ROTATION_0        = 0,
+    SCREEN_ROTATION_90       = M_PI_2,
+    SCREEN_ROTATION_180      = M_PI,
+    SCREEN_ROTATION_270      = M_2_PI / 3,
+    SCREEN_ROTATION_MINUS_90 = - M_PI_2;
+
+// Math.sign polyfill
+function sign(x) {
+	x = +x; // convert to a number
+	if (x === 0 || isNaN(x))
+		return x;
+	return x > 0 ? 1 : -1;
+}
+
+///// Promise-based Sensor Data checker //////
+
+function SensorCheck(sensorRootObj) {
+
+	var promise = new Promise(function(resolve, reject) {
+
+		var runCheck = function (tries) {
+
+			setTimeout(function() {
+
+				if (sensorRootObj && sensorRootObj.data) {
+
+					resolve();
+
+				} else if (tries >= 20) {
+
+					reject();
+
+				} else {
+
+					runCheck(++tries);
+
+				}
+
+			}, 50);
+
+		};
+
+		runCheck(0);
+
+	});
+
+	return promise;
+
+}
+
+////// Internal Event Handlers //////
+
+function handleScreenOrientationChange () {
+
+	if ( hasScreenOrientationAPI ) {
+
+		screenOrientationAngle = ( window.screen.orientation.angle || 0 ) * degToRad;
+
+	} else {
+
+		screenOrientationAngle = ( window.orientation || 0 ) * degToRad;
+
+	}
+
+}
+
+function handleDeviceOrientationChange ( event ) {
+
+	sensors.orientation.data = event;
+
+	// Fire every callback function each time deviceorientation is updated
+	for ( var i in sensors.orientation.callbacks ) {
+
+		sensors.orientation.callbacks[ i ].call( this );
+
+	}
+
+}
+
+function handleDeviceMotionChange ( event ) {
+
+	sensors.motion.data = event;
+
+	// Fire every callback function each time devicemotion is updated
+	for ( var i in sensors.motion.callbacks ) {
+
+		sensors.motion.callbacks[ i ].call( this );
+
+	}
+
+}
+
+///// FULLTILT API Root Object /////
+
+var FULLTILT = {};
+
+FULLTILT.version = "0.5.3";
+
+///// FULLTILT API Root Methods /////
+
+FULLTILT.getDeviceOrientation = function(options) {
+
+	var promise = new Promise(function(resolve, reject) {
+
+		var control = new FULLTILT.DeviceOrientation(options);
+
+		control.start();
+
+		var orientationSensorCheck = new SensorCheck(sensors.orientation);
+
+		orientationSensorCheck.then(function() {
+
+			control._alphaAvailable = (sensors.orientation.data.alpha && sensors.orientation.data.alpha !== null);
+			control._betaAvailable = (sensors.orientation.data.beta && sensors.orientation.data.beta !== null);
+			control._gammaAvailable = (sensors.orientation.data.gamma && sensors.orientation.data.gamma !== null);
+
+			resolve(control);
+
+		}).catch(function() {
+
+			control.stop();
+			reject('DeviceOrientation is not supported');
+
+		});
+
+	});
+
+	return promise;
+
+};
+
+FULLTILT.getDeviceMotion = function(options) {
+
+	var promise = new Promise(function(resolve, reject) {
+
+		var control = new FULLTILT.DeviceMotion(options);
+
+		control.start();
+
+		var motionSensorCheck = new SensorCheck(sensors.motion);
+
+		motionSensorCheck.then(function() {
+
+			control._accelerationXAvailable = (sensors.motion.data.acceleration && sensors.motion.data.acceleration.x);
+			control._accelerationYAvailable = (sensors.motion.data.acceleration && sensors.motion.data.acceleration.y);
+			control._accelerationZAvailable = (sensors.motion.data.acceleration && sensors.motion.data.acceleration.z);
+
+			control._accelerationIncludingGravityXAvailable = (sensors.motion.data.accelerationIncludingGravity && sensors.motion.data.accelerationIncludingGravity.x);
+			control._accelerationIncludingGravityYAvailable = (sensors.motion.data.accelerationIncludingGravity && sensors.motion.data.accelerationIncludingGravity.y);
+			control._accelerationIncludingGravityZAvailable = (sensors.motion.data.accelerationIncludingGravity && sensors.motion.data.accelerationIncludingGravity.z);
+
+			control._rotationRateAlphaAvailable = (sensors.motion.data.rotationRate && sensors.motion.data.rotationRate.alpha);
+			control._rotationRateBetaAvailable = (sensors.motion.data.rotationRate && sensors.motion.data.rotationRate.beta);
+			control._rotationRateGammaAvailable = (sensors.motion.data.rotationRate && sensors.motion.data.rotationRate.gamma);
+
+			resolve(control);
+
+		}).catch(function() {
+
+			control.stop();
+			reject('DeviceMotion is not supported');
+
+		});
+
+	});
+
+	return promise;
+
+};
+
+
+////// FULLTILT.Quaternion //////
+
+FULLTILT.Quaternion = function ( x, y, z, w ) {
+
+	var quat, outQuat;
+
+	this.set = function ( x, y, z, w ) {
+
+		this.x = x || 0;
+		this.y = y || 0;
+		this.z = z || 0;
+		this.w = w || 1;
+
+	};
+
+	this.copy = function ( quaternion ) {
+
+		this.x = quaternion.x;
+		this.y = quaternion.y;
+		this.z = quaternion.z;
+		this.w = quaternion.w;
+
+	};
+
+	this.setFromEuler = (function () {
+
+		var _x, _y, _z;
+		var _x_2, _y_2, _z_2;
+		var cX, cY, cZ, sX, sY, sZ;
+
+		return function ( euler ) {
+
+			euler = euler || {};
+
+			_z = ( euler.alpha || 0 ) * degToRad;
+			_x = ( euler.beta || 0 ) * degToRad;
+			_y = ( euler.gamma || 0 ) * degToRad;
+
+			_z_2 = _z / 2;
+			_x_2 = _x / 2;
+			_y_2 = _y / 2;
+
+			cX = Math.cos( _x_2 );
+			cY = Math.cos( _y_2 );
+			cZ = Math.cos( _z_2 );
+			sX = Math.sin( _x_2 );
+			sY = Math.sin( _y_2 );
+			sZ = Math.sin( _z_2 );
+
+			this.set(
+				sX * cY * cZ - cX * sY * sZ, // x
+				cX * sY * cZ + sX * cY * sZ, // y
+				cX * cY * sZ + sX * sY * cZ, // z
+				cX * cY * cZ - sX * sY * sZ  // w
+			);
+
+			this.normalize();
+
+			return this;
+
+		};
+
+	})();
+
+	this.setFromRotationMatrix = (function () {
+
+		var R;
+
+		return function( matrix ) {
+
+			R = matrix.elements;
+
+			this.set(
+				0.5 * Math.sqrt( 1 + R[0] - R[4] - R[8] ) * sign( R[7] - R[5] ), // x
+				0.5 * Math.sqrt( 1 - R[0] + R[4] - R[8] ) * sign( R[2] - R[6] ), // y
+				0.5 * Math.sqrt( 1 - R[0] - R[4] + R[8] ) * sign( R[3] - R[1] ), // z
+				0.5 * Math.sqrt( 1 + R[0] + R[4] + R[8] )                        // w
+			);
+
+			return this;
+
+		};
+
+	})();
+
+	this.multiply = function ( quaternion ) {
+
+		outQuat = FULLTILT.Quaternion.prototype.multiplyQuaternions( this, quaternion );
+		this.copy( outQuat );
+
+		return this;
+
+	};
+
+	this.rotateX = function ( angle ) {
+
+		outQuat = FULLTILT.Quaternion.prototype.rotateByAxisAngle( this, [ 1, 0, 0 ], angle );
+		this.copy( outQuat );
+
+		return this;
+
+	};
+
+	this.rotateY = function ( angle ) {
+
+		outQuat = FULLTILT.Quaternion.prototype.rotateByAxisAngle( this, [ 0, 1, 0 ], angle );
+		this.copy( outQuat );
+
+		return this;
+
+	};
+
+	this.rotateZ = function ( angle ) {
+
+		outQuat = FULLTILT.Quaternion.prototype.rotateByAxisAngle( this, [ 0, 0, 1 ], angle );
+		this.copy( outQuat );
+
+		return this;
+
+	};
+
+	this.normalize = function () {
+
+		return FULLTILT.Quaternion.prototype.normalize( this );
+
+	};
+
+	// Initialize object values
+	this.set( x, y, z, w );
+
+};
+
+FULLTILT.Quaternion.prototype = {
+
+	constructor: FULLTILT.Quaternion,
+
+	multiplyQuaternions: function () {
+
+		var multipliedQuat = new FULLTILT.Quaternion();
+
+		return function ( a, b ) {
+
+			var qax = a.x, qay = a.y, qaz = a.z, qaw = a.w;
+			var qbx = b.x, qby = b.y, qbz = b.z, qbw = b.w;
+
+			multipliedQuat.set(
+				qax * qbw + qaw * qbx + qay * qbz - qaz * qby, // x
+				qay * qbw + qaw * qby + qaz * qbx - qax * qbz, // y
+				qaz * qbw + qaw * qbz + qax * qby - qay * qbx, // z
+				qaw * qbw - qax * qbx - qay * qby - qaz * qbz  // w
+			);
+
+			return multipliedQuat;
+
+		};
+
+	}(),
+
+	normalize: function( q ) {
+
+		var len = Math.sqrt( q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w );
+
+		if ( len === 0 ) {
+
+			q.x = 0;
+			q.y = 0;
+			q.z = 0;
+			q.w = 1;
+
+		} else {
+
+			len = 1 / len;
+
+			q.x *= len;
+			q.y *= len;
+			q.z *= len;
+			q.w *= len;
+
+		}
+
+		return q;
+
+	},
+
+	rotateByAxisAngle: function () {
+
+		var outputQuaternion = new FULLTILT.Quaternion();
+		var transformQuaternion = new FULLTILT.Quaternion();
+
+		var halfAngle, sA;
+
+		return function ( targetQuaternion, axis, angle ) {
+
+			halfAngle = ( angle || 0 ) / 2;
+			sA = Math.sin( halfAngle );
+
+			transformQuaternion.set(
+				( axis[ 0 ] || 0 ) * sA, // x
+				( axis[ 1 ] || 0 ) * sA, // y
+				( axis[ 2 ] || 0 ) * sA, // z
+				Math.cos( halfAngle )    // w
+			);
+
+			// Multiply quaternion by q
+			outputQuaternion = FULLTILT.Quaternion.prototype.multiplyQuaternions( targetQuaternion, transformQuaternion );
+
+			return FULLTILT.Quaternion.prototype.normalize( outputQuaternion );
+
+		};
+
+	}()
+
+};
+
+////// FULLTILT.RotationMatrix //////
+
+FULLTILT.RotationMatrix = function ( m11, m12, m13, m21, m22, m23, m31, m32, m33 ) {
+
+	var outMatrix;
+
+	this.elements = new Float32Array( 9 );
+
+	this.identity = function () {
+
+		this.set(
+			1, 0, 0,
+			0, 1, 0,
+			0, 0, 1
+		);
+
+		return this;
+
+	};
+
+	this.set = function ( m11, m12, m13, m21, m22, m23, m31, m32, m33 ) {
+
+		this.elements[ 0 ] = m11 || 1;
+		this.elements[ 1 ] = m12 || 0;
+		this.elements[ 2 ] = m13 || 0;
+		this.elements[ 3 ] = m21 || 0;
+		this.elements[ 4 ] = m22 || 1;
+		this.elements[ 5 ] = m23 || 0;
+		this.elements[ 6 ] = m31 || 0;
+		this.elements[ 7 ] = m32 || 0;
+		this.elements[ 8 ] = m33 || 1;
+
+	};
+
+	this.copy = function ( matrix ) {
+
+		this.elements[ 0 ] = matrix.elements[ 0 ];
+		this.elements[ 1 ] = matrix.elements[ 1 ];
+		this.elements[ 2 ] = matrix.elements[ 2 ];
+		this.elements[ 3 ] = matrix.elements[ 3 ];
+		this.elements[ 4 ] = matrix.elements[ 4 ];
+		this.elements[ 5 ] = matrix.elements[ 5 ];
+		this.elements[ 6 ] = matrix.elements[ 6 ];
+		this.elements[ 7 ] = matrix.elements[ 7 ];
+		this.elements[ 8 ] = matrix.elements[ 8 ];
+
+	};
+
+	this.setFromEuler = (function() {
+
+		var _x, _y, _z;
+		var cX, cY, cZ, sX, sY, sZ;
+
+		return function ( euler ) {
+
+			euler = euler || {};
+
+			_z = ( euler.alpha || 0 ) * degToRad;
+			_x = ( euler.beta || 0 ) * degToRad;
+			_y = ( euler.gamma || 0 ) * degToRad;
+
+			cX = Math.cos( _x );
+			cY = Math.cos( _y );
+			cZ = Math.cos( _z );
+			sX = Math.sin( _x );
+			sY = Math.sin( _y );
+			sZ = Math.sin( _z );
+
+			//
+			// ZXY-ordered rotation matrix construction.
+			//
+
+			this.set(
+				cZ * cY - sZ * sX * sY, // 1,1
+				- cX * sZ,              // 1,2
+				cY * sZ * sX + cZ * sY, // 1,3
+
+				cY * sZ + cZ * sX * sY, // 2,1
+				cZ * cX,                // 2,2
+				sZ * sY - cZ * cY * sX, // 2,3
+
+				- cX * sY,              // 3,1
+				sX,                     // 3,2
+				cX * cY                 // 3,3
+			);
+
+			this.normalize();
+
+			return this;
+
+		};
+
+	})();
+
+	this.setFromQuaternion = (function() {
+
+		var sqw, sqx, sqy, sqz;
+
+		return function( q ) {
+
+			sqw = q.w * q.w;
+			sqx = q.x * q.x;
+			sqy = q.y * q.y;
+			sqz = q.z * q.z;
+
+			this.set(
+				sqw + sqx - sqy - sqz,       // 1,1
+				2 * (q.x * q.y - q.w * q.z), // 1,2
+				2 * (q.x * q.z + q.w * q.y), // 1,3
+
+				2 * (q.x * q.y + q.w * q.z), // 2,1
+				sqw - sqx + sqy - sqz,       // 2,2
+				2 * (q.y * q.z - q.w * q.x), // 2,3
+
+				2 * (q.x * q.z - q.w * q.y), // 3,1
+				2 * (q.y * q.z + q.w * q.x), // 3,2
+				sqw - sqx - sqy + sqz        // 3,3
+			);
+
+			return this;
+
+		};
+
+	})();
+
+	this.multiply = function ( m ) {
+
+		outMatrix = FULLTILT.RotationMatrix.prototype.multiplyMatrices( this, m );
+		this.copy( outMatrix );
+
+		return this;
+
+	};
+
+	this.rotateX = function ( angle ) {
+
+		outMatrix = FULLTILT.RotationMatrix.prototype.rotateByAxisAngle( this, [ 1, 0, 0 ], angle );
+		this.copy( outMatrix );
+
+		return this;
+
+	};
+
+	this.rotateY = function ( angle ) {
+
+		outMatrix = FULLTILT.RotationMatrix.prototype.rotateByAxisAngle( this, [ 0, 1, 0 ], angle );
+		this.copy( outMatrix );
+
+		return this;
+
+	};
+
+	this.rotateZ = function ( angle ) {
+
+		outMatrix = FULLTILT.RotationMatrix.prototype.rotateByAxisAngle( this, [ 0, 0, 1 ], angle );
+		this.copy( outMatrix );
+
+		return this;
+
+	};
+
+	this.normalize = function () {
+
+		return FULLTILT.RotationMatrix.prototype.normalize( this );
+
+	};
+
+	// Initialize object values
+	this.set( m11, m12, m13, m21, m22, m23, m31, m32, m33 );
+
+};
+
+FULLTILT.RotationMatrix.prototype = {
+
+	constructor: FULLTILT.RotationMatrix,
+
+	multiplyMatrices: function () {
+
+		var matrix = new FULLTILT.RotationMatrix();
+
+		var aE, bE;
+
+		return function ( a, b ) {
+
+			aE = a.elements;
+			bE = b.elements;
+
+			matrix.set(
+				aE[0] * bE[0] + aE[1] * bE[3] + aE[2] * bE[6],
+				aE[0] * bE[1] + aE[1] * bE[4] + aE[2] * bE[7],
+				aE[0] * bE[2] + aE[1] * bE[5] + aE[2] * bE[8],
+
+				aE[3] * bE[0] + aE[4] * bE[3] + aE[5] * bE[6],
+				aE[3] * bE[1] + aE[4] * bE[4] + aE[5] * bE[7],
+				aE[3] * bE[2] + aE[4] * bE[5] + aE[5] * bE[8],
+
+				aE[6] * bE[0] + aE[7] * bE[3] + aE[8] * bE[6],
+				aE[6] * bE[1] + aE[7] * bE[4] + aE[8] * bE[7],
+				aE[6] * bE[2] + aE[7] * bE[5] + aE[8] * bE[8]
+			);
+
+			return matrix;
+
+		};
+
+	}(),
+
+	normalize: function( matrix ) {
+
+		var R = matrix.elements;
+
+		// Calculate matrix determinant
+		var determinant = R[0] * R[4] * R[8] - R[0] * R[5] * R[7] - R[1] * R[3] * R[8] + R[1] * R[5] * R[6] + R[2] * R[3] * R[7] - R[2] * R[4] * R[6];
+
+		// Normalize matrix values
+		R[0] /= determinant;
+		R[1] /= determinant;
+		R[2] /= determinant;
+		R[3] /= determinant;
+		R[4] /= determinant;
+		R[5] /= determinant;
+		R[6] /= determinant;
+		R[7] /= determinant;
+		R[8] /= determinant;
+
+		matrix.elements = R;
+
+		return matrix;
+
+	},
+
+	rotateByAxisAngle: function () {
+
+		var outputMatrix = new FULLTILT.RotationMatrix();
+		var transformMatrix = new FULLTILT.RotationMatrix();
+
+		var sA, cA;
+		var validAxis = false;
+
+		return function ( targetRotationMatrix, axis, angle ) {
+
+			transformMatrix.identity(); // reset transform matrix
+
+			validAxis = false;
+
+			sA = Math.sin( angle );
+			cA = Math.cos( angle );
+
+			if ( axis[ 0 ] === 1 && axis[ 1 ] === 0 && axis[ 2 ] === 0 ) { // x
+
+				validAxis = true;
+
+				transformMatrix.elements[4] = cA;
+				transformMatrix.elements[5] = -sA;
+				transformMatrix.elements[7] = sA;
+				transformMatrix.elements[8] = cA;
+
+	 		} else if ( axis[ 1 ] === 1 && axis[ 0 ] === 0 && axis[ 2 ] === 0 ) { // y
+
+				validAxis = true;
+
+				transformMatrix.elements[0] = cA;
+				transformMatrix.elements[2] = sA;
+				transformMatrix.elements[6] = -sA;
+				transformMatrix.elements[8] = cA;
+
+	 		} else if ( axis[ 2 ] === 1 && axis[ 0 ] === 0 && axis[ 1 ] === 0 ) { // z
+
+				validAxis = true;
+
+				transformMatrix.elements[0] = cA;
+				transformMatrix.elements[1] = -sA;
+				transformMatrix.elements[3] = sA;
+				transformMatrix.elements[4] = cA;
+
+	 		}
+
+			if ( validAxis ) {
+
+				outputMatrix = FULLTILT.RotationMatrix.prototype.multiplyMatrices( targetRotationMatrix, transformMatrix );
+
+				outputMatrix = FULLTILT.RotationMatrix.prototype.normalize( outputMatrix );
+
+			} else {
+
+				outputMatrix = targetRotationMatrix;
+
+			}
+
+			return outputMatrix;
+
+		};
+
+	}()
+
+};
+
+////// FULLTILT.Euler //////
+
+FULLTILT.Euler = function ( alpha, beta, gamma ) {
+
+	this.set = function ( alpha, beta, gamma ) {
+
+		this.alpha = alpha || 0;
+		this.beta  = beta  || 0;
+		this.gamma = gamma || 0;
+
+	};
+
+	this.copy = function ( inEuler ) {
+
+		this.alpha = inEuler.alpha;
+		this.beta  = inEuler.beta;
+		this.gamma = inEuler.gamma;
+
+	};
+
+	this.setFromRotationMatrix = (function () {
+
+		var R, _alpha, _beta, _gamma;
+
+		return function ( matrix ) {
+
+			R = matrix.elements;
+
+			if (R[8] > 0) { // cos(beta) > 0
+
+				_alpha = Math.atan2(-R[1], R[4]);
+				_beta  = Math.asin(R[7]); // beta (-pi/2, pi/2)
+				_gamma = Math.atan2(-R[6], R[8]); // gamma (-pi/2, pi/2)
+
+			} else if (R[8] < 0) {  // cos(beta) < 0
+
+				_alpha = Math.atan2(R[1], -R[4]);
+				_beta  = -Math.asin(R[7]);
+				_beta  += (_beta >= 0) ? - M_PI : M_PI; // beta [-pi,-pi/2) U (pi/2,pi)
+				_gamma = Math.atan2(R[6], -R[8]); // gamma (-pi/2, pi/2)
+
+			} else { // R[8] == 0
+
+				if (R[6] > 0) {  // cos(gamma) == 0, cos(beta) > 0
+
+					_alpha = Math.atan2(-R[1], R[4]);
+					_beta  = Math.asin(R[7]); // beta [-pi/2, pi/2]
+					_gamma = - M_PI_2; // gamma = -pi/2
+
+				} else if (R[6] < 0) { // cos(gamma) == 0, cos(beta) < 0
+
+					_alpha = Math.atan2(R[1], -R[4]);
+					_beta  = -Math.asin(R[7]);
+					_beta  += (_beta >= 0) ? - M_PI : M_PI; // beta [-pi,-pi/2) U (pi/2,pi)
+					_gamma = - M_PI_2; // gamma = -pi/2
+
+				} else { // R[6] == 0, cos(beta) == 0
+
+					// gimbal lock discontinuity
+					_alpha = Math.atan2(R[3], R[0]);
+					_beta  = (R[7] > 0) ? M_PI_2 : - M_PI_2; // beta = +-pi/2
+					_gamma = 0; // gamma = 0
+
+				}
+
+			}
+
+			// alpha is in [-pi, pi], make sure it is in [0, 2*pi).
+			if (_alpha < 0) {
+				_alpha += M_2_PI; // alpha [0, 2*pi)
+			}
+
+			// Convert to degrees
+			_alpha *= radToDeg;
+			_beta  *= radToDeg;
+			_gamma *= radToDeg;
+
+			// apply derived euler angles to current object
+			this.set( _alpha, _beta, _gamma );
+
+		};
+
+	})();
+
+	this.setFromQuaternion = (function () {
+
+		var _alpha, _beta, _gamma;
+
+		return function ( q ) {
+
+			var sqw = q.w * q.w;
+			var sqx = q.x * q.x;
+			var sqy = q.y * q.y;
+			var sqz = q.z * q.z;
+
+			var unitLength = sqw + sqx + sqy + sqz; // Normalised == 1, otherwise correction divisor.
+			var wxyz = q.w * q.x + q.y * q.z;
+			var epsilon = 1e-6; // rounding factor
+
+			if (wxyz > (0.5 - epsilon) * unitLength) {
+
+				_alpha = 2 * Math.atan2(q.y, q.w);
+				_beta = M_PI_2;
+				_gamma = 0;
+
+			} else if (wxyz < (-0.5 + epsilon) * unitLength) {
+
+				_alpha = -2 * Math.atan2(q.y, q.w);
+				_beta = -M_PI_2;
+				_gamma = 0;
+
+			} else {
+
+				var aX = sqw - sqx + sqy - sqz;
+				var aY = 2 * (q.w * q.z - q.x * q.y);
+
+				var gX = sqw - sqx - sqy + sqz;
+				var gY = 2 * (q.w * q.y - q.x * q.z);
+
+				if (gX > 0) {
+
+					_alpha = Math.atan2(aY, aX);
+					_beta  = Math.asin(2 * wxyz / unitLength);
+					_gamma = Math.atan2(gY, gX);
+
+				} else {
+
+					_alpha = Math.atan2(-aY, -aX);
+					_beta  = -Math.asin(2 * wxyz / unitLength);
+					_beta  += _beta < 0 ? M_PI : - M_PI;
+					_gamma = Math.atan2(-gY, -gX);
+
+				}
+
+			}
+
+			// alpha is in [-pi, pi], make sure it is in [0, 2*pi).
+			if (_alpha < 0) {
+				_alpha += M_2_PI; // alpha [0, 2*pi)
+			}
+
+			// Convert to degrees
+			_alpha *= radToDeg;
+			_beta  *= radToDeg;
+			_gamma *= radToDeg;
+
+			// apply derived euler angles to current object
+			this.set( _alpha, _beta, _gamma );
+
+		};
+
+	})();
+
+	this.rotateX = function ( angle ) {
+
+		FULLTILT.Euler.prototype.rotateByAxisAngle( this, [ 1, 0, 0 ], angle );
+
+		return this;
+
+	};
+
+	this.rotateY = function ( angle ) {
+
+		FULLTILT.Euler.prototype.rotateByAxisAngle( this, [ 0, 1, 0 ], angle );
+
+		return this;
+
+	};
+
+	this.rotateZ = function ( angle ) {
+
+		FULLTILT.Euler.prototype.rotateByAxisAngle( this, [ 0, 0, 1 ], angle );
+
+		return this;
+
+	};
+
+	// Initialize object values
+	this.set( alpha, beta, gamma );
+
+};
+
+FULLTILT.Euler.prototype = {
+
+	constructor: FULLTILT.Euler,
+
+	rotateByAxisAngle: function () {
+
+		var _matrix = new FULLTILT.RotationMatrix();
+		var outEuler;
+
+		return function ( targetEuler, axis, angle ) {
+
+			_matrix.setFromEuler( targetEuler );
+
+			_matrix = FULLTILT.RotationMatrix.prototype.rotateByAxisAngle( _matrix, axis, angle );
+
+			targetEuler.setFromRotationMatrix( _matrix );
+
+			return targetEuler;
+
+		};
+
+	}()
+
+};
+
+///// FULLTILT.DeviceOrientation //////
+
+FULLTILT.DeviceOrientation = function (options) {
+
+	this.options = options || {}; // by default use UA deviceorientation 'type' ("game" on iOS, "world" on Android)
+
+	var tries = 0;
+	var maxTries = 200;
+	var successCount = 0;
+	var successThreshold = 10;
+
+	this.alphaOffsetScreen = 0;
+	this.alphaOffsetDevice = undefined;
+
+	// Create a game-based deviceorientation object (initial alpha === 0 degrees)
+	if (this.options.type === "game") {
+
+		var setGameAlphaOffset = function(evt) {
+
+			if (evt.alpha !== null) { // do regardless of whether 'evt.absolute' is also true
+				this.alphaOffsetDevice = new FULLTILT.Euler(evt.alpha, 0, 0);
+				this.alphaOffsetDevice.rotateZ( -screenOrientationAngle );
+
+				// Discard first {successThreshold} responses while a better compass lock is found by UA
+				if(++successCount >= successThreshold) {
+					window.removeEventListener( 'deviceorientation', setGameAlphaOffset, false );
+					return;
+				}
+			}
+
+			if(++tries >= maxTries) {
+				window.removeEventListener( 'deviceorientation', setGameAlphaOffset, false );
+			}
+
+		}.bind(this);
+
+		window.addEventListener( 'deviceorientation', setGameAlphaOffset, false );
+
+	// Create a compass-based deviceorientation object (initial alpha === compass degrees)
+	} else if (this.options.type === "world") {
+
+		var setCompassAlphaOffset = function(evt) {
+
+			if (evt.absolute !== true && evt.webkitCompassAccuracy !== undefined && evt.webkitCompassAccuracy !== null && +evt.webkitCompassAccuracy >= 0 && +evt.webkitCompassAccuracy < 50) {
+				this.alphaOffsetDevice = new FULLTILT.Euler(evt.webkitCompassHeading, 0, 0);
+				this.alphaOffsetDevice.rotateZ( screenOrientationAngle );
+				this.alphaOffsetScreen = screenOrientationAngle;
+
+				// Discard first {successThreshold} responses while a better compass lock is found by UA
+				if(++successCount >= successThreshold) {
+					window.removeEventListener( 'deviceorientation', setCompassAlphaOffset, false );
+					return;
+				}
+			}
+
+			if(++tries >= maxTries) {
+				window.removeEventListener( 'deviceorientation', setCompassAlphaOffset, false );
+			}
+
+		}.bind(this);
+
+		window.addEventListener( 'deviceorientation', setCompassAlphaOffset, false );
+
+	} // else... use whatever orientation system the UA provides ("game" on iOS, "world" on Android)
+
+};
+
+FULLTILT.DeviceOrientation.prototype = {
+
+	constructor: FULLTILT.DeviceOrientation,
+
+	start: function ( callback ) {
+
+		if ( callback && Object.prototype.toString.call( callback ) == '[object Function]' ) {
+
+			sensors.orientation.callbacks.push( callback );
+
+		}
+
+		if( !screenActive ) {
+
+			if ( hasScreenOrientationAPI ) {
+
+			window.screen.orientation.addEventListener( 'change', handleScreenOrientationChange, false );
+
+			} else {
+
+				window.addEventListener( 'orientationchange', handleScreenOrientationChange, false );
+
+			}
+
+		}
+
+		if ( !sensors.orientation.active ) {
+
+			window.addEventListener( 'deviceorientation', handleDeviceOrientationChange, false );
+
+			sensors.orientation.active = true;
+
+		}
+
+	},
+
+	stop: function () {
+
+		if ( sensors.orientation.active ) {
+
+			window.removeEventListener( 'deviceorientation', handleDeviceOrientationChange, false );
+
+			sensors.orientation.active = false;
+
+		}
+
+	},
+
+	listen: function( callback ) {
+
+		this.start( callback );
+
+	},
+
+	getFixedFrameQuaternion: (function () {
+
+		var euler = new FULLTILT.Euler();
+		var matrix = new FULLTILT.RotationMatrix();
+		var quaternion = new FULLTILT.Quaternion();
+
+		return function() {
+
+			var orientationData = sensors.orientation.data || { alpha: 0, beta: 0, gamma: 0 };
+
+			var adjustedAlpha = orientationData.alpha;
+
+			if (this.alphaOffsetDevice) {
+				matrix.setFromEuler( this.alphaOffsetDevice );
+				matrix.rotateZ( - this.alphaOffsetScreen );
+				euler.setFromRotationMatrix( matrix );
+
+				if (euler.alpha < 0) {
+					euler.alpha += 360;
+				}
+
+				euler.alpha %= 360;
+
+				adjustedAlpha -= euler.alpha;
+			}
+
+			euler.set(
+				adjustedAlpha,
+				orientationData.beta,
+				orientationData.gamma
+			);
+
+			quaternion.setFromEuler( euler );
+
+			return quaternion;
+
+		};
+
+	})(),
+
+	getScreenAdjustedQuaternion: (function () {
+
+		var quaternion;
+
+		return function() {
+
+			quaternion = this.getFixedFrameQuaternion();
+
+			// Automatically apply screen orientation transform
+			quaternion.rotateZ( - screenOrientationAngle );
+
+			return quaternion;
+
+		};
+
+	})(),
+
+	getFixedFrameMatrix: (function () {
+
+		var euler = new FULLTILT.Euler();
+		var matrix = new FULLTILT.RotationMatrix();
+
+		return function () {
+
+			var orientationData = sensors.orientation.data || { alpha: 0, beta: 0, gamma: 0 };
+
+			var adjustedAlpha = orientationData.alpha;
+
+			if (this.alphaOffsetDevice) {
+				matrix.setFromEuler( this.alphaOffsetDevice );
+				matrix.rotateZ( - this.alphaOffsetScreen );
+				euler.setFromRotationMatrix( matrix );
+
+				if (euler.alpha < 0) {
+					euler.alpha += 360;
+				}
+
+				euler.alpha %= 360;
+
+				adjustedAlpha -= euler.alpha;
+			}
+
+			euler.set(
+				adjustedAlpha,
+				orientationData.beta,
+				orientationData.gamma
+			);
+
+			matrix.setFromEuler( euler );
+
+			return matrix;
+
+		};
+
+	})(),
+
+	getScreenAdjustedMatrix: (function () {
+
+		var matrix;
+
+		return function () {
+
+			matrix = this.getFixedFrameMatrix();
+
+			// Automatically apply screen orientation transform
+			matrix.rotateZ( - screenOrientationAngle );
+
+			return matrix;
+
+		};
+
+	})(),
+
+	getFixedFrameEuler: (function () {
+
+		var euler = new FULLTILT.Euler();
+		var matrix;
+
+		return function () {
+
+			matrix = this.getFixedFrameMatrix();
+
+			euler.setFromRotationMatrix( matrix );
+
+			return euler;
+
+		};
+
+	})(),
+
+	getScreenAdjustedEuler: (function () {
+
+		var euler = new FULLTILT.Euler();
+		var matrix;
+
+		return function () {
+
+			matrix = this.getScreenAdjustedMatrix();
+
+			euler.setFromRotationMatrix( matrix );
+
+			return euler;
+
+		};
+
+	})(),
+
+	isAbsolute: function () {
+
+		if ( sensors.orientation.data && sensors.orientation.data.absolute === true ) {
+			return true;
+		}
+
+		return false;
+
+	},
+
+	getLastRawEventData: function () {
+
+		return sensors.orientation.data || {};
+
+	},
+
+	_alphaAvailable: false,
+	_betaAvailable: false,
+	_gammaAvailable: false,
+
+	isAvailable: function(_valueType){
+
+		switch(_valueType){
+			case this.ALPHA:
+				return this._alphaAvailable;
+
+			case this.BETA:
+				return this._betaAvailable;
+
+			case this.GAMMA:
+				return this._gammaAvailable;
+		}
+
+	},
+
+	ALPHA: 'alpha',
+	BETA: 'beta',
+	GAMMA: 'gamma'
+
+};
+
+
+///// FULLTILT.DeviceMotion //////
+
+FULLTILT.DeviceMotion = function (options) {
+
+	this.options = options || {}; // placeholder object since no options are currently supported
+
+};
+
+FULLTILT.DeviceMotion.prototype = {
+
+	constructor: FULLTILT.DeviceMotion,
+
+	start: function ( callback ) {
+
+		if ( callback && Object.prototype.toString.call( callback ) == '[object Function]' ) {
+
+			sensors.motion.callbacks.push( callback );
+
+		}
+
+		if( !screenActive ) {
+
+			if ( hasScreenOrientationAPI ) {
+
+				window.screen.orientation.addEventListener( 'change', handleScreenOrientationChange, false );
+
+			} else {
+
+				window.addEventListener( 'orientationchange', handleScreenOrientationChange, false );
+
+			}
+
+		}
+
+		if ( !sensors.motion.active ) {
+
+			window.addEventListener( 'devicemotion', handleDeviceMotionChange, false );
+
+			sensors.motion.active = true;
+
+		}
+
+	},
+
+	stop: function () {
+
+		if ( sensors.motion.active ) {
+
+			window.removeEventListener( 'devicemotion', handleDeviceMotionChange, false );
+
+			sensors.motion.active = false;
+
+		}
+
+	},
+
+	listen: function( callback ) {
+
+		this.start( callback );
+
+	},
+
+	getScreenAdjustedAcceleration: function () {
+
+		var accData = sensors.motion.data && sensors.motion.data.acceleration ? sensors.motion.data.acceleration : { x: 0, y: 0, z: 0 };
+		var screenAccData = {};
+
+		switch ( screenOrientationAngle ) {
+			case SCREEN_ROTATION_90:
+				screenAccData.x = - accData.y;
+				screenAccData.y =   accData.x;
+				break;
+			case SCREEN_ROTATION_180:
+				screenAccData.x = - accData.x;
+				screenAccData.y = - accData.y;
+				break;
+			case SCREEN_ROTATION_270:
+			case SCREEN_ROTATION_MINUS_90:
+				screenAccData.x =   accData.y;
+				screenAccData.y = - accData.x;
+				break;
+			default: // SCREEN_ROTATION_0
+				screenAccData.x =   accData.x;
+				screenAccData.y =   accData.y;
+				break;
+		}
+
+		screenAccData.z = accData.z;
+
+		return screenAccData;
+
+	},
+
+	getScreenAdjustedAccelerationIncludingGravity: function () {
+
+		var accGData = sensors.motion.data && sensors.motion.data.accelerationIncludingGravity ? sensors.motion.data.accelerationIncludingGravity : { x: 0, y: 0, z: 0 };
+		var screenAccGData = {};
+
+		switch ( screenOrientationAngle ) {
+			case SCREEN_ROTATION_90:
+				screenAccGData.x = - accGData.y;
+				screenAccGData.y =   accGData.x;
+				break;
+			case SCREEN_ROTATION_180:
+				screenAccGData.x = - accGData.x;
+				screenAccGData.y = - accGData.y;
+				break;
+			case SCREEN_ROTATION_270:
+			case SCREEN_ROTATION_MINUS_90:
+				screenAccGData.x =   accGData.y;
+				screenAccGData.y = - accGData.x;
+				break;
+			default: // SCREEN_ROTATION_0
+				screenAccGData.x =   accGData.x;
+				screenAccGData.y =   accGData.y;
+				break;
+		}
+
+		screenAccGData.z = accGData.z;
+
+		return screenAccGData;
+
+	},
+
+	getScreenAdjustedRotationRate: function () {
+
+		var rotRateData = sensors.motion.data && sensors.motion.data.rotationRate ? sensors.motion.data.rotationRate : { alpha: 0, beta: 0, gamma: 0 };
+		var screenRotRateData = {};
+
+		switch ( screenOrientationAngle ) {
+			case SCREEN_ROTATION_90:
+				screenRotRateData.beta  = - rotRateData.gamma;
+				screenRotRateData.gamma =   rotRateData.beta;
+				break;
+			case SCREEN_ROTATION_180:
+				screenRotRateData.beta  = - rotRateData.beta;
+				screenRotRateData.gamma = - rotRateData.gamma;
+				break;
+			case SCREEN_ROTATION_270:
+			case SCREEN_ROTATION_MINUS_90:
+				screenRotRateData.beta  =   rotRateData.gamma;
+				screenRotRateData.gamma = - rotRateData.beta;
+				break;
+			default: // SCREEN_ROTATION_0
+				screenRotRateData.beta  =   rotRateData.beta;
+				screenRotRateData.gamma =   rotRateData.gamma;
+				break;
+		}
+
+		screenRotRateData.alpha = rotRateData.alpha;
+
+		return screenRotRateData;
+
+	},
+
+	getLastRawEventData: function () {
+
+		return sensors.motion.data || {};
+
+	},
+
+	_accelerationXAvailable: false,
+	_accelerationYAvailable: false,
+	_accelerationZAvailable: false,
+
+	_accelerationIncludingGravityXAvailable: false,
+	_accelerationIncludingGravityYAvailable: false,
+	_accelerationIncludingGravityZAvailable: false,
+
+	_rotationRateAlphaAvailable: false,
+	_rotationRateBetaAvailable: false,
+	_rotationRateGammaAvailable: false,
+
+	isAvailable: function(_valueType){
+
+		switch(_valueType){
+			case this.ACCELERATION_X:
+				return this._accelerationXAvailable;
+
+			case this.ACCELERATION_Y:
+				return this._accelerationYAvailable;
+
+			case this.ACCELERATION_Z:
+				return this._accelerationZAvailable;
+
+			case this.ACCELERATION_INCLUDING_GRAVITY_X:
+				return this._accelerationIncludingGravityXAvailable;
+
+			case this.ACCELERATION_INCLUDING_GRAVITY_Y:
+				return this._accelerationIncludingGravityYAvailable;
+
+			case this.ACCELERATION_INCLUDING_GRAVITY_Z:
+				return this._accelerationIncludingGravityZAvailable;
+
+			case this.ROTATION_RATE_ALPHA:
+				return this._rotationRateAlphaAvailable;
+
+			case this.ROTATION_RATE_BETA:
+				return this._rotationRateBetaAvailable;
+
+			case this.ROTATION_RATE_GAMMA:
+				return this._rotationRateGammaAvailable;
+		}
+	},
+
+	ACCELERATION_X: 'accelerationX',
+	ACCELERATION_Y: 'accelerationY',
+	ACCELERATION_Z: 'accelerationZ',
+
+	ACCELERATION_INCLUDING_GRAVITY_X: 'accelerationIncludingGravityX',
+	ACCELERATION_INCLUDING_GRAVITY_Y: 'accelerationIncludingGravityY',
+	ACCELERATION_INCLUDING_GRAVITY_Z: 'accelerationIncludingGravityZ',
+
+	ROTATION_RATE_ALPHA: 'rotationRateAlpha',
+	ROTATION_RATE_BETA: 'rotationRateBeta',
+	ROTATION_RATE_GAMMA: 'rotationRateGamma'
+
+};
+
+////// Attach FULLTILT to root DOM element //////
+
+window.FULLTILT = FULLTILT;
+
+})( window );
+;
 /****************************************************************************
 geolocation-device-orientation.js
 
@@ -32702,6 +34176,8 @@ Define global events to handle device orientation and calibration
                 newEvent[id] = typeof event[id] == 'number' ? Math.round(event[id]) : event[id];
             });
 
+
+newEvent.test = window.test;
 
             var screenOrientation = window.o9n.getOrientation();
             newEvent.angle = screenOrientation.angle;
@@ -33017,6 +34493,160 @@ window.geolocation.GeolocationHandler:
         }
     };
 
+
+}(jQuery, this/*, document*/));
+
+
+;
+/****************************************************************************
+geolocation-standard_tilt.js
+
+Creates window.geolocation.provider = version of GeolocationProvider that
+provides location from the browser geolocation API
+
+****************************************************************************/
+
+(function ($, window/*, document, undefined*/) {
+    "use strict";
+
+    //Create namespaces
+    var ns = window.geolocation = window.geolocation || {};
+
+    var geolocationOptions = {
+        /* From https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition */
+
+        /*
+        maximumAge:
+            Is a positive long value indicating the maximum age in milliseconds of a possible cached position that is acceptable to return.
+            If set to 0, it means that the device cannot use a cached position and must attempt to retrieve the real current position.
+            If set to Infinity the device must return a cached position regardless of its age. Default: 0.
+        */
+        //maximumAge          : 10 * 1000, //Allow 10sec old position
+
+        /*
+        timeout:
+            Is a positive long value representing the maximum length of time (in milliseconds) the device is allowed to take in order to return a position.
+            The default value is Infinity, meaning that getCurrentPosition() won't return until the position is available.
+        */
+        //timeout             : 10 * 1000,
+
+        /*
+        enableHighAccuracy:
+            Is a boolean value that indicates the application would like to receive the best possible results.
+            If true and if the device is able to provide a more accurate position, it will do so.
+            Note that this can result in slower response times or increased power consumption (with a GPS chip on a mobile device for example).
+            On the other hand, if false, the device can take the liberty to save resources by responding more quickly and/or using less power. Default: false.
+        */
+        enableHighAccuracy  : true
+    };
+
+    /*
+    GeolocationPosition = {
+        coords   : GeolocationCoordinates
+        timestamp: Millisecond
+
+    From https://developer.mozilla.org/en-US/docs/Web/API/GeolocationCoordinates:
+    GeolocationCoordinates = {
+        latitude        : Position's latitude in decimal degrees.
+        longitude       : Position's longitude in decimal degrees.
+        altitude        : Position's altitude in meters, relative to sea level. This value can be null if the implementation cannot provide the data.
+        accuracy        : Accuracy of the latitude and longitude properties, expressed in meters.
+        altitudeAccuracy: Accuracy of the altitude expressed in meters. This value can be null.
+        heading         : Direction towards which the device is facing. This value, specified in degrees, indicates how far off from heading true north the device is. 0 degrees represents true north, and the direction is determined clockwise (which means that east is 90 degrees and west is 270 degrees). If speed is 0, heading is NaN. If the device is unable to provide heading information, this value is null.
+        speed           : Velocity of the device in meters per second. This value can be null.
+    }
+    All properties are double
+    */
+
+    //*****************************************************************
+    //*****************************************************************
+    // Obtain a new *world-oriented* Full Tilt JS DeviceOrientation Promise
+    var promise = window.FULLTILT.getDeviceOrientation({ 'type': 'world' });
+
+    // Wait for Promise result
+    promise.then(function(deviceOrientation) { // Device Orientation Events are supported
+        // Register a callback to run every time a new
+        // deviceorientation event is fired by the browser.
+
+//console.log(deviceOrientation);
+
+        deviceOrientation.listen(function() {
+            // Get the current *screen-adjusted* device orientation angles
+            var currentOrientation = deviceOrientation.getScreenAdjustedEuler();
+
+deviceOrientation.test = deviceOrientation.isAbsolute();
+
+            // Calculate the current compass heading that the user is 'looking at' (in degrees)
+            var compassHeading = 360 - parseInt( currentOrientation.alpha );
+deviceOrientation.test2 = compassHeading;
+
+            var html = '';
+            $.each(['alpha', 'test', 'test2', 'latitude', 'longitude', 'altitude', 'accuracy', 'altitudeAccuracy', 'heading', 'speed'], function(index, id){
+                html = html + '<br>' + id + ': ' + deviceOrientation[id];
+            });
+
+            // Do something with `compassHeading` here...
+// HER>             $('.tilt').html('compassHeading = ' + compassHeading);
+            $('.tilt').html(html);
+
+        });
+
+    }).catch(function(errorMessage) { // Device Orientation Events are not supported
+
+        //console.log('FULLTILT-error', errorMessage);
+            $('.tilt').html('Error = ' + errorMessage);
+
+    // Implement some fallback controls here...
+
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //*****************************************************************
+    //*****************************************************************
+    var Provider_tilt = function(){
+            this.lastCoords = {};
+            ns.GeolocationProvider.call(this, geolocationOptions);
+        };
+
+    Provider_tilt.prototype = Object.create(ns.GeolocationProvider.prototype);
+
+
+    $.extend(Provider_tilt.prototype, {
+        activate: function(){
+            this._success = this._success || $.proxy(this.success, this);
+            this._error   = this._error   || $.proxy(this.onError, this);
+
+            if (navigator.geolocation)
+                navigator.geolocation.watchPosition(this._success, this._error, geolocationOptions);
+            else
+                this.onError(4);
+        },
+
+
+        deactivate: function(){
+            if (navigator.geolocation)
+                navigator.clearWatch();
+        },
+
+        success: function( GeolocationPosition ){
+            this.update( GeolocationPosition.coords );
+        },
+
+    });
+
+    //Create window.geolocation.provider_tilt
+    ns.provider_tilt = new Provider_tilt();
 
 }(jQuery, this/*, document*/));
 
@@ -35845,6 +37475,21 @@ function defineValue(obj, key, val) {
     };
   }
 
+  function createCachedFormatter(fn) {
+    var cache = {};
+    return function invokeFormatter(val, lng, options) {
+      var key = lng + JSON.stringify(options);
+      var formatter = cache[key];
+
+      if (!formatter) {
+        formatter = fn(lng, options);
+        cache[key] = formatter;
+      }
+
+      return formatter(val);
+    };
+  }
+
   var Formatter = function () {
     function Formatter() {
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -35854,23 +37499,38 @@ function defineValue(obj, key, val) {
       this.logger = baseLogger.create('formatter');
       this.options = options;
       this.formats = {
-        number: function number(val, lng, options) {
-          return new Intl.NumberFormat(lng, options).format(val);
-        },
-        currency: function currency(val, lng, options) {
-          return new Intl.NumberFormat(lng, _objectSpread$4(_objectSpread$4({}, options), {}, {
+        number: createCachedFormatter(function (lng, options) {
+          var formatter = new Intl.NumberFormat(lng, options);
+          return function (val) {
+            return formatter.format(val);
+          };
+        }),
+        currency: createCachedFormatter(function (lng, options) {
+          var formatter = new Intl.NumberFormat(lng, _objectSpread$4(_objectSpread$4({}, options), {}, {
             style: 'currency'
-          })).format(val);
-        },
-        datetime: function datetime(val, lng, options) {
-          return new Intl.DateTimeFormat(lng, _objectSpread$4({}, options)).format(val);
-        },
-        relativetime: function relativetime(val, lng, options) {
-          return new Intl.RelativeTimeFormat(lng, _objectSpread$4({}, options)).format(val, options.range || 'day');
-        },
-        list: function list(val, lng, options) {
-          return new Intl.ListFormat(lng, _objectSpread$4({}, options)).format(val);
-        }
+          }));
+          return function (val) {
+            return formatter.format(val);
+          };
+        }),
+        datetime: createCachedFormatter(function (lng, options) {
+          var formatter = new Intl.DateTimeFormat(lng, _objectSpread$4({}, options));
+          return function (val) {
+            return formatter.format(val);
+          };
+        }),
+        relativetime: createCachedFormatter(function (lng, options) {
+          var formatter = new Intl.RelativeTimeFormat(lng, _objectSpread$4({}, options));
+          return function (val) {
+            return formatter.format(val, options.range || 'day');
+          };
+        }),
+        list: createCachedFormatter(function (lng, options) {
+          var formatter = new Intl.ListFormat(lng, _objectSpread$4({}, options));
+          return function (val) {
+            return formatter.format(val);
+          };
+        })
       };
       this.init(options);
     }
@@ -35888,6 +37548,11 @@ function defineValue(obj, key, val) {
       key: "add",
       value: function add(name, fc) {
         this.formats[name.toLowerCase().trim()] = fc;
+      }
+    }, {
+      key: "addCached",
+      value: function addCached(name, fc) {
+        this.formats[name.toLowerCase().trim()] = createCachedFormatter(fc);
       }
     }, {
       key: "format",
@@ -44096,357 +45761,6 @@ if (typeof define === 'function' && define.amd) {
 }(jQuery, this, document));
 ;
 /****************************************************************************
-    jquery-base-slider-handle,
-
-    (c) 2015, FCOO
-
-    https://github.com/fcoo/jquery-base-slider
-    https://github.com/fcoo
-
-****************************************************************************/
-(function (window/*, document, undefined*/) {
-    "use strict";
-
-    //Create baseSlider-namespace
-	window._baseSlider = window._baseSlider || {};
-	var ns = window._baseSlider;
-
-    /*******************************************************************
-    elementsOverlapping
-    Return true if $element1 and $element2 is overlapping horizontal
-    *******************************************************************/
-    function elementsOverlapping( $element1, $element2 ){
-        if ($element1 && $element2){
-            var rect1 = $element1.get(0).getBoundingClientRect(),
-                rect2 = $element2.get(0).getBoundingClientRect();
-            return ((rect1.left >= rect2.left) && (rect1.left <= rect2.right)) ||
-                    ((rect2.left >= rect1.left) && (rect2.left <= rect1.right));
-        }
-        return false;
-    }
-
-    /*******************************************************************
-    SliderHandle
-    Object to reprecent a 'handle' on the slider
-    The handle don't need to have a actual DOM-handle. The min and max-value of the slider
-    is also reprecented as a SliderHandle
-    The object contains the following items:
-        value   : A SliderValue-object reprecenting the value
-        $handle : $-object = the DOM handle (optional)
-        marker  : Object containing of tree $-object: $outer and $text (optional)
-
-    options
-        marker: [string] = class-name of the marker
-    *******************************************************************/
-    var SliderHandle = function( options ){
-        this.id      = options.id;
-        this.slider  = options.slider || options.value.slider;
-        options.value.slider = this.slider;
-        this.value   = ns.sliderValue( options.value );
-        this.$handle = !!options.$handle; //Set to boolean. Created in this.append
-        this.handleClassName = options.handleClassName || '';
-        this.handleCSS = options.handleCSS || {};
-        this.appended = false,
-
-        this.markerData = options.markerData || {};
-
-        this.markerClassName = options.marker;
-        this.marker  = !!this.markerClassName;
-
-        //overlappingHandleList = list of SliderHandle. If any of the marker in overlappingHandleList[xx] is overlapping this => this is hidden
-        this.overlappingHandleList = [];
-
-        //overlapHandleList = list of SliderHandle. this is overlapping all the marker in overlapHandleList[xx]
-        this.overlapHandleList = [];
-
-
-        this.draggingClassName = options.draggingClassName; //Classname for handler when it is being dragged MANGLER
-        this.lastLeftPercent = '';
-    };
-
-    SliderHandle.prototype = {
-        //addOverlap( handle ) - Set this to overlap handle
-        addOverlap: function( handle ){
-            if (this.marker && handle && handle.marker ){
-                this.overlapHandleList.push( handle );
-                handle.overlappingHandleList.push( this );
-            }
-        },
-
-        //append() - Create and append this.$handle and $.marker
-        append: function( $container ){
-            //Append handle
-            if (this.$handle)
-                this.$handle =
-                    $('<span/>')
-                        .addClass('handle '+this.id)
-                        .addClass(this.handleClassName)
-                        .css( this.handleCSS )
-                        .appendTo( $container );
-
-            //Append marker
-            if (this.marker){
-                this.marker = {};
-                //Outer div
-                this.marker.$outer =
-                    $('<div/>')
-                        .addClass('marker-outer')
-                        .addClass(this.markerClassName)
-                        .appendTo($container);
-                //Inner div
-                this.marker.$inner =
-                        $('<div/>')
-                            .addClass('marker')
-                            .appendTo(this.marker.$outer);
-                this.marker.$text =
-                        $('<span/>')
-                            .addClass('marker-text')
-                            .attr( this.markerData )
-                            .appendTo(this.marker.$inner);
-            }
-            this.appended = true;
-            return this;
-        },
-
-        //remove
-        remove: function(){
-            if (!this.appended) return;
-            if (this.$handle){
-                this.$handle.remove();
-                this.$handle = true;
-            }
-            if (this.marker.$outer){
-                this.marker.$outer.remove();
-                this.marker = true;
-            }
-            this.appended = false;
-        },
-
-        //update()
-        //Set the position of $handle and $marker and update the content of $marker
-        update: function( force ){
-            if (!this.appended) return;
-            var leftPercent = this.getLeftPosition() + '%';
-
-            if (force || (leftPercent != this.lastLeftPercent)){
-                this.lastLeftPercent = leftPercent;
-                if (this.$handle){
-                    this.$handle.css('left', leftPercent);
-                }
-                if (this.marker){
-                    //Set marker content
-                    this.marker.$text.html( this.getMarkerText() );
-
-                    //Set marker position
-                    this.marker.$outer.css('left', leftPercent);
-
-                    //Force all handles overlapped by this to update
-                    if (!force)
-                        $.each( this.overlapHandleList, function( index, handle ){
-                            handle.update( true );
-                        });
-
-                    //Set marker visibility
-                    this.marker.$outer.css('visibility', this.markerIsHidden() ? 'hidden' : 'visible');
-                }
-            }
-            return this;
-        },
-
-        //onFocus - overwriten for individual handle-types
-        onFocus: function(){
-            if (!this.appended) return;
-            this.$handle.addClass('hover');
-            if (this.marker && this.marker.$outer)
-                this.marker.$outer.addClass('hover');
-
-        },
-
-        //onBlur - overwriten for individual handle-types
-        onBlur: function(){
-            if (!this.appended) return;
-            this.$handle.removeClass('hover');
-            if (this.marker && this.marker.$outer)
-                this.marker.$outer.removeClass('hover');
-        },
-
-        //getMarkerText
-        getLeftPosition: function(){
-            return this.value.getPercent();
-        },
-
-        //getMarkerText
-        getMarkerText: function(){
-            return this.slider.decorate( this.slider._prettify( this.value.getValue() ) );
-        },
-
-        //markerIsHidden: return true if the marker is overlapping any of the markers in YYY
-        markerIsHidden: function(){
-            var thisMarker$text = this.marker.$text,
-                result = false;
-            $.each( this.overlappingHandleList, function( index, handle ){
-                result = result || elementsOverlapping( thisMarker$text, handle.marker.$text );
-            });
-            return result;
-        }
-
-    };
-
-
-    ns.SliderHandle = SliderHandle;
-    ns.sliderHandle = function( options ){
-        return new ns.SliderHandle( options );
-    };
-
-}(this/*, document*/));
-
-;
-/****************************************************************************
-    jquery-base-slider-value,
-
-    (c) 2015, FCOO
-
-    https://github.com/fcoo/jquery-base-slider
-    https://github.com/fcoo
-
-****************************************************************************/
-(function (window/*, document, undefined*/) {
-    "use strict";
-
-    //Create baseSlider-namespace
-	window._baseSlider = window._baseSlider || {};
-	var ns = window._baseSlider;
-
-    /*******************************************************************
-    toFixed
-    Round num to 5 digits
-    *******************************************************************/
-    function toFixed( num ) {
-        return +num.toFixed(5);
-    }
-
-
-    /*******************************************************************
-    SliderValue
-    Object to store and alter "value" releated to the slider
-    The object contains the following items:
-        value   : The actual value ,
-        percent : The value as percent of the total slider width
-        rem     : The value converted to rem
-    *******************************************************************/
-    var SliderValue = function( options ){
-        this.slider = options.slider;
-        this.valueOffset = this.slider.options.min;
-        this.valueRange = this.slider.options.max - this.valueOffset;
-        this.percentOffset = 0;
-        this.percentRange = 100;
-        this.adjustToStep = !!options.adjustToStep;
-        this.fixed = !!options.fixed;
-        this.fixedValue = options.value;
-        this.value   = 0;
-        this.rem     = 0;
-        this.percent = 0;
-        this.minList = [];
-        this.maxList = [];
-
-        var _this = this;
-        $.each( options.minList || [], function( index, sliderValueMin ){ _this.addMin( sliderValueMin ); });
-        $.each( options.maxList || [], function( index, sliderValueMax ){ _this.addMax( sliderValueMax ); });
-
-        this.setValue( options.value );
-    };
-
-    SliderValue.prototype = {
-        //addMin( sliderValue, minDistance )
-        //Add sliderValue to list of SliderValue that this must allways be greater than or equal to
-        addMin: function( sliderValue, minDistance ){
-            if (sliderValue === null) return this;
-            if ($.isNumeric(sliderValue))
-                sliderValue = new SliderValue({ value: sliderValue, slider: this.slider });
-            this.minList.push( {sliderValue: sliderValue, minDistance: minDistance || 0} );
-            this.update();
-            return this;
-        },
-
-        //addMax( sliderValue, minDistance )
-        //Add sliderValue to list of SliderValue that this must allways be less than or equal to
-        addMax: function( sliderValue, minDistance ){
-            if (sliderValue === null) return this;
-            if ($.isNumeric(sliderValue))
-                sliderValue = new SliderValue({ value: sliderValue, slider: this.slider });
-            this.maxList.push( {sliderValue: sliderValue, minDistance: minDistance || 0} );
-            this.update();
-            return this;
-        },
-
-        setValue: function( newValue, isFixed ){
-            this.value = newValue;
-            if (isFixed && this.fixed)
-                this.fixedValue = newValue;
-            this.update();
-            return this;
-        },
-
-        setPercent: function( newPercent ){
-            this.setValue( this.valueRange*(newPercent - this.percentOffset)/this.percentRange + this.valueOffset );
-        },
-
-        update: function(){
-
-            if (this.fixed)
-                this.value = this.fixedValue;
-            else {
-                //Adjust this.value with respect to {sliderValue,minDistance} in this.minList
-                var _this = this;
-                $.each( this.minList, function( index, rec ){
-                    if (rec.sliderValue)
-                        _this.value = Math.max( _this.value, rec.sliderValue.value + rec.minDistance );
-                });
-                //Adjust this.value with respect to {sliderValue,minDistance} in this.maxList
-                $.each( this.maxList, function( index, rec ){
-                    if (rec.sliderValue)
-                        _this.value = Math.min( _this.value, rec.sliderValue.value - rec.minDistance );
-                });
-
-                //Adjust this.value with respect to step and stepOffset
-                if (this.adjustToStep){
-                    var offset = this.slider.options.min + this.slider.options.stepOffset;
-                    this.value -= offset;
-                    this.value = this.slider.options.step * Math.round( this.value/this.slider.options.step );
-                    this.value += offset;
-                }
-            }
-
-            //Calculate precent
-            this.percent = this.percentRange*(this.value - this.valueOffset)/this.valueRange + this.percentOffset;
-
-            return this;
-        },
-
-        getValue: function(){
-            return toFixed( this.value );
-        },
-
-        getPercent: function( inclUnit ){
-            return toFixed( this.percent ) + (inclUnit ? '%' : 0);
-        },
-
-        getRem: function( inclUnit ){
-            return toFixed( this.rem ) + (inclUnit ? 'rem' : 0);
-        }
-
-    };
-
-
-    ns.SliderValue = SliderValue;
-    ns.sliderValue = function( options ){
-        return new ns.SliderValue( options );
-    };
-
-}(this/*, document*/));
-
-;
-/****************************************************************************
     jquery-base-slider, Description from README.md
 
     (c) 2015, FCOO
@@ -44479,8 +45793,8 @@ if (typeof define === 'function' && define.amd) {
         resizable   : false,    //If true the container of the slider can be resized and the grid will automatic redraw to adjust number of ticks and labels to the new width
 
         //Dimensions (only for options.handleFixed: true)
-        width         : 0,  // The total width of the slider (in px for 1rem = 16px)
-        valueDistances: 3,  // The distance between each value on the slider (in px for 1rem = 16px). Width will be valueDistances*( max - min )
+        width         : 0,  // The total width of the slider (px)
+        valueDistances: 3,  // The distance between each value on the slider (px). Width will be valueDistances*( max - min )
 
         //Ranges and value
         min  : 0,           // Set slider minimum value
@@ -44504,6 +45818,11 @@ if (typeof define === 'function' && define.amd) {
         pinColor: 'black',          // The color of the pin. Use  setPin( value , color )  to change the color dynamical
         pinIcon : 'fa-map-marker',  // The class-name from Fontawasome setting the icon used as pin
 
+
+        //Ticks and labels
+        majorColor  : '#000000',
+        minorColor  : '#555555',
+
         //Steps
         step        : 1,    // Set sliders step. Always > 0. Could be fractional.
         stepOffset  : 0,    // When  step  > 1: Offset for the allowed values. Eq. Min=0, max=100, step=5, stepOffset=3 => allowed values=3,8,13,...,92,97 (3+N*5). Only tested for options.single: true
@@ -44523,6 +45842,24 @@ if (typeof define === 'function' && define.amd) {
         impactLineColors      : {green: "green", yellow: "yellow", red: "red"}, //The line colors used when showImpactLineColor: true
         reverseImpactLineColor: false, // The line on a double slider is colored as red-[handle]-yellow-[handle]-green. Must have showImpactLineColor: true
 
+        //Size
+        sizeFactor: 1, //Factor to re-size default sizes
+        fixedSize: {
+            borderWidth: 1,
+        },
+        size: {
+            fontSize        : 10,
+            majorTickLength : 9,
+            minorTickLength : 6,
+
+            lineHeight      : 6,
+
+
+            lineBorderRadius: 2,
+            textPadding     : 2,
+
+            labelInnerHeight: 10,
+        },
 
         //Grid (ticks and label)
         grid            : false,                      // Enables grid of values.
@@ -44536,10 +45873,9 @@ if (typeof define === 'function' && define.amd) {
         gridColors      : null, //Array of { [fromValue, ]value, color } to set colors on the line. If no fromValue is given the the previous value is used.
                                 //If value == null or < min => A triangle is added to the left indicating 'below min'.
                                 //If value > max            =>  A triangle is added to the right indicating 'above max'.
-        labelColors     : null, //Array of {value, className, color, backgroundColor} to set frame around and className, color, backgroundColor for the label and with value
+        labelColors     : null, //Array of {value, color, backgroundColor} to set frame around and color, backgroundColor for the label and with value
 
         labelClickable         : true, //Allows click on labels to select value of label. If false a click on a label is equal to a click on the line (e.q. find nearest value
-        labelClickableFullWidth: true, //If true and options.labelClickable: true and the value of the label is selectable (with respect to options.step and options.stepOffset) the clickable width of the label is expanded to half the distance to the neighbour labels
 
         //Marker above handle
         showMinMax : false,    // Show min and max markers
@@ -44564,47 +45900,7 @@ if (typeof define === 'function' && define.amd) {
         onChangeOnDragging: true, // If false onChange-function is only called when dragging the sliding is finish.
         onChangeDelay     : 500,  // If onChangeOnDragging == false the callback-function is called when the slider has been on the same tick for onChangeDelay milliseconds
 
-
-        //Buttons
-        buttons      : {value:{}, from:{}, to:{} },
-        /*
-        JSON-record with id or buttons for first, previousPage, previousShift, previous, (now,) next, nextShift, nextPage and last value
-            options.buttons = {
-                value: {buttonList},
-                from : {buttonList},
-                to   : {buttonList}
-            }
-            {buttonList} = {
-                firstBtn        : element or string,
-                previousPageBtn : element or string,
-                previousShiftBtn: element or string,
-                previousBtn     : element or string,
-                nowBtn          : element or string,
-                nextBtn         : element or string,
-                nextShiftBtn    : element or string,
-                nextPageBtn     : element or string,
-                lastBtn         : element or string
-            }
-        */
-
-
-        /****************************************
-        Internal options
-        ****************************************/
-        //The standard button-ids are firstBtn, previousBtn, nowBtn, nextBtn, lastBtn with the following steps
-        buttonOptions: {
-            'firstBtn'        : { sign: -1, delta: 99 },
-            'previousPageBtn' : { sign: -1, delta:  3 },
-            'previousShiftBtn': { sign: -1, delta:  2 },
-            'previousBtn'     : { sign: -1, delta:  1 },
-            'nowBtn'          : { sign: +1, delta:  0 },
-            'nextBtn'         : { sign: +1, delta:  1 },
-            'nextShiftBtn'    : { sign: +1, delta:  2 },
-            'nextPageBtn'     : { sign: +1, delta:  3 },
-            'lastBtn'         : { sign: +1, delta: 99 }
-        },
-
-        minDistanceRem: 4/16 //Minimum distance between ticks and between labels
+        minDistance: 4 //Minimum distance between ticks and between labels
 
     };
 
@@ -44615,68 +45911,12 @@ if (typeof define === 'function' && define.amd) {
     *******************************************************************/
 
     /*******************************************************************
-    Get font-size for the html
-    *******************************************************************/
-    var htmlFontSize = parseFloat( $('html').css('font-size') || $('body').css('font-size') || $.DEFAULT_BROWSER_FONT_SIZE || '16px' );
-
-    function onFontSizeChange( event, fontSize ){
-        htmlFontSize = parseFloat( fontSize.fontSizePx ) || htmlFontSize;
-    }
-
-    $.onFontSizeChanged( onFontSizeChange );
-
-    /*******************************************************************
     toFixed
     Round num to 5 digits
     *******************************************************************/
     function toFixed( num ) {
         return +num.toFixed(5);
     }
-
-    /*******************************************************************
-    pxToRem
-    *******************************************************************/
-    function pxToRem( valuePx, inclUnit ){
-        return valuePx / htmlFontSize + (inclUnit ? 'rem' : 0);
-    }
-
-    /*******************************************************************
-    getEventLeft
-    Return the left (= x) position of an event
-    *******************************************************************/
-    function getEventLeft( event ){
-        return  event.gesture && event.gesture.center ? event.gesture.center.x :
-                event.pageX ? event.pageX :
-                event.originalEvent && event.originalEvent.touches && event.originalEvent.touches.length ? event.originalEvent.touches[0].pageX :
-                event.touches && event.touches.length ? event.touches[0].pageX :
-                0;
-    }
-
-    /*******************************************************************
-    objectsAreDifferent
-    Return true if obj1 and obj2 are not equal
-    *******************************************************************/
-    function objectsAreDifferent( obj1, obj2 ){
-        var result = false,
-            props = Object.getOwnPropertyNames(obj1).concat( Object.getOwnPropertyNames(obj2) );
-
-        $.each( props, function( index, id ){
-            var type1 = $.type(obj1[id]),
-                type2 = $.type(obj2[id]);
-
-            result =
-                result ||
-                (   ((type1 == 'number') || (type2 == 'number')) && //One or both are number AND
-                    ((type1 != type2) || (obj1[id] != obj2[id]))    //type are different OR value are different
-                );
-        });
-        return result;
-    }
-
-    //'Global' text-element to be used by getTextWidth
-    var $outerTextElement = null,
-        textElement       = null;
-
 
     /*******************************************************************
     ********************************************************************
@@ -44690,29 +45930,9 @@ if (typeof define === 'function' && define.amd) {
         this.input          = input;
         this.pluginCount   = pluginCount;
 
-        this.htmlFontSize = htmlFontSize;
-
         this.initializing     = true;
         this.currentHandle    = null;
         this.isRepeatingClick = false;
-
-
-        //Create element outside DOM used to calc width of text-elements
-        this.$outerTextElement =
-            $outerTextElement ||
-            $('<div/>')
-                .addClass('grid')
-                .css({ position: 'absolute', top: -10000, left: -10000 })
-                .appendTo( $('body') );
-        $outerTextElement = this.$outerTextElement;
-
-        this.textElement =
-            textElement ||
-            $('<span/>')
-                .addClass('grid-label')
-                .appendTo( this.$outerTextElement )
-                .get(0);
-        textElement = this.textElement;
 
         /*******************************************************************
         Set and adjust options that can't be changed by this.update(options)
@@ -44722,7 +45942,7 @@ if (typeof define === 'function' && define.amd) {
 
         if (this.options.handleFixed){
             this.options.double = false;
-            this.options.handle = 'fixed';
+            this.options.handle = options.handle || 'fixed';
         }
 
         this.options.isSingle = !this.options.double;
@@ -44731,7 +45951,6 @@ if (typeof define === 'function' && define.amd) {
 
         this.options.singleHandleId =
             this.options.isSingle ? (this.options.handleFixed ? 'fixed' : 'single') : 'from-to';
-
 
         /*******************************************************************
         this.events contains event-functions and options
@@ -44747,8 +45966,23 @@ if (typeof define === 'function' && define.amd) {
             //Add resize-event to window
             $(window).on('resize', this.events.containerOnResize );
 
-        //Update slider when browser font-size is changed
-        $.onFontSizeChanged( this.onFontSizeChange, this );
+        /*******************************************************************
+        Adjust different sizes
+        *******************************************************************/
+        var size       = this.options.size,
+            sizeFactor = this.options.sizeFactor;
+
+        $.each(size, function(index, id){
+            if ( size[id] && $.isNumeric(size[id]) )
+                size[id] = sizeFactor * parseFloat( size[id] );
+        });
+
+        $.each(this.options.fixedSize, function(id, value){
+            size[id] = value;
+        });
+
+        //Calc sizes
+        size.labelHeight = size.borderWidth + size.textPadding + size.fontSize + size.textPadding + size.borderWidth;
 
         /*******************************************************************
         this.result = record with the current result from the slider
@@ -44778,7 +46012,6 @@ if (typeof define === 'function' && define.amd) {
         *******************************************************************/
         this.cache = {
             $input : $(this.input),
-            buttons: { value:{}, from:{}, to:{} }
         };
 
         //Hide the input
@@ -44851,9 +46084,8 @@ if (typeof define === 'function' && define.amd) {
             this.dimentions_old is the last values
             *******************************************************************/
             this.dimentions = {
-                containerWidth          :  0,   //Width of the container [px]
-                containerWidthRem       :  0,   //Width of the container [rem]
-                outerContainerWidthRem  :  0    //Width of outer container [rem]
+                containerWidth     :  0, //Width of the container [px]
+                outerContainerWidth:  0  //Width of outer container [px]
             };
 
             this.dimentions_old = $.extend({}, this.dimentions );
@@ -45106,7 +46338,7 @@ if (typeof define === 'function' && define.amd) {
                 //Sets the width of the container with full width
                 var width = this.options.width || this.options.valueDistances*(this.options.max - this.options.min);
 
-                this.cache.$fullWidthContainer.width( Math.ceil(pxToRem(width))+'rem' );
+                this.cache.$fullWidthContainer.width( width +'px' );
 
                 this.cache.$fullWidthContainer.wrap('<div/>');
                 this.cache.$outerContainer = this.cache.$fullWidthContainer.parent();
@@ -45210,14 +46442,11 @@ if (typeof define === 'function' && define.amd) {
 
 
             //Update the height of the slider
-            this.cache.$container.css('height', pxToRem( this.cache.$lineBackground.height(), true) );
+            this.cache.$container.css('height', this.cache.$lineBackground.height()+'px' );
 
             /****************************************************
             Append grid with ticks and optional labels
             ****************************************************/
-            if (this.options.grid)
-                this.cache.$grid = $span('grid', this.cache.$container);
-
             //Adjust top-position if no marker is displayed
             if (!this.options.showMinMax && !this.options.showFromTo)
                 this.cache.$container.addClass("no-marker");
@@ -45230,21 +46459,8 @@ if (typeof define === 'function' && define.amd) {
             if (this.options.hasPin)
                 this.cache.$container.addClass("has-pin");
 
-            //Append buttons
-            function getButton( id ){
-                return $.type( id ) === 'string' ? $('#' +  id ) : id;
-            }
-            this.options.buttons.value = this.options.buttons.value || {};
-            this.options.buttons.from = this.options.buttons.from || {};
-            this.options.buttons.to   = this.options.buttons.to   || {};
-            $.each( this.options.buttonOptions, function( id ){
-                _this.cache.buttons.value[ id ] = getButton( _this.options.buttons.value[ id ] );
-                _this.cache.buttons.from[ id ]  = getButton( _this.options.buttons.from[ id ] );
-                _this.cache.buttons.to[ id ]    = getButton( _this.options.buttons.to  [ id ] );
-            });
-
             //Append grid(s)
-            this.$currentGridContainer = null;
+            this.$currentGrid = null;
             if (this.options.grid)
                 this.appendGrid();
 
@@ -45271,16 +46487,6 @@ if (typeof define === 'function' && define.amd) {
         remove
         *******************************************************************/
         remove: function () {
-            var _this = this;
-            //************************************************
-            function offEvents( $elem, eventNames ){
-                if (!$elem) return;
-                $.each( eventNames.split(' '), function( index, eventName ){
-                    $elem.off( eventName + ".irs_" + _this.pluginCount );
-                });
-            }
-            //************************************************
-
             if (this.cache.$outerContainer){
                 this.cache.$outerContainer.remove();
                 this.cache.$outerContainer = null;
@@ -45291,16 +46497,561 @@ if (typeof define === 'function' && define.amd) {
             }
 
             this.eachHandle('remove');
+        },
 
-            //Unbind click on buttons
-            $.each( this.cache.buttons, function( valueOrToOrFrom, buttonRecord ){
-                $.each( buttonRecord, function( id, $btn ){
-                    offEvents( $btn, 'mousedown mouseup mouseleave click' );
-                });
-            });
+        /*******************************************************************
+        ********************************************************************
+        ADJUST ELEMENTS
+        ********************************************************************
+        *******************************************************************/
+
+        /*******************************************************************
+        setImpactLineColors
+        Sets the color of the line when line colors are impact (green-yellow-red)
+        *******************************************************************/
+        setImpactLineColors: function(){
+            this.cache.$leftLineColor.css  ( 'background-color', this.options.impactLineColors[ this.options.reverseImpactLineColor ? 'red' : 'green' ] );
+            this.cache.$centerLineColor.css( 'background-color', this.options.impactLineColors.yellow );
+            this.cache.$rightLineColor.css ( 'background-color', this.options.impactLineColors[ this.options.reverseImpactLineColor ? 'green' : 'red' ] );
+        },
+
+        /*******************************************************************
+        currentHandleBlur
+        *******************************************************************/
+        currentHandleBlur: function () {
+            if (this.currentHandle)
+                this.currentHandle.onBlur();
+            this.currentHandle = null;
         },
 
 
+        /*******************************************************************
+        updateHandlesAndLines
+        *******************************************************************/
+        updateHandlesAndLines: function () {
+            //***********************************************
+            function setLeftAndWidth( $elem, left, width ){
+                if (!$elem) return;
+                var css = {};
+                if (left !== null)
+                    css.left = toFixed(left) + (left ? '%' : '');
+                if (width !== null)
+                    css.width = toFixed(width) + (width ? '%' : '');
+                $elem.css( css );
+            }
+            //***********************************************
+
+            /*****************************************************
+            Adjust left-position and width of all lineColor-elements (if any)
+            *****************************************************/
+            if (this.options.isSingle) {
+                var singlePercent = this.handles[this.options.singleHandleId].value.getPercent();
+                setLeftAndWidth( this.cache.$leftLineColor,  null,          singlePercent       );
+                setLeftAndWidth( this.cache.$rightLineColor, singlePercent, 100 - singlePercent );
+            }
+            else {
+                var fromPercent = this.handles.from.value.getPercent(),
+                    toPercent   = this.handles.to.value.getPercent();
+                setLeftAndWidth( this.cache.$leftLineColor,   null,        fromPercent             );
+                setLeftAndWidth( this.cache.$centerLineColor, fromPercent, toPercent - fromPercent );
+                setLeftAndWidth( this.cache.$rightLineColor,  toPercent,   100 - toPercent         );
+            }
+
+            /*****************************************************
+            Set position of all handles
+            *****************************************************/
+            this.eachHandle('update');
+
+            //Special case for fixed-mode: Keep the handle centered in container
+            if (this.options.isFixed){
+                var containerLeft =
+                        -1.0 * this.dimentions.containerWidth * this.handles.fixed.value.percent/100 +
+                         0.5 * this.dimentions.outerContainerWidth;
+
+                this.cache.$container.css('left', toFixed(containerLeft) + 'px');
+            }
+
+            /*****************************************************
+            Callback and reset
+            *****************************************************/
+            this.onChanging();
+
+        },
+
+        /*******************************************************************
+        ********************************************************************
+        SERVICE METHODS
+        ********************************************************************
+        *******************************************************************/
+
+        /*******************************************************************
+        _prettify
+        *******************************************************************/
+        _prettify: function (num) {
+            return $.isFunction(this.options.prettify) ? this.options.prettify(num) : num;
+        },
+
+        /*******************************************************************
+        PrettifyLabel
+        *******************************************************************/
+        _prettifyLabel: function(text) {
+            return $.isFunction(this.options.prettifyLabel) ? this.options.prettifyLabel(text) : text;
+        },
+
+        /*******************************************************************
+        decorate
+        *******************************************************************/
+        decorate: function ( content ) {
+            return this.options.prefix + content + this.options.postfix;
+        },
+
+        /*******************************************************************
+        ********************************************************************
+        GRID
+        Use appendGridContainer to create new grids. Use appendLabel(text, left[, value]) to add a grid-label
+        ********************************************************************
+        *******************************************************************/
+
+        /*******************************************************************
+        getTextWidth
+        Get width of value as text OR max width of all values in array of value
+        *******************************************************************/
+        getTextWidth: function( value, options = {} ){
+            var _this = this,
+                ctx = this.cache.ctx,
+                ctx_font = ctx.font,
+                valueList = $.isArray( value ) ? value : [value],
+                result = 0;
+
+            if (options.italic)
+                ctx.font = 'italic ' + ctx.font;
+            if (options.bold)
+                ctx.font = 'bold ' + ctx.font;
+
+            valueList.forEach( function(txt){
+                result = Math.max( result, ctx.measureText( _this._valueToText(txt) ).width );
+            });
+
+            ctx.font = ctx_font;
+
+            return result;
+        },
+
+        /*******************************************************************
+        appendGridContainer
+        *******************************************************************/
+        appendGridContainer: function( options = {} ){
+            //options.labelBetweenTicks = true => special version where the labels are placed up and between the ticks
+            this.options.labelBetweenTicks = !!options.labelBetweenTicks;
+
+            var $newGrid = $('<span class="grid"></span>'),
+                $newCanvas =
+                    $('<canvas/>')
+                        .addClass('grid-canvas')
+                        .appendTo($newGrid),
+                size = this.options.size,
+                ctx = this.cache.ctx = $newCanvas.get(0).getContext("2d"),
+                canvasMargin = this.cache.canvasMargin = Math.ceil( this.getTextWidth([this._valueToText(this.options.min), this._valueToText(this.options.max)] ) ),
+                canvasWidth = this.dimentions.containerWidth + 2 * canvasMargin,
+                canvasHeight = this.options.labelBetweenTicks ?
+                                Math.max(size.majorTickLength, size.fontSize) :
+                                size.majorTickLength + size.labelHeight;
+
+            $newCanvas
+                .css('left', '-'+canvasMargin+'px')
+                .attr('width', canvasWidth)
+                .attr('height', canvasHeight);
+
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+            ctx.translate(0.5, 0.5);
+            ctx.lineWidth    = 1;
+            ctx.textAlign    = "center";
+            ctx.textBaseline = "top";       //"bottom" or "middle" or "alphabetic" or "hanging"
+
+            ctx.strokeStyle = this.options.majorColor;
+            ctx.font = size.fontSize + 'px Arial';
+
+            if (this.options.labelClickable && !this.options.disable && !this.options.readOnly){
+                this.canvasId = this.canvasId || 0;
+                this.canvasId++;
+                $newCanvas.data('canvasId', this.canvasId);
+                this.canvasLabels = this.canvasLabels || {};
+                this.canvasLabels[this.canvasId] = [];
+            }
+
+            if (this.$currentGrid){
+                this.nextGridTop += this.$currentGrid.height();
+                this.$currentGrid = $newGrid.insertAfter( this.$currentGrid );
+                this.$currentGrid.css('top', this.nextGridTop+'px' );
+            }
+            else {
+                this.$currentGrid = $newGrid.appendTo(this.cache.$container);
+                this.nextGridTop = this.$currentGrid.position().top;
+            }
+
+            this.cache.$grid = this.cache.$container.find(".grid");
+
+            //Special case: If the labels for the current grid shall be placed between the ticks instead of under..
+            if (this.options.labelBetweenTicks){
+                this.$currentGrid.addClass("label-between-ticks");
+            }
+        },
+
+
+        /*******************************************************************
+        appendTick
+        *******************************************************************/
+        appendTick: function( leftPercent, options ){
+            if (!this.$currentGrid) return;
+
+            options = $.extend( {minor: false, color: ''}, options );
+
+            var left = this.cache.canvasMargin + (this.dimentions.containerWidth * leftPercent / 100),
+                ctx  = this.cache.ctx,
+                size = this.options.size,
+                length = options.minor ? size.minorTickLength : size.majorTickLength;
+
+
+            ctx.beginPath();
+
+            ctx.shadowColor   = 'rgba(255, 255, 255, .75)';
+            ctx.shadowOffsetX = 1;
+            ctx.shadowOffsetY = 0;
+            ctx.lineWidth     = 1;
+            ctx.strokeStyle   = options.minor ? this.options.minorColor : this.options.majorColor;
+            ctx.moveTo(left, 0);
+            ctx.lineTo(left, length );
+            ctx.stroke();
+
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+      },
+
+        /*******************************************************************
+        _valueToText
+        *******************************************************************/
+        _valueToText: function( value ){
+            var result = this._prettifyLabel( value );
+            return this.options.decorateLabel ? this.decorate(result) : result;
+        },
+
+        /*******************************************************************
+        appendLabel
+        *******************************************************************/
+        appendLabel: function( leftPercent, value, options ){
+            if (!this.$currentGrid) return;
+
+            options = $.extend( {color: ''}, options );
+
+            //Check if the value for the label is a selectable one
+            options.labelClickable = options.labelClickable &&  ((value - this.options.stepOffset) % this.options.step) === 0;
+
+            var text = this._valueToText( value ),
+                size   = this.options.size,
+                ctx    = this.cache.ctx,
+                left   = this.cache.canvasMargin + (this.dimentions.containerWidth * leftPercent / 100),
+                textWidth = this.getTextWidth(text),
+                top, width, height, boxLeft, textTop;
+
+            if (this.options.labelBetweenTicks){
+                //Special case where the labels are placed up between the ticks
+                top     = 0;
+                textTop = 0;
+                width   = textWidth;
+                height  = size.fontSize;
+            }
+            else {
+                top     = size.majorTickLength;
+                textTop = top + size.borderWidth + size.textPadding;
+                width   = size.borderWidth + size.textPadding + textWidth + size.textPadding + size.borderWidth,
+                height  = size.labelHeight;
+            }
+            boxLeft = left - width/2;
+
+            //Find bg-color and text-color
+            var color = options.minor ? this.options.minorColor : this.options.majorColor,
+                textColor = color,
+                labelColorRec = this.options.labelColorRec[value],
+                canvasLabels = this.canvasLabels[this.canvasId];
+
+            if (labelColorRec){
+                //Label with individual background- and text-color
+                var bgColor   = labelColorRec.backgroundColor;
+                textColor = labelColorRec.color;
+
+                //Draw border and background (if any)
+                ctx.fillStyle = color;
+                ctx.fillRect(boxLeft, top, width, height);
+                ctx.fillStyle = bgColor;
+
+                ctx.beginPath();
+                ctx.fillRect(boxLeft + size.borderWidth, top + size.borderWidth, width - 2*size.borderWidth, height - 2*size.borderWidth);
+                ctx.stroke();
+            }
+
+            //ctx.fillStyle = 'pink';                     //Only test
+            //ctx.fillRect(boxLeft, top, width, height);  //Only test
+
+            if (options.labelClickable && !this.options.disable && !this.options.readOnly)
+                canvasLabels.push( {top: top, left: boxLeft, right: boxLeft+width, bottom: top+height, percent: leftPercent} );
+
+            //Draw the text
+            var ctx_font = ctx.font;
+            if (!options.minor)
+                ctx.font = 'bold ' + ctx.font;
+            if (options.italic)
+                ctx.font = 'italic ' + ctx.font;
+            ctx.fillStyle = textColor;
+
+            ctx.beginPath();
+            ctx.fillText(text, left, textTop);
+            ctx.stroke();
+
+            ctx.font = ctx_font;
+        },
+
+
+        /*******************************************************************
+        appendGrid
+        *******************************************************************/
+        appendGrid: function () {
+            if (!this.options.grid) return;
+            this.appendStandardGrid();
+        },
+
+        /*******************************************************************
+        appendStandardGrid
+        Simple call _appendStandardGrid. Can be overwriten in decending classes
+        *******************************************************************/
+        appendStandardGrid: function ( textOptions ) {
+            this._appendStandardGrid( textOptions );
+        },
+
+
+        /*******************************************************************
+        preAppendGrid and postAppendGrid
+        must be called as first and last when creating a grid - used if a new appendStandardGrid is used
+        *******************************************************************/
+        preAppendGrid: function( options = {} ){
+            this.appendGridContainer( options );
+        },
+
+        postAppendGrid: function(){
+            //Update the height of the slider
+            this.cache.$container.css('height', (this.nextGridTop + this.$currentGrid.height())+'px' );
+        },
+
+
+        /*******************************************************************
+        getGridOptions
+        Get options needed for building the grid
+        *******************************************************************/
+        getGridOptions: function(){
+            var o = this.options,
+                result = {},
+                gridDistanceIndex = 0;
+
+            result.gridContainerWidth = this.cache.$grid.outerWidth(false);
+            result.gridDistanceStep = o.gridDistances[gridDistanceIndex]; // = number of steps between each tick
+            result.stepPx = o.step * result.gridContainerWidth / o.range / o.majorTicksFactor;
+
+            //Increse grid-distance until the space between two ticks are more than 4px
+            while ( (result.stepPx*result.gridDistanceStep) <= o.minDistance){
+                gridDistanceIndex++;
+                if (gridDistanceIndex < o.gridDistances.length)
+                    result.gridDistanceStep = o.gridDistances[gridDistanceIndex];
+                else
+                    result.gridDistanceStep = result.gridDistanceStep*2;
+            }
+
+            result.tickDistanceNum = result.gridDistanceStep * o.step;          //The numerical distance between each ticks
+            result.tickDistancePx  = result.gridDistanceStep * result.stepPx;   //The px distance between each ticks
+
+            if (o.maxLabelWidth)
+                result.maxLabelWidth = o.maxLabelWidth;
+            else {
+                //Find widest label
+                var value = o.min,
+                    valueList = [],
+                    step = 1;
+
+                while (value <= o.max){
+                    //if value corrected by o.majorTicksOffset and o.majorTicksFactor is a DIV of the tick distance => calculate the width of the tick
+                    if ((value - o.majorTicksOffset)*o.majorTicksFactor % result.tickDistanceNum === 0){
+                        valueList.push( value );
+                        step = result.tickDistanceNum;
+                    }
+                    value += step;
+                }
+                result.maxLabelWidth = this.getTextWidth() + o.minDistance; //Adding min space between text/labels
+            }
+
+            //Calculate automatic distances between major ticks
+            var majorTicks = o.majorTicks;
+            if (!majorTicks){
+                //Find ticks between each major tick
+                gridDistanceIndex = 0;
+                majorTicks = o.gridDistances[gridDistanceIndex];
+                while (majorTicks * result.tickDistancePx < result.maxLabelWidth){
+                    gridDistanceIndex++;
+                    if (gridDistanceIndex < o.gridDistances.length)
+                        majorTicks = o.gridDistances[gridDistanceIndex];
+                    else
+                        majorTicks = majorTicks*2;
+                }
+            }
+
+            result.majorTickDistanceNum = result.tickDistanceNum * majorTicks;
+            result.majorTickDistancePx  = result.tickDistancePx  * majorTicks;
+
+            return result;
+        },
+
+
+        /*******************************************************************
+        _appendStandardGrid
+        *******************************************************************/
+        _appendStandardGrid: function ( textOptions, tickOptions ) {
+            this.preAppendGrid();
+
+            textOptions = $.extend( {labelClickable: this.options.labelClickable}, textOptions || {}  );
+            tickOptions = tickOptions || {};
+
+            //Get all options regarding the grid
+            this.gridOptions = this.getGridOptions();
+            $.extend( this.options, this.gridOptions );
+
+            //Add all the minor and major ticks
+            var o     = this.options,
+                value = o.min,
+                step  = 1,
+                valueP, valueOffset;
+
+            while (value <= o.max){
+                valueOffset = (value - o.majorTicksOffset)*o.majorTicksFactor;
+                if (valueOffset % o.tickDistanceNum === 0){
+                    valueP = (value-o.min)*o.percentProValue;
+                    if (valueOffset % o.majorTickDistanceNum === 0){
+                        //add major tick and text/label
+                        this.appendTick( valueP, tickOptions );
+                        this.appendLabel( valueP, value, textOptions );
+                    }
+                    else
+                        if (o.showMinorTicks)
+                            //Add minor tick
+                            this.appendTick( valueP, { minor:true } );
+                    step = o.tickDistanceNum;
+                }
+                value += step;
+            }
+
+            //Append colors on the grid
+            if (this.options.gridColors)
+                this.appendGridColors( this.options.gridColors );
+
+            this.postAppendGrid();
+        },
+
+        /*******************************************************************
+        addGridColor
+        *******************************************************************/
+        appendGridColors: function( gridColors ){
+            var fromValue,
+                toValue  = this.options.min,
+                i,
+                gridColor,
+                percentFactor = 100 / (this.options.max - this.options.min);
+
+
+            for (i=0; i<gridColors.length; i++ ){
+                gridColor = gridColors[i];
+                if ( (gridColor.value === null) || (gridColor.value < this.options.min) || (gridColor.value > this.options.max) ){
+                    //add triangle to the left or right
+                    var $span = $('<span/>')
+                                    .addClass( 'grid-color')
+                                    .appendTo( this.$currentGrid );
+                    if (gridColor.value > this.options.max)
+                        $span
+                            .addClass('gt-max')
+                            .css('border-left-color', gridColor.color);
+                    else
+                        $span
+                            .addClass('lt-min')
+                            .css('border-right-color', gridColor.color);
+                }
+                else {
+                    fromValue = gridColor.fromValue !== undefined ? gridColor.fromValue : toValue;
+                    toValue = gridColor.value;
+
+                    $('<span/>')
+                        .addClass('grid-color' + (i%2?' to':' from'))
+                        .css({
+                            'left'            : percentFactor*(fromValue - this.options.min) + '%',
+                            'width'           : percentFactor*(toValue-fromValue) + '%',
+                            'background-color': gridColor.color
+                           })
+                        .appendTo( this.$currentGrid );
+                }
+            }
+        },
+    }; //end of BaseSlider.prototype
+
+
+    $.fn.baseSlider = function (options) {
+        return this.each(function() {
+            if (!$.data(this, "baseSlider")) {
+                $.data(this, "baseSlider", new window.BaseSlider(this, options, pluginCount++));
+            }
+        });
+    };
+
+
+}(jQuery, this, document));
+
+;
+/****************************************************************************
+jquery-base-slider-events
+****************************************************************************/
+(function ($, window/*, document, undefined*/) {
+    "use strict";
+
+    /*******************************************************************
+    getEventLeft
+    Return the left (= x) position of an event
+    *******************************************************************/
+    function getEventLeft( event ){
+        return  event.gesture && event.gesture.center ? event.gesture.center.x :
+                event.pageX ? event.pageX :
+                event.originalEvent && event.originalEvent.touches && event.originalEvent.touches.length ? event.originalEvent.touches[0].pageX :
+                event.touches && event.touches.length ? event.touches[0].pageX :
+                0;
+    }
+
+
+    /*******************************************************************
+    objectsAreDifferent
+    Return true if obj1 and obj2 are not equal
+    *******************************************************************/
+    function objectsAreDifferent( obj1, obj2 ){
+        var result = false,
+            props = Object.getOwnPropertyNames(obj1).concat( Object.getOwnPropertyNames(obj2) );
+
+        $.each( props, function( index, id ){
+            var type1 = $.type(obj1[id]),
+                type2 = $.type(obj2[id]);
+
+            result =
+                result ||
+                (   ((type1 == 'number') || (type2 == 'number')) && //One or both are number AND
+                    ((type1 != type2) || (obj1[id] != obj2[id]))    //type are different OR value are different
+                );
+        });
+        return result;
+    }
+
+
+
+    $.extend(window.BaseSlider.prototype, {
         /*******************************************************************
         bindEvents
         *******************************************************************/
@@ -45359,23 +47110,6 @@ if (typeof define === 'function' && define.amd) {
 
             //Add keyboard events to the line
             addEvents( this.cache.$line, "keydown", this.key );
-
-            //Bind click on buttons
-            $.each( this.cache.buttons, function( fromOrTo, buttonRecord ){
-                $.each( buttonRecord, function( id, $btn ){
-                    var options = $.extend({handleId: fromOrTo}, _this.options.buttonOptions[id]);
-                    addEvents( $btn, 'mousedown',  _this.startRepeatingClick                         );
-                    addEvents( $btn, 'mouseup',    _this.endRepeatingClick                           );
-                    addEvents( $btn, 'mouseleave', _this.endRepeatingClick,                  true    );
-                    addEvents( $btn, 'click',      _this.moveByButtonOrKeyboardOrMouseWheel, options );
-
-                    if ( $btn && $btn.autoclickWhilePressed && options.delta && (options.delta != 99) && (!$btn.data('auto-click-when-pressed-added')) ){
-                        $btn.data('auto-click-when-pressed-added', true);
-                        $btn.autoclickWhilePressed();
-                    }
-
-                });
-            });
         },
 
 
@@ -45392,10 +47126,8 @@ if (typeof define === 'function' && define.amd) {
         containerOnResize: function(){
             if (this.initializing || !this.isBuild)
                 return;
-
             this.parentOnResize();
         },
-
 
         /*******************************************************************
         parentOnResize
@@ -45422,9 +47154,8 @@ if (typeof define === 'function' && define.amd) {
         getDimentions: function(){
             var result = {};
             result.containerWidth    = Math.max(0, this.cache.$container.innerWidth()) || this.dimentions.containerWidth;
-            result.containerWidthRem = pxToRem(result.containerWidth);
             if (this.options.isFixed)
-                result.outerContainerWidthRem = pxToRem( this.cache.$outerContainer.innerWidth() );
+                result.outerContainerWidth = this.cache.$outerContainer.innerWidth();
             return result;
         },
 
@@ -45440,25 +47171,13 @@ if (typeof define === 'function' && define.amd) {
 
             if (!this.initializing && this.isBuild){
                 //Update the slider if the width has changed
-                if (this.dimentions.containerWidthRem && objectsAreDifferent( this.dimentions, this.dimentions_old))
+                if (this.dimentions.containerWidth && objectsAreDifferent( this.dimentions, this.dimentions_old)){
                     updateSlider = true;
 
-                    //Check if the grid of a resizable slider has changed
-                    if (this.options.resizable){
-                        var _this = this,
-                            rebuild = false,
-                            newGridOptions = this.getGridOptions(),
-                            idList = ['gridDistanceStep', 'majorTickDistanceNum']; //List of options-id to compare for changes
-
-                        $.each( idList, function( index, id ){
-                            rebuild = rebuild || (newGridOptions[id] != _this.gridOptions[id]);
-                        });
-
-                        if (rebuild){
-                            this.update();
-                            return;
-                        }
-                    }
+                    //If it is a resizable slider :  Update it
+                    if (this.options.resizable)
+                        this.update();
+                }
             }
             else {
                 //Reset timeout and try to build the slider
@@ -45467,7 +47186,7 @@ if (typeof define === 'function' && define.amd) {
                     this.checkContainerDimentions_TimeoutId = null;
                 }
 
-                if (this.dimentions.containerWidthRem){
+                if (this.dimentions.containerWidth){
                     this.build();
                     updateSlider = true;
                 }
@@ -45494,39 +47213,10 @@ if (typeof define === 'function' && define.amd) {
             }
         },
 
-        /*******************************************************************
-        onFontSizeChange
-        Called when the font-size of the browser is changed
-        *******************************************************************/
-        onFontSizeChange: function( event, fontSize ){
-            onFontSizeChange( event, fontSize );
-            if (this.htmlFontSize != htmlFontSize){
-                this.htmlFontSize = htmlFontSize;
-                if (this.options.resizable)
-                    this.update();
-                else
-                    this.dimentions = this.getDimentions();
-            }
-        },
 
         /*******************************************************************
         KEY, WHEEL AND BUTTON EVENTS
         *******************************************************************/
-        /*******************************************************************
-        startRepeatingClick
-        *******************************************************************/
-        startRepeatingClick: function () {
-            this.isRepeatingClick = true;
-        },
-
-        /*******************************************************************
-        endRepeatingClick
-        *******************************************************************/
-        endRepeatingClick: function (callOnChange) {
-            this.isRepeatingClick = false;
-            if (callOnChange)
-                this.onChange();
-        },
 
         /*******************************************************************
         key
@@ -45698,9 +47388,14 @@ if (typeof define === 'function' && define.amd) {
         Called when tap and press/pressup on the slider (line and grid)
         *******************************************************************/
         onTap: function(event) {
+
+
+
             var _this = this,
                 percent = NaN, // = the percent to set this.currentHandle
                 elem    = event.gesture.target;
+
+
 
             event.preventDefault();
             event.stopImmediatePropagation();
@@ -45722,11 +47417,22 @@ if (typeof define === 'function' && define.amd) {
                 });
 
             //If not on a handle: Test if the tap was on a label
-            if (window.isNaN(percent))
-                while (window.isNaN(percent) && !!elem && elem.getAttribute){
-                    percent = parseFloat( elem.getAttribute('data-base-slider-percent') );
-                    elem = elem.parentNode;
+            if (window.isNaN(percent)){
+                //Check if the tap was on a canvas
+                var canvasId = $(elem).data('canvasId');
+                if (canvasId){
+                    var originalEvent = event.gesture.srcEvent,
+                        canvasX       = originalEvent.offsetX,
+                        canvasY       = originalEvent.offsetY;
+
+                    $.each(_this.canvasLabels[canvasId] || [], function(index, rec){
+                        if ( (canvasX >= rec.left) && (canvasX <= rec.right) && (canvasY >= rec.top) && (canvasY <= rec.bottom) ){
+                            percent = rec.percent;
+                            return false;
+                        }
+                    });
                 }
+            }
 
             //If not on a handle and not on a label: Find percent according to mouse-position
             if (window.isNaN(percent)){
@@ -45845,134 +47551,6 @@ if (typeof define === 'function' && define.amd) {
 
         /*******************************************************************
         ********************************************************************
-        ADJUST ELEMENTS
-        ********************************************************************
-        *******************************************************************/
-
-        /*******************************************************************
-        setImpactLineColors
-        Sets the color of the line when line colors are impact (green-yellow-red)
-        *******************************************************************/
-        setImpactLineColors: function(){
-            this.cache.$leftLineColor.css  ( 'background-color', this.options.impactLineColors[ this.options.reverseImpactLineColor ? 'red' : 'green' ] );
-            this.cache.$centerLineColor.css( 'background-color', this.options.impactLineColors.yellow );
-            this.cache.$rightLineColor.css ( 'background-color', this.options.impactLineColors[ this.options.reverseImpactLineColor ? 'green' : 'red' ] );
-        },
-
-        /*******************************************************************
-        currentHandleBlur
-        *******************************************************************/
-        currentHandleBlur: function () {
-            if (this.currentHandle)
-                this.currentHandle.onBlur();
-            this.currentHandle = null;
-        },
-
-
-        /*******************************************************************
-        updateHandlesAndLines
-        *******************************************************************/
-        updateHandlesAndLines: function () {
-            //***********************************************
-            function setLeftAndWidth( $elem, left, width ){
-                if (!$elem) return;
-                var css = {};
-                if (left !== null)
-                    css.left = toFixed(left) + (left ? '%' : '');
-                if (width !== null)
-                    css.width = toFixed(width) + (width ? '%' : '');
-                $elem.css( css );
-            }
-            //***********************************************
-
-            /*****************************************************
-            Adjust left-position and width of all lineColor-elements (if any)
-            *****************************************************/
-            if (this.options.isSingle) {
-                var singlePercent = this.handles[this.options.singleHandleId].value.getPercent();
-                setLeftAndWidth( this.cache.$leftLineColor,  null,          singlePercent       );
-                setLeftAndWidth( this.cache.$rightLineColor, singlePercent, 100 - singlePercent );
-            }
-            else {
-                var fromPercent = this.handles.from.value.getPercent(),
-                    toPercent   = this.handles.to.value.getPercent();
-                setLeftAndWidth( this.cache.$leftLineColor,   null,        fromPercent             );
-                setLeftAndWidth( this.cache.$centerLineColor, fromPercent, toPercent - fromPercent );
-                setLeftAndWidth( this.cache.$rightLineColor,  toPercent,   100 - toPercent         );
-            }
-
-            /*****************************************************
-            Set position of all handles
-            *****************************************************/
-            this.eachHandle('update');
-
-            //Special case for fixed-mode: Keep the handle centered in container
-            if (this.options.isFixed){
-                var containerLeft =
-                        -1.0 * this.dimentions.containerWidthRem * this.handles.fixed.value.percent/100 +
-                         0.5 * this.dimentions.outerContainerWidthRem;
-
-                this.cache.$container.css('left', toFixed(containerLeft) + 'rem');
-            }
-
-
-            /*****************************************************
-            Callback and reset
-            *****************************************************/
-            this.onChanging();
-
-        },
-
-
-        /*******************************************************************
-        ********************************************************************
-        SET VALUES (TO, FROM, PIN ETC.)
-        ********************************************************************
-        *******************************************************************/
-
-        /*******************************************************************
-        setAnyValue
-        *******************************************************************/
-        setAnyValue: function( id, value ){
-            if (this.handles[id]){
-                this.handles[id].value.setValue( value );
-
-                this.updateHandlesAndLines();
-                this.onChange();
-            }
-        },
-
-        /*******************************************************************
-        setValue, setFromValue, setToValue
-        *******************************************************************/
-        setValue    : function( value ) {this.setAnyValue( this.options.singleHandleId, value );},
-        setFromValue: function( value ) { this.setAnyValue( 'from',   value ); },
-        setToValue  : function( value ) { this.setAnyValue( 'to',     value ); },
-
-        /*******************************************************************
-        setPin
-        *******************************************************************/
-        setPin: function( value, color, icon ) {
-            if (!this.options.hasPin) return;
-            if (value !== null)
-                this.handles.pin.value.setValue( value, true );
-
-            this.options.pinColor = color || this.options.pinColor || 'black';
-
-            var oldIcon = this.options.pinIcon || '';
-            this.options.pinIcon = icon || this.options.pinIcon || 'fa-map-marker';
-
-            this.handles.pin.$handle
-                .css('color', this.options.pinColor)
-                .removeClass( oldIcon )
-                .addClass( this.options.pinIcon );
-
-            this.updateHandlesAndLines();
-        },
-
-
-        /*******************************************************************
-        ********************************************************************
         CALLBACK
         ********************************************************************
         *******************************************************************/
@@ -46040,7 +47618,6 @@ if (typeof define === 'function' && define.amd) {
 
         /*******************************************************************
         onChanging
-
         *******************************************************************/
         onChanging: function(){
             //If it is dragging and onChangeOnDragging == false => set timeout to call onChange after XX ms if the handle hasn't moved
@@ -46063,398 +47640,273 @@ if (typeof define === 'function' && define.amd) {
         },
 
 
-        /*******************************************************************
-        ********************************************************************
-        SERVICE METHODS
-        ********************************************************************
-        *******************************************************************/
 
-        /*******************************************************************
-        _prettify
-        *******************************************************************/
-        _prettify: function (num) {
-            return $.isFunction(this.options.prettify) ? this.options.prettify(num) : num;
-        },
 
-        /*******************************************************************
-        PrettifyLabel
-        *******************************************************************/
-        _prettifyLabel: function(text) {
-            return $.isFunction(this.options.prettifyLabel) ? this.options.prettifyLabel(text) : text;
-        },
 
-        /*******************************************************************
-        decorate
-        *******************************************************************/
-        decorate: function ( content ) {
-            return this.options.prefix + content + this.options.postfix;
-        },
+    }); //end of BaseSlider.prototype
 
-        /*******************************************************************
-        ********************************************************************
-        GRID
-        Use appendGridContainer to create new grids. Use appendLabel(text, left[, value]) to add a grid-label
-        ********************************************************************
-        *******************************************************************/
+}(jQuery, this, document));
 
-        /*******************************************************************
-        appendGridContainer
-        *******************************************************************/
-        appendGridContainer: function(){
-            if (this.$currentGridContainer){
-                this.totalGridContainerTop += this.$currentGridContainer.height();
-                this.$currentGridContainer =
-                    $('<span class="grid"></span>').insertAfter( this.$currentGridContainer );
-                this.$currentGridContainer.css('top', pxToRem( this.totalGridContainerTop, true) );
+;
+/****************************************************************************
+    jquery-base-slider-handle,
+
+    (c) 2015, FCOO
+
+    https://github.com/fcoo/jquery-base-slider
+    https://github.com/fcoo
+
+****************************************************************************/
+(function (window/*, document, undefined*/) {
+    "use strict";
+
+    //Create baseSlider-namespace
+	window._baseSlider = window._baseSlider || {};
+	var ns = window._baseSlider;
+
+    /*******************************************************************
+    elementsOverlapping
+    Return true if $element1 and $element2 is overlapping horizontal
+    *******************************************************************/
+    function elementsOverlapping( $element1, $element2 ){
+        if ($element1 && $element2){
+            var rect1 = $element1.get(0).getBoundingClientRect(),
+                rect2 = $element2.get(0).getBoundingClientRect();
+            return ((rect1.left >= rect2.left) && (rect1.left <= rect2.right)) ||
+                    ((rect2.left >= rect1.left) && (rect2.left <= rect1.right));
+        }
+        return false;
+    }
+
+    /*******************************************************************
+    SliderHandle
+    Object to reprecent a 'handle' on the slider
+    The handle don't need to have a actual DOM-handle. The min and max-value of the slider
+    is also reprecented as a SliderHandle
+    The object contains the following items:
+        value   : A SliderValue-object reprecenting the value
+        $handle : $-object = the DOM handle (optional)
+        marker  : Object containing of tree $-object: $outer and $text (optional)
+
+    options
+        marker: [string] = class-name of the marker
+    *******************************************************************/
+    var SliderHandle = function( options ){
+        this.id      = options.id;
+        this.slider  = options.slider || options.value.slider;
+        options.value.slider = this.slider;
+        this.value   = ns.sliderValue( options.value );
+        this.$handle = !!options.$handle; //Set to boolean. Created in this.append
+        this.handleClassName = options.handleClassName || '';
+        this.handleCSS = options.handleCSS || {};
+        this.appended = false,
+
+        this.markerData = options.markerData || {};
+
+        this.markerClassName = options.marker;
+        this.marker  = !!this.markerClassName;
+
+        //overlappingHandleList = list of SliderHandle. If any of the marker in overlappingHandleList[xx] is overlapping this => this is hidden
+        this.overlappingHandleList = [];
+
+        //overlapHandleList = list of SliderHandle. this is overlapping all the marker in overlapHandleList[xx]
+        this.overlapHandleList = [];
+
+
+        this.draggingClassName = options.draggingClassName; //Classname for handler when it is being dragged MANGLER
+        this.lastLeftPercent = '';
+    };
+
+    SliderHandle.prototype = {
+        //addOverlap( handle ) - Set this to overlap handle
+        addOverlap: function( handle ){
+            if (this.marker && handle && handle.marker ){
+                this.overlapHandleList.push( handle );
+                handle.overlappingHandleList.push( this );
             }
-            else {
-                this.$currentGridContainer = this.cache.$grid;
-                this.totalGridContainerTop = this.$currentGridContainer.position().top;
-            }
-
-            this.cache.$grid = this.cache.$container.find(".grid");
-            return this.$currentGridContainer;
         },
 
-
-        /*******************************************************************
-        appendTick
-        *******************************************************************/
-        appendTick: function( left, options ){
-            if (!this.$currentGridContainer) return;
-
-            options = $.extend( {minor: false, color: ''}, options );
-
-            var result = document.createElement("span");
-//            result.className = "grid-pol" + (options.minor ? ' minor' : '');
-            result.className = "grid-pol" + (options.minor ? '' : ' major');
-            result.style.left = left + '%';
-
-            if (options.color)
-                result.style.backgroundColor = options.color;
-
-            this.currentGridContainer.appendChild( result );
-            return result;
-
-        },
-
-        /*******************************************************************
-        _valueToText
-        *******************************************************************/
-        _valueToText: function( value ){
-            var result = this._prettifyLabel( value );
-            return this.options.decorateLabel ? this.decorate(result) : result;
-        },
-
-        /*******************************************************************
-        appendLabel
-        *******************************************************************/
-        appendLabel: function( left, value, options ){
-            if (!this.$currentGridContainer) return;
-
-            options = $.extend( {color: ''}, options );
-
-            //Check if the value for the label is a selectable one
-            options.labelClickable = options.labelClickable &&  ((value - this.options.stepOffset) % this.options.step) === 0;
-
-            var text = this._valueToText( value ),
-                outer = document.createElement("div"),
-                result = document.createElement("div"),
-                className = 'grid-label';
-
-            outer.className = 'grid-label-outer';
-            outer.style.left  = left+'%';
-            outer.appendChild(result);
-
-            if (options.minor)
-                className += ' minor';
-            if (options.italic)
-                className += ' italic';
-            if (options.color)
-                result.style.color = options.color;
-
-            //Create inner-span with the text
-            var inner = document.createElement("span"),
-                innerClassName = 'grid-label-text';
-            inner.innerHTML = text;
-
-            if (this.options.labelColorRec[value]){
-                var textOptions = this.options.labelColorRec[value];
-
-                innerClassName += ' frame';
-                if (textOptions.className)
-                    innerClassName += ' '+textOptions.className;
-                if (textOptions.color)
-                    inner.style.color = textOptions.color;
-                if (textOptions.backgroundColor)
-                    inner.style.backgroundColor = textOptions.backgroundColor;
-            }
-
-            inner.className = innerClassName;
-            result.appendChild(inner);
-
-            if (options.labelClickable && !this.options.disable && !this.options.readOnly){
-                //Can be used later: outer.setAttribute('data-base-slider-value', value);
-                outer.setAttribute('data-base-slider-percent', outer.style.left);
-                className += ' clickable';
-                if (this.options.labelClickableFullWidth)
-                    result.style.width = this.options.majorTickDistanceRem +'rem';
-
-            }
-
-            result.className = className;
-            this.currentGridContainer.appendChild( outer );
-            return result;
-        },
-
-
-        /*******************************************************************
-        getTextWidth
-        Get width of value as text OR max width of all values in array of value
-        *******************************************************************/
-        getTextWidth: function( value, options ){
-            var _this = this;
-            if ($.isArray( value )){
-                var html = '';
-                $.each( value, function(index, oneValue ){
-                    html += _this._valueToText( oneValue ) + '<br>';
-                });
-                return this.getDecorateTextWidth( html, options );
-            }
-            else
-                return this.getDecorateTextWidth( this._valueToText( value ) , options );
-        },
-
-        /*******************************************************************
-        getDecorateTextWidth
-        *******************************************************************/
-        getDecorateTextWidth: function( html, options, factor, floor ){
-            var newClassName = 'grid-label';
-            if (options){
-                if (options.minor)
-                    newClassName += ' minor';
-                if (options.italic)
-                    newClassName += ' italic';
-            }
-            if (this.textElement.className != newClassName )
-                this.textElement.className = newClassName;
-            this.textElement.innerHTML = html;
-
-            var result = parseFloat( this.textElement.offsetWidth );
-            if (factor)
-                result = factor*result;
-            if (floor)
-                result = Math.floor(result);
-
-            return pxToRem( result );
-        },
-
-
-        /*******************************************************************
-        appendGrid
-        *******************************************************************/
-        appendGrid: function () {
-            if (!this.options.grid) return;
-            this.appendStandardGrid();
-        },
-
-        /*******************************************************************
-        appendStandardGrid
-        Simple call _appendStandardGrid. Can be overwriten in decending classes
-        *******************************************************************/
-        appendStandardGrid: function ( textOptions ) {
-            this._appendStandardGrid( textOptions );
-        },
-
-
-        /*******************************************************************
-        preAppendGrid and postAppendGrid
-        must be called as first and last when creating a grid - used if a new appendStandardGrid is used
-        *******************************************************************/
-        preAppendGrid: function(){
-            this.appendGridContainer();
-            //The DOM-version of this.$currentGridContainer
-            this.currentGridContainer = this.$currentGridContainer.get(0);
-
-            //Create the grid outside the DOM
-            //Save width in % and set in in px instead of %
-            this.currentGridContainerWidth = this.currentGridContainer.style.width;
-            this.$currentGridContainer.css('width', this.$currentGridContainer.width());
-            this.$currentGridContainer.width( this.$currentGridContainer.width() );
-            this.$currentGridContainerMarker = $('<div/>').insertAfter( this.$currentGridContainer );
-            this.$currentGridContainer.detach();
-        },
-        postAppendGrid: function(){
-            //Insert the created grid into the DOM
-            this.$currentGridContainer.insertBefore( this.$currentGridContainerMarker );
-            this.$currentGridContainer.css('width', this.currentGridContainerWidth );
-            this.$currentGridContainerMarker.remove();
-
-            //Update the height of the slider
-            this.cache.$container.css('height', pxToRem( this.totalGridContainerTop + this.$currentGridContainer.height(), true) );
-
-        },
-
-
-        /*******************************************************************
-        getGridOptions
-        Get options needed for building the grid
-        *******************************************************************/
-        getGridOptions: function(){
-            var o = this.options,
-                result = {},
-                gridDistanceIndex = 0;
-
-            result.gridContainerWidthRem = pxToRem( this.cache.$grid.outerWidth(false) );
-            result.gridDistanceStep = o.gridDistances[gridDistanceIndex]; // = number of steps between each tick
-            result.stepRem = o.step * result.gridContainerWidthRem / o.range / o.majorTicksFactor;
-
-            //Increse grid-distance until the space between two ticks are more than 4px
-            while ( (result.stepRem*result.gridDistanceStep) <= o.minDistanceRem){
-                gridDistanceIndex++;
-                if (gridDistanceIndex < o.gridDistances.length)
-                    result.gridDistanceStep = o.gridDistances[gridDistanceIndex];
-                else
-                    result.gridDistanceStep = result.gridDistanceStep*2;
-            }
-
-            result.tickDistanceNum = result.gridDistanceStep * o.step;          //The numerical distance between each ticks
-            result.tickDistanceRem = result.gridDistanceStep * result.stepRem;  //The rem distance between each ticks
-
-            if (o.maxLabelWidthRem)
-                result.maxLabelWidthRem = o.maxLabelWidthRem;
-            else {
-                //Find widest label
-                var value = o.min,
-                    valueList = [],
-                    step = 1;
-
-                while (value <= o.max){
-                    //if value corrected by o.majorTicksOffset and o.majorTicksFactor is a DIV of the tick distance => calculate the width of the tick
-                    if ((value - o.majorTicksOffset)*o.majorTicksFactor % result.tickDistanceNum === 0){
-                        valueList.push( value );
-                        step = result.tickDistanceNum;
-                    }
-                    value += step;
-                }
-                result.maxLabelWidthRem = this.getTextWidth( valueList ) + o.minDistanceRem; //Adding min space between text/labels
-            }
-
-            //Calculate automatic distances between major ticks
-            var majorTicks = o.majorTicks;
-            if (!majorTicks){
-                //Find ticks between each major tick
-                gridDistanceIndex = 0;
-                majorTicks = o.gridDistances[gridDistanceIndex];
-                while (majorTicks * result.tickDistanceRem < result.maxLabelWidthRem){
-                    gridDistanceIndex++;
-                    if (gridDistanceIndex < o.gridDistances.length)
-                        majorTicks = o.gridDistances[gridDistanceIndex];
-                    else
-                        majorTicks = majorTicks*2;
-                }
-            }
-
-            result.majorTickDistanceNum = result.tickDistanceNum*majorTicks;
-            result.majorTickDistanceRem = result.tickDistanceRem*majorTicks;
-
-            return result;
-        },
-
-
-        /*******************************************************************
-        _appendStandardGrid
-        *******************************************************************/
-        _appendStandardGrid: function ( textOptions, tickOptions ) {
-            this.preAppendGrid();
-
-            textOptions = $.extend( {labelClickable: this.options.labelClickable}, textOptions || {}  );
-            tickOptions = tickOptions || {};
-
-            //Get all options regarding the grid
-            this.gridOptions = this.getGridOptions();
-            $.extend( this.options, this.gridOptions );
-
-
-            //Add all the minor and major ticks
-            var o     = this.options,
-                value = o.min,
-                step  = 1,
-                valueP, valueOffset;
-
-            while (value <= o.max){
-                valueOffset = (value - o.majorTicksOffset)*o.majorTicksFactor;
-                if (valueOffset % o.tickDistanceNum === 0){
-                    valueP = (value-o.min)*o.percentProValue;
-                    if (valueOffset % o.majorTickDistanceNum === 0){
-                        //add major tick and text/label
-                        this.appendTick( valueP, tickOptions );
-                        this.appendLabel( valueP, value, textOptions );
-                    }
-                    else
-                        if (o.showMinorTicks)
-                            //Add minor tick
-                            this.appendTick( valueP, { minor:true } );
-                    step = o.tickDistanceNum;
-                }
-                value += step;
-            }
-
-            //Append colors on the grid
-            if (this.options.gridColors)
-                this.appendGridColors( this.options.gridColors );
-
-            this.postAppendGrid();
-        },
-
-        /*******************************************************************
-        addGridColor
-        *******************************************************************/
-        appendGridColors: function( gridColors ){
-            var fromValue,
-                toValue  = this.options.min,
-                i,
-                gridColor,
-                percentFactor = 100 / (this.options.max - this.options.min);
-
-
-            for (i=0; i<gridColors.length; i++ ){
-                gridColor = gridColors[i];
-                if ( (gridColor.value === null) || (gridColor.value < this.options.min) || (gridColor.value > this.options.max) ){
-                    //add triangle to the left or right
-                    var $span = $('<span/>')
-                                    .addClass( 'grid-color')
-                                    .appendTo( this.$currentGridContainer );
-                    if (gridColor.value > this.options.max)
-                        $span
-                            .addClass('gt-max')
-                            .css('border-left-color', gridColor.color);
-                    else
-                        $span
-                            .addClass('lt-min')
-                            .css('border-right-color', gridColor.color);
-                }
-                else {
-                    fromValue = gridColor.fromValue !== undefined ? gridColor.fromValue : toValue;
-                    toValue = gridColor.value;
-
+        //append() - Create and append this.$handle and $.marker
+        append: function( $container ){
+            //Append handle
+            if (this.$handle)
+                this.$handle =
                     $('<span/>')
-                        .addClass('grid-color' + (i%2?' to':' from'))
-                        .css({
-                            'left'            : percentFactor*(fromValue - this.options.min) + '%',
-                            'width'           : percentFactor*(toValue-fromValue) + '%',
-                            'background-color': gridColor.color
-                           })
-                        .appendTo( this.$currentGridContainer );
+                        .addClass('handle '+this.id)
+                        .addClass(this.handleClassName)
+                        .css( this.handleCSS )
+                        .appendTo( $container );
+
+            //Append marker
+            if (this.marker){
+                this.marker = {};
+                //Outer div
+                this.marker.$outer =
+                    $('<div/>')
+                        .addClass('marker-outer')
+                        .addClass(this.markerClassName)
+                        .appendTo($container);
+                //Inner div
+                this.marker.$inner =
+                        $('<div/>')
+                            .addClass('marker')
+                            .appendTo(this.marker.$outer);
+                this.marker.$text =
+                        $('<span/>')
+                            .addClass('marker-text')
+                            .attr( this.markerData )
+                            .appendTo(this.marker.$inner);
+            }
+            this.appended = true;
+            return this;
+        },
+
+        //remove
+        remove: function(){
+            if (!this.appended) return;
+            if (this.$handle){
+                this.$handle.remove();
+                this.$handle = true;
+            }
+            if (this.marker.$outer){
+                this.marker.$outer.remove();
+                this.marker = true;
+            }
+            this.appended = false;
+        },
+
+        //update()
+        //Set the position of $handle and $marker and update the content of $marker
+        update: function( force ){
+            if (!this.appended) return;
+            var leftPercent = this.getLeftPosition() + '%';
+
+            if (force || (leftPercent != this.lastLeftPercent)){
+                this.lastLeftPercent = leftPercent;
+                if (this.$handle){
+                    this.$handle.css('left', leftPercent);
                 }
+                if (this.marker){
+                    //Set marker content
+                    this.marker.$text.html( this.getMarkerText() );
+
+                    //Set marker position
+                    this.marker.$outer.css('left', leftPercent);
+
+                    //Force all handles overlapped by this to update
+                    if (!force)
+                        $.each( this.overlapHandleList, function( index, handle ){
+                            handle.update( true );
+                        });
+
+                    //Set marker visibility
+                    this.marker.$outer.css('visibility', this.markerIsHidden() ? 'hidden' : 'visible');
+                }
+            }
+            return this;
+        },
+
+        //onFocus - overwriten for individual handle-types
+        onFocus: function(){
+            if (!this.appended) return;
+            this.$handle.addClass('hover');
+            if (this.marker && this.marker.$outer)
+                this.marker.$outer.addClass('hover');
+
+        },
+
+        //onBlur - overwriten for individual handle-types
+        onBlur: function(){
+            if (!this.appended) return;
+            this.$handle.removeClass('hover');
+            if (this.marker && this.marker.$outer)
+                this.marker.$outer.removeClass('hover');
+        },
+
+        //getMarkerText
+        getLeftPosition: function(){
+            return this.value.getPercent();
+        },
+
+        //getMarkerText
+        getMarkerText: function(){
+            return this.slider.decorate( this.slider._prettify( this.value.getValue() ) );
+        },
+
+        //markerIsHidden: return true if the marker is overlapping any of the markers in YYY
+        markerIsHidden: function(){
+            var thisMarker$text = this.marker.$text,
+                result = false;
+            $.each( this.overlappingHandleList, function( index, handle ){
+                result = result || elementsOverlapping( thisMarker$text, handle.marker.$text );
+            });
+            return result;
+        }
+
+    };
+
+
+    ns.SliderHandle = SliderHandle;
+    ns.sliderHandle = function( options ){
+        return new ns.SliderHandle( options );
+    };
+
+}(this/*, document*/));
+
+;
+/****************************************************************************
+jquery-base-slider-public.js
+****************************************************************************/
+(function ($, window/*, document, undefined*/) {
+    "use strict";
+
+    $.extend(window.BaseSlider.prototype, {
+        /*******************************************************************
+        SET VALUES (TO, FROM, PIN ETC.)
+        *******************************************************************/
+
+        /*******************************************************************
+        setAnyValue
+        *******************************************************************/
+        setAnyValue: function( id, value ){
+            if (this.handles[id]){
+                this.handles[id].value.setValue( value );
+
+                this.updateHandlesAndLines();
+                this.onChange();
             }
         },
 
+        /*******************************************************************
+        setValue, setFromValue, setToValue
+        *******************************************************************/
+        setValue    : function( value ) {this.setAnyValue( this.options.singleHandleId, value );},
+        setFromValue: function( value ) { this.setAnyValue( 'from',   value ); },
+        setToValue  : function( value ) { this.setAnyValue( 'to',     value ); },
 
         /*******************************************************************
-        ********************************************************************
+        setPin
+        *******************************************************************/
+        setPin: function( value, color, icon ) {
+            if (!this.options.hasPin) return;
+            if (value !== null)
+                this.handles.pin.value.setValue( value, true );
+
+            this.options.pinColor = color || this.options.pinColor || 'black';
+
+            var oldIcon = this.options.pinIcon || '';
+            this.options.pinIcon = icon || this.options.pinIcon || 'fa-map-marker';
+
+            this.handles.pin.$handle
+                .css('color', this.options.pinColor)
+                .removeClass( oldIcon )
+                .addClass( this.options.pinIcon );
+
+            this.updateHandlesAndLines();
+        },
+
+        /*******************************************************************
         PUBLIC METHODS
-        ********************************************************************
         *******************************************************************/
 
         /*******************************************************************
@@ -46499,19 +47951,148 @@ if (typeof define === 'function' && define.amd) {
             this.input = null;
             this.options = null;
         }
-    }; //end of BaseSlider.prototype
+
+    }); //end of BaseSlider.prototype
+
+}(jQuery, this, document));
+
+;
+/****************************************************************************
+    jquery-base-slider-value,
+
+    (c) 2015, FCOO
+
+    https://github.com/fcoo/jquery-base-slider
+    https://github.com/fcoo
+
+****************************************************************************/
+(function (window/*, document, undefined*/) {
+    "use strict";
+
+    //Create baseSlider-namespace
+	window._baseSlider = window._baseSlider || {};
+	var ns = window._baseSlider;
+
+    /*******************************************************************
+    toFixed
+    Round num to 5 digits
+    *******************************************************************/
+    function toFixed( num ) {
+        return +num.toFixed(5);
+    }
 
 
-    $.fn.baseSlider = function (options) {
-        return this.each(function() {
-            if (!$.data(this, "baseSlider")) {
-                $.data(this, "baseSlider", new window.BaseSlider(this, options, pluginCount++));
+    /*******************************************************************
+    SliderValue
+    Object to store and alter "value" releated to the slider
+    The object contains the following items:
+        value   : The actual value ,
+        percent : The value as percent of the total slider width
+    *******************************************************************/
+    var SliderValue = function( options ){
+        this.slider = options.slider;
+        this.valueOffset = this.slider.options.min;
+        this.valueRange = this.slider.options.max - this.valueOffset;
+        this.percentOffset = 0;
+        this.percentRange = 100;
+        this.adjustToStep = !!options.adjustToStep;
+        this.fixed = !!options.fixed;
+        this.fixedValue = options.value;
+        this.value   = 0;
+        this.percent = 0;
+        this.minList = [];
+        this.maxList = [];
+
+        var _this = this;
+        $.each( options.minList || [], function( index, sliderValueMin ){ _this.addMin( sliderValueMin ); });
+        $.each( options.maxList || [], function( index, sliderValueMax ){ _this.addMax( sliderValueMax ); });
+
+        this.setValue( options.value );
+    };
+
+    SliderValue.prototype = {
+        //addMin( sliderValue, minDistance )
+        //Add sliderValue to list of SliderValue that this must allways be greater than or equal to
+        addMin: function( sliderValue, minDistance ){
+            if (sliderValue === null) return this;
+            if ($.isNumeric(sliderValue))
+                sliderValue = new SliderValue({ value: sliderValue, slider: this.slider });
+            this.minList.push( {sliderValue: sliderValue, minDistance: minDistance || 0} );
+            this.update();
+            return this;
+        },
+
+        //addMax( sliderValue, minDistance )
+        //Add sliderValue to list of SliderValue that this must allways be less than or equal to
+        addMax: function( sliderValue, minDistance ){
+            if (sliderValue === null) return this;
+            if ($.isNumeric(sliderValue))
+                sliderValue = new SliderValue({ value: sliderValue, slider: this.slider });
+            this.maxList.push( {sliderValue: sliderValue, minDistance: minDistance || 0} );
+            this.update();
+            return this;
+        },
+
+        setValue: function( newValue, isFixed ){
+            this.value = newValue;
+            if (isFixed && this.fixed)
+                this.fixedValue = newValue;
+            this.update();
+            return this;
+        },
+
+        setPercent: function( newPercent ){
+            this.setValue( this.valueRange*(newPercent - this.percentOffset)/this.percentRange + this.valueOffset );
+        },
+
+        update: function(){
+
+            if (this.fixed)
+                this.value = this.fixedValue;
+            else {
+                //Adjust this.value with respect to {sliderValue,minDistance} in this.minList
+                var _this = this;
+                $.each( this.minList, function( index, rec ){
+                    if (rec.sliderValue)
+                        _this.value = Math.max( _this.value, rec.sliderValue.value + rec.minDistance );
+                });
+                //Adjust this.value with respect to {sliderValue,minDistance} in this.maxList
+                $.each( this.maxList, function( index, rec ){
+                    if (rec.sliderValue)
+                        _this.value = Math.min( _this.value, rec.sliderValue.value - rec.minDistance );
+                });
+
+                //Adjust this.value with respect to step and stepOffset
+                if (this.adjustToStep){
+                    var offset = this.slider.options.min + this.slider.options.stepOffset;
+                    this.value -= offset;
+                    this.value = this.slider.options.step * Math.round( this.value/this.slider.options.step );
+                    this.value += offset;
+                }
             }
-        });
+
+            //Calculate precent
+            this.percent = this.percentRange*(this.value - this.valueOffset)/this.valueRange + this.percentOffset;
+
+            return this;
+        },
+
+        getValue: function(){
+            return toFixed( this.value );
+        },
+
+        getPercent: function( inclUnit ){
+            return toFixed( this.percent ) + (inclUnit ? '%' : 0);
+        },
     };
 
 
-}(jQuery, this, document));
+    ns.SliderValue = SliderValue;
+    ns.sliderValue = function( options ){
+        return new ns.SliderValue( options );
+    };
+
+}(this/*, document*/));
 
 ;
 /****************************************************************************
@@ -65657,14 +67238,6 @@ options:
 
     ** SAME AS IN JQUERY-BASE-SLIDER PLUS **
 
-    display:
-        value:
-            tzElement, utcElement, relativeElement  //jQuery-object or String (=search)
-        from:
-            tzElement, utcElement, relativeElement  //jQuery-object or String (=search)
-        to:
-            tzElement, utcElement, relativeElement  //jQuery-object or String (=search)
-
     format:
         showRelative: boolean; If true the grid etc show the relative time ('Now + 2h') Default = false
         showUTC     : boolean; When true a scale for utc is also shown.                 Default = false. Only if showRelative == false
@@ -65719,24 +67292,14 @@ options:
         };
 
     window.TimeSlider = function (input, options, pluginCount) {
-        var _this = this;
-
-        this.VERSION = "6.1.5";
+        this.VERSION = "7.0.2";
 
         //Setting default options
         this.options = $.extend( true, {}, defaultOptions, options );
-        this._updateOptionsFormat();
 
-        this.options.display = this.options.display || {};
-        //Convert options.display.[value | from | to] from selector-string to $-elements (if needed)
-        $.each( ['value', 'from', 'to'], function( index, id ){
-            _this.options.display[id] = _this.options.display[id] || {};
-            $.each( ['tzElement', 'utcElement', 'relativeElement'], function( index, attrId ){
-                var selector = _this.options.display[id][attrId];
-                if ($.type(selector) == 'string')
-                    _this.options.display[id][attrId] = $(selector);
-            });
-        });
+        this.useMomentDateFormat = !(options.format && options.format.date);
+
+        this._updateOptionsFormat();
 
         //Set min/minMoment, max/maxMoment, from/fromMoment, to/toMoment, and value/valueMoment
         var valMom = setValueAndMoment( this.options.min, this.options.minMoment );
@@ -65759,11 +67322,6 @@ options:
             var value = setValueAndMoment( undefined, moment( this.options.stepOffsetMoment ) ).value;
             this.options.stepOffset = (value - this.options.min) % this.options.step;
         }
-
-        //Update display-element onChanging if
-        if (!this.options.onChangeOnDragging)
-            this.preOnChanging =  $.proxy( this.updateDisplay, this );
-
 
         //Create BaseSlider - dont create grid here
         var optionsGrid = this.options.grid;
@@ -65836,7 +67394,6 @@ options:
             this.result.valueMoment = valueToMoment ( this.result.value );
         },
 
-
         /**************************************************************
         appendDateGrid
         ***************************************************************/
@@ -65844,29 +67401,25 @@ options:
             var o = this.options,
                 value,
                 valueP = 0,
-                valueRem = o.stepRem/o.step,
+                valuePx = o.stepPx/o.step,
                 midnights = 0,
                 isFirstMidnight = true,
                 firstMidnightValue = 0,
                 lastMidnightValue = 0,
-                dayRem,
+                dayPx,
                 values = [],
                 dateFormats,
                 dateFormatOk,
                 textWidth;
 
-            this.preAppendGrid();
+            this.preAppendGrid( {labelBetweenTicks: true} );
 
-            this.$currentGridContainer.addClass("label-between-ticks");
             this._prettifyLabel = this._prettifyLabelAbsoluteDate;
 
             //Setting tick at midnight
             value = o.min;
             while (value <= o.max){
-                //Old version: Force midnights tag to be on minor-tick => error on shift to/from DST (Daylight Saving Time)
-                //if ( ((value - this.options.majorTicksOffset) % o.tickDistanceNum === 0) && (this._valueToTzMoment( value, this.options.format.timezone ).hour() === 0) ){
-
-                //New version: Allow midnights tags on every hour regardless if there are a tag
+                //Allow midnights tags on every hour regardless if there are a tag
                 if (this._valueToTzMoment( value, this.options.format.timezone ).hour() === 0){
 
                     midnights++;
@@ -65882,15 +67435,15 @@ options:
                 valueP += o.percentProValue;
             }
 
-            //Find the max width (in rem) of a date-label = dayRem
-            dayRem = valueRem * (
+            //Find the max width (in Px) of a date-label = dayPx
+            dayPx = valuePx * (
                                   midnights === 0 ? o.range :
                                   midnights == 1  ? Math.max( firstMidnightValue - o.min, o.max - firstMidnightValue ) :
                                                     20  //Setting a full day to 20 hours to allow date-string on days up to 20 hours at the ends
-                                ) - this.options.minDistanceRem; // = margin
+                                ) - this.options.minDistance; // = margin
 
             if (!o.format.dateFormat){
-                //Find the format for the date, where all dates is smaller than dayRem
+                //Find the format for the date, where all dates is smaller than dayPx
                 dateFormats = moment.sfDateFormatList( function( code ){
                                 //Include all formats except full weekday or full month
                                 return (code.charAt(0) != 'F') && (code.charAt(1) != 'F');
@@ -65903,10 +67456,10 @@ options:
                     value += 24;
                 }
 
-                //Checking if all dates displayed in dayFormat are samller than the max width for a day = dayRem. Setting this._prettifyLabel will force getTextWidth to use the text directly
+                //Checking if all dates displayed in dayFormat are samller than the max width for a day = dayPx. Setting this._prettifyLabel will force getTextWidth to use the text directly
                 for (var i=0; i<dateFormats.length; i++ ){
                     o.format.dateFormat = dateFormats[i];
-                    dateFormatOk = (this.getTextWidth( values, textOptions ) <= dayRem);
+                    dateFormatOk = (this.getTextWidth( values, textOptions ) <= dayPx);
 
                     if (dateFormatOk)
                       break;
@@ -65933,17 +67486,17 @@ options:
                 else {
                     //first day - check if there are space to put a date-label
                     textWidth = this.getTextWidth( o.min, textOptions );
-                    if ( valueRem*(firstMidnightValue - o.min) >= textWidth ){
+                    if ( valuePx*(firstMidnightValue - o.min) >= textWidth ){
                         //Try to place the date-text under 12 o'clock (noon) but always keep inside the left edge
-                        var minTextValue = o.min + textWidth/2/valueRem;
+                        var minTextValue = o.min + textWidth/2/valuePx;
                         this.appendLabel( o.percentProValue * ( Math.max( minTextValue, firstMidnightValue-12 ) - o.min ), o.min, textOptions );
                     }
 
                     //last day - check if there are space to put a date-label
                     textWidth = this.getTextWidth( o.max, textOptions );
-                    if ( valueRem*(o.max - lastMidnightValue) >= textWidth ){
+                    if ( valuePx*(o.max - lastMidnightValue) >= textWidth ){
                         //Try to place the date-text under 12 o'clock (noon) but always keep inside the right edge
-                        var maxTextValue = o.max - textWidth/2/valueRem;
+                        var maxTextValue = o.max - textWidth/2/valuePx;
                         this.appendLabel( o.percentProValue * ( Math.min( maxTextValue, lastMidnightValue+12 ) - o.min ), o.max, textOptions );
                     }
 
@@ -66011,16 +67564,30 @@ options:
         /**************************************************************
         _updateOptionsFormat
         ***************************************************************/
-        _updateOptionsFormat: function( format ){
-            $.extend( true, this.options.format, format || {}  );
+        _updateOptionsFormat: function( format = {} ){
+            $.extend( true, this.options.format, format );
+
+            var forceFormat = this.useMomentDateFormat ? null : this.options.format.date;
 
             //Merge current moment.simpleFormat.options into this.options.format
             $.extend( true, this.options.format, moment.sfGetOptions() );
 
+            if (forceFormat)
+                this.options.format.date = forceFormat;
+
             //Create the format for the label over the 'dragger'
-            this.options.format.dateHourFormat =
-                (this.options.format.date == 'DMY' ? 'DD-MMM' : 'MMM-DD') + //Dec-24 / 24-Dec
-                ' ' + moment.sfGetTimeFormat();
+            var dateFormat = '';
+
+            switch (this.options.format.date + (this.options.format.showYear ? '_Y' : '')){
+                case 'DMY'  : dateFormat = 'DD. MMM';       break;
+                case 'DMY_Y': dateFormat = 'DD. MMM YYYY';  break;
+                case 'MDY'  : dateFormat = 'MMM DD';        break;
+                case 'MDY_Y': dateFormat = 'MMM DD YYYY';   break;
+                case 'YMD'  : dateFormat = 'MMM DD';        break;
+                case 'YMD_Y': dateFormat = 'YYYY MMM DD';   break;
+            }
+
+            this.options.format.dateHourFormat = dateFormat + ' ' + moment.sfGetTimeFormat();
 
             //Set dateformat = '' to make appendDateGrid find new format
             this.options.format.dateFormat = '';
@@ -66040,37 +67607,11 @@ options:
         ***************************************************************/
         setFormat: function( format ){
             //Reset label-width in case time-format is changed (12h <-> 24h)
-            this.options.maxLabelWidthRem = 0;
+            this.options.maxLabelWidth = 0;
 
             this._updateOptionsFormat( format );
             this.update();
-            this.updateDisplay();
         },
-
-        /**************************************************************
-        updateDisplay
-        Updates the elements with text versions of from-value and to-value as timezone-date, utc-date and relative time
-        ***************************************************************/
-        updateDisplay: function(){
-            var _this = this;
-            $.each( ['value', 'from', 'to'], function(index, id){
-                var value = _this.result[id],
-                    valueList = [
-                        _this._valueToFormat( value, _this.options.format.timezone ),
-                        _this._valueToFormat( value, 'utc' ),
-                        _this._valueToFormat( value )
-                    ];
-                $.each( ['tzElement', 'utcElement', 'relativeElement'], function( index, attrId ){
-                    var $elem = _this.options.display[id][attrId],
-                        text = valueList[index];
-                    if ($elem)
-                        $elem.each( function(){ $(this).text( text ); } );
-                });
-            });
-        },
-
-        preOnChange: function(){ this.updateDisplay(); }
-
     };
     window.TimeSlider.prototype = $.extend( {}, window.BaseSlider.prototype, window.TimeSlider.prototype );
 
@@ -70806,15 +72347,17 @@ module.exports = g;
     };
 
 
+
     //Extend $.fn with method to open a card given by id (string) or index (integer)
     $.fn.bsOpenCard = function( indexOrId ){
         this.addClass('no-transition');
         var $accordionItem =
                 this.children(
                     $.type(indexOrId) == 'number' ?
-                    'div.card:nth-of-type('+(indexOrId+1)+')' :
-                    'div.card[data-user-id="' + indexOrId + '"]'
+                    'div.accordion-item:nth-of-type('+(indexOrId+1)+')' :
+                    'div.accordion-item[data-user-id="' + indexOrId + '"]'
                 );
+
         if ($accordionItem && $accordionItem.length)
             $accordionItem.children('.collapse').collapse('show');
         this.removeClass('no-transition');

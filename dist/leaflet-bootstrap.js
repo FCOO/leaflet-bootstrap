@@ -3296,12 +3296,21 @@ Can be used as leaflet standard zoom control with Bootstrap style
 
             //Adjust zoom-container to be a button-group container and move to new container and adjust zoom-buttons to bsButton
             var bsButtonGroupClassNames = $.bsButtonGroup({vertical:true, center:true}).attr('class'),
-                bsButtonClassNames = $.bsButton({square: true, bigIcon: true}).attr('class'),
+                bsButtonClassNames = $.bsButton({square: true, _bigIcon: true}).attr('class'),
                 $zoomContainer = $(this.zoom._container);
             $zoomContainer
                 .removeClass()
                 .addClass( bsButtonGroupClassNames )
                 .appendTo( $contentContainer );
+
+            //Replace text +/- with icons
+            var zoom = this.zoom;
+            $.each({
+                _zoomInButton : 'fa-plus',
+                _zoomOutButton: 'fa-minus'
+            }, function(elemId, iconClass){
+                $._bsCreateIcon(iconClass, $(zoom[elemId]).empty());
+            });
 
             $zoomContainer.children()
                 .removeClass()
@@ -4112,7 +4121,7 @@ leaflet-bootstrap-compass-device.js
                 noHorizontalPadding : false,
                 scroll              : false,
                 semiTransparent     : false, //true,
-                width               : 140,
+                width               : 156,
                 content             : '<div class="lb-conpass-content"></div><div class="lb-conpass-content-error" style="display:none; text-align:center"></div>',
             },
 
