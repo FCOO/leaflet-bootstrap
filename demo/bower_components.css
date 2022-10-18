@@ -5896,8 +5896,8 @@ textarea.form-control-lg {
   --bs-popover-header-padding-x: 0.375rem;
   --bs-popover-header-padding-y: 0.375rem;
   --bs-popover-header-font-size: 1rem;
-  --bs-popover-header-color: ;
-  --bs-popover-header-bg: #e9ecef;
+  --bs-popover-header-color: var(jb-header-color);
+  --bs-popover-header-bg: var(--jb-header-bg);
   --bs-popover-body-padding-x: 0.375rem;
   --bs-popover-body-padding-y: 0.375rem;
   --bs-popover-body-color: #212529;
@@ -10373,21 +10373,43 @@ BUTTON-GROUP
 .btn-group-vertical .header-content-container {
   font-size: var(--bs-modal-content-font-size); }
 
-.btn-group-vertical .header-content-container {
-  width: 100%;
-  margin-bottom: 1px; }
+.btn-group .header-content, .btn-group-vertical .header-content {
+  color: var(--jb-inner-header-color);
+  background-color: var(--jb-inner-header-bg); }
+  .btn-group .header-content.header-main, .btn-group-vertical .header-content.header-main {
+    color: var(--jb-header-color);
+    background-color: var(--jb-header-bg); }
 
 .btn-group-vertical .btn.container-icon-and-text > i, .btn-group-vertical .btn.container-icon-and-text > .container-stacked-icons {
   width: 1.25em;
   text-align: center; }
 
-.btn-group-vertical .header-content-container + .btn,
-.btn-group-vertical .btn-group-vertical .btn {
+.btn-group-vertical .header-content-container + .btn:not(.after-space),
+.btn-group-vertical .btn-group-vertical .btn:not(.after-space) {
   border-top-left-radius: 0;
   border-top-right-radius: 0; }
 
-.btn-group-vertical + .btn-group-vertical {
-  margin-top: var(--bs-modal-header-padding-y); }
+/*
+To have a space between two button-groups
+the button-group before the space gets class="after-space"
+*/
+.btn-group.space-after {
+  margin-right: var(--bs-modal-header-padding-x); }
+
+.btn-group-vertical.space-after {
+  margin-bottom: var(--bs-modal-header-padding-y); }
+
+/*
+To have a space between two buttons in a (vertical) button-group
+the button before the space gets class="after-space"
+*/
+.btn-group-vertical .space-after {
+  margin-bottom: var(--bs-modal-header-padding-y);
+  border-bottom-left-radius: var(--bs-btn-border-radius) !important;
+  border-bottom-right-radius: var(--bs-btn-border-radius) !important; }
+  .btn-group-vertical .space-after + .btn {
+    border-top-left-radius: var(--bs-btn-border-radius) !important;
+    border-top-right-radius: var(--bs-btn-border-radius) !important; }
 
 .btn-group-vertical.btn-group-sm {
   --bs-modal-content-font-size: 0.875rem;
@@ -10469,6 +10491,7 @@ HEADER-CONTENT
   color: var(--jb-header-color);
   background-color: var(--jb-header-bg);
   cursor: default;
+  pointer-events: none;
   /****************************************************
     List of icons inside a header are placed inside a container
     <div class="header-icon-container>
@@ -10477,7 +10500,8 @@ HEADER-CONTENT
     </div>
     ****************************************************/ }
   .header-content.clickable {
-    cursor: pointer; }
+    cursor: pointer;
+    pointer-events: inherit; }
   .header-content.header-content-smaller {
     font-size: var(--bs-footer-font-size);
     padding: var(--bs-footer-padding-y) var(--bs-footer-padding-x); }
@@ -10495,6 +10519,7 @@ HEADER-CONTENT
   .header-content .header-icon-container {
     display: flex;
     align-items: baseline;
+    pointer-events: initial;
     flex-shrink: 0;
     justify-content: space-between;
     margin-left: auto;

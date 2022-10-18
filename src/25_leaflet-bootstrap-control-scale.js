@@ -82,7 +82,7 @@ https://github.com/nerik/leaflet-graphicscale
 
                 //Items belows options.popupList
                 options.selectFormat ?
-                    [{type:'button',   icon:'fa-cog',           text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this), closeOnClick: true, }] :
+                    [{type:'button', icon:'fa-cog', text: {da:'Format...', en:'Format...'}, spaceBefore: true, onClick: $.proxy(this.options.selectFormat, this), closeOnClick: true, }] :
                     null
             );
         },

@@ -1339,7 +1339,7 @@ https://github.com/nerik/leaflet-graphicscale
 
                 //Items belows options.popupList
                 options.selectFormat ?
-                    [{type:'button',   icon:'fa-cog',           text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this), closeOnClick: true, }] :
+                    [{type:'button', icon:'fa-cog', text: {da:'Format...', en:'Format...'}, spaceBefore: true, onClick: $.proxy(this.options.selectFormat, this), closeOnClick: true, }] :
                     null
             );
         },
@@ -2227,25 +2227,27 @@ https://github.com/nerik/leaflet-graphicscale
 
         $.each( objectList, function(index, obj){
             var contextmenuOptions = obj.contextmenuOptions,
-                lineBefore         = false;
+                firstObject        = !index;
 
             checkWidth( contextmenuOptions.width );
 
             //If no header is given and there are more than one object => add header (if any)
             if (!o.header && (objectList.length > 1) && contextmenuOptions.items.length && !!contextmenuOptions.header){
                 var headerOptions = $._bsAdjustIconAndText(contextmenuOptions.header);
-                headerOptions.lineBefore = true;
+                headerOptions.spaceBefore = !firstObject;
+                headerOptions.mainHeader = firstObject;
                 list.push(headerOptions);
             }
-            lineBefore = true;
+
+            var firstItem = true;
 
             $.each( contextmenuOptions.items, function(index, item){
                 //Set default options
                 item = $.extend(
-                    isContextmenuPopup ? {closeOnClick: true} : {lineBefore: lineBefore},
+                    isContextmenuPopup ? {closeOnClick: true} : {spaceBefore: firstItem},
                     item
                 );
-                lineBefore = false;
+                firstItem = false;
                 item.id = item.onClick ? item.id || 'itemId' + nextId++ : null;
                 checkWidth( item.width );
                 if (item.onClick || item.onChange)
@@ -2259,11 +2261,12 @@ https://github.com/nerik/leaflet-graphicscale
                     if (!item.type || (item.type == 'button'))
                         //It is not a checkbox or radio => use 2. argument as latlng
                         item.latlng = o.latlng;
-
-                    item.class = 'text-truncate';
                 }
+
                 list.push(item);
             });
+
+            firstObject = false;
         });
 
         result.width = widthToUse;
@@ -2498,7 +2501,7 @@ Options for selectiong position-format and to activate context-menu
 
                 //Items belows options.popupList
                 this.options.selectFormat ?
-                    [{type:'button', closeOnClick: true, icon: 'fa-cog', text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this)}] :
+                    [{type:'button', closeOnClick: true, icon: 'fa-cog', text: {da:'Format...', en:'Format...'}, spaceBefore: true, onClick: $.proxy(this.options.selectFormat, this)}] :
                     null
             );
             //Set format-options and event for change of format
@@ -4226,8 +4229,8 @@ leaflet-bootstrap-compass-device.js
             //Create error-info
             this.$contentContainer.bsModal.$content.find('.lb-conpass-content-error')._bsAddHtml({
                 text: {
-                    da: 'Det var ikke muligt at bestemme din enheds orientering',
-                    en: 'It was not possible to detect the orientation of<br>your device'
+                    da: 'Det var ikke muligt at bestemme din enheds&nbsp;orientering',
+                    en: 'It was not possible to detect the orientation of your&nbsp;device'
                 }
             });
 

@@ -76,7 +76,7 @@ Options for selectiong position-format and to activate context-menu
 
                 //Items belows options.popupList
                 this.options.selectFormat ?
-                    [{type:'button', closeOnClick: true, icon: 'fa-cog', text: {da:'Format...', en:'Format...'}, onClick: $.proxy(this.options.selectFormat, this)}] :
+                    [{type:'button', closeOnClick: true, icon: 'fa-cog', text: {da:'Format...', en:'Format...'}, spaceBefore: true, onClick: $.proxy(this.options.selectFormat, this)}] :
                     null
             );
             //Set format-options and event for change of format

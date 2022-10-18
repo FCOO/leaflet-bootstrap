@@ -145,8 +145,8 @@ leaflet-bootstrap-compass-device.js
             //Create error-info
             this.$contentContainer.bsModal.$content.find('.lb-conpass-content-error')._bsAddHtml({
                 text: {
-                    da: 'Det var ikke muligt at bestemme din enheds orientering',
-                    en: 'It was not possible to detect the orientation of<br>your device'
+                    da: 'Det var ikke muligt at bestemme din enheds&nbsp;orientering',
+                    en: 'It was not possible to detect the orientation of your&nbsp;device'
                 }
             });
 

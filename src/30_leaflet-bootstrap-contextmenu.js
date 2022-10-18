@@ -190,25 +190,27 @@
 
         $.each( objectList, function(index, obj){
             var contextmenuOptions = obj.contextmenuOptions,
-                lineBefore         = false;
+                firstObject        = !index;
 
             checkWidth( contextmenuOptions.width );
 
             //If no header is given and there are more than one object => add header (if any)
             if (!o.header && (objectList.length > 1) && contextmenuOptions.items.length && !!contextmenuOptions.header){
                 var headerOptions = $._bsAdjustIconAndText(contextmenuOptions.header);
-                headerOptions.lineBefore = true;
+                headerOptions.spaceBefore = !firstObject;
+                headerOptions.mainHeader = firstObject;
                 list.push(headerOptions);
             }
-            lineBefore = true;
+
+            var firstItem = true;
 
             $.each( contextmenuOptions.items, function(index, item){
                 //Set default options
                 item = $.extend(
-                    isContextmenuPopup ? {closeOnClick: true} : {lineBefore: lineBefore},
+                    isContextmenuPopup ? {closeOnClick: true} : {spaceBefore: firstItem},
                     item
                 );
-                lineBefore = false;
+                firstItem = false;
                 item.id = item.onClick ? item.id || 'itemId' + nextId++ : null;
                 checkWidth( item.width );
                 if (item.onClick || item.onChange)
@@ -222,11 +224,12 @@
                     if (!item.type || (item.type == 'button'))
                         //It is not a checkbox or radio => use 2. argument as latlng
                         item.latlng = o.latlng;
-
-                    item.class = 'text-truncate';
                 }
+
                 list.push(item);
             });
+
+            firstObject = false;
         });
 
         result.width = widthToUse;

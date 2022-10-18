@@ -5,7 +5,6 @@ $markerSizeList: 14px, 20px, 24px; //MUST match markerSizeList in leaflet-bootst
 
 //Adjust tooltip to bootstrap style
 .leaflet-tooltip {
-//	padding         : $tooltip-padding-y $tooltip-padding-x;
 	padding         : $btn-padding-y-xs $btn-padding-x-xs;
 	background-color: $popover-bg;
 	border          : $popover-border-width solid $popover-border-color;

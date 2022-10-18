@@ -30,7 +30,10 @@
             height:99%;
         }
 
-
+        :root {
+            --jb-header-bg: darkgreen;
+            --jb-inner-header-bg: green;
+        }
     </style>
 
 </head>
@@ -592,9 +595,9 @@ content = {
     })
         .addTo(map1)
         .setContextmenuOptions({alsoAsPopup: true})
-        .setContextmenuHeader({da: 'Grøn polygon', en:'Green polygon'})
+        .setContextmenuHeader({da: 'Grøn polygon laaaaaaang', en:'Green polygon looooooooong'})
         .addContextmenuItems([
-            {icon:'fa-home', text:{da:'GREEN Poly 1'}, width: '10em', onClick: function(id, latlng){ console.log('GREEN Poly 1',arguments); }},
+            {icon:'fa-home', text:{da:'GREEN Poly 1 very looooooooooooooong'}, width: '10em', onClick: function(id, latlng){ console.log('GREEN Poly 1',arguments); }},
             {icon:'fa-map',  text:'GREEN Poly 2', onClick: function(latlng){ console.log('GREEN Poly 2',this, latlng); }},
         ]);
 
