@@ -32,7 +32,7 @@
 
         :root {
             --jb-header-bg: darkgreen;
-            --jb-inner-header-bg: green;
+            --jb-inner-header-bg: MediumSpringGreen;
         }
     </style>
 
@@ -605,10 +605,10 @@ content = {
 
     var bGroup = L.control.bsButtonGroup({
             list: [
-                {icon:'fa-home'},
-                {icon:'fa-plus'},
-                {icon:'fa-minus'},
-                {icon:'fa-map'}
+                {id:'id1', icon:'fa-home'},
+                {id:'id2', icon:'fa-plus'},
+                {id:'id3', icon:'fa-minus'},
+                {id:'id4', icon:'fa-map'}
             ]
         });
         map1.addControl(bGroup);
@@ -940,17 +940,22 @@ content = {
                 //noHorizontalPadding: true,
 
                 buttons   : [
-                    {id:'button_'+i, icon:'fa-home', text:'click me #'+i, 
+                    {id:'button_'+i, icon:'fa-home', text:'IsLast #'+i, 
+                        onClick: function(id, selected, button, map, legend){ 
+                            console.log('click me:', id, map, legend, arguments); legend.updateContent('Skide godt do!'); 
+                        } 
+                    }, 
+                    {id:'button_'+i, icon:'fa-home', text:'click me #'+i, isLastButton: true,
                         onClick: function(id, selected, button, map, legend){ 
                             console.log('click me:', id, map, legend, arguments); legend.updateContent('Skide godt do!'); 
                         } 
                     }, 
 
-                    $.bsCheckboxButton({id:'checkbox_button_'+i, text: {da:'Vælg mig', en:'Select me'}, icon: ['fa-thumbs-down', 'fa-thumbs-up'], selected: false,
-                        onChange: function(id, selected, $button, _this, map){ 
-                            console.log('bsCheckboxButton', arguments.length, id,selected, _this, 'map=null',map); 
-                        }
-                    }),
+// HER>                     $.bsCheckboxButton({id:'checkbox_button_'+i, text: {da:'Vælg mig', en:'Select me'}, icon: ['fa-thumbs-down', 'fa-thumbs-up'], selected: false,
+// HER>                         onChange: function(id, selected, $button, _this, map){ 
+// HER>                             console.log('bsCheckboxButton', arguments.length, id,selected, _this, 'map=null',map); 
+// HER>                         }
+// HER>                     }),
 
                     {
                         type:'checkboxbutton', icon:['fa-home', 'fa-map'], text:'Tra daa', selected: true, 

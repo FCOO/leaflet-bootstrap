@@ -72526,11 +72526,14 @@ module.exports = g;
                 baseClass             : 'btn-group',
                 leftClass             : 'btn-group-left', //Class for group when content is left-align
                 centerClass           : '', //Class for group when content is center-align
+                fullWidthClass        : 'btn-group-full-width',
+                centerInParentClass   : 'btn-group-center-in-parent',
                 verticalClassPostfix  : '-vertical',
                 horizontalClassPostfix: '',
                 center                : !options.vertical, //Default: center on horizontal and left on vertical
                 useTouchSize          : true,
                 attr                  : { role: 'group' },
+                inclHeader            : options.vertical,   //Default: Include headers (= items without onClick)
                 buttonOptions         : {
                     onClick         : options.onClick,
                     returnFromClick : options.returnFromClick,
@@ -72538,11 +72541,13 @@ module.exports = g;
                 }
             });
 
+
         options.baseClassPostfix = options.vertical ? options.verticalClassPostfix : options.horizontalClassPostfix;
 
-        var result = $('<'+ options.tagName + '/>')
-                        ._bsAddIdAndName( options )
-                        ._bsAddBaseClassAndSize( options );
+        var result = options.container || options.$container || $('<'+ options.tagName + '/>');
+        result
+            ._bsAddIdAndName( options )
+            ._bsAddBaseClassAndSize( options );
 
         //Transfere generel button-options to buttonOptions
         $.each(['square', 'bigSquare', 'bigIcon', 'extraLargeIcon'], function(index, id){
@@ -72565,11 +72570,11 @@ module.exports = g;
         if (options.allowZeroSelected)
             result.addClass( 'allow-zero-selected' );
 
-        if (options.fullWidth)
-            result.addClass('btn-group-full-width');
+        if (options.fullWidthClass && options.fullWidth)
+            result.addClass(options.fullWidthClass);
 
-        if (options.centerInParent)
-            result.addClass('btn-group-center-in-parent');
+        if (options.centerInParentClass && options.centerInParent)
+            result.addClass(options.centerInParentClass);
 
 
         if (options.border)
@@ -72589,19 +72594,20 @@ module.exports = g;
             spaceAfter      = buttonOptions.spaceAfter || buttonOptions.lineAfter;
             $previousButton = null;
 
-            if (buttonOptions.id || !options.vertical)
+            if (buttonOptions.id || buttonOptions.onClick  || buttonOptions.onChange)
                 $previousButton =
                     $._anyBsButton( $.extend({}, options.buttonOptions, buttonOptions ) )
                         .appendTo( result );
             else
-                //Create content as header in vertical button-group
-                $('<div/>')
-                    .addClass('btn header-content')
-                    .toggleClass('header-main', !!buttonOptions.mainHeader)
+                if (options.inclHeader)
+                    //Create content as header
+                    $('<div/>')
+                        .addClass('btn header-content')
+                        .toggleClass('header-main', !!buttonOptions.mainHeader)
 
-                    .addClass( buttonOptions.class )
-                    ._bsHeaderAndIcons( {header: buttonOptions} )
-                    .appendTo( result );
+                        .addClass( buttonOptions.class )
+                        ._bsHeaderAndIcons( {header: buttonOptions} )
+                        .appendTo( result );
         });
         return result;
     };
@@ -72650,6 +72656,35 @@ module.exports = g;
         var result = $.bsButtonGroup( options );
 
         result.data('radioGroup', radioGroup );
+
+        return result;
+    };
+
+
+    /**********************************************************
+    bsButtonBar( options ) - create a horizontal group of buttons
+    options:
+        inclHeader : false. If true buttons without id or onClick are included
+        justify    : "start", "end", "center", "between", "around", or "evenly"
+        buttons    : as bsButtonGroup
+    **********************************************************/
+    $.bsButtonBar = function( options ){
+        options =
+            $._bsAdjustOptions( options, {
+                fullWidthClass  : 'w-100',
+                fullWidth       : true
+            }, {
+                baseClass   : 'btn-bar',
+                class       : 'm-0 p-0 d-flex flex-row flex-nowrap justify-content-'+(options.justify || options.align || 'center'),
+                vertical    : false,
+                center      : true,
+                useTouchSize: true,
+                buttonOptions: {
+                    _class: 'flex-shrink-1 text-truncate'
+                }
+            } );
+
+        var result = $.bsButtonGroup( options );
 
         return result;
     };

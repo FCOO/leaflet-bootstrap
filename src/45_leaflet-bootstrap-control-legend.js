@@ -295,15 +295,38 @@ leaflet-bootstrap-control-legend.js
                         content.push( this.$contentContainer );
                     }
 
-                    if (options.buttons || options.buttonList){
-                        //Convert button-list to content
-                        var buttonList = L._adjustButtonList(options.buttons || options.buttonList, this );
 
-                        this.$buttonContainer =
-                            $('<div/>')
-                                .addClass('text-right modal-footer')
-                                .css('padding', 0)
-                                ._bsAppendContent( buttonList );
+                    var buttonList = L._adjustButtonList(options.buttons || options.buttonList, this );
+                    if (buttonList){
+
+                        //Buttons added inside button-bar. If button-options have first: true => new 'line' = new bsButtonGroup
+                        var groupList = [],
+                            currentList = [];
+
+                        buttonList.forEach( function(buttonOptions){
+                            if (buttonOptions.isFirstButton && currentList.length){
+                                groupList.push( currentList );
+                                currentList = [];
+                            }
+
+                            currentList.push( buttonOptions );
+
+                            if (buttonOptions.isLastButton){
+                                groupList.push( currentList );
+                                currentList = [];
+                            }
+                        });
+                        if (currentList.length)
+                            groupList.push( currentList );
+
+                        var $buttonContainer = this.$buttonContainer = $('<div/>').addClass('modal-footer d-block');
+                        groupList.forEach( function( list ){
+                            $.bsButtonBar({
+                                small   : true,
+                                buttons : list,
+                                justify : 'center'
+                            }).appendTo( $buttonContainer );
+                        });
 
                         content.push( this.$buttonContainer );
                     }
