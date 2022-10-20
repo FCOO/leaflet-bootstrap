@@ -195,7 +195,7 @@
             checkWidth( contextmenuOptions.width );
 
             //If no header is given and there are more than one object => add header (if any)
-            if (!o.header && (objectList.length > 1) && contextmenuOptions.items.length && !!contextmenuOptions.header){
+            if ((!firstObject || !o.header) && (objectList.length > 1) && contextmenuOptions.items.length && !!contextmenuOptions.header){
                 var headerOptions = $._bsAdjustIconAndText(contextmenuOptions.header);
                 headerOptions.spaceBefore = !firstObject;
                 headerOptions.mainHeader = firstObject;
@@ -210,6 +210,7 @@
                     isContextmenuPopup ? {closeOnClick: true} : {spaceBefore: firstItem},
                     item
                 );
+
                 firstItem = false;
                 item.id = item.onClick ? item.id || 'itemId' + nextId++ : null;
                 checkWidth( item.width );
