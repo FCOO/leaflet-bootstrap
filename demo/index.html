@@ -539,8 +539,8 @@ content = {
             {icon:'fa-home', text:{da:first?'Blue#1 (dont close)':'RED#1 (dont close)'}, onClick: function(latlng){ console.log('Marker 1',this, latlng); }, width: '20em', closeOnClick: false },
             {icon:'fa-map',  text:{da:first?'Blue#22':'RED#2'}, onClick: function(latlng){ console.log('Marker 2',this, latlng); } },
         ]);
-        if (first)
-            marker.excludeMapContextmenu();
+// HER>         if (first)
+// HER>             marker.excludeMapContextmenu();
 
         marker.setContextmenuParent(first);
 
@@ -940,12 +940,12 @@ content = {
                 //noHorizontalPadding: true,
 
                 buttons   : [
-                    {id:'button_'+i, icon:'fa-home', text:'IsLast #'+i, 
+                    {id:'button_'+i, icon:'fa-home', text:'IsLast #'+i, _isLastButton: true, 
                         onClick: function(id, selected, button, map, legend){ 
                             console.log('click me:', id, map, legend, arguments); legend.updateContent('Skide godt do!'); 
                         } 
                     }, 
-                    {id:'button_'+i, icon:'fa-home', text:'click me #'+i, isLastButton: true,
+                    {id:'button_'+i, icon:'fa-home', text:'click me #'+i, 
                         onClick: function(id, selected, button, map, legend){ 
                             console.log('click me:', id, map, legend, arguments); legend.updateContent('Skide godt do!'); 
                         } 

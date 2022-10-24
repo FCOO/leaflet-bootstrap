@@ -2132,7 +2132,6 @@ https://github.com/nerik/leaflet-graphicscale
             if (this.contextmenuOptions.alsoAsPopup && this.bindPopup){
                 var popupContent = ns._popupContent({
                         object       : this,
-                        header       : this.contextmenuOptions.header,
                         isNormalPopup: true,
                         map          : this._map,
                         includeMap   : false
@@ -2180,7 +2179,6 @@ https://github.com/nerik/leaflet-graphicscale
     options = {
         object       : The object with the context-menu
         isNormalPopup: BOOLEAN, true if the content are for a normal popup
-        header       : The header for popup-version (isNormalPopup == true)
         map          : The map where the contextmenu/object is located
         includeMap   : BOOLEAN, if true the contextmenus of _map are included
         latlng       : The position where the contextmenu was trigged
@@ -2203,17 +2201,15 @@ https://github.com/nerik/leaflet-graphicscale
         if (o.includeMap && o.map)
             objectList.push(o.map);
 
+
         var isContextmenuPopup = !o.isNormalPopup,
+            header = objectList[0].contextmenuOptions.header,
             result = {
-                header : o.header && o.isNormalPopup ? o.header : null,
-                content: {
-                    type     : 'menu',
-                    fullWidth: true,
-                    list     : [],
-                    small    : true
-                }
+                header : o.isNormalPopup ? header : null,
+                content: [],
             },
-            list       = result.content.list,
+            menuList,
+            accordion,
             maxWidth   = 0,
             widthToUse = undefined,
             nextId     = 0;
@@ -2231,24 +2227,50 @@ https://github.com/nerik/leaflet-graphicscale
 
             checkWidth( contextmenuOptions.width );
 
-            //If no header is given and there are more than one object => add header (if any)
-            if ((!firstObject || !o.header) && (objectList.length > 1) && contextmenuOptions.items.length && !!contextmenuOptions.header){
-                var headerOptions = $._bsAdjustIconAndText(contextmenuOptions.header);
-                headerOptions.spaceBefore = !firstObject;
-                headerOptions.mainHeader = firstObject;
-                list.push(headerOptions);
-            }
+            if (firstObject){
+                //First is added as menu
+                result.content.push({
+                    type     : 'menu',
+                    fullWidth: true,
+                    list     : [],
+                    small    : true
+                });
+                menuList = result.content[0].list;
 
-            var firstItem = true;
+                if (isContextmenuPopup && header){
+                    var headerOptions = $._bsAdjustIconAndText(contextmenuOptions.header);
+                    headerOptions.mainHeader = true;
+                    menuList.push(headerOptions);
+                }
+            }
+            else {
+                //The rest is added inside a accordion
+                if (!accordion){
+                    accordion = {
+                        type : 'accordion',
+                        list : [],
+                        small: true
+                    };
+                    result.content.push( accordion );
+                }
+
+                var accordionItem = $._bsAdjustIconAndText(contextmenuOptions.header);
+                accordionItem.content = {
+                    type     : 'menu',
+                    fullWidth: true,
+                    list     : []
+                };
+                accordion.list.push(accordionItem);
+                menuList = accordionItem.content.list;
+            }
 
             $.each( contextmenuOptions.items, function(index, item){
                 //Set default options
                 item = $.extend(
-                    isContextmenuPopup ? {closeOnClick: true} : {spaceBefore: firstItem},
+                    isContextmenuPopup ? {closeOnClick: true} : {},
                     item
                 );
 
-                firstItem = false;
                 item.id = item.onClick ? item.id || 'itemId' + nextId++ : null;
                 checkWidth( item.width );
                 if (item.onClick || item.onChange)
@@ -2264,7 +2286,7 @@ https://github.com/nerik/leaflet-graphicscale
                         item.latlng = o.latlng;
                 }
 
-                list.push(item);
+                menuList.push(item);
             });
 
             firstObject = false;
@@ -2360,12 +2382,12 @@ https://github.com/nerik/leaflet-graphicscale
             var popupContent = ns._popupContent({
                     object       : source,
                     isNormalPopup: false,
-                    header       : null,
                     map          : this._map,
                     includeMap   : !firedOnMap && !source.contextmenuOptions.excludeMapContextmenu && this._map.contextmenuOptions,
                     latlng       : latlng
                 }),
-                itemExists = popupContent.content.list.length > 0;
+
+                itemExists = popupContent.content[0].list.length > 0;
 
             this.contextmenuMarker = this.contextmenuMarker || L.bsMarkerRedCross(this._map.getCenter(), {pane: 'overlayPane'}).addTo( this._map );
             this.contextmenuMarker.setLatLng(latlng);
