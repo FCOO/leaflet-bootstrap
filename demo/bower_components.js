@@ -72210,6 +72210,8 @@ module.exports = g;
                 $contentContainer =
                     $('<div/>')
                         .addClass('accordion-body')
+                        .toggleClass('no-vertical-padding', !!opt.noVerticalPadding)
+                        .toggleClass('no-horizontal-padding', !!opt.noHorizontalPadding)
                         .appendTo( $outer );
 
             //Add footer
@@ -72580,6 +72582,9 @@ module.exports = g;
         if (options.border)
             result.addClass('btn-group-border');
 
+        if (options.noRoundBorder)
+            result.addClass('btn-group-no-round-border');
+
         if (options.attr)
             result.attr( options.attr );
 
@@ -72672,10 +72677,10 @@ module.exports = g;
         options =
             $._bsAdjustOptions( options, {
                 fullWidthClass  : 'w-100',
-                fullWidth       : true
+                fullWidth       : true,
+                class           : 'm-0 p-0 d-flex flex-row flex-nowrap justify-content-'+(options.justify || options.align || 'center'),
             }, {
                 baseClass   : 'btn-bar',
-                class       : 'm-0 p-0 d-flex flex-row flex-nowrap justify-content-'+(options.justify || options.align || 'center'),
                 vertical    : false,
                 center      : true,
                 useTouchSize: true,

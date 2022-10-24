@@ -10281,7 +10281,7 @@ Also overwrite default bootstrap behaviour
   .btn-jb.no-shadow {
     box-shadow: none !important; }
   .btn-jb.min-width {
-    min-width: 5em; }
+    min-width: 5em !important; }
   .btn-jb > i.fa {
     min-width: 1em;
     text-align: left; }
@@ -10349,6 +10349,9 @@ Modernizr-test for elements with class="hide-for-selected" or "show-for-selected
 /************************************************************
 BUTTON-GROUP
 ************************************************************/
+.btn-group-vertical.btn-group-no-round-border > .btn {
+  border-radius: 0; }
+
 .input-group .btn-group,
 .btn-group:not(.btn-group-vertical).btn-group-full-width {
   display: flex;
@@ -11375,6 +11378,10 @@ Using Bootstrap Collapse to create accordion
     line-height: 1.25;
     font-size: var(--bs-footer-font-size);
     padding: var(--bs-accordion-footer-padding); }
+  .accordion .accordion-body.no-vertical-padding {
+    --bs-accordion-body-padding-y: 0 !important; }
+  .accordion .accordion-body.no-horizontal-padding {
+    --bs-accordion-body-padding-x: 0 !important; }
   .modal-dialog-sm .accordion, .accordion.accordion-sm {
     --bs-accordion-font-size: 0.875rem;
     --bs-accordion-btn-padding-x: 0.25rem;

@@ -2249,16 +2249,19 @@ https://github.com/nerik/leaflet-graphicscale
                     accordion = {
                         type : 'accordion',
                         list : [],
-                        small: true
+                        small: true,
                     };
                     result.content.push( accordion );
                 }
 
                 var accordionItem = $._bsAdjustIconAndText(contextmenuOptions.header);
+                accordionItem.noVerticalPadding   = true;
+                accordionItem.noHorizontalPadding = true;
                 accordionItem.content = {
-                    type     : 'menu',
-                    fullWidth: true,
-                    list     : []
+                    type         : 'menu',
+                    noRoundBorder: true,
+                    fullWidth    : true,
+                    list         : []
                 };
                 accordion.list.push(accordionItem);
                 menuList = accordionItem.content.list;
