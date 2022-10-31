@@ -364,7 +364,7 @@
 
             //Create the popup
             var firstTime = !this.popup;
-            this.popup = this.popup || L.popup();
+            this.popup = this.popup || L.popup({autoPan: false});
 
             //Update popup content
             this.popup

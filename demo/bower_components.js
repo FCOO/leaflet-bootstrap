@@ -57266,7 +57266,6 @@ return index;
     https://github.com/FCOO
 
 ****************************************************************************/
-
 (function ($, window, document/*, undefined*/) {
     "use strict";
 
@@ -57279,27 +57278,40 @@ return index;
     //Create namespace
     var ns = window.JqueryScrollContainer = window.JqueryScrollContainer || {};
 
-    var scrollbarWidth = null;
-    window.getScrollbarWidth = function() {
-        if (scrollbarWidth === null){
-            if (typeof document === 'undefined')
-                return 0;
-
-            var body = document.body,
-                box = document.createElement('div'),
-                boxStyle = box.style;
-
-            box.className       = 'jq-scroll-default';
-            boxStyle.position   = 'fixed';
-            boxStyle.left       = 0;
-            boxStyle.visibility = 'hidden';
-            boxStyle.overflowY  = 'scroll';
-            body.appendChild(box);
-            scrollbarWidth = box.getBoundingClientRect().right;
-            body.removeChild(box);
+    //Calc the scrollbar-width when the document is loaded
+    var getScrollbarWidth = window.getScrollbarWidth = function() {
+        if (typeof document === 'undefined'){
+            window.setTimeout( getScrollbarWidth, 1000 );
+            return;
         }
+
+        var body = document.body,
+            box = document.createElement('div'),
+            boxStyle = box.style;
+
+        box.className       = 'jq-scroll-default';
+        boxStyle.position   = 'fixed';
+        boxStyle.left       = 0;
+        boxStyle.visibility = 'hidden';
+        boxStyle.overflowY  = 'scroll';
+        body.appendChild(box);
+        var scrollbarWidth = box.getBoundingClientRect().right;
+        body.removeChild(box);
+
+        //Update to css-var for scrollbars
+        var root = document.querySelector(':root');
+        root.style.setProperty('--jsc-scroll-size', scrollbarWidth+'px');
+        if (scrollbarWidth > 0){
+            root.style.setProperty('--jsc-scroll-padding'     , scrollbarWidth+'px');
+            root.style.setProperty('--jsc-scroll-auto-padding', '0px');
+        }
+
         return scrollbarWidth;
     };
+
+    //Called when document is laoded
+    $(getScrollbarWidth);
+
 
     //Extend $.fn with scrollIntoView
     $.fn.extend({
@@ -57390,7 +57402,7 @@ return index;
         this.addClass('jq-scroll-default');
 
         if (isVertical && options.paddingLeft)
-            this.css('padding-left', window.getScrollbarWidth()+'px' );
+            this.addClass('jq-scroll-padding-left');
 
         //Update scroll-shadow when scrolling
         if (!isBoth)
@@ -71855,6 +71867,7 @@ module.exports = g;
                 addBorder         = false,
                 buildInsideParent = false,
                 noPadding         = false,
+                isButtonType      = false,
                 noValidation      = false;
 
 
@@ -71864,17 +71877,16 @@ module.exports = g;
                     options[id] = parentOptions[id];
             });
 
-
             var hasPreOrPost = options.prepend || options.before || options.append || options.after;
 
             if (options.type){
                 var type = options.type.toLowerCase();
                 switch (type){
-                    case 'button'                : buildFunc = $.bsButton;                  break;
+                    case 'button'                : buildFunc = $.bsButton;                  isButtonType = true; break;
 
-                    case 'checkboxbutton'        : buildFunc = $.bsCheckboxButton;          break;
-                    case 'standardcheckboxbutton': buildFunc = $.bsStandardCheckboxButton;  break;
-                    case 'iconcheckboxbutton'    : buildFunc = $.bsIconCheckboxButton;      break;
+                    case 'checkboxbutton'        : buildFunc = $.bsCheckboxButton;          isButtonType = true; break;
+                    case 'standardcheckboxbutton': buildFunc = $.bsStandardCheckboxButton;  isButtonType = true; break;
+                    case 'iconcheckboxbutton'    : buildFunc = $.bsIconCheckboxButton;      isButtonType = true; break;
 
                     case 'buttongroup'           : buildFunc = $.bsButtonGroup;             insideFormGroup = true; break;
 
@@ -71883,6 +71895,7 @@ module.exports = g;
                     case 'select'           :   buildFunc = $.bsSelect;             insideFormGroup = true; break;
 
                     case 'selectlist'       :   buildFunc = $.bsSelectList;         break;
+                    case 'selectbutton'     :   buildFunc = $.bsSelectButton;       isButtonType = true; break;
 
                     case 'radiobuttongroup' :   buildFunc = $.bsRadioButtonGroup;   addBorder = true; insideFormGroup = true; break;
                     case 'checkbox'         :   buildFunc = $.bsCheckbox;           insideFormGroup = true; noPadding = true; break;
@@ -71899,7 +71912,6 @@ module.exports = g;
                     case 'conpacttext'      :   buildFunc = buildCompactText;
                                                 options.noLabel = true; options.noVerticalPadding = true;
                                                 insideFormGroup = true; addBorder = true; noValidation = true; break;
-
                     case 'text'             :
                     case 'textarea'         :
                     case 'textbox'          :   insideFormGroup = true;
@@ -71931,6 +71943,14 @@ module.exports = g;
                     default                 :   buildFunc = $.fn._bsAddHtml;        noPadding = true; buildInsideParent = true;
                 }
             }
+
+
+            //Button'ish elemnts get inside a formgroup if there are label or border
+            if (isButtonType)
+                if ((options.label && !options.noLabel) || options.border){
+                    addBorder = true;
+                    insideFormGroup = true;
+                }
 
             if (options.lineBefore || options.lineAfter)
                 insideFormGroup = true;
@@ -72310,6 +72330,7 @@ module.exports = g;
                 selected            : 'selected',
                 noBorder            : 'no-border',
                 focus               : 'init_focus',
+                truncate            : 'text-truncate',
                 fullWidth           : 'w-100'
             };
 
@@ -73132,7 +73153,10 @@ module.exports = g;
                 case 'standardcheckboxbutton':
                 case 'iconcheckboxbutton'    : $elem._cbxSet(value, true, isSemiSelected, semiSelectedValue); break;
 
-                case 'selectlist'      : this.getRadioGroup().setSelected(value); break;
+                case 'selectlist'  : this.getRadioGroup().setSelected(value); break;
+
+                case 'selectbutton': $elem._bsSelectButton_setValue( value ); break;
+
                 case 'radiobuttongroup': this.getRadioGroup().setSelected(value, false, isSemiSelected, semiSelectedValue); break;
 
                 case 'slider'    :
@@ -73151,7 +73175,8 @@ module.exports = g;
             var result;
             switch (this.options.type || 'input'){
                 case 'input'            : result = '';    break;
-                case 'select'           : result = null;  break;
+                case 'select'           :
+                case 'selectbutton'     : result = null;  break;
 
                 case 'checkbox'              :
                 case 'checkboxbutton'        :
@@ -73206,6 +73231,9 @@ module.exports = g;
 
                 case 'selectlist'       : result = this.getRadioGroup().getSelected();  break;
                 case 'radiobuttongroup' : result = this.getRadioGroup().getSelected();  break;
+
+                case 'selectbutton'     : result = $elem._bsSelectButton_getValue(); break;
+
 
                 case 'slider'    :
                 case 'timeslider': result = this._getSliderValue();              break;
@@ -73297,7 +73325,7 @@ module.exports = g;
         this.inputs = {};
 
         var typeList = ['button', 'checkboxbutton', 'standardcheckboxbutton', 'iconcheckboxbutton',
-                        'input', 'select', 'selectlist', 'radiobuttongroup', 'checkbox', 'radio', 'table', 'slider', 'timeslider', 'hidden', 'inputgroup', 'formControlGroup'],
+                        'input', 'select', 'selectlist', 'selectbutton', 'radiobuttongroup', 'checkbox', 'radio', 'table', 'slider', 'timeslider', 'hidden', 'inputgroup', 'formControlGroup'],
 
             //semiSelectedValueTypes = {TYPE_ID:TYPE} TYPE_ID = the types that accept a semi-selected value. TYPE = the $.type result that detect if the value of a element is semi-selected
             semiSelectedValueTypes = {
@@ -74352,7 +74380,10 @@ options
 
     var zindexAllwaysOnTop  = 9999,
         modalBackdropLevels = 0,
-        $modalBackdrop = null;
+
+        $modalBackdrop_current = null,
+        $modalBackdrop = null,
+        $modalTransparentBackdrop = null;
 
     /******************************************************
     $.fn._setModalBackdropZIndex
@@ -74373,20 +74404,30 @@ options
     $._addModalBackdropLevel
     Move the backdrop up in z-index
     ******************************************************/
-    $._addModalBackdropLevel = function(){
+    function addAnyModalBackdropLevel( $modalBD, transparent ){
         modalBackdropLevels++;
 
-        if (!$modalBackdrop)
-            $modalBackdrop =
+        if (!$modalBD)
+            $modalBD =
                 $('<div/>')
                     .append( $('<i/>')._bsAddHtml({icon:'fa-spinner fa-spin'}) )
                     .addClass('global-backdrop')
+                    .toggleClass('transparent', !!transparent)
                     .appendTo( $('body') );
 
-        $modalBackdrop
+        $modalBD
             ._setModalBackdropZIndex( -1 )
             .removeClass('hidden')
             .addClass('show');
+
+        return $modalBD;
+    }
+
+    $._addModalBackdropLevel = function(transparent){
+        if (transparent)
+            $modalBackdrop_current = $modalTransparentBackdrop = addAnyModalBackdropLevel($modalTransparentBackdrop, true);
+        else
+            $modalBackdrop_current = $modalBackdrop = addAnyModalBackdropLevel($modalBackdrop);
     };
 
     /******************************************************
@@ -74394,17 +74435,23 @@ options
     Move the backdrop down in z-index
     ******************************************************/
     $._removeModalBackdropLevel = function( noDelay ){
+        var isTransparentBD = ($modalBackdrop_current === $modalTransparentBackdrop);
+
         modalBackdropLevels--;
 
-        $modalBackdrop._setModalBackdropZIndex( -1 );
-        if (!modalBackdropLevels){
-            $modalBackdrop
+        $modalBackdrop_current._setModalBackdropZIndex( -1 );
+        if (!modalBackdropLevels || isTransparentBD){
+            $modalBackdrop_current
                 .removeClass('show');
-            if (noDelay)
-                $modalBackdrop.addClass('hidden');
+            if (noDelay || isTransparentBD)
+                $modalBackdrop_current.addClass('hidden');
             else
-                window.setTimeout( function(){ $modalBackdrop.addClass('hidden'); }, 2000 );
+                window.setTimeout( function(){ $modalBackdrop_current.addClass('hidden'); }, 2000 );
         }
+
+        if ($modalBackdrop_current === $modalTransparentBackdrop)
+            $modalBackdrop_current = $modalBackdrop;
+
     };
 
 
@@ -74970,7 +75017,7 @@ jquery-bootstrap-modal-promise.js
         currentModal = this;
 
         //Move up the backdrop
-        $._addModalBackdropLevel();
+        $._addModalBackdropLevel(this.bsModal.transparentBackground);
 
         //Add layer for noty on the modal
         $._bsNotyAddLayer();
@@ -75287,6 +75334,8 @@ jquery-bootstrap-modal-promise.js
         //this.bsModal contains all created elements
         this.bsModal = {};
         this.bsModal.onChange = options.onChange || null;
+
+        this.bsModal.transparentBackground = !!options.transparentBackground;
 
         //bsModal.cssHeight and bsModal.cssWidth = [size] of { width or height options}
         this.bsModal.cssHeight = {};
@@ -75833,7 +75882,6 @@ jquery-bootstrap-modal-promise.js
         $result.onClose = options.onClose;
 
         //Create as modal and adds methods - only allow close by esc for non-static modal (typical a non-form)
-// HER>         $result.modal({
         new bootstrap.Modal($result, {
            //Name       Value                                   Type                Default Description
            backdrop :   options.static ? "static" : true,   //  boolean or 'static' true	Includes a modal-backdrop element. Alternatively, specify static for a backdrop which doesn't close the modal on click.
@@ -76768,10 +76816,21 @@ jquery-bootstrap-modal-promise.js
             $option.prop('label', text);
     }
 
+
+    function bsSelect_onChange( event ){
+        var $select = $(event.target),
+            selectedIndex = $select.get(0).selectedIndex,
+            options = $select.data('bsOptions'),
+            selectedItem = options.optionList[selectedIndex];
+
+        if (options.onChange)
+            $.proxy(options.onChange, options.context)(selectedItem.id, true, $select);
+    }
+
     var selectboxId = 0;
     $.bsSelect = $.bsSelectBox = $.bsSelectbox = function( options ){
 
-        options.items = options.items || options.list;
+        //options.items = options.items || options.list;
         options.list = options.list || options.items;
 
         options =
@@ -76788,6 +76847,8 @@ jquery-bootstrap-modal-promise.js
                     ._bsAddBaseClassAndSize( options )
                     ._bsAddIdAndName( options );
 
+
+        options.optionList = [];
         $.each( options.list, function( index, itemOptions ){
             var $option =
                     itemOptions.id ?
@@ -76798,11 +76859,20 @@ jquery-bootstrap-modal-promise.js
 
             $option
                 .addClass('jb-option')
+                .addClass(itemOptions.textClass)
+                .toggleClass('text-center', !!itemOptions.center)
                 .data('jb-text', itemOptions.text)
                 .appendTo($select);
 
+            if (itemOptions.id)
+                options.optionList.push( itemOptions );
+
             setOptionText( $option );
         });
+
+
+        $select.data('bsOptions', options);
+        $select.on('change', bsSelect_onChange);
 
         //wrap inside a label (if any)
         var $result = options.label ? $select._wrapLabel({ label: options.label }) : $select;
@@ -76813,6 +76883,115 @@ jquery-bootstrap-modal-promise.js
     };
 
 }(jQuery, this.i18next, this, document));
+;
+/****************************************************************************
+	jquery-bootstrap-selectbutton.js,
+
+    bsSelectButton( options ) - create a button that opens a modal with a selectlist
+
+****************************************************************************/
+
+(function ($/*, window, document, undefined*/) {
+	"use strict";
+
+    var selectButtonId = 0;
+    $.bsSelectButton = $.bsSelectbutton = function( options ){
+
+        options.id      = options.id || '_bsSelectButton'+ selectButtonId++,
+        options.text    = options.text || {da:'Vælg...', en:'Select...'};
+        options.onClick = $.fn._bsSelectButton_onClick;
+        options.list    = options.list || options.items;
+        options._class  = (options._class || '') + ' text-truncate btn-select';
+        delete options.items;
+
+        var $result = $.bsButton( options );
+
+        options = $result.data('bsButton_options');
+        options.context = $result,
+        $result.data('bsButton_options', options);
+
+        if (options.selectedId)
+            $result._bsSelectButton_setValue(options.selectedId);
+
+        return $result;
+    };
+
+    /**************************************************
+    Methods for bsSelectButton
+    **************************************************/
+    $.fn._bsSelectButton_setValue = function( value ){
+        var options = this.data('bsButton_options'),
+            selectedItem;
+
+        options.selectedId = value;
+        this.data('bsButton_options', options);
+
+        options.list.forEach( function(item){
+            if (item.id == value)
+                selectedItem = item;
+        });
+
+        if (selectedItem){
+            this
+                .empty()
+                ._bsAddHtml(
+                    $.extend(true,
+                        {textClass: 'text-truncate'},
+                        selectedItem
+                    )
+                );
+
+            if (options.onChange)
+                $.proxy(options.onChange, options.context)(value);
+        }
+
+        return this;
+    };
+
+    $.fn._bsSelectButton_getValue = function(){
+        return this.data('bsButton_options').selectedId;
+    };
+
+    var $selectButton_Modal = null;
+    $.fn._bsSelectButton_onClick = function( /*id, selected, $button*/ ){
+        var options    = this.data('bsButton_options'),
+            selectedId = options.selectedId,
+            list       = $.extend(true, {}, options).list;
+
+        list.forEach(function(item){
+            item.selected = item.id ? item.id == selectedId : false;
+        });
+
+        if ($selectButton_Modal)
+            $selectButton_Modal.remove();
+
+        $selectButton_Modal = $.bsModal({
+            noHeader    : true,
+            closeButton : false,
+            clickable   : true,
+            transparentBackground: true,
+            scroll      : list.length > 5,
+            content: {
+                type         : 'selectlist',
+                allowReselect: true,
+                list         : list,
+                onChange     : $.fn._bsSelectButton_onChange,
+                context      : this,
+                truncate     : true
+            },
+            show: true
+        });
+    };
+
+    /**************************************************
+    **************************************************/
+    $.fn._bsSelectButton_onChange = function( id ){
+        this._bsSelectButton_setValue( id );
+        if ($selectButton_Modal)
+            $selectButton_Modal.close();
+    };
+
+}(jQuery, this, document));
 ;
 /****************************************************************************
 	jquery-bootstrap-selectlist.js,
@@ -76860,7 +77039,8 @@ jquery-bootstrap-modal-promise.js
             var isItem = (itemOptions.id != undefined ),
                 $item = $(isItem ? '<a/>' : '<div/>')
                             .addClass( isItem ? 'dropdown-item' : 'dropdown-header' )
-                            .addClass( options.center ? 'text-center' : '')
+                            .toggleClass( 'text-center',   !!options.center )
+                            .toggleClass( 'text-truncate', !!options.truncate )
                             ._bsAddHtml( itemOptions, false, false, true )
                             .appendTo( $result );
 
@@ -77059,8 +77239,8 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
     $.BSASMODAL.BSTABLE = function( modalOptions = {}){
         var showHeader = this.find('.no-header').length == 0,
             _this      = this,
-            $tableWithHeader,
-            $result, $thead, count;
+            $result,
+            count;
 
         if (showHeader){
             //Clone the header and place them in fixed-body of the modal. Hide the original header by padding the table
@@ -77072,12 +77252,12 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
                 _this.sortBy( columnIndex );
             });
 
-            $tableWithHeader =
+            this.$tableWithHeader =
                 $('<table/>')
                     ._bsAddBaseClassAndSize( this.data(dataTableId) )
                     .addClass('table-with-header')
                     .append( this.$theadClone );
-            $thead = this.find('thead');
+            this.$thead = this.find('thead');
             count  = 20;
         }
 
@@ -77086,14 +77266,14 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
                             flexWidth        : true,
                             noVerticalPadding: true,
                             content          : this,
-                            fixedContent     : $tableWithHeader
+                            fixedContent     : this.$tableWithHeader
                         })
                       );
 
         if (showHeader){
             //Using timeout to wait for the browser to update DOM and get height of the header
-            var setHeaderHeight = this.setHeaderHeight = function(){
-                    var height = $tableWithHeader.outerHeight();
+            var setHeaderHeight = function(){
+                    var height = _this.$tableWithHeader.outerHeight();
                     if (height <= 0){
                         count--;
                         if (count){
@@ -77103,23 +77283,14 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
                         }
                     }
 
-                    _this.css('margin-top', -height+'px');
-                    setHeaderWidth();
+                    _this.setHeaderWidthAndHeight();
 
                     //Only set header-height once
                     $result.off('shown.bs.modal.table', setHeaderHeight );
-                },
-
-                setHeaderWidth = function(){
-                    $thead.find('th').each(function( index, th ){
-                        _this.$theadClone.find('th:nth-child(' + (index+1) + ')')
-                            .width( $(th).width()+'px' );
-                    });
-                    $tableWithHeader.width( _this.width()+'px' );
                 };
 
             $result.on('shown.bs.modal.table', setHeaderHeight );
-            $thead.resize( setHeaderWidth );
+            this.$thead.resize( $.proxy(this.setHeaderWidthAndHeight, this) );
         }
 
         return $result;
@@ -77146,7 +77317,6 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
             if (options.selectable)
                 $tr.attr('id', rowContent.id || 'rowId_'+rowId++);
 
-//HER            var lastSortBy = this.lastSortBy || {};
             var _this = this;
             $.each( options.columns, function( index, columnOptions ){
                 var content = rowContent[columnOptions.id],
@@ -77264,6 +77434,26 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
         },
 
         /**********************************************************
+        setHeaderWidthAndHeight - Set the width of headers in the cloned table and adjust margin-top
+        **********************************************************/
+        setHeaderWidthAndHeight: function(){
+            var _this   = this,
+                options = _this.data(dataTableId);
+
+            if (options.showHeader){
+                this.$thead.find('th').each(function( index, th ){
+                    _this.$theadClone.find('th:nth-child(' + (index+1) + ')')
+                        .width( $(th).width()+'px' );
+                });
+                this.$tableWithHeader.width( this.width()+'px' );
+
+                //Set the margin-top of the table to hide its own header
+                var headerHeight = _this.$tableWithHeader.outerHeight();
+                this.css('margin-top', -headerHeight + 'px');
+            }
+        },
+
+        /**********************************************************
         sortBy - Sort the table
         **********************************************************/
         sortBy: function( idOrIndex, dir ){
@@ -77375,6 +77565,10 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
                     }
                 });
             }
+
+            //Re-calc and update width and height of headers
+            this.setHeaderWidthAndHeight();
+
         },
 
         /**********************************************************
@@ -77384,8 +77578,7 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
             this.find('tbody tr').removeClass('filter-out');
             if (!dontSort)
                 this._resort();
-            if (this.setHeaderHeight)
-                this.setHeaderHeight();
+            this.setHeaderWidthAndHeight();
             return this;
         },
 
@@ -77429,8 +77622,8 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
             //Sort table again
             this._resort();
 
-            if (this.setHeaderHeight)
-                this.setHeaderHeight();
+            this.setHeaderWidthAndHeight();
+
             return this;
         }
     }; //end of bsTable_prototype = {

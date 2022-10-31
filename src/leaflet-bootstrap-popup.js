@@ -18,6 +18,8 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
     *********************************************************/
     L.Popup.prototype.options.closeButton = false;
     L.Popup.prototype.options.offset = [0, 11];
+    //L.Popup.prototype.options.autoPan = false;  //Set it to false if you don't want the map to do panning animation to fit the opened popup.
+
 
     //Add methods to pin or unpin popup
     L.Popup.prototype._setPinned = function(pinned) {

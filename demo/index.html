@@ -134,7 +134,7 @@
                 position          : 'bottomright',  //1
                 isExtended: true,
                 tooltipOnButton: false,//!index,
-                selectFormat: first ? function(){ console.log(this); this.setMode(confirm('Use nautical?') ? 'NAUTICAL' : 'METRIC'); } : null,
+                selectFormat: first ? function(){ console.log(this); this.setState({mode: confirm('Use nautical?') ? 'NAUTICAL' : 'METRIC'}); } : null,
                 scaleOptions1: true,
                 popupList: [{id: 'scaleOptions1', type: 'checkbox', text: 'Skide godt 2(closeOnClick:false)', onChange: function(value){ console.log('scaleOptions1',value);}, closeOnClick: false}],
                 //onChange: function(state){ console.log('onChange state=', state); }
