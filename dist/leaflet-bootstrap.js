@@ -2276,9 +2276,8 @@ https://github.com/nerik/leaflet-graphicscale
 
                 item.id = item.onClick ? item.id || 'itemId' + nextId++ : null;
                 checkWidth( item.width );
-                if (item.onClick || item.onChange)
 
-                if (isContextmenuPopup){
+                if ((item.onClick || item.onChange) && isContextmenuPopup){
                     if (item.closeOnClick){
                         item.postClick        = o.map.contextmenu._hide;
                         item.postClickContext = o.map.contextmenu;
