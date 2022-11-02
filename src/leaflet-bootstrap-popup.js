@@ -150,6 +150,11 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
         //Reset pinned-status
         var _this = this,
             isPinned = !!this._pinned;
+
+
+        //Save current popup that are updated
+        L.currentPopup_map = this._map;
+
         this._setPinned(false);
 
         //Create and adjust options in this._content into options for bsModal
@@ -310,6 +315,9 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
         this._setPinned(isPinned);
 
         this.fire('contentupdate');
+
+        L.currentPopup_map = null;
+
     };
 
     /*********************************************************

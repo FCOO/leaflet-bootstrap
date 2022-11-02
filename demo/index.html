@@ -210,10 +210,15 @@ nextMap.addControl( nextMap.bsScaleControl );
             .bindPopup({
                 showTooltip: true, 
                 header: {icon:'fa-home', text:'Header'},
-                buttons: [{icon:'fa-home', text:'Davs', 
-                            onClick: function(){
-                                console.log('test af contextmenu', arguments.length, 'map=', arguments[3]);
-                            }
+                buttons: [{
+                    icon:'fa-home', text:'Davs', 
+                    onClick: function(){
+                        console.log('test af contextmenu', arguments.length, 'map=', arguments[3]);
+                    }
+                },{
+                    id: 'standardchckboxbutton1', type: 'standardchckboxbutton', text: 'standardchckboxbutton', 
+                    selected: function(){ console.log('HER'); return false; },
+                    onClick: function(id, selected){ console.log(id, selected); }
                 }], 
                 width: 300,
 scroll: false,
