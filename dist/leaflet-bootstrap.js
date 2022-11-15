@@ -4137,6 +4137,16 @@ leaflet-bootstrap-compass-device.js
 (function ($, L, window/*, document, undefined*/) {
     "use strict";
 
+    var testMode = false;
+
+    /*******************************************
+    L.Control.BsCompass
+    *******************************************/
+    //To prevent the control from being updated to mush the control is only updated every bsCompassUpdateInterval ms
+    var bsCompassUpdateInterval = 1000;
+
+
+
     L.Control.BsCompass = L.Control.BsButtonBox.extend({
         options: {
             position: "topcenter",
@@ -4218,7 +4228,6 @@ leaflet-bootstrap-compass-device.js
         onAdd: function(map) {
             var result = L.Control.BsButtonBox.prototype.onAdd.call(this, map);
 
-
             /*
             Create info-cont = 3x2 boxes with
               |  Fixed device   |       Arrow       | Rotated device |
@@ -4282,48 +4291,86 @@ leaflet-bootstrap-compass-device.js
                 }
             });
 
-            window.geolocation.onDeviceorientation(this.update, this);
+
+            this.needToUpdateControl = true;
+            //Add interval to allow updating the DOM
+            if (!this.intervalId)
+                this.setIntervalId = window.setInterval( $.proxy( this.updateControl, this), bsCompassUpdateInterval) ;
+
+
+            if (testMode){
+                var _this = this;
+                window.setInterval( function(){
+                    _this.update({ deviceorientation: 360*Math.random() });
+                }, 2);
+
+            }
+            else
+                window.geolocation.onDeviceorientation(this.update, this);
 
             return result;
+        },
+
+        onRemove: function(){
+            this.needToUpdateControl = false;
+            if (this.intervalId){
+                window.clearInterval(this.intervalId);
+                this.intervalId = null;
+            }
+
+            return L.Control.BsButtonBox.prototype.onRemove ? L.Control.BsButtonBox.prototype.onRemove.apply(this, arguments) : this;
         },
 
         /*******************************************
         update
         *******************************************/
         update: function( event = {}) {
-
             var orientation = event.deviceorientation || (event.deviceorientation === 0) ? event.deviceorientation : null,
                 orientationExists = orientation !== null,
-                orientationSecondary = (event.type || '').toUpperCase().includes("SECONDARY");
+                orientationEventType = event.type || '',
+                orientationSecondary = orientationEventType.toUpperCase().includes("SECONDARY");
 
-            /*
-            portrait-primary
-            portrait-secondary
-            landscape-primary
-            landscape-secondary
-            */
-            this.bsButton.parent().toggleClass('no-device-orientation', !orientationExists);
+            if ( (orientation          !== this.orientation) ||
+                 (orientationExists    !== this.orientationExists) ||
+                 (orientationEventType !== this.orientationEventType) ||
+                 (orientationSecondary !== this.orientationSecondary) ){
 
-            if (orientationExists){
+                this.orientation          = orientation;
+                this.orientationExists    = orientationExists;
+                this.orientationEventType = orientationEventType;
+                this.orientationSecondary = orientationSecondary;
 
-                $('html')
-                    .toggleClass('orientation-primary',   !orientationSecondary)
-                    .toggleClass('orientation-secondary',  orientationSecondary);
+                this.needToUpdateControl = true;
+            }
+        },
 
-                this.$container.find('.rotate').css('transform', 'rotate('+ orientation + 'deg)');
-                this.$container.find('.rotate-compass').css('transform', 'rotate('+ -1*orientation + 'deg)');
 
-                var offset = 0;
-                switch (event.type){
-                    case 'portrait-primary'     : offset =   0; break;
-                    case 'portrait-secondary'   : offset = 180; break;
-                    case 'landscape-primary'    : offset =  90; break;
-                    case 'landscape-secondary'  : offset = 270; break;
+        updateControl: function(){
+            if (this.needToUpdateControl){
+                this.needToUpdateControl = false;
+
+                this.bsButton.parent().toggleClass('no-device-orientation', !this.orientationExists);
+
+                if (this.orientationExists){
+                    $('html')
+                        .toggleClass('orientation-primary',   !this.orientationSecondary)
+                        .toggleClass('orientation-secondary',  this.orientationSecondary);
+
+                    this.$container.find('.rotate').css('transform', 'rotate('+ this.orientation + 'deg)');
+                    this.$container.find('.rotate-compass').css('transform', 'rotate('+ -1*this.orientation + 'deg)');
+
+                    var offset = 0;
+                    switch (this.orientationEventType){
+                        case 'portrait-primary'     : offset =   0; break;
+                        case 'portrait-secondary'   : offset = 180; break;
+                        case 'landscape-primary'    : offset =  90; break;
+                        case 'landscape-secondary'  : offset = 270; break;
+                    }
+
+                    var orientation = Math.round( (this.orientation + offset +360) % 360 );
+
+                    this.options.setOrientationNumber(orientation, this.$orientation, this);
                 }
-
-                orientation = (orientation + offset +360) % 360;
-
-                this.options.setOrientationNumber(orientation, this.$orientation, this);
             }
 
             return this;

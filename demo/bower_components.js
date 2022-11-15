@@ -34086,9 +34086,6 @@ Define global events to handle device orientation and calibration
                 newEvent[id] = typeof event[id] == 'number' ? Math.round(event[id]) : event[id];
             });
 
-
-newEvent.test = window.test;
-
             var screenOrientation = window.o9n.getOrientation();
             newEvent.angle = screenOrientation.angle;
             newEvent.type  = screenOrientation.type;
@@ -34201,7 +34198,7 @@ window.geolocation.GeolocationHandler:
     /***********************************************************
     GeolocationProvider
     Obejct that provides position, heading, speed etc. from
-    a source. Differnet inherrited versions are created for
+    a source. Different inherrited versions are created for
     geolocation, AIS, manual entering etc.
     Each GeolocationProvider has 0-N GeolocationHandler
     that gets its coords from this
@@ -34403,160 +34400,6 @@ window.geolocation.GeolocationHandler:
         }
     };
 
-
-}(jQuery, this/*, document*/));
-
-
-;
-/****************************************************************************
-geolocation-standard_tilt.js
-
-Creates window.geolocation.provider = version of GeolocationProvider that
-provides location from the browser geolocation API
-
-****************************************************************************/
-
-(function ($, window/*, document, undefined*/) {
-    "use strict";
-
-    //Create namespaces
-    var ns = window.geolocation = window.geolocation || {};
-
-    var geolocationOptions = {
-        /* From https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition */
-
-        /*
-        maximumAge:
-            Is a positive long value indicating the maximum age in milliseconds of a possible cached position that is acceptable to return.
-            If set to 0, it means that the device cannot use a cached position and must attempt to retrieve the real current position.
-            If set to Infinity the device must return a cached position regardless of its age. Default: 0.
-        */
-        //maximumAge          : 10 * 1000, //Allow 10sec old position
-
-        /*
-        timeout:
-            Is a positive long value representing the maximum length of time (in milliseconds) the device is allowed to take in order to return a position.
-            The default value is Infinity, meaning that getCurrentPosition() won't return until the position is available.
-        */
-        //timeout             : 10 * 1000,
-
-        /*
-        enableHighAccuracy:
-            Is a boolean value that indicates the application would like to receive the best possible results.
-            If true and if the device is able to provide a more accurate position, it will do so.
-            Note that this can result in slower response times or increased power consumption (with a GPS chip on a mobile device for example).
-            On the other hand, if false, the device can take the liberty to save resources by responding more quickly and/or using less power. Default: false.
-        */
-        enableHighAccuracy  : true
-    };
-
-    /*
-    GeolocationPosition = {
-        coords   : GeolocationCoordinates
-        timestamp: Millisecond
-
-    From https://developer.mozilla.org/en-US/docs/Web/API/GeolocationCoordinates:
-    GeolocationCoordinates = {
-        latitude        : Position's latitude in decimal degrees.
-        longitude       : Position's longitude in decimal degrees.
-        altitude        : Position's altitude in meters, relative to sea level. This value can be null if the implementation cannot provide the data.
-        accuracy        : Accuracy of the latitude and longitude properties, expressed in meters.
-        altitudeAccuracy: Accuracy of the altitude expressed in meters. This value can be null.
-        heading         : Direction towards which the device is facing. This value, specified in degrees, indicates how far off from heading true north the device is. 0 degrees represents true north, and the direction is determined clockwise (which means that east is 90 degrees and west is 270 degrees). If speed is 0, heading is NaN. If the device is unable to provide heading information, this value is null.
-        speed           : Velocity of the device in meters per second. This value can be null.
-    }
-    All properties are double
-    */
-
-    //*****************************************************************
-    //*****************************************************************
-    // Obtain a new *world-oriented* Full Tilt JS DeviceOrientation Promise
-    var promise = window.FULLTILT.getDeviceOrientation({ 'type': 'world' });
-
-    // Wait for Promise result
-    promise.then(function(deviceOrientation) { // Device Orientation Events are supported
-        // Register a callback to run every time a new
-        // deviceorientation event is fired by the browser.
-
-//console.log(deviceOrientation);
-
-        deviceOrientation.listen(function() {
-            // Get the current *screen-adjusted* device orientation angles
-            var currentOrientation = deviceOrientation.getScreenAdjustedEuler();
-
-deviceOrientation.test = deviceOrientation.isAbsolute();
-
-            // Calculate the current compass heading that the user is 'looking at' (in degrees)
-            var compassHeading = 360 - parseInt( currentOrientation.alpha );
-deviceOrientation.test2 = compassHeading;
-
-            var html = '';
-            $.each(['alpha', 'test', 'test2', 'latitude', 'longitude', 'altitude', 'accuracy', 'altitudeAccuracy', 'heading', 'speed'], function(index, id){
-                html = html + '<br>' + id + ': ' + deviceOrientation[id];
-            });
-
-            // Do something with `compassHeading` here...
-// HER>             $('.tilt').html('compassHeading = ' + compassHeading);
-            $('.tilt').html(html);
-
-        });
-
-    }).catch(function(errorMessage) { // Device Orientation Events are not supported
-
-        //console.log('FULLTILT-error', errorMessage);
-            $('.tilt').html('Error = ' + errorMessage);
-
-    // Implement some fallback controls here...
-
-  });
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //*****************************************************************
-    //*****************************************************************
-    var Provider_tilt = function(){
-            this.lastCoords = {};
-            ns.GeolocationProvider.call(this, geolocationOptions);
-        };
-
-    Provider_tilt.prototype = Object.create(ns.GeolocationProvider.prototype);
-
-
-    $.extend(Provider_tilt.prototype, {
-        activate: function(){
-            this._success = this._success || $.proxy(this.success, this);
-            this._error   = this._error   || $.proxy(this.onError, this);
-
-            if (navigator.geolocation)
-                navigator.geolocation.watchPosition(this._success, this._error, geolocationOptions);
-            else
-                this.onError(4);
-        },
-
-
-        deactivate: function(){
-            if (navigator.geolocation)
-                navigator.clearWatch();
-        },
-
-        success: function( GeolocationPosition ){
-            this.update( GeolocationPosition.coords );
-        },
-
-    });
-
-    //Create window.geolocation.provider_tilt
-    ns.provider_tilt = new Provider_tilt();
 
 }(jQuery, this/*, document*/));
 
@@ -35389,11 +35232,11 @@ function defineValue(obj, key, val) {
 	var minor = parseInt(splitVersion[1]);
 
 	var JQ_LT_17 = (major < 1) || (major == 1 && minor < 7);
-	
+
 	function eventsData($el) {
 		return JQ_LT_17 ? $el.data('events') : $._data($el[0]).events;
 	}
-	
+
 	function moveHandlerToTop($el, eventName, isDelegated) {
 		var data = eventsData($el);
 		var events = data[eventName];
@@ -35411,7 +35254,7 @@ function defineValue(obj, key, val) {
 			events.unshift(events.pop());
 		}
 	}
-	
+
 	function moveEventHandlers($elems, eventsString, isDelegate) {
 		var events = eventsString.split(/\s+/);
 		$elems.each(function() {
@@ -35421,7 +35264,7 @@ function defineValue(obj, key, val) {
 			}
 		});
 	}
-	
+
 	function makeMethod(methodName) {
 		$.fn[methodName + 'First'] = function() {
 			var args = $.makeArray(arguments);
@@ -35446,7 +35289,7 @@ function defineValue(obj, key, val) {
 	$.fn.delegateFirst = function() {
 		var args = $.makeArray(arguments);
 		var eventsString = args[1];
-		
+
 		if (eventsString) {
 			args.splice(0, 2);
 			$.fn.delegate.apply(this, arguments);
@@ -35466,7 +35309,7 @@ function defineValue(obj, key, val) {
 
 		return this;
 	};
-	
+
 	// on (jquery >= 1.7)
 	if (!JQ_LT_17) {
 		$.fn.onFirst = function(types, selector) {
@@ -38573,8 +38416,8 @@ function defineValue(obj, key, val) {
     };
     (function(factory) {
         if (true) {
-            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(2) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory, 
-            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__, 
+            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(2) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory,
+            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__,
             __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
         } else {}
     })(function(Inputmask) {
@@ -38668,8 +38511,8 @@ function defineValue(obj, key, val) {
     };
     (function(factory) {
         if (true) {
-            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(3), __webpack_require__(5) ], 
-            __WEBPACK_AMD_DEFINE_FACTORY__ = factory, __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__, 
+            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(3), __webpack_require__(5) ],
+            __WEBPACK_AMD_DEFINE_FACTORY__ = factory, __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__,
             __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
         } else {}
     })(function($, window, undefined) {
@@ -40182,7 +40025,7 @@ function defineValue(obj, key, val) {
             function seekPrevious(pos, newBlock) {
                 var position = pos, tests;
                 if (position <= 0) return 0;
-                while (--position > 0 && (newBlock === true && getTest(position).match.newBlockMarker !== true || newBlock !== true && !isMask(position) && (tests = getTests(position), 
+                while (--position > 0 && (newBlock === true && getTest(position).match.newBlockMarker !== true || newBlock !== true && !isMask(position) && (tests = getTests(position),
                 tests.length < 2 || tests.length === 2 && tests[1].match.def === ""))) {}
                 return position;
             }
@@ -41419,8 +41262,8 @@ function defineValue(obj, key, val) {
     };
     (function(factory) {
         if (true) {
-            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(4) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory, 
-            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__, 
+            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(4) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory,
+            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__,
             __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
         } else {}
     })(function($) {
@@ -41449,8 +41292,8 @@ function defineValue(obj, key, val) {
     };
     (function(factory) {
         if (true) {
-            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(2) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory, 
-            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__, 
+            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(2) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory,
+            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__,
             __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
         } else {}
     })(function(Inputmask) {
@@ -41701,8 +41544,8 @@ function defineValue(obj, key, val) {
     };
     (function(factory) {
         if (true) {
-            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(2) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory, 
-            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__, 
+            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(2) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory,
+            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__,
             __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
         } else {}
     })(function(Inputmask) {
@@ -42252,8 +42095,8 @@ function defineValue(obj, key, val) {
     };
     (function(factory) {
         if (true) {
-            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(4), __webpack_require__(2) ], 
-            __WEBPACK_AMD_DEFINE_FACTORY__ = factory, __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__, 
+            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(4), __webpack_require__(2) ],
+            __WEBPACK_AMD_DEFINE_FACTORY__ = factory, __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__,
             __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
         } else {}
     })(function($, Inputmask) {
@@ -45552,7 +45395,7 @@ if (typeof define === 'function' && define.amd) {
 
 ;
 /****************************************************************************
-	modernizr-javascript.js, 
+	modernizr-javascript.js,
 
 	(c) 2016, FCOO
 
@@ -45563,20 +45406,20 @@ if (typeof define === 'function' && define.amd) {
 
 (function ($, window, document, undefined) {
 	"use strict";
-	
+
 	var ns = window;
 
     //Extend the jQuery prototype
     $.fn.extend({
-        modernizrOn : function( test ){ 
-            return this.modernizrToggle( test, true ); 
+        modernizrOn : function( test ){
+            return this.modernizrToggle( test, true );
         },
 
-        modernizrOff: function( test ){ 
-            return this.modernizrToggle( test, false ); 
+        modernizrOff: function( test ){
+            return this.modernizrToggle( test, false );
         },
-        
-        modernizrToggle: function( test, on ){ 
+
+        modernizrToggle: function( test, on ){
 		if ( on === undefined )
             return this.modernizrToggle( test, !this.hasClass( test ) );
 
@@ -48067,6 +47910,11 @@ jquery-base-slider-public.js
 
         _cbxSet: function( selected, dontCallOnChange, semiSelected, semiSelectedValue ){
             var options = this.data('cbx_options');
+
+            //Allow selected to be a function
+            if (typeof selected === "function")
+                selected = selected();
+
             options.selected = !!selected;
 
             var $elements = options.selector ? this.children( options.selector ) : this;
@@ -48392,19 +48240,19 @@ jquery-base-slider-public.js
 ;
 /* @preserve
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2013-2018 Petka Antonov
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
@@ -48412,7 +48260,7 @@ jquery-base-slider-public.js
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- * 
+ *
  */
 /**
  * bluebird build version 3.7.2
@@ -52004,28 +51852,28 @@ _dereq_('./using.js')(Promise, apiRejection, tryConvertToPromise, createContext,
 _dereq_('./any.js')(Promise);
 _dereq_('./each.js')(Promise, INTERNAL);
 _dereq_('./filter.js')(Promise, INTERNAL);
-                                                         
-    util.toFastProperties(Promise);                                          
-    util.toFastProperties(Promise.prototype);                                
-    function fillTypes(value) {                                              
-        var p = new Promise(INTERNAL);                                       
-        p._fulfillmentHandler0 = value;                                      
-        p._rejectionHandler0 = value;                                        
-        p._promise0 = value;                                                 
-        p._receiver0 = value;                                                
-    }                                                                        
-    // Complete slack tracking, opt out of field-type tracking and           
-    // stabilize map                                                         
-    fillTypes({a: 1});                                                       
-    fillTypes({b: 2});                                                       
-    fillTypes({c: 3});                                                       
-    fillTypes(1);                                                            
-    fillTypes(function(){});                                                 
-    fillTypes(undefined);                                                    
-    fillTypes(false);                                                        
-    fillTypes(new Promise(INTERNAL));                                        
-    debug.setBounds(Async.firstLineError, util.lastLineError);               
-    return Promise;                                                          
+
+    util.toFastProperties(Promise);
+    util.toFastProperties(Promise.prototype);
+    function fillTypes(value) {
+        var p = new Promise(INTERNAL);
+        p._fulfillmentHandler0 = value;
+        p._rejectionHandler0 = value;
+        p._promise0 = value;
+        p._receiver0 = value;
+    }
+    // Complete slack tracking, opt out of field-type tracking and
+    // stabilize map
+    fillTypes({a: 1});
+    fillTypes({b: 2});
+    fillTypes({c: 3});
+    fillTypes(1);
+    fillTypes(function(){});
+    fillTypes(undefined);
+    fillTypes(false);
+    fillTypes(new Promise(INTERNAL));
+    debug.setBounds(Async.firstLineError, util.lastLineError);
+    return Promise;
 
 };
 
@@ -65142,7 +64990,7 @@ return index;
 
     var keys = ['Hours', 'Minutes', 'Seconds', 'Milliseconds'];
     var maxValues = [24, 60, 60, 1000];
-    
+
     // Capitalize first letter
     key = key.charAt(0).toUpperCase() + key.slice(1).toLowerCase();
 
@@ -65188,7 +65036,7 @@ return index;
 }).call(this);
 ;
 //! moment-timezone.js
-//! version : 0.5.38
+//! version : 0.5.39
 //! Copyright (c) JS Foundation and other contributors
 //! license : MIT
 //! github.com/moment/moment-timezone
@@ -65218,7 +65066,7 @@ return index;
 	// 	return moment;
 	// }
 
-	var VERSION = "0.5.38",
+	var VERSION = "0.5.39",
 		zones = {},
 		links = {},
 		countries = {},
@@ -65880,7 +65728,7 @@ return index;
 	}
 
 	loadData({
-		"version": "2022e",
+		"version": "2022f",
 		"zones": [
 			"Africa/Abidjan|GMT|0|0||48e5",
 			"Africa/Nairobi|EAT|-30|0||47e5",
@@ -65901,14 +65749,14 @@ return index;
 			"America/Fortaleza|-03|30|0||34e5",
 			"America/Asuncion|-03 -04|30 40|01010101010101010101010|1T0r0 1fB0 19X0 1ip0 17b0 1ip0 17b0 1ip0 19X0 1fB0 19X0 1fB0 19X0 1fB0 19X0 1ip0 17b0 1ip0 17b0 1ip0 19X0 1fB0|28e5",
 			"America/Panama|EST|50|0||15e5",
-			"America/Mexico_City|CST CDT|60 50|01010101010101010101010|1T3k0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1lb0 14p0 1nX0|20e6",
+			"America/Mexico_City|CST CDT|60 50|0101010101010|1T3k0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0|20e6",
 			"America/Managua|CST|60|0||22e5",
 			"America/Caracas|-04|40|0||29e5",
 			"America/Lima|-05|50|0||11e6",
 			"America/Denver|MST MDT|70 60|01010101010101010101010|1SSV0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0|26e5",
 			"America/Campo_Grande|-03 -04|30 40|010101|1SKr0 1zd0 On0 1HB0 FX0|77e4",
 			"America/Chicago|CST CDT|60 50|01010101010101010101010|1SSU0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0|92e5",
-			"America/Chihuahua|MST MDT|70 60|01010101010101010101010|1T3l0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1lb0 14p0 1nX0|81e4",
+			"America/Chihuahua|MST MDT CST|70 60 60|0101010101012|1T3l0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0|81e4",
 			"America/Phoenix|MST|70|0||42e5",
 			"America/Whitehorse|PST PDT MST|80 70 70|010101012|1SSW0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1z90|23e3",
 			"America/New_York|EST EDT|50 40|01010101010101010101010|1SST0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0|21e6",
@@ -65917,9 +65765,11 @@ return index;
 			"America/Godthab|-03 -02|30 20|01010101010101010101010|1T0p0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1o00 11A0 1qM0|17e3",
 			"America/Grand_Turk|AST EDT EST|40 40 50|012121212121212121212|1Vkv0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0|37e2",
 			"America/Havana|CST CDT|50 40|01010101010101010101010|1SSR0 1zc0 Oo0 1zc0 Oo0 1zc0 Oo0 1zc0 Rc0 1zc0 Oo0 1zc0 Oo0 1zc0 Oo0 1zc0 Oo0 1zc0 Oo0 1zc0 Rc0 1zc0|21e5",
+			"America/Mazatlan|MST MDT|70 60|0101010101010|1T3l0 1nX0 11B0 1nX0 14p0 1lb0 14p0 1lb0 14p0 1nX0 11B0 1nX0|44e4",
 			"America/Metlakatla|AKST AKDT PST|90 80 80|010120101010101010101010|1SSX0 1zb0 Op0 1zb0 uM0 jB0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0|14e2",
 			"America/Miquelon|-03 -02|30 20|01010101010101010101010|1SSR0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0|61e2",
 			"America/Noronha|-02|20|0||30e2",
+			"America/Ojinaga|MST MDT CST|70 60 60|0101010101012|1SSV0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1wn0|23e3",
 			"America/Santiago|-03 -04|30 40|01010101010101010101010|1Tk30 Ap0 1Nb0 Ap0 1zb0 11B0 1nX0 11B0 1nX0 11B0 1nX0 14p0 1lb0 11B0 1qL0 11B0 1nX0 11B0 1nX0 11B0 1nX0 11B0|62e5",
 			"America/Sao_Paulo|-02 -03|20 30|010101|1SKq0 1zd0 On0 1HB0 FX0|20e6",
 			"Atlantic/Azores|-01 +00|10 0|01010101010101010101010|1T0p0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1o00 11A0 1qM0|25e4",
@@ -65992,7 +65842,7 @@ return index;
 			"MET|MET MEST|-10 -20|01010101010101010101010|1T0p0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1o00 11A0 1qM0|",
 			"Pacific/Chatham|+1345 +1245|-dJ -cJ|01010101010101010101010|1T320 1a00 1fA0 1cM0 1fA0 1a00 1fA0 1a00 1fA0 1a00 1fA0 1a00 1fA0 1a00 1io0 1a00 1fA0 1a00 1fA0 1a00 1fA0 1a00|600",
 			"Pacific/Apia|+14 +13|-e0 -d0|0101010101|1T320 1a00 1fA0 1cM0 1fA0 1a00 1fA0 1a00 1fA0|37e3",
-			"Pacific/Fiji|+13 +12|-d0 -c0|010101010101010101010|1Swe0 1VA0 s00 1VA0 s00 20o0 pc0 2hc0 bc0 4q00 pc0 20o0 pc0 20o0 pc0 20o0 s00 1VA0 s00 20o0|88e4",
+			"Pacific/Fiji|+13 +12|-d0 -c0|0101010101|1Swe0 1VA0 s00 1VA0 s00 20o0 pc0 2hc0 bc0|88e4",
 			"Pacific/Guam|ChST|-a0|0||17e4",
 			"Pacific/Marquesas|-0930|9u|0||86e2",
 			"Pacific/Pago_Pago|SST|b0|0||37e2",
@@ -66092,13 +65942,10 @@ return index;
 			"America/Chicago|Canada/Central",
 			"America/Chicago|US/Central",
 			"America/Chicago|US/Indiana-Starke",
-			"America/Chihuahua|America/Mazatlan",
-			"America/Chihuahua|Mexico/BajaSur",
 			"America/Denver|America/Boise",
 			"America/Denver|America/Cambridge_Bay",
 			"America/Denver|America/Edmonton",
 			"America/Denver|America/Inuvik",
-			"America/Denver|America/Ojinaga",
 			"America/Denver|America/Shiprock",
 			"America/Denver|America/Yellowknife",
 			"America/Denver|Canada/Mountain",
@@ -66169,6 +66016,7 @@ return index;
 			"America/Managua|America/Swift_Current",
 			"America/Managua|America/Tegucigalpa",
 			"America/Managua|Canada/Saskatchewan",
+			"America/Mazatlan|Mexico/BajaSur",
 			"America/Mexico_City|America/Bahia_Banderas",
 			"America/Mexico_City|America/Merida",
 			"America/Mexico_City|America/Monterrey",
@@ -66517,7 +66365,7 @@ return index;
 			"BW|Africa/Maputo Africa/Gaborone",
 			"BY|Europe/Minsk",
 			"BZ|America/Belize",
-			"CA|America/St_Johns America/Halifax America/Glace_Bay America/Moncton America/Goose_Bay America/Toronto America/Nipigon America/Thunder_Bay America/Iqaluit America/Pangnirtung America/Winnipeg America/Rainy_River America/Resolute America/Rankin_Inlet America/Regina America/Swift_Current America/Edmonton America/Cambridge_Bay America/Yellowknife America/Inuvik America/Dawson_Creek America/Fort_Nelson America/Whitehorse America/Dawson America/Vancouver America/Panama America/Puerto_Rico America/Phoenix America/Blanc-Sablon America/Atikokan America/Creston",
+			"CA|America/St_Johns America/Halifax America/Glace_Bay America/Moncton America/Goose_Bay America/Toronto America/Iqaluit America/Pangnirtung America/Winnipeg America/Resolute America/Rankin_Inlet America/Regina America/Swift_Current America/Edmonton America/Cambridge_Bay America/Yellowknife America/Inuvik America/Dawson_Creek America/Fort_Nelson America/Whitehorse America/Dawson America/Vancouver America/Panama America/Puerto_Rico America/Phoenix America/Blanc-Sablon America/Atikokan America/Creston",
 			"CC|Asia/Yangon Indian/Cocos",
 			"CD|Africa/Maputo Africa/Lagos Africa/Kinshasa Africa/Lubumbashi",
 			"CF|Africa/Lagos Africa/Bangui",
@@ -67715,12 +67563,12 @@ options:
 /*! @websanova/url - v2.6.3 - 2020-01-25 */
 !function(){function t(t,r){var a,o={};if("tld?"!==t){if(r=r||window.location.toString(),!t)return r;if(t=t.toString(),a=r.match(/^mailto:([^\/].+)/))o.protocol="mailto",o.email=a[1];else{if((a=r.match(/(.*?)\/#\!(.*)/))&&(r=a[1]+a[2]),(a=r.match(/(.*?)#(.*)/))&&(o.hash=a[2],r=a[1]),o.hash&&t.match(/^#/))return h(t,o.hash);if((a=r.match(/(.*?)\?(.*)/))&&(o.query=a[2],r=a[1]),o.query&&t.match(/^\?/))return h(t,o.query);if((a=r.match(/(.*?)\:?\/\/(.*)/))&&(o.protocol=a[1].toLowerCase(),r=a[2]),(a=r.match(/(.*?)(\/.*)/))&&(o.path=a[2],r=a[1]),o.path=(o.path||"").replace(/^([^\/])/,"/$1"),t.match(/^[\-0-9]+$/)&&(t=t.replace(/^([^\/])/,"/$1")),t.match(/^\//))return e(t,o.path.substring(1));if((a=(a=e("/-1",o.path.substring(1)))&&a.match(/(.*?)\.([^.]+)$/))&&(o.file=a[0],o.filename=a[1],o.fileext=a[2]),(a=r.match(/(.*)\:([0-9]+)$/))&&(o.port=a[2],r=a[1]),(a=r.match(/(.*?)@(.*)/))&&(o.auth=a[1],r=a[2]),o.auth&&(a=o.auth.match(/(.*)\:(.*)/),o.user=a?a[1]:o.auth,o.pass=a?a[2]:void 0),o.hostname=r.toLowerCase(),"."===t.charAt(0))return e(t,o.hostname);o.port=o.port||("https"===o.protocol?"443":"80"),o.protocol=o.protocol||("443"===o.port?"https":"http")}return t in o?o[t]:"{}"===t?o:void 0}}function e(t,r){var a=t.charAt(0),o=r.split(a);return a===t?o:o[(t=parseInt(t.substring(1),10))<0?o.length+t:t-1]}function h(t,r){for(var a,o=t.charAt(0),e=r.split("&"),h=[],n={},c=[],i=t.substring(1),p=0,u=e.length;p<u;p++)if(""!==(h=(h=e[p].match(/(.*?)=(.*)/))||[e[p],e[p],""])[1].replace(/\s/g,"")){if(h[2]=(a=h[2]||"",decodeURIComponent(a.replace(/\+/g," "))),i===h[1])return h[2];(c=h[1].match(/(.*)\[([0-9]+)\]/))?(n[c[1]]=n[c[1]]||[],n[c[1]][c[2]]=h[2]):n[h[1]]=h[2]}return o===t?n:n[i]}window.url=t}();
 ;
-/* 
-  @package NOTY - Dependency-free notification library 
-  @version version: 3.2.0-beta 
-  @contributors https://github.com/needim/noty/graphs/contributors 
-  @documentation Examples and Documentation - https://ned.im/noty 
-  @license Licensed under the MIT licenses: http://www.opensource.org/licenses/mit-license.php 
+/*
+  @package NOTY - Dependency-free notification library
+  @version version: 3.2.0-beta
+  @contributors https://github.com/needim/noty/graphs/contributors
+  @documentation Examples and Documentation - https://ned.im/noty
+  @license Licensed under the MIT licenses: http://www.opensource.org/licenses/mit-license.php
 */
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -69753,7 +69601,7 @@ Promise$2.prototype = {
     The primary way of interacting with a promise is through its `then` method,
     which registers callbacks to receive either a promise's eventual value or the
     reason why the promise cannot be fulfilled.
-  
+
     ```js
     findUser().then(function(user){
       // user is available
@@ -69761,14 +69609,14 @@ Promise$2.prototype = {
       // user is unavailable, and you are given the reason why
     });
     ```
-  
+
     Chaining
     --------
-  
+
     The return value of `then` is itself a promise.  This second, 'downstream'
     promise is resolved with the return value of the first promise's fulfillment
     or rejection handler, or rejected if the handler throws an exception.
-  
+
     ```js
     findUser().then(function (user) {
       return user.name;
@@ -69778,7 +69626,7 @@ Promise$2.prototype = {
       // If `findUser` fulfilled, `userName` will be the user's name, otherwise it
       // will be `'default name'`
     });
-  
+
     findUser().then(function (user) {
       throw new Error('Found user, but still unhappy');
     }, function (reason) {
@@ -69791,7 +69639,7 @@ Promise$2.prototype = {
     });
     ```
     If the downstream promise does not specify a rejection handler, rejection reasons will be propagated further downstream.
-  
+
     ```js
     findUser().then(function (user) {
       throw new PedagogicalException('Upstream error');
@@ -69803,15 +69651,15 @@ Promise$2.prototype = {
       // The `PedgagocialException` is propagated all the way down to here
     });
     ```
-  
+
     Assimilation
     ------------
-  
+
     Sometimes the value you want to propagate to a downstream promise can only be
     retrieved asynchronously. This can be achieved by returning a promise in the
     fulfillment or rejection handler. The downstream promise will then be pending
     until the returned promise is settled. This is called *assimilation*.
-  
+
     ```js
     findUser().then(function (user) {
       return findCommentsByAuthor(user);
@@ -69819,9 +69667,9 @@ Promise$2.prototype = {
       // The user's comments are now available
     });
     ```
-  
+
     If the assimliated promise rejects, then the downstream promise will also reject.
-  
+
     ```js
     findUser().then(function (user) {
       return findCommentsByAuthor(user);
@@ -69831,15 +69679,15 @@ Promise$2.prototype = {
       // If `findCommentsByAuthor` rejects, we'll have the reason here
     });
     ```
-  
+
     Simple Example
     --------------
-  
+
     Synchronous Example
-  
+
     ```javascript
     let result;
-  
+
     try {
       result = findResult();
       // success
@@ -69847,9 +69695,9 @@ Promise$2.prototype = {
       // failure
     }
     ```
-  
+
     Errback Example
-  
+
     ```js
     findResult(function(result, err){
       if (err) {
@@ -69859,9 +69707,9 @@ Promise$2.prototype = {
       }
     });
     ```
-  
+
     Promise Example;
-  
+
     ```javascript
     findResult().then(function(result){
       // success
@@ -69869,15 +69717,15 @@ Promise$2.prototype = {
       // failure
     });
     ```
-  
+
     Advanced Example
     --------------
-  
+
     Synchronous Example
-  
+
     ```javascript
     let author, books;
-  
+
     try {
       author = findAuthor();
       books  = findBooksByAuthor(author);
@@ -69886,19 +69734,19 @@ Promise$2.prototype = {
       // failure
     }
     ```
-  
+
     Errback Example
-  
+
     ```js
-  
+
     function foundBooks(books) {
-  
+
     }
-  
+
     function failure(reason) {
-  
+
     }
-  
+
     findAuthor(function(author, err){
       if (err) {
         failure(err);
@@ -69923,9 +69771,9 @@ Promise$2.prototype = {
       }
     });
     ```
-  
+
     Promise Example;
-  
+
     ```javascript
     findAuthor().
       then(findBooksByAuthor).
@@ -69935,7 +69783,7 @@ Promise$2.prototype = {
       // something went wrong
     });
     ```
-  
+
     @method then
     @param {Function} onFulfilled
     @param {Function} onRejected
@@ -69947,25 +69795,25 @@ Promise$2.prototype = {
   /**
     `catch` is simply sugar for `then(undefined, onRejection)` which makes it the same
     as the catch block of a try/catch statement.
-  
+
     ```js
     function findAuthor(){
       throw new Error('couldn't find that author');
     }
-  
+
     // synchronous
     try {
       findAuthor();
     } catch(reason) {
       // something went wrong
     }
-  
+
     // async with promises
     findAuthor().catch(function(reason){
       // something went wrong
     });
     ```
-  
+
     @method catch
     @param {Function} onRejection
     Useful for tooling.
@@ -70870,10 +70718,10 @@ module.exports = g;
     //Will choke on undefined navigator and window vars when run on server
     //Return boolean false and exit function when running server-side
 
-    if( typeof window === "undefined" || 
-        window.navigator === undefined || 
-        window.navigator.userAgent === undefined || 
-        window.navigator.mimeTypes === undefined){ 
+    if( typeof window === "undefined" ||
+        window.navigator === undefined ||
+        window.navigator.userAgent === undefined ||
+        window.navigator.mimeTypes === undefined){
             return false;
     }
 
@@ -70884,8 +70732,8 @@ module.exports = g;
     //Time to jump through hoops -- browser vendors do not make it easy to detect PDF support.
 
     /*
-        IE11 still uses ActiveX for Adobe Reader, but IE 11 doesn't expose window.ActiveXObject the same way 
-        previous versions of IE did. window.ActiveXObject will evaluate to false in IE 11, but "ActiveXObject" 
+        IE11 still uses ActiveX for Adobe Reader, but IE 11 doesn't expose window.ActiveXObject the same way
+        previous versions of IE did. window.ActiveXObject will evaluate to false in IE 11, but "ActiveXObject"
         in window evaluates to true.
 
         MS Edge does not support ActiveX so this test will evaluate false
@@ -70903,20 +70751,20 @@ module.exports = g;
     let supportsPdfMimeType = (nav.mimeTypes["application/pdf"] !== undefined);
 
     //Safari on iPadOS doesn't report as 'mobile' when requesting desktop site, yet still fails to embed PDFs
-    let isSafariIOSDesktopMode = (  nav.platform !== undefined && 
-                                    nav.platform === "MacIntel" && 
-                                    nav.maxTouchPoints !== undefined && 
+    let isSafariIOSDesktopMode = (  nav.platform !== undefined &&
+                                    nav.platform === "MacIntel" &&
+                                    nav.maxTouchPoints !== undefined &&
                                     nav.maxTouchPoints > 1 );
 
     //Quick test for mobile devices.
     let isMobileDevice = (isSafariIOSDesktopMode || /Mobi|Tablet|Android|iPad|iPhone/.test(ua));
 
-    //Safari desktop requires special handling 
-    let isSafariDesktop = ( !isMobileDevice && 
-                            nav.vendor !== undefined && 
-                            /Apple/.test(nav.vendor) && 
+    //Safari desktop requires special handling
+    let isSafariDesktop = ( !isMobileDevice &&
+                            nav.vendor !== undefined &&
+                            /Apple/.test(nav.vendor) &&
                             /Safari/.test(ua) );
-    
+
     //Firefox started shipping PDF.js in Firefox 19. If this is Firefox 19 or greater, assume PDF.js is available
     let isFirefoxWithPDFJS = (!isMobileDevice && /irefox/.test(ua) && ua.split("rv:").length > 1) ? (parseInt(ua.split("rv:")[1].split(".")[0], 10) > 18) : false;
 
@@ -71033,9 +70881,9 @@ module.exports = g;
 
         let source = url;
 
-        if(embedType === "pdfjs"){ 
+        if(embedType === "pdfjs"){
             //If PDFJS_URL already contains a ?, assume querystring is in place, and use an ampersand to append PDFJS's file parameter
-            let connector = (PDFJS_URL.indexOf("?") !== -1) ? "&" : "?"; 
+            let connector = (PDFJS_URL.indexOf("?") !== -1) ? "&" : "?";
             source = PDFJS_URL + connector + "file=" + encodeURIComponent(url) + pdfOpenFragment;
         }
 
@@ -71068,7 +70916,7 @@ module.exports = g;
                 style += "position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%;";
             }
 
-            el.style.cssText = style; 
+            el.style.cssText = style;
 
         }
 
@@ -71126,32 +70974,32 @@ module.exports = g;
         if(forcePDFJS && PDFJS_URL){
             return generatePDFObjectMarkup("pdfjs", targetNode, url, pdfOpenFragment, width, height, id, title, omitInlineStyles, PDFJS_URL);
         }
- 
+
         // --== Embed attempt #2 ==--
 
         //Embed PDF if traditional support is provided, or if this developer is willing to roll with assumption
-        //that modern desktop (not mobile) browsers natively support PDFs 
+        //that modern desktop (not mobile) browsers natively support PDFs
         if(supportsPDFs || (assumptionMode && !isMobileDevice)){
-            
-            //Should we use <embed> or <iframe>? In most cases <embed>. 
+
+            //Should we use <embed> or <iframe>? In most cases <embed>.
             //Allow developer to force <iframe>, if desired
             //There is an edge case where Safari does not respect 302 redirect requests for PDF files when using <embed> element.
             //Redirect appears to work fine when using <iframe> instead of <embed> (Addresses issue #210)
             //Forcing Safari desktop to use iframe due to freezing bug in macOS 11 (Big Sur)
             let embedtype = (forceIframe || supportRedirect || isSafariDesktop) ? "iframe" : "embed";
-            
+
             return generatePDFObjectMarkup(embedtype, targetNode, url, pdfOpenFragment, width, height, id, title, omitInlineStyles);
 
         }
-        
+
         // --== Embed attempt #3 ==--
-        
+
         //If everything else has failed and a PDFJS fallback is provided, try to use it
         if(PDFJS_URL){
             return generatePDFObjectMarkup("pdfjs", targetNode, url, pdfOpenFragment, width, height, id, title, omitInlineStyles, PDFJS_URL);
         }
-        
-        // --== PDF embed not supported! Use fallback ==-- 
+
+        // --== PDF embed not supported! Use fallback ==--
 
         //Display the fallback link if available
         if(fallbackLink){
@@ -72466,7 +72314,7 @@ module.exports = g;
 
 
         var icon = [
-                options.type == 'radio' ?
+                ((options.type == 'radio') || options.isRadio || options.radio) ?
                     //Radio-button icons
                     [
                         'fas fa-circle standard-checkbox-checked-color icon-show-for-checked',              //"Blue"/"Semi-selected-orange" background
@@ -74249,8 +74097,11 @@ options
             itemOptions.small = options.small;
 
             switch (itemOptions.type){
-                case 'button':
-                    $item = $.bsButton($.extend(itemOptions, {returnFromClick: true}));
+                case 'button'                :
+                case 'checkboxbutton'        :
+                case 'standardcheckboxbutton':
+                case 'iconcheckboxbutton'    :
+                    $item = $._anyBsButton($.extend(itemOptions, {returnFromClick: true}));
                     isItemWithSpaceAfter = true;
                     break;
 
@@ -86272,7 +86123,7 @@ var SVG = (function () {
             //bottomcenter need an extra container to be placed at the bottom
             this._controlCorners['bottomcenter'] =
                 L.DomUtil.create(
-                    'div', 
+                    'div',
                     'leaflet-bottom leaflet-center',
                     L.DomUtil.create('div', 'leaflet-control-bottomcenter',    this._controlContainer)
                 );
@@ -86972,7 +86823,7 @@ var SVG = (function () {
         }
     });
 
-    
+
 
 (function() {
         numeral.register('format', 'bps', {
@@ -89784,7 +89635,7 @@ if (Number.prototype.toDegrees === undefined) {
 
 ;
 /*! =======================================================
-                      VERSION  11.0.2              
+                      VERSION  11.0.2
 ========================================================= */
 "use strict";
 
