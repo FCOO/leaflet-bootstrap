@@ -37,6 +37,9 @@ leaflet-bootstrap-control.scss
 
 
 //If a control is 'hidden' (visibility = hidden) all children get display = none
-div.leaflet-control.leaflet-control-hidden * {
-    display: none !important;
+div.leaflet-control.leaflet-control-hidden {
+    margin-top: 0;
+    * {
+        display: none !important;
+    }
 }

@@ -441,12 +441,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
 	line-height: 1.1;
 	padding: 2px 5px 1px;
 	white-space: nowrap;
-	overflow: hidden;
 	-moz-box-sizing: border-box;
 	     box-sizing: border-box;
-
-	background: #fff;
-	background: rgba(255, 255, 255, 0.5);
+	background: rgba(255, 255, 255, 0.8);
+	text-shadow: 1px 1px #fff;
 	}
 .leaflet-control-scale-line:not(:first-child) {
 	border-top: 2px solid #777;
@@ -1404,6 +1402,7 @@ Customize Bootstrap
 See https://getbootstrap.com/docs/5.2/customize/options/ for description
 /star star/ = Differnet from default
 ************************************************/
+/**/
 /**/
 /**/
 /***********************************************
@@ -3671,7 +3670,7 @@ textarea.form-control-lg {
   z-index: 4; }
 
 .btn {
-  --bs-btn-padding-x: 0.75rem;
+  --bs-btn-padding-x: 0.375rem;
   --bs-btn-padding-y: 0.375rem;
   --bs-btn-font-family: ;
   --bs-btn-font-size: 1rem;
@@ -4016,13 +4015,13 @@ textarea.form-control-lg {
 
 .btn-lg, .btn-group-lg > .btn {
   --bs-btn-padding-y: 0.5rem;
-  --bs-btn-padding-x: 1rem;
+  --bs-btn-padding-x: 0.5rem;
   --bs-btn-font-size: 1.25rem;
   --bs-btn-border-radius: 0.5rem; }
 
 .btn-sm, .btn-group-sm > .btn, .btn-bar-sm > .btn {
   --bs-btn-padding-y: 0.25rem;
-  --bs-btn-padding-x: 0.5rem;
+  --bs-btn-padding-x: 0.25rem;
   --bs-btn-font-size: 0.875rem;
   --bs-btn-border-radius: 0.25rem; }
 
@@ -4381,8 +4380,8 @@ textarea.form-control-lg {
     border-bottom-left-radius: 0; }
 
 .dropdown-toggle-split {
-  padding-right: 0.5625rem;
-  padding-left: 0.5625rem; }
+  padding-right: 0.28125rem;
+  padding-left: 0.28125rem; }
   .dropdown-toggle-split::after,
   .dropup .dropdown-toggle-split::after,
   .dropend .dropdown-toggle-split::after {
@@ -4391,12 +4390,12 @@ textarea.form-control-lg {
     margin-right: 0; }
 
 .btn-sm + .dropdown-toggle-split, .btn-group-sm > .btn + .dropdown-toggle-split, .btn-bar-sm > .btn + .dropdown-toggle-split {
-  padding-right: 0.375rem;
-  padding-left: 0.375rem; }
+  padding-right: 0.1875rem;
+  padding-left: 0.1875rem; }
 
 .btn-lg + .dropdown-toggle-split, .btn-group-lg > .btn + .dropdown-toggle-split {
-  padding-right: 0.75rem;
-  padding-left: 0.75rem; }
+  padding-right: 0.375rem;
+  padding-left: 0.375rem; }
 
 .btn-group-vertical {
   flex-direction: column;
@@ -5707,7 +5706,7 @@ textarea.form-control-lg {
     margin-right: auto;
     margin-left: auto; }
   .modal-sm {
-    --bs-modal-width: 320px; } }
+    --bs-modal-width: 352px; } }
 
 @media (min-width: 992px) {
   .modal-lg,
@@ -10135,6 +10134,42 @@ Bootstrap allready have the following classes
 .opacity-100 {
   opacity: 100; }
 
+.font-size-0-50em {
+  font-size: 0.50em !important; }
+
+.font-size-0-65em {
+  font-size: 0.65em !important; }
+
+.font-size-0-75em {
+  font-size: 0.75em !important; }
+
+.font-size-1-1em {
+  font-size: 1.1em  !important; }
+
+.font-size-1-2em {
+  font-size: 1.2em  !important; }
+
+.font-size-1-5em {
+  font-size: 1.5em  !important; }
+
+.no-margin {
+  margin: 0 !important; }
+
+.no-margin-left {
+  margin-left: 0 !important; }
+
+.no-margin-right {
+  margin-right: 0 !important; }
+
+.no-margin-top {
+  margin-top: 0 !important; }
+
+.no-margin-bottom {
+  margin-bottom: 0 !important; }
+
+.no-margin-children * {
+  margin: 0 !important; }
+
 .container-icon-and-text:not(.fa-stack) > span:not(:last-child),
 .container-icon-and-text:not(.fa-stack) > a:not(:last-child),
 .container-icon-and-text:not(.fa-stack) > .container-stacked-icons:not(:last-child):not(.fa-no-margin),
@@ -10202,7 +10237,7 @@ Include btn-sizes when inside a btn-bar
 ************************************************************/
 .btn-xs, .btn-group-xs > .btn, .btn-bar-xs > .btn {
   --bs-btn-padding-y: 0.125rem;
-  --bs-btn-padding-x: 0.25rem;
+  --bs-btn-padding-x: 0.125rem;
   --bs-btn-font-size: 0.75rem;
   --bs-btn-border-radius: 0.125rem; }
 
@@ -10233,7 +10268,9 @@ Also overwrite default bootstrap behaviour
   --bs-btn-border-color: #adb5bd;
   --bs-btn-hover-border-color: #b5bcc4;
   --bs-btn-active-border-color: #b5bcc4;
-  --bs-btn-focus-shadow-rgb: 13, 110, 253; }
+  --bs-btn-focus-shadow-rgb: 13, 110, 253;
+  --bs-btn-smaller-font-size: 0.875rem;
+  --bs-btn-larger-font-size: 1.25rem; }
   .btn-jb.standard {
     --bs-btn-color: #212529;
     --bs-btn-bg: #f8f9fa;
@@ -10350,6 +10387,16 @@ Also overwrite default bootstrap behaviour
     flex-direction: row;
     align-items: center;
     justify-content: center; }
+  .btn-jb .font-size-larger {
+    font-size: var(--bs-btn-larger-font-size); }
+  .btn-jb .font-size-smaller {
+    font-size: var(--bs-btn-smaller-font-size); }
+  .btn-jb.btn-lg, .btn-group-lg > .btn-jb.btn {
+    --bs-btn-smaller-font-size: 1rem;
+    --bs-btn-larger-font-size: 1.25rem; }
+  .btn-jb.btn-sm, .btn-group-sm > .btn-jb.btn, .btn-bar-sm > .btn-jb.btn {
+    --bs-btn-smaller-font-size: 0.75rem;
+    --bs-btn-larger-font-size: 1rem; }
 
 /************************************************************
 Modernizr-test for elements with class="hide-for-selected" or "show-for-selected"
@@ -10694,7 +10741,7 @@ div.checkbox, div.radio {
   --bs-check-input-padding-y: 0.375rem;
   padding: var(--bs-check-input-padding-y) 0; }
   div.checkbox .form-check-input, div.radio .form-check-input {
-    margin-top: var(--bs-check-input-padding-y); }
+    flex-shrink: 0; }
   div.checkbox input.semi-selected, div.radio input.semi-selected {
     background-color: #fd7e14; }
   div.checkbox label, div.radio label {
@@ -10778,6 +10825,12 @@ body.modal-open .modal {
   overflow-y: hidden;
   padding: 0 !important; }
 
+:root {
+  --jb-modal-sm-rem: 22rem;
+  --jb-modal-md-rem: 31.25rem;
+  --jb-modal-lg-rem: 50rem;
+  --jb-modal-xl-rem: 75rem; }
+
 .modal div.modal-dialog {
   opacity: 0;
   transition: opacity .3s linear; }
@@ -10829,22 +10882,22 @@ div.modal-dialog {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  --bs-modal-content-font-size: $jb-font-size;
+  --bs-modal-content-font-size: 1rem;
   font-size: var(--bs-modal-content-font-size);
   margin: 0 auto;
   min-height: 100%;
   max-width: 100vw;
-  width: 20rem;
+  width: var(--jb-modal-sm-rem);
   /****************************************************
     .MODAL-CONTENT
     AND ITS COMPONENTS (HEADER, FIXED-BODY, BODY AND FOOTER)
     ****************************************************/ }
   div.modal-dialog.modal-flex-width {
-    width: 31.25rem; }
+    width: var(--jb-modal-md-rem); }
     div.modal-dialog.modal-flex-width.modal-extra-width {
-      width: 50rem; }
+      width: var(--jb-modal-lg-rem); }
     div.modal-dialog.modal-flex-width.modal-mega-width {
-      width: 75rem; }
+      width: var(--jb-modal-xl-rem); }
   div.modal-dialog.modal-dialog-inline .modal-content {
     box-shadow: none;
     max-height: inherit; }
@@ -11324,6 +11377,7 @@ Adjustmernt to Bootstrap table
   --bs-table-cell-padding-y: 0.375rem;
   --bs-table-cell-padding: 0.375rem;
   word-break: normal;
+  margin-bottom: 0;
   /*************************************
     Header
     *************************************/
