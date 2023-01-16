@@ -163,7 +163,7 @@ leaflet-bootstrap-compass-device.js
                 small    : true,
                 fullWidth: true,
                 icon     : 'fa-compass-slash',
-                text     : {da:'Fjern kompasset', en: 'Remove the compass'},
+                text     : {da: 'Skjul', en: 'Hide'},
                 onClick  : this.hide.bind(this)
             }).appendTo( $compassContentError );
 
