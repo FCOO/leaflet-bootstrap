@@ -65,7 +65,7 @@ Font-family for four icons used in leaflet-bootstrap
     //Adjust mouse-icons
     $factor: 1.2;
     font-size: $factor*1em;
-    line-height: 1/$factor * 1em !important;
+    line-height: math.div(1, $factor) * 1em !important;
     vertical-align: -.0667em;
     margin-right: 0 !important;
 }

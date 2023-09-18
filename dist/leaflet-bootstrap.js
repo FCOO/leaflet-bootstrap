@@ -4553,7 +4553,6 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
         var _this = this,
             isPinned = !!this._pinned;
 
-
         //Save current popup that are updated
         L.currentPopup_map = this._map;
 

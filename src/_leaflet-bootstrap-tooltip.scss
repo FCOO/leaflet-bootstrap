@@ -39,7 +39,7 @@ $markerSizeList: 14px, 20px, 24px; //MUST match markerSizeList in leaflet-bootst
 //Adjust position when for differnet marker-size
 @each $size in $markerSizeList {
     $index: index($markerSizeList, $size) - 1;
-    $margin: $size / 2 + 3px;
+    $margin: math.div($size, 2) + 3px;
 
     .leaflet-tooltip-icon-#{$index} {
         &.leaflet-tooltip-bottom { margin-top :      $margin; }
