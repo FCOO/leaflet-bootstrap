@@ -1,6 +1,6 @@
 {
   "name": "leaflet-bootstrap",
-  "version": "3.30.3",
+  "version": "3.30.4",
   "homepage": "https://github.com/FCOO/leaflet-bootstrap",
   "author": "Niels Holt nho@fcoo.dk",
   "description": "package.json is only use for building the package. see bower.json for more info",
@@ -9,7 +9,7 @@
     "url": "git://github.com/FCOO/leaflet-bootstrap.git"
   },
   "devDependencies": {
-    "grunt-fcoo-grunt-plugin": "^6.4.0"
+    "grunt-fcoo-grunt-plugin": "^6.7.0"
   },
   "license": "MIT"
 }

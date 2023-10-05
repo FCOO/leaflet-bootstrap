@@ -13,7 +13,7 @@ leaflet-bootstrap-control-legend.js
             position        : "topright",
             icon            : 'fa-list',
             bigIcon         : true,
-            semiTransparent : true,
+            semiTransparent : false,
             content: {
                 header          : {
                     icon: 'fas fa-list',
@@ -27,7 +27,7 @@ leaflet-bootstrap-control-legend.js
                 noVerticalPadding   : false,
                 noHorizontalPadding : false,
                 scroll              : true,
-                semiTransparent     : true,
+                semiTransparent     : false,
                 width               : 300,
                 content             : '<div class="no-layer"/>',
             },
@@ -227,7 +227,7 @@ leaflet-bootstrap-control-legend.js
 
 
     L.BsLegend = function( options ){
-        this.options = $.extend(true, {}, L.BsLegend_defaultOptions, options);
+        this.options = $.extend(true, {semiTransparent: true}, L.BsLegend_defaultOptions, options);
         this.index = options.index;
     };
 
@@ -272,6 +272,7 @@ leaflet-bootstrap-control-legend.js
                         onWarning  : options.onWarning,
                         icons      : {},
                         content    : '',
+semiTransparent: true,
                         closeButton: false
                     };
 

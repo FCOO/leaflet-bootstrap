@@ -34,6 +34,8 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
             onAdd: function() {
                 var _this = this;
+
+                defaultButtonOptions = $.extend({semiTransparent: false}, defaultButtonOptions);
                 this.options = $._bsAdjustOptions( this.options, defaultButtonOptions);
 
                 if (this.options.list)
@@ -72,6 +74,8 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
         initialize: function(options){
             //Set default _bsButtons-options
+            options = $.extend({semiTransparent: true}, options);
+
             _bsButtons.prototype.initialize.call(this, options);
         },
 
@@ -182,9 +186,9 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
             //Adjust options for the button and create it
             var defaultButtonOptions = {
-                    onClick        : this.onToggle,
-                    semiTransparent: true,
-                    square         : true,
+                    onClick: this.onToggle,
+                    square : true,
+                    semiTransparent: false
                 };
 
             this.bsButton =
@@ -240,7 +244,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
                             {
                                 closeButton     : false,
                                 clickable       : true,
-                                semiTransparent : true,
+                                semiTransparent : false,
                                 extended        : null,
                                 minimized       : null,
                                 isExtended      : false, //Not the same as this.options.isExtended

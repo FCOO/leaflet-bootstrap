@@ -1,12 +1,12 @@
 /***********************************************
 leaflet-bootstrap-control-scale.scss
 ************************************************/
-$lineHeight       : 6px;
+$lineHeight       : 8px; //6px;
 $borderWidth      : 1px;
 $color            : #000;
 $color2           : #fff;
 $fillHollowPadding: 1px;
-$fontSize         : 10px;
+$fontSize         : 12px;//10px
 
 $halfLabelWidth: 40px; //Must ge eq minUnitWidth from src/leaflet-bootstrap-control-scale.js
 $labelWidth    : 2 * $halfLabelWidth;

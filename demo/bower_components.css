@@ -1707,7 +1707,7 @@ Modal
 ************************************************/
 /***********************************************
 Button And Modal
-Opacity for semi-transparent and transparent content
+Opacity for semi-transparent and transparent content using color-mix
 ************************************************/
 :root,
 [data-bs-theme=light] {
@@ -15330,7 +15330,7 @@ div.modal-dialog .modal-content.modal-minimized.modal-minimized-semi-transparent
   background: none;
 }
 div.modal-dialog .modal-content.modal-minimized.modal-minimized-semi-transparent .modal-body, div.modal-dialog .modal-content.modal-minimized.modal-minimized-semi-transparent .modal-body-fixed, div.modal-dialog .modal-content.modal-minimized.modal-minimized-semi-transparent .modal-footer, div.modal-dialog .modal-content.modal-normal.modal-normal-semi-transparent .modal-body, div.modal-dialog .modal-content.modal-normal.modal-normal-semi-transparent .modal-body-fixed, div.modal-dialog .modal-content.modal-normal.modal-normal-semi-transparent .modal-footer, div.modal-dialog .modal-content.modal-extended.modal-extended-semi-transparent .modal-body, div.modal-dialog .modal-content.modal-extended.modal-extended-semi-transparent .modal-body-fixed, div.modal-dialog .modal-content.modal-extended.modal-extended-semi-transparent .modal-footer {
-  background: rgba(var(--bs-body-bg), 0.5);
+  background: color-mix(in srgb, var(--bs-body-bg), transparent 50%);
 }
 div.modal-dialog .modal-content.modal-minimized.modal-minimized-clickable .modal-body, div.modal-dialog .modal-content.modal-minimized.modal-minimized-clickable .modal-body-fixed, div.modal-dialog .modal-content.modal-normal.modal-normal-clickable .modal-body, div.modal-dialog .modal-content.modal-normal.modal-normal-clickable .modal-body-fixed, div.modal-dialog .modal-content.modal-extended.modal-extended-clickable .modal-body, div.modal-dialog .modal-content.modal-extended.modal-extended-clickable .modal-body-fixed {
   cursor: pointer;

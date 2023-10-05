@@ -31,7 +31,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
             showSlider : false,
             showHistory: false,
             historyEnabled: true,
-            semiTransparent: true,
+// HER>semiTransparent: true,
 
             tooltipDirection: 'top',
 
@@ -56,7 +56,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
             if (window.bsIsTouch)
                 options.content = {
                     clickable          : false,
-                    semiTransparent    : true,
+                    semiTransparent    : false,
                     noVerticalPadding  : true,
                     noHorizontalPadding: true,
                     header             : {text: {da:'Zoom/Center', en:'Zoom/Centre'}},
@@ -122,7 +122,10 @@ Can be used as leaflet standard zoom control with Bootstrap style
 
             //Adjust zoom-container to be a button-group container and move to new container and adjust zoom-buttons to bsButton
             var bsButtonGroupClassNames = $.bsButtonGroup({vertical:true, center:true}).attr('class'),
-                bsButtonClassNames = $.bsButton({square: true, _bigIcon: true}).attr('class'),
+                bsButtonClassNames = $.bsButton({
+                    semiTransparent : false,
+                    square          : true,
+                    _bigIcon        : true}).attr('class'),
                 $zoomContainer = $(this.zoom._container);
             $zoomContainer
                 .removeClass()

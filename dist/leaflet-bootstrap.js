@@ -717,6 +717,8 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
             onAdd: function() {
                 var _this = this;
+
+                defaultButtonOptions = $.extend({semiTransparent: false}, defaultButtonOptions);
                 this.options = $._bsAdjustOptions( this.options, defaultButtonOptions);
 
                 if (this.options.list)
@@ -755,6 +757,8 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
         initialize: function(options){
             //Set default _bsButtons-options
+            options = $.extend({semiTransparent: true}, options);
+
             _bsButtons.prototype.initialize.call(this, options);
         },
 
@@ -865,9 +869,9 @@ Create leaflet-control for jquery-bootstrap button-classes:
 
             //Adjust options for the button and create it
             var defaultButtonOptions = {
-                    onClick        : this.onToggle,
-                    semiTransparent: true,
-                    square         : true,
+                    onClick: this.onToggle,
+                    square : true,
+                    semiTransparent: false
                 };
 
             this.bsButton =
@@ -923,7 +927,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
                             {
                                 closeButton     : false,
                                 clickable       : true,
-                                semiTransparent : true,
+                                semiTransparent : false,
                                 extended        : null,
                                 minimized       : null,
                                 isExtended      : false, //Not the same as this.options.isExtended
@@ -1285,7 +1289,7 @@ https://github.com/nerik/leaflet-graphicscale
             width               : 'auto',
             content: {
                 modalContentClassName: 'leaflet-bootstrap-control-scale',
-                semiTransparent      : true,
+                semiTransparent      : true, //Allways semi-transparent
                 clickable            : true,
                 noHeader             : true,
                 content              : 'This is not empty'
@@ -2473,12 +2477,11 @@ Options for selectiong position-format and to activate context-menu
                 iconMapCenter      + ' icon-hide-for-checked'
             ]],
             width           : 'auto',
-            semiTransparent : true,
             popupPlacement  : 'top',
             tooltipDirection: 'top',
 
             content     : {
-                semiTransparent    : true,
+                semiTransparent    : false,
                 clickable          : true,
                 noHeader           : true,
                 noVerticalPadding  : true,
@@ -2601,13 +2604,13 @@ Options for selectiong position-format and to activate context-menu
                         type  : 'button',
                         square: true,
                         icon  : iconCursorPosition,
-                        semiTransparent: true,
+                        transparent: true,
                     },
                     after: !this.options.inclContextmenu ? null : {
                         type  :'button',
                         square: true,
                         icon  : L.BsControl.prototype.options.rightClickIcon,
-                        semiTransparent: true,
+                        transparent: true,
                         onClick: function(){
                             window.notyInfo(
                                 { icon: L.BsControl.prototype.options.rightClickIcon,
@@ -3233,7 +3236,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
             showSlider : false,
             showHistory: false,
             historyEnabled: true,
-            semiTransparent: true,
+// HER>semiTransparent: true,
 
             tooltipDirection: 'top',
 
@@ -3258,7 +3261,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
             if (window.bsIsTouch)
                 options.content = {
                     clickable          : false,
-                    semiTransparent    : true,
+                    semiTransparent    : false,
                     noVerticalPadding  : true,
                     noHorizontalPadding: true,
                     header             : {text: {da:'Zoom/Center', en:'Zoom/Centre'}},
@@ -3324,7 +3327,10 @@ Can be used as leaflet standard zoom control with Bootstrap style
 
             //Adjust zoom-container to be a button-group container and move to new container and adjust zoom-buttons to bsButton
             var bsButtonGroupClassNames = $.bsButtonGroup({vertical:true, center:true}).attr('class'),
-                bsButtonClassNames = $.bsButton({square: true, _bigIcon: true}).attr('class'),
+                bsButtonClassNames = $.bsButton({
+                    semiTransparent : false,
+                    square          : true,
+                    _bigIcon        : true}).attr('class'),
                 $zoomContainer = $(this.zoom._container);
             $zoomContainer
                 .removeClass()
@@ -3624,7 +3630,7 @@ leaflet-bootstrap-control-legend.js
             position        : "topright",
             icon            : 'fa-list',
             bigIcon         : true,
-            semiTransparent : true,
+            semiTransparent : false,
             content: {
                 header          : {
                     icon: 'fas fa-list',
@@ -3638,7 +3644,7 @@ leaflet-bootstrap-control-legend.js
                 noVerticalPadding   : false,
                 noHorizontalPadding : false,
                 scroll              : true,
-                semiTransparent     : true,
+                semiTransparent     : false,
                 width               : 300,
                 content             : '<div class="no-layer"/>',
             },
@@ -3838,7 +3844,7 @@ leaflet-bootstrap-control-legend.js
 
 
     L.BsLegend = function( options ){
-        this.options = $.extend(true, {}, L.BsLegend_defaultOptions, options);
+        this.options = $.extend(true, {semiTransparent: true}, L.BsLegend_defaultOptions, options);
         this.index = options.index;
     };
 
@@ -3883,6 +3889,7 @@ leaflet-bootstrap-control-legend.js
                         onWarning  : options.onWarning,
                         icons      : {},
                         content    : '',
+semiTransparent: true,
                         closeButton: false
                     };
 
@@ -4165,9 +4172,6 @@ leaflet-bootstrap-compass-device.js
 
             class: 'lb-compass-btn no-device-orientation rotate',
 
-            semiTransparent : true,
-            //transparent : true,
-
             content: {
                 header          : {
                     icon: 'fa-compass',
@@ -4181,7 +4185,7 @@ leaflet-bootstrap-compass-device.js
                 noVerticalPadding   : false,
                 noHorizontalPadding : false,
                 scroll              : false,
-                semiTransparent     : false, //true,
+                semiTransparent     : false,
                 width               : 156,
                 content             : '<div class="lb-conpass-content"></div><div class="lb-conpass-content-error" style="display:none; text-align:center"></div>',
             },

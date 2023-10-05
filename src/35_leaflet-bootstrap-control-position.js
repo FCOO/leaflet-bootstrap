@@ -23,12 +23,11 @@ Options for selectiong position-format and to activate context-menu
                 iconMapCenter      + ' icon-hide-for-checked'
             ]],
             width           : 'auto',
-            semiTransparent : true,
             popupPlacement  : 'top',
             tooltipDirection: 'top',
 
             content     : {
-                semiTransparent    : true,
+                semiTransparent    : false,
                 clickable          : true,
                 noHeader           : true,
                 noVerticalPadding  : true,
@@ -151,13 +150,13 @@ Options for selectiong position-format and to activate context-menu
                         type  : 'button',
                         square: true,
                         icon  : iconCursorPosition,
-                        semiTransparent: true,
+                        transparent: true,
                     },
                     after: !this.options.inclContextmenu ? null : {
                         type  :'button',
                         square: true,
                         icon  : L.BsControl.prototype.options.rightClickIcon,
-                        semiTransparent: true,
+                        transparent: true,
                         onClick: function(){
                             window.notyInfo(
                                 { icon: L.BsControl.prototype.options.rightClickIcon,

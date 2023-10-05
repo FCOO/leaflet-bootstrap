@@ -33,9 +33,6 @@ leaflet-bootstrap-compass-device.js
 
             class: 'lb-compass-btn no-device-orientation rotate',
 
-            semiTransparent : true,
-            //transparent : true,
-
             content: {
                 header          : {
                     icon: 'fa-compass',
@@ -49,7 +46,7 @@ leaflet-bootstrap-compass-device.js
                 noVerticalPadding   : false,
                 noHorizontalPadding : false,
                 scroll              : false,
-                semiTransparent     : false, //true,
+                semiTransparent     : false,
                 width               : 156,
                 content             : '<div class="lb-conpass-content"></div><div class="lb-conpass-content-error" style="display:none; text-align:center"></div>',
             },

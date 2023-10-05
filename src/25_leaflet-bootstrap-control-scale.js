@@ -28,7 +28,7 @@ https://github.com/nerik/leaflet-graphicscale
             width               : 'auto',
             content: {
                 modalContentClassName: 'leaflet-bootstrap-control-scale',
-                semiTransparent      : true,
+                semiTransparent      : true, //Allways semi-transparent
                 clickable            : true,
                 noHeader             : true,
                 content              : 'This is not empty'
