@@ -440,6 +440,9 @@ leaflet-bootstrap-control-attribution.scss
 .mouse-hover .leaflet-control-container .leaflet-control-attribution.leaflet-control-attribution-bs:hover {
   background: color-mix(in srgb, var(--bs-body-bg), transparent 75%);
 }
+.leaflet-control-container .leaflet-control-attribution.leaflet-control-attribution-bs:empty {
+  vissibility: hidden;
+}
 
 /***********************************************
 leaflet-bootstrap-control-button.scss
