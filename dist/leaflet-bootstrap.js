@@ -795,6 +795,7 @@ Create leaflet-control for jquery-bootstrap button-classes:
         },
 
         initialize: function(options){
+
             L.Control.BsButton.prototype.initialize.call(this, options);
 
             if (this.options.extendedButton)
