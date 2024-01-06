@@ -2206,6 +2206,8 @@ https://github.com/nerik/leaflet-graphicscale
         if (o.includeMap && o.map)
             objectList.push(o.map);
 
+        if (!objectList.length)
+            return;
 
         var isContextmenuPopup = !o.isNormalPopup,
             header = objectList[0].contextmenuOptions.header,
@@ -2392,9 +2394,12 @@ https://github.com/nerik/leaflet-graphicscale
                     map          : this._map,
                     includeMap   : !firedOnMap && !source.contextmenuOptions.excludeMapContextmenu && this._map.contextmenuOptions,
                     latlng       : latlng
-                }),
+                });
 
-                itemExists = popupContent.content[0].list.length > 0;
+            if (!popupContent)
+                return;
+
+            var itemExists = popupContent.content[0].list.length > 0;
 
             this.contextmenuMarker = this.contextmenuMarker || L.bsMarkerRedCross(this._map.getCenter(), {pane: 'overlayPane'}).addTo( this._map );
             this.contextmenuMarker.setLatLng(latlng);
