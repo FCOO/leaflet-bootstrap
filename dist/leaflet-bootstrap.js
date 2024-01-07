@@ -2261,7 +2261,9 @@ https://github.com/nerik/leaflet-graphicscale
                     result.content.push( accordion );
                 }
 
-                var accordionItem = $._bsAdjustIconAndText(contextmenuOptions.header);
+                //Get accordion-header or use default
+                var accordionItem = $._bsAdjustIconAndText(contextmenuOptions.header || {da:'Mere...', en:'More...'} );
+
                 accordionItem.noVerticalPadding   = true;
                 accordionItem.noHorizontalPadding = true;
                 accordionItem.content = {
