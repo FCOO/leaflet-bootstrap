@@ -2,7 +2,7 @@
 leaflet-bootstrap-contextmenu.scss
 ************************************************/
 
-//Adjust content wwhen insida a popup used as contextmenu
+//Adjust content when inside a popup used as contextmenu
 .leaflet-popup-contextmenu {
     .modal-content {
         padding: 0 !important;
@@ -15,6 +15,12 @@ leaflet-bootstrap-contextmenu.scss
     }
 }
 
+
+
+//Set space between groups of menu-items in contet-menu and popup-as-
+.leaflet-popup-content .modal-body > .contextmenu-item-group:not(:first-child) {
+    margin-top: 4px;
+}
 
 
 //'Dummy' class to force red cross on contetxmenu

@@ -42,6 +42,10 @@
             return this;
         },
 
+        setContextmenuSimpleMode: function( on ){
+            return this.setContextmenuOptions( {simpleMode: !!on} );
+        },
+
         setContextmenuHeader: function(header){
             this.setContextmenuOptions( {header: header} );
             this._updatePopupWithContentmenuItems();
@@ -150,31 +154,54 @@
     ns._popupContent = function(options){
         var o = options,
             objectList = [], //List of objects with iterms for the contextmenu
-            nextObj = o.object;
+            nextObj = o.object,
+            totalNrOfItems = 0,
+            mainNrOfItems = 0;
 
         while (nextObj){
             if (nextObj.contextmenuOptions){
                 objectList.push(nextObj);
+
+                //Include header in non-first object
+                if (totalNrOfItems && nextObj.contextmenuOptions.header)
+                    totalNrOfItems++;
+
+                if (nextObj.contextmenuOptions.items){
+                    var items = nextObj.contextmenuOptions.items.length;
+                    totalNrOfItems += items;
+                    mainNrOfItems = mainNrOfItems || items;
+                }
+
                 nextObj = nextObj.contextmenuOptions.parent;
             }
             else
                 nextObj = null;
         }
 
-        if (o.includeMap && o.map)
+        if (o.includeMap && o.map){
             objectList.push(o.map);
+
+            //The map is always a accordion and therefore count as one
+            o.map.contextmenuOptions.simpleMode = false;
+            totalNrOfItems++;
+        }
 
         if (!objectList.length)
             return;
 
-        var isContextmenuPopup = !o.isNormalPopup,
-            header = objectList[0].contextmenuOptions.header,
+        /*
+        Set the default mode as simple (menu) or accordion
+        Default: If the number of other items is > 3 => default mode is accordion (simpleMode = false)
+        If getDefaultSimpleMode: function(mainNrOfItems, totalNrOfItems) return BOOLEAN is given in context-menu-options use this
+        setContextmenuOptions({ getDefaultSimpleMode: function(mainNrOfItems, totalNrOfItems){return...} });
+        */
+        var mainObjContextmenuOptions = objectList[0].contextmenuOptions,
+            defaultSimpleMode = mainObjContextmenuOptions.getDefaultSimpleMode ? mainObjContextmenuOptions.getDefaultSimpleMode(mainNrOfItems, totalNrOfItems) : totalNrOfItems - mainNrOfItems <= 3,
+            isContextmenuPopup = !o.isNormalPopup,
             result = {
-                header : o.isNormalPopup ? header : null,
-                content: [],
+                header : o.header && o.isNormalPopup ? o.header : null,
+                content: []
             },
-            menuList,
-            accordion,
             maxWidth   = 0,
             widthToUse = undefined,
             nextId     = 0;
@@ -188,40 +215,37 @@
 
         $.each( objectList, function(index, obj){
             var contextmenuOptions = obj.contextmenuOptions,
-                firstObject        = !index;
+                firstObject        = !index,
+                simpleMode = firstObject || (contextmenuOptions.items.length == 1) || (typeof contextmenuOptions.simpleMode == 'boolean' ? contextmenuOptions.simpleMode : defaultSimpleMode),
+
+                //Create the main content = menu for simple-mode, accordion for no-simple-mode
+                nextContent = {
+                    type        : simpleMode ? 'menu' : 'accordion',
+                    fullWidth   : true,
+                    list        : [],
+                    small       : true,
+                    class       : 'contextmenu-item-group',
+                },
+                itemList;
 
             checkWidth( contextmenuOptions.width );
 
-            if (firstObject){
-                //First is added as menu
-                result.content.push({
-                    type     : 'menu',
-                    fullWidth: true,
-                    list     : [],
-                    small    : true
-                });
-                menuList = result.content[0].list;
+            result.content.push(nextContent);
 
-                if (isContextmenuPopup && header){
+            if (simpleMode){
+                itemList = nextContent.list;
+
+                //In simple-mode: If no header is given and there are more than one object => add header (if any)
+                if ((!firstObject || !o.header) && (objectList.length > 1) && contextmenuOptions.items.length && !!contextmenuOptions.header) {
                     var headerOptions = $._bsAdjustIconAndText(contextmenuOptions.header);
-                    headerOptions.mainHeader = true;
-                    menuList.push(headerOptions);
+                    headerOptions.spaceBefore = !firstObject;
+                    headerOptions.mainHeader = firstObject;
+                    itemList.push(headerOptions);
                 }
             }
             else {
-                //The rest is added inside a accordion
-                if (!accordion){
-                    accordion = {
-                        type : 'accordion',
-                        list : [],
-                        small: true,
-                    };
-                    result.content.push( accordion );
-                }
-
-                //Get accordion-header or use default
+                //Add items inside a accordionItem. First get accordion-header or use default
                 var accordionItem = $._bsAdjustIconAndText(contextmenuOptions.header || {da:'Mere...', en:'More...'} );
-
                 accordionItem.noVerticalPadding   = true;
                 accordionItem.noHorizontalPadding = true;
                 accordionItem.content = {
@@ -230,14 +254,15 @@
                     fullWidth    : true,
                     list         : []
                 };
-                accordion.list.push(accordionItem);
-                menuList = accordionItem.content.list;
+                nextContent.list.push(accordionItem);
+                itemList = accordionItem.content.list;
             }
 
+            //Add all items to itemList
             $.each( contextmenuOptions.items, function(index, item){
                 //Set default options
                 item = $.extend(
-                    isContextmenuPopup ? {closeOnClick: true} : {},
+                    isContextmenuPopup ? {closeOnClick: true} : simpleMode ? {spaceBefore: !index} : {},
                     item
                 );
 
@@ -255,11 +280,10 @@
                         item.latlng = o.latlng;
                 }
 
-                menuList.push(item);
+                itemList.push(item);
             });
 
-            firstObject = false;
-        });
+        }); //end of $.each( objectList, function(index, obj){
 
         result.width = widthToUse;
 
@@ -351,6 +375,7 @@
             var popupContent = ns._popupContent({
                     object       : source,
                     isNormalPopup: false,
+                    header       : null,
                     map          : this._map,
                     includeMap   : !firedOnMap && !source.contextmenuOptions.excludeMapContextmenu && this._map.contextmenuOptions,
                     latlng       : latlng

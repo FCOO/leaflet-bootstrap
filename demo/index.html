@@ -418,7 +418,7 @@ scroll: false,
 //HER            (!first ? L.bsMarkerCircle : L.marker)( e.latlng, {
             L.bsMarkerCircle( e.latlng, {
                 draggable: true,
-                colorName: 'red',
+                colorName: first ? 'blue' : 'red',
                 shadow: false,
                 tooltipHideWhenPopupOpen: true,
                 tooltip: 'TOOLTIP____________________________________!'
@@ -437,9 +437,9 @@ content = {
 };
 */
 
-        if (!first)
+        if (!first && false)
             marker.bindPopup({
-                header: 'Overskrift',
+                header: {text: {da:'Overskrift'}},
                 _semiTransparent: first, //true,
                 //clickable: true,
 
@@ -459,7 +459,7 @@ content = {
                         $body.html( moment().format('HH:mm.ss'));
                     }
                 },
-                //dynamic: true,
+                dynamic: true,
                 showTooltip: true,
                 verticalButtons: true,
                 scroll: false,
@@ -545,7 +545,7 @@ content = {
 
         marker.setContextmenuOptions(first ? {alsoAsPopup: first} : {} );
 
-        //marker.setContextmenuHeader(first ? {text:{da:'Blue markers'}} : {text:{da:'RED Markers'}});
+// HER>         marker.setContextmenuHeader(first ? {text:{da:'Blue markers'}} : {text:{da:'RED Markers'}});
         marker.addContextmenuItems([
             {icon:'fa-home', text:{da:first?'Blue#1 (dont close)':'RED#1 (dont close)'}, onClick: function(latlng){ console.log('Marker 1',this, latlng); }, width: '20em', closeOnClick: false },
             {icon:'fa-map',  text:{da:first?'Blue#22':'RED#2'}, onClick: function(latlng){ console.log('Marker 2',this, latlng); } },

@@ -76332,7 +76332,6 @@ module.exports = g;
             $._bsAdjustOptions( options, {}, {
                 baseClass   : 'accordion',
                 styleClass  : '',
-                class       : '',
                 content     : ''
             });
 
