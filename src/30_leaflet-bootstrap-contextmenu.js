@@ -224,7 +224,8 @@
                     fullWidth   : true,
                     list        : [],
                     small       : true,
-                    class       : 'contextmenu-item-group',
+                    class       : 'contextmenu-item-group', //For accordion
+                    styleClass  : 'contextmenu-item-group'  //For menu
                 },
                 itemList;
 
