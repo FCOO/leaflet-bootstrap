@@ -2088,8 +2088,8 @@ https://github.com/nerik/leaflet-graphicscale
             return this.setContextmenuOptions( {simpleMode: !!on} );
         },
 
-        setContextmenuHeader: function(header){
-            this.setContextmenuOptions( {header: header} );
+        setContextmenuHeader: function(header, force){
+            this.setContextmenuOptions( {header: header, headerForce: force} );
             this._updatePopupWithContentmenuItems();
             return this;
         },
@@ -2279,7 +2279,8 @@ https://github.com/nerik/leaflet-graphicscale
                 itemList = nextContent.list;
 
                 //In simple-mode: If no header is given and there are more than one object => add header (if any)
-                if ((!firstObject || !o.header) && (objectList.length > 1) && contextmenuOptions.items.length && !!contextmenuOptions.header) {
+                if (contextmenuOptions.items.length && !!contextmenuOptions.header && (!o.header || !firstObject || contextmenuOptions.forceHeader)) {
+// HER>                 if ((!firstObject || !o.header) && (objectList.length > 1) && contextmenuOptions.items.length && !!contextmenuOptions.header) {
                     var headerOptions = $._bsAdjustIconAndText(contextmenuOptions.header);
                     headerOptions.spaceBefore = !firstObject;
                     headerOptions.mainHeader = firstObject;
