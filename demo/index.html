@@ -213,6 +213,9 @@ nextMap.addControl( nextMap.bsScaleControl );
             .addTo(nextMap)
             .bindTooltip({icon:'fa-home', text:'Godt'}, {delay:2000})
             .bindPopup({
+                
+                //onOpen: function(popup){ console.log('RIGTIG godt', popup); },
+                
                 showTooltip: true, 
                 header: {icon:'fa-home', text:'Header'},
                 buttons: [{

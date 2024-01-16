@@ -4517,20 +4517,25 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
     Extend L.Popup._initLayout to create popup with Bootstrap-components
     and add event onOpen and onClose
     *********************************************************/
-    function popup_onOpen(event){
+    function popup_onOpenOrClose(event, methodName){
         var popup   = event.target,
-            options = popup.options,
-            arg     = options.onOpenArg ? options.onOpenArg.slice() : [];
+            options = popup.options[methodName] ? popup.options : popup._content[methodName] ? popup._content : null;
+
+        if (!options)
+            return;
+
+        var arg = options.onOpenArg ? options.onOpenArg.slice() : [];
         arg.unshift(popup);
-        options.onOpen.apply(options.onOpenContext, arg);
+
+        options[methodName].apply(options[methodName+'Context'], arg);
+    }
+
+    function popup_onOpen(event){
+        popup_onOpenOrClose(event, 'onOpen');
     }
 
     function popup_onClose(event){
-        var popup   = event.target,
-            options = popup.options,
-            arg     = options.onCloseArg ? options.onCloseArg.slice() : [];
-        arg.unshift(popup);
-        options.onClose.apply(options.onCloseContext, arg);
+        popup_onOpenOrClose(event, 'onClose');
     }
 
     L.Popup.prototype._initLayout = function (_initLayout) {
@@ -4552,10 +4557,10 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
                 small       : true
             });
 
-            //Add onOpen and onClose events from options (if any)
-            if (this.options.onOpen)
+            //Add onOpen and onClose events from options or content (if any)
+            if (this.options.onOpen || this._content.onOpen)
                 this.on('add', popup_onOpen);
-            if (this.options.onClose)
+            if (this.options.onClose || this._content.onClose)
                 this.on('remove', popup_onClose);
 
             //Close open popup and brint to front when "touched"
