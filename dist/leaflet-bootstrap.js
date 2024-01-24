@@ -2304,6 +2304,14 @@ https://github.com/nerik/leaflet-graphicscale
 
             //Add all items to itemList
             $.each( contextmenuOptions.items, function(index, item){
+
+                //Allow item to be a function
+                item = $.isFunction(item) ? item() : item;
+
+                if (!item)
+                    return;
+
+
                 //Set default options
                 item = $.extend(
                     isContextmenuPopup ? {closeOnClick: true} : simpleMode ? {spaceBefore: !index} : {},

@@ -395,7 +395,10 @@ scroll: false,
     var first = null;
     
     map1.setContextmenuHeader({icon:'fa-map', text:'MAP 1'});
-    map1.addContextmenuItems([{
+    map1.addContextmenuItems([
+    function(){ return {icon:'fa-map', text: 'Function', onClick: alert}; },
+    function(){ return null },
+    {
         icon:'fa-home', text:{da:'Map#1 (w=180)'}, 
         onClick: function(id, latlng){ 
             console.log('MAP 1-1',latlng, arguments); 
