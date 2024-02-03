@@ -34496,10 +34496,10 @@ function defineValue(obj, key, val) {
   }
 
   /*!
-   * GSAP 3.12.4
+   * GSAP 3.12.5
    * https://gsap.com
    *
-   * @license Copyright 2008-2023, GreenSock. All rights reserved.
+   * @license Copyright 2008-2024, GreenSock. All rights reserved.
    * Subject to the terms at https://gsap.com/standard-license or for
    * Club GSAP members, the agreement issued with that membership.
    * @author: Jack Doyle, jack@greensock.com
@@ -35441,9 +35441,10 @@ function defineValue(obj, key, val) {
       _quickTween,
       _registerPluginQueue = [],
       _createPlugin = function _createPlugin(config) {
-    if (_windowExists() && config) {
-      config = !config.name && config["default"] || config;
+    if (!config) return;
+    config = !config.name && config["default"] || config;
 
+    if (_windowExists() || config.headless) {
       var name = config.name,
           isFunc = _isFunction(config),
           Plugin = name && !isFunc && config.init ? function () {
@@ -35491,7 +35492,7 @@ function defineValue(obj, key, val) {
 
       config.register && config.register(gsap, Plugin, PropTween);
     } else {
-      config && _registerPluginQueue.push(config);
+      _registerPluginQueue.push(config);
     }
   },
       _255 = 255,
@@ -35707,7 +35708,7 @@ function defineValue(obj, key, val) {
           time,
           frame;
 
-      elapsed > _lagThreshold && (_startTime += elapsed - _adjustedLag);
+      (elapsed > _lagThreshold || elapsed < 0) && (_startTime += elapsed - _adjustedLag);
       _lastUpdate += elapsed;
       time = _lastUpdate - _startTime;
       overlap = time - _nextTime;
@@ -35748,11 +35749,10 @@ function defineValue(obj, key, val) {
 
             _install(_installScope || _win.GreenSockGlobals || !_win.gsap && _win || {});
 
-            _raf = _win.requestAnimationFrame;
-
             _registerPluginQueue.forEach(_createPlugin);
           }
 
+          _raf = typeof requestAnimationFrame !== "undefined" && requestAnimationFrame;
           _id && _self.sleep();
 
           _req = _raf || function (f) {
@@ -35765,7 +35765,7 @@ function defineValue(obj, key, val) {
         }
       },
       sleep: function sleep() {
-        (_raf ? _win.cancelAnimationFrame : clearTimeout)(_id);
+        (_raf ? cancelAnimationFrame : clearTimeout)(_id);
         _tickerActive = 0;
         _req = _emptyFunc;
       },
@@ -37637,7 +37637,7 @@ function defineValue(obj, key, val) {
           if (iteration !== prevIteration) {
             timeline && this._yEase && _propagateYoyoEase(timeline, isYoyo);
 
-            if (this.vars.repeatRefresh && !isYoyo && !this._lock && this._time !== dur && this._initted) {
+            if (this.vars.repeatRefresh && !isYoyo && !this._lock && this._time !== cycleDuration && this._initted) {
               this._lock = force = 1;
               this.render(_roundPrecise(cycleDuration * iteration), true).invalidate()._lock = 0;
             }
@@ -37688,7 +37688,7 @@ function defineValue(obj, key, val) {
           pt = pt._next;
         }
 
-        timeline && timeline.render(totalTime < 0 ? totalTime : !time && isYoyo ? -_tinyNum : timeline._dur * timeline._ease(time / this._dur), suppressEvents, force) || this._startAt && (this._zTime = totalTime);
+        timeline && timeline.render(totalTime < 0 ? totalTime : timeline._dur * timeline._ease(time / this._dur), suppressEvents, force) || this._startAt && (this._zTime = totalTime);
 
         if (this._onUpdate && !suppressEvents) {
           isNegative && _rewindStartAt(this, totalTime, suppressEvents, force);
@@ -38238,6 +38238,7 @@ function defineValue(obj, key, val) {
     function MatchMedia(scope) {
       this.contexts = [];
       this.scope = scope;
+      _context && _context.data.push(this);
     }
 
     var _proto6 = MatchMedia.prototype;
@@ -38619,7 +38620,7 @@ function defineValue(obj, key, val) {
       }
     }
   }, _buildModifierPlugin("roundProps", _roundModifier), _buildModifierPlugin("modifiers"), _buildModifierPlugin("snap", snap)) || _gsap;
-  Tween.version = Timeline.version = gsap.version = "3.12.4";
+  Tween.version = Timeline.version = gsap.version = "3.12.5";
   _coreReady = 1;
   _windowExists() && _wake();
   var Power0 = _easeMap.Power0,
@@ -40177,8 +40178,9 @@ function defineValue(obj, key, val) {
     }
     on(events, listener) {
       events.split(' ').forEach(event => {
-        this.observers[event] = this.observers[event] || [];
-        this.observers[event].push(listener);
+        if (!this.observers[event]) this.observers[event] = new Map();
+        const numListeners = this.observers[event].get(listener) || 0;
+        this.observers[event].set(listener, numListeners + 1);
       });
       return this;
     }
@@ -40188,22 +40190,28 @@ function defineValue(obj, key, val) {
         delete this.observers[event];
         return;
       }
-      this.observers[event] = this.observers[event].filter(l => l !== listener);
+      this.observers[event].delete(listener);
     }
     emit(event) {
       for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
         args[_key - 1] = arguments[_key];
       }
       if (this.observers[event]) {
-        const cloned = [].concat(this.observers[event]);
-        cloned.forEach(observer => {
-          observer(...args);
+        const cloned = Array.from(this.observers[event].entries());
+        cloned.forEach(_ref => {
+          let [observer, numTimesAdded] = _ref;
+          for (let i = 0; i < numTimesAdded; i++) {
+            observer(...args);
+          }
         });
       }
       if (this.observers['*']) {
-        const cloned = [].concat(this.observers['*']);
-        cloned.forEach(observer => {
-          observer.apply(observer, [event, ...args]);
+        const cloned = Array.from(this.observers['*'].entries());
+        cloned.forEach(_ref2 => {
+          let [observer, numTimesAdded] = _ref2;
+          for (let i = 0; i < numTimesAdded; i++) {
+            observer.apply(observer, [event, ...args]);
+          }
         });
       }
     }
@@ -40229,28 +40237,31 @@ function defineValue(obj, key, val) {
       if (s[m]) t[m] = s[m];
     });
   }
+  const lastOfPathSeparatorRegExp = /###/g;
   function getLastOfPath(object, path, Empty) {
     function cleanKey(key) {
-      return key && key.indexOf('###') > -1 ? key.replace(/###/g, '.') : key;
+      return key && key.indexOf('###') > -1 ? key.replace(lastOfPathSeparatorRegExp, '.') : key;
     }
     function canNotTraverseDeeper() {
       return !object || typeof object === 'string';
     }
-    const stack = typeof path !== 'string' ? [].concat(path) : path.split('.');
-    while (stack.length > 1) {
+    const stack = typeof path !== 'string' ? path : path.split('.');
+    let stackIndex = 0;
+    while (stackIndex < stack.length - 1) {
       if (canNotTraverseDeeper()) return {};
-      const key = cleanKey(stack.shift());
+      const key = cleanKey(stack[stackIndex]);
       if (!object[key] && Empty) object[key] = new Empty();
       if (Object.prototype.hasOwnProperty.call(object, key)) {
         object = object[key];
       } else {
         object = {};
       }
+      ++stackIndex;
     }
     if (canNotTraverseDeeper()) return {};
     return {
       obj: object,
-      k: cleanKey(stack.shift())
+      k: cleanKey(stack[stackIndex])
     };
   }
   function setPath(object, path, newValue) {
@@ -40258,7 +40269,22 @@ function defineValue(obj, key, val) {
       obj,
       k
     } = getLastOfPath(object, path, Object);
-    obj[k] = newValue;
+    if (obj !== undefined || path.length === 1) {
+      obj[k] = newValue;
+      return;
+    }
+    let e = path[path.length - 1];
+    let p = path.slice(0, path.length - 1);
+    let last = getLastOfPath(object, p, Object);
+    while (last.obj === undefined && p.length) {
+      e = `${p[p.length - 1]}.${e}`;
+      p = p.slice(0, p.length - 1);
+      last = getLastOfPath(object, p, Object);
+      if (last && last.obj && typeof last.obj[`${last.k}.${e}`] !== 'undefined') {
+        last.obj = undefined;
+      }
+    }
+    last.obj[`${last.k}.${e}`] = newValue;
   }
   function pushPath(object, path, newValue, concat) {
     const {
@@ -40317,13 +40343,34 @@ function defineValue(obj, key, val) {
     }
     return data;
   }
+  class RegExpCache {
+    constructor(capacity) {
+      this.capacity = capacity;
+      this.regExpMap = new Map();
+      this.regExpQueue = [];
+    }
+    getRegExp(pattern) {
+      const regExpFromCache = this.regExpMap.get(pattern);
+      if (regExpFromCache !== undefined) {
+        return regExpFromCache;
+      }
+      const regExpNew = new RegExp(pattern);
+      if (this.regExpQueue.length === this.capacity) {
+        this.regExpMap.delete(this.regExpQueue.shift());
+      }
+      this.regExpMap.set(pattern, regExpNew);
+      this.regExpQueue.push(pattern);
+      return regExpNew;
+    }
+  }
   const chars = [' ', ',', '?', '!', ';'];
+  const looksLikeObjectPathRegExpCache = new RegExpCache(20);
   function looksLikeObjectPath(key, nsSeparator, keySeparator) {
     nsSeparator = nsSeparator || '';
     keySeparator = keySeparator || '';
     const possibleChars = chars.filter(c => nsSeparator.indexOf(c) < 0 && keySeparator.indexOf(c) < 0);
     if (possibleChars.length === 0) return true;
-    const r = new RegExp(`(${possibleChars.map(c => c === '?' ? '\\?' : c).join('|')})`);
+    const r = looksLikeObjectPathRegExpCache.getRegExp(`(${possibleChars.map(c => c === '?' ? '\\?' : c).join('|')})`);
     let matched = !r.test(key);
     if (!matched) {
       const ki = key.indexOf(keySeparator);
@@ -40337,33 +40384,29 @@ function defineValue(obj, key, val) {
     let keySeparator = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '.';
     if (!obj) return undefined;
     if (obj[path]) return obj[path];
-    const paths = path.split(keySeparator);
+    const tokens = path.split(keySeparator);
     let current = obj;
-    for (let i = 0; i < paths.length; ++i) {
-      if (!current) return undefined;
-      if (typeof current[paths[i]] === 'string' && i + 1 < paths.length) {
+    for (let i = 0; i < tokens.length;) {
+      if (!current || typeof current !== 'object') {
         return undefined;
       }
-      if (current[paths[i]] === undefined) {
-        let j = 2;
-        let p = paths.slice(i, i + j).join(keySeparator);
-        let mix = current[p];
-        while (mix === undefined && paths.length > i + j) {
-          j++;
-          p = paths.slice(i, i + j).join(keySeparator);
-          mix = current[p];
+      let next;
+      let nextPath = '';
+      for (let j = i; j < tokens.length; ++j) {
+        if (j !== i) {
+          nextPath += keySeparator;
         }
-        if (mix === undefined) return undefined;
-        if (mix === null) return null;
-        if (path.endsWith(p)) {
-          if (typeof mix === 'string') return mix;
-          if (p && typeof mix[p] === 'string') return mix[p];
+        nextPath += tokens[j];
+        next = current[nextPath];
+        if (next !== undefined) {
+          if (['string', 'number', 'boolean'].indexOf(typeof next) > -1 && j < tokens.length - 1) {
+            continue;
+          }
+          i += j - i + 1;
+          break;
         }
-        const joinedPath = paths.slice(i + j).join(keySeparator);
-        if (joinedPath) return deepFind(mix, joinedPath, keySeparator);
-        return undefined;
       }
-      current = current[paths[i]];
+      current = next;
     }
     return current;
   }
@@ -40403,13 +40446,27 @@ function defineValue(obj, key, val) {
       let options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
       const keySeparator = options.keySeparator !== undefined ? options.keySeparator : this.options.keySeparator;
       const ignoreJSONStructure = options.ignoreJSONStructure !== undefined ? options.ignoreJSONStructure : this.options.ignoreJSONStructure;
-      let path = [lng, ns];
-      if (key && typeof key !== 'string') path = path.concat(key);
-      if (key && typeof key === 'string') path = path.concat(keySeparator ? key.split(keySeparator) : key);
+      let path;
       if (lng.indexOf('.') > -1) {
         path = lng.split('.');
+      } else {
+        path = [lng, ns];
+        if (key) {
+          if (Array.isArray(key)) {
+            path.push(...key);
+          } else if (typeof key === 'string' && keySeparator) {
+            path.push(...key.split(keySeparator));
+          } else {
+            path.push(key);
+          }
+        }
       }
       const result = getPath(this.data, path);
+      if (!result && !ns && !key && lng.indexOf('.') > -1) {
+        lng = path[0];
+        ns = path[1];
+        key = path.slice(2).join('.');
+      }
       if (result || !ignoreJSONStructure || typeof key !== 'string') return result;
       return deepFind(this.data && this.data[lng] && this.data[lng][ns], key, keySeparator);
     }
@@ -40660,7 +40717,8 @@ function defineValue(obj, key, val) {
         const defaultValueSuffixOrdinalFallback = options.ordinal && needsPluralHandling ? this.pluralResolver.getSuffix(lng, options.count, {
           ordinal: false
         }) : '';
-        const defaultValue = options[`defaultValue${defaultValueSuffix}`] || options[`defaultValue${defaultValueSuffixOrdinalFallback}`] || options.defaultValue;
+        const needsZeroSuffixLookup = needsPluralHandling && !options.ordinal && options.count === 0 && this.pluralResolver.shouldUseIntlApi();
+        const defaultValue = needsZeroSuffixLookup && options[`defaultValue${this.options.pluralSeparator}zero`] || options[`defaultValue${defaultValueSuffix}`] || options[`defaultValue${defaultValueSuffixOrdinalFallback}`] || options.defaultValue;
         if (!this.isValidLookup(res) && hasDefaultValue) {
           usedDefault = true;
           res = defaultValue;
@@ -40704,7 +40762,11 @@ function defineValue(obj, key, val) {
           if (this.options.saveMissing) {
             if (this.options.saveMissingPlurals && needsPluralHandling) {
               lngs.forEach(language => {
-                this.pluralResolver.getSuffixes(language, options).forEach(suffix => {
+                const suffixes = this.pluralResolver.getSuffixes(language, options);
+                if (needsZeroSuffixLookup && options[`defaultValue${this.options.pluralSeparator}zero`] && suffixes.indexOf(`${this.options.pluralSeparator}zero`) < 0) {
+                  suffixes.push(`${this.options.pluralSeparator}zero`);
+                }
+                suffixes.forEach(suffix => {
                   send([language], key + suffix, options[`defaultValue${suffix}`] || defaultValue);
                 });
               });
@@ -41227,7 +41289,7 @@ function defineValue(obj, key, val) {
       let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
       if (this.shouldUseIntlApi()) {
         try {
-          return new Intl.PluralRules(getCleanedCode(code), {
+          return new Intl.PluralRules(getCleanedCode(code === 'dev' ? 'en' : code), {
             type: options.ordinal ? 'ordinal' : 'cardinal'
           });
         } catch (err) {
@@ -41341,12 +41403,16 @@ function defineValue(obj, key, val) {
       if (this.options) this.init(this.options);
     }
     resetRegExp() {
-      const regexpStr = `${this.prefix}(.+?)${this.suffix}`;
-      this.regexp = new RegExp(regexpStr, 'g');
-      const regexpUnescapeStr = `${this.prefix}${this.unescapePrefix}(.+?)${this.unescapeSuffix}${this.suffix}`;
-      this.regexpUnescape = new RegExp(regexpUnescapeStr, 'g');
-      const nestingRegexpStr = `${this.nestingPrefix}(.+?)${this.nestingSuffix}`;
-      this.nestingRegexp = new RegExp(nestingRegexpStr, 'g');
+      const getOrResetRegExp = (existingRegExp, pattern) => {
+        if (existingRegExp && existingRegExp.source === pattern) {
+          existingRegExp.lastIndex = 0;
+          return existingRegExp;
+        }
+        return new RegExp(pattern, 'g');
+      };
+      this.regexp = getOrResetRegExp(this.regexp, `${this.prefix}(.+?)${this.suffix}`);
+      this.regexpUnescape = getOrResetRegExp(this.regexpUnescape, `${this.prefix}${this.unescapePrefix}(.+?)${this.unescapeSuffix}${this.suffix}`);
+      this.nestingRegexp = getOrResetRegExp(this.nestingRegexp, `${this.nestingPrefix}(.+?)${this.nestingSuffix}`);
     }
     interpolate(str, data, lng, options) {
       let match;
@@ -76418,6 +76484,8 @@ module.exports = g;
                         .addClass('accordion-body')
                         .toggleClass('no-vertical-padding', !!opt.noVerticalPadding)
                         .toggleClass('no-horizontal-padding', !!opt.noHorizontalPadding)
+                        .addClass(opt.class || '')
+                        .addClass(opt.className || '')
                         .appendTo( $outer );
 
             //Add footer
@@ -76518,7 +76586,8 @@ module.exports = g;
                 noBorder            : 'no-border',
                 focus               : 'init_focus',
                 truncate            : 'text-truncate',
-                fullWidth           : 'w-100'
+                fullWidth           : 'w-100',
+                fullHeight          : 'h-100',
             };
 
         //Use standard color if not primary or transparent (any kind)
@@ -76588,6 +76657,9 @@ module.exports = g;
 
         if (options.prop)
             result.prop( options.prop );
+
+        if (options.css)
+            result.css( options.css );
 
         result.data('bsButton_options', options );
 
@@ -76966,7 +77038,8 @@ module.exports = g;
                 center      : true,
                 useTouchSize: true,
                 buttonOptions: {
-                    _class: 'flex-shrink-1 text-truncate'
+                    css: {'flex': options.buttonFullWidth ? '1 1 0' : '0 1 auto'},
+                    _class: 'text-truncate'
                 }
             } );
 
@@ -81968,13 +82041,15 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
         },
 
         defaultColunmOptions = {
-            align        : 'left',
-            verticalAlign: 'middle',
-            noWrap       : false,
-            truncate     : false,
-            fixedWidth   : false,
-            sortBy       : 'string',
-            sortable     : false
+            align               : 'left',
+            verticalAlign       : 'middle',
+            noWrap              : false,
+            truncate            : false,
+            fixedWidth          : false,
+            sortBy              : 'string',
+            sortable            : false,
+            noHorizontalPadding : false,
+            noVerticalPadding   : false
         },
 
         dataTableId = 'bsTable_options';
@@ -81987,7 +82062,8 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
             ._bsAddStyleClasses( columnOptions.align )
             .toggleClass('text-nowrap', !!columnOptions.noWrap )
 //TODO            .toggleClass('text-truncate', !!columnOptions.truncate )
-            .toggleClass('px-0', !!columnOptions.noHorizontalPadding );
+            .toggleClass('px-0', !!columnOptions.noHorizontalPadding )
+            .toggleClass('py-0', !!columnOptions.noVerticalPadding );
 
         if (addWidth && columnOptions.width)
             $element.css({

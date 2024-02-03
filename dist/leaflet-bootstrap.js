@@ -3983,9 +3983,10 @@ semiTransparent: true,
                         var $buttonContainer = this.$buttonContainer = $('<div/>').addClass('modal-footer d-block');
                         groupList.forEach( function( list ){
                             $.bsButtonBar({
-                                small   : true,
-                                buttons : list,
-                                justify : 'center'
+                                small          : true,
+                                buttons        : list,
+                                justify        : 'center',
+                                buttonFullWidth: true,
                             }).appendTo( $buttonContainer );
                         });
 

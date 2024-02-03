@@ -957,7 +957,18 @@ semiTransparent: false,
                 //noVerticalPadding: true,
                 //noHorizontalPadding: true,
 
-                buttons   : [
+                buttons   : i == 0 ? [
+                    {id:'button_'+i, icon:'fa-home', text:'IsLast #'+i, _isLastButton: true, 
+                        onClick: function(id, selected, button, map, legend){ 
+                            console.log('click me:', id, map, legend, arguments); legend.updateContent('Skide godt do!'); 
+                        } 
+                    }, 
+                    {id:'button_'+i, icon:'fa-home', text:'click me #'+i, 
+                        onClick: function(id, selected, button, map, legend){ 
+                            console.log('click me:', id, map, legend, arguments); legend.updateContent('Skide godt do!'); 
+                        } 
+                    }
+                ] :[
                     {id:'button_'+i, icon:'fa-home', text:'IsLast #'+i, _isLastButton: true, 
                         onClick: function(id, selected, button, map, legend){ 
                             console.log('click me:', id, map, legend, arguments); legend.updateContent('Skide godt do!'); 
