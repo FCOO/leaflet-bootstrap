@@ -211,7 +211,8 @@ leaflet-bootstrap-control-legend.js
 
     *******************************************************************
     ******************************************************************/
-    L.BsLegend_close_icon = ['fa-map fa-scale-x-08', 'fa-slash fa-scale-x-08'];
+    L.BsLegend_close_icon  = ['fa-map fa-scale-x-08', 'fa-slash fa-scale-x-08'];
+    L.BsLegend_close_title = {da:'Skjul', en:'Hide'};
     L.BsLegend_defaultOptions = function(){
         return {
             show       : true,  //Show or hide the legend at init
@@ -223,7 +224,7 @@ leaflet-bootstrap-control-legend.js
             closeIconOptions: {
                 icon     : L.BsLegend_close_icon,
                 className: $.BSMODAL_USE_SQUARE_ICONS ? null : 'fa-map-margin-right',
-                title    : {da:'Skjul', en:'Hide'},
+                title    : L.BsLegend_close_title
             }
         };
     };
