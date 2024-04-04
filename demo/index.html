@@ -12,7 +12,8 @@
     <link  href="bower_components.css" rel="stylesheet">
     <link  href="leaflet-polyline.css" rel="stylesheet">
     <link  href="../src/leaflet-bootstrap.css" rel="stylesheet">
-    <link  href="css/all.css" rel="stylesheet">
+
+    <link  href="fcoo-fontawesome.css" rel="stylesheet">
     <style>
         html, body {
             padding: 0; margin: 0; width:100%; height:100%; overflow: hidden;
@@ -72,7 +73,26 @@
 
     L.Renderer.prototype.options.padding = .5;
 
+    $.BSMODAL_USE_SQUARE_ICONS = true;
 
+    let icon_fa_prefix = 'far fa-';
+    $._set_bsHeaderIcons({
+        pin     : ['far fa-thumbtack fa-inside-circle', $.FONTAWESOME_PREFIX + ' fa-circle'],
+        unpin   : ['fas fa-thumbtack fa-inside-circle', $.FONTAWESOME_PREFIX + ' fa-circle'],
+    }, {
+        back    : icon_fa_prefix + 'arrow-left',
+        forward : icon_fa_prefix + 'arrow-right',
+        pin     : icon_fa_prefix + 'thumbtack',
+        unpin   : icon_fa_prefix + 'thumbtack',
+        extend  : icon_fa_prefix + 'square-plus',
+        diminish: icon_fa_prefix + 'square-minus',
+        new     : icon_fa_prefix + 'window-maximize',
+        warning : icon_fa_prefix + 'exclamation',
+        info    : icon_fa_prefix + 'info',
+        help    : icon_fa_prefix + 'question',
+        close   : icon_fa_prefix + 'xmark'
+    });
+    L.BsLegend_close_icon = ['far fa-map fa-scale-x-08', 'fas fa-slash fa-scale-x-08']; 
 
 
 //test    L.BsLegend.prototype.options.closeIconOptions.icon = 'fa-home';

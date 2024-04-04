@@ -3871,23 +3871,26 @@ leaflet-bootstrap-control-legend.js
 
     *******************************************************************
     ******************************************************************/
-    L.BsLegend_defaultOptions = {
-        show       : true,  //Show or hide the legend at init
-        showContent: true,  //Show or hide the content at init
-        showIcons  : true,  //Show or hide the icon-buttons t the header at init
-        isExtended : true,  //Extend/diminish the legend at init
+    L.BsLegend_close_icon = ['fa-map fa-scale-x-08', 'fa-slash fa-scale-x-08'];
+    L.BsLegend_defaultOptions = function(){
+        return {
+            show       : true,  //Show or hide the legend at init
+            showContent: true,  //Show or hide the content at init
+            showIcons  : true,  //Show or hide the icon-buttons t the header at init
+            isExtended : true,  //Extend/diminish the legend at init
 
-        //closeIconOptions = options for the close-icon in the header that removes the layer
-        closeIconOptions: {
-            icon     : ['fa-map fa-scale-x-08', 'fa-slash fa-scale-x-08'],
-            className: 'fa-map-margin-right',
-            title    : {da:'Skjul', en:'Hide'},
-        }
+            //closeIconOptions = options for the close-icon in the header that removes the layer
+            closeIconOptions: {
+                icon     : L.BsLegend_close_icon,
+                className: $.BSMODAL_USE_SQUARE_ICONS ? null : 'fa-map-margin-right',
+                title    : {da:'Skjul', en:'Hide'},
+            }
+        };
     };
 
 
     L.BsLegend = function( options ){
-        this.options = $.extend(true, {semiTransparent: true}, L.BsLegend_defaultOptions, options);
+        this.options = $.extend(true, {semiTransparent: true}, L.BsLegend_defaultOptions(), options);
         this.index = options.index;
     };
 
