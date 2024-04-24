@@ -243,7 +243,7 @@ leaflet-bootstrap-control-legend.js
         addTo: function( parent ){
             var _this = this,
                 options = this.options,
-                normalIcon = options.icon || 'fa-square text-white',
+                normalIcon = options.icon || 'fa-square-full text-white',
                 normalIconIsStackedIcon = false;
 
             //Add class to normal-icon to make it visible when working = off

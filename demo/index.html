@@ -74,6 +74,7 @@
     L.Renderer.prototype.options.padding = .5;
 
     $.BSMODAL_USE_SQUARE_ICONS = true;
+    $.FONTAWESOME_PREFIX = 'far'; 
 
     let icon_fa_prefix = 'far fa-';
     $._set_bsHeaderIcons({
@@ -463,9 +464,9 @@ content = {
 };
 */
 
-        if (!first && false)
+        if (!first && true)
             marker.bindPopup({
-                header: {text: {da:'Overskrift'}},
+                header: {icon: L.bsMarkerAsIcon('red', 'yellow', false), text: {da:'Overskrift'}},
                 _semiTransparent: first, //true,
                 //clickable: true,
 
