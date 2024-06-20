@@ -2280,8 +2280,11 @@ https://github.com/nerik/leaflet-graphicscale
 
                 //In simple-mode: If no header is given and there are more than one object => add header (if any)
                 if (contextmenuOptions.items.length && !!contextmenuOptions.header && (!o.header || !firstObject || contextmenuOptions.forceHeader)) {
-// HER>                 if ((!firstObject || !o.header) && (objectList.length > 1) && contextmenuOptions.items.length && !!contextmenuOptions.header) {
                     var headerOptions = $._bsAdjustIconAndText(contextmenuOptions.header);
+
+                    //Bug fix: For some (unknown) reason the header sometime also have content => error in display. The content is removed
+                    delete headerOptions.content;
+
                     headerOptions.spaceBefore = !firstObject;
                     headerOptions.mainHeader = firstObject;
                     itemList.push(headerOptions);
@@ -2334,7 +2337,6 @@ https://github.com/nerik/leaflet-graphicscale
 
                 itemList.push(item);
             });
-
         }); //end of $.each( objectList, function(index, obj){
 
         result.width = widthToUse;

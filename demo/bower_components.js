@@ -34532,11 +34532,11 @@ function defineValue(obj, key, val) {
 	var minor = parseInt(splitVersion[1]);
 
 	var JQ_LT_17 = (major < 1) || (major == 1 && minor < 7);
-
+	
 	function eventsData($el) {
 		return JQ_LT_17 ? $el.data('events') : $._data($el[0]).events;
 	}
-
+	
 	function moveHandlerToTop($el, eventName, isDelegated) {
 		var data = eventsData($el);
 		var events = data[eventName];
@@ -34554,7 +34554,7 @@ function defineValue(obj, key, val) {
 			events.unshift(events.pop());
 		}
 	}
-
+	
 	function moveEventHandlers($elems, eventsString, isDelegate) {
 		var events = eventsString.split(/\s+/);
 		$elems.each(function() {
@@ -34564,7 +34564,7 @@ function defineValue(obj, key, val) {
 			}
 		});
 	}
-
+	
 	function makeMethod(methodName) {
 		$.fn[methodName + 'First'] = function() {
 			var args = $.makeArray(arguments);
@@ -34589,7 +34589,7 @@ function defineValue(obj, key, val) {
 	$.fn.delegateFirst = function() {
 		var args = $.makeArray(arguments);
 		var eventsString = args[1];
-
+		
 		if (eventsString) {
 			args.splice(0, 2);
 			$.fn.delegate.apply(this, arguments);
@@ -34609,7 +34609,7 @@ function defineValue(obj, key, val) {
 
 		return this;
 	};
-
+	
 	// on (jquery >= 1.7)
 	if (!JQ_LT_17) {
 		$.fn.onFirst = function(types, selector) {
@@ -41546,20 +41546,38 @@ function defineValue(obj, key, val) {
       if (!options.interpolation) options.interpolation = {
         escapeValue: true
       };
-      const iOpts = options.interpolation;
-      this.escape = iOpts.escape !== undefined ? iOpts.escape : escape;
-      this.escapeValue = iOpts.escapeValue !== undefined ? iOpts.escapeValue : true;
-      this.useRawValueToEscape = iOpts.useRawValueToEscape !== undefined ? iOpts.useRawValueToEscape : false;
-      this.prefix = iOpts.prefix ? regexEscape(iOpts.prefix) : iOpts.prefixEscaped || '{{';
-      this.suffix = iOpts.suffix ? regexEscape(iOpts.suffix) : iOpts.suffixEscaped || '}}';
-      this.formatSeparator = iOpts.formatSeparator ? iOpts.formatSeparator : iOpts.formatSeparator || ',';
-      this.unescapePrefix = iOpts.unescapeSuffix ? '' : iOpts.unescapePrefix || '-';
-      this.unescapeSuffix = this.unescapePrefix ? '' : iOpts.unescapeSuffix || '';
-      this.nestingPrefix = iOpts.nestingPrefix ? regexEscape(iOpts.nestingPrefix) : iOpts.nestingPrefixEscaped || regexEscape('$t(');
-      this.nestingSuffix = iOpts.nestingSuffix ? regexEscape(iOpts.nestingSuffix) : iOpts.nestingSuffixEscaped || regexEscape(')');
-      this.nestingOptionsSeparator = iOpts.nestingOptionsSeparator ? iOpts.nestingOptionsSeparator : iOpts.nestingOptionsSeparator || ',';
-      this.maxReplaces = iOpts.maxReplaces ? iOpts.maxReplaces : 1000;
-      this.alwaysFormat = iOpts.alwaysFormat !== undefined ? iOpts.alwaysFormat : false;
+      const {
+        escape: escape$1,
+        escapeValue,
+        useRawValueToEscape,
+        prefix,
+        prefixEscaped,
+        suffix,
+        suffixEscaped,
+        formatSeparator,
+        unescapeSuffix,
+        unescapePrefix,
+        nestingPrefix,
+        nestingPrefixEscaped,
+        nestingSuffix,
+        nestingSuffixEscaped,
+        nestingOptionsSeparator,
+        maxReplaces,
+        alwaysFormat
+      } = options.interpolation;
+      this.escape = escape$1 !== undefined ? escape$1 : escape;
+      this.escapeValue = escapeValue !== undefined ? escapeValue : true;
+      this.useRawValueToEscape = useRawValueToEscape !== undefined ? useRawValueToEscape : false;
+      this.prefix = prefix ? regexEscape(prefix) : prefixEscaped || '{{';
+      this.suffix = suffix ? regexEscape(suffix) : suffixEscaped || '}}';
+      this.formatSeparator = formatSeparator || ',';
+      this.unescapePrefix = unescapeSuffix ? '' : unescapePrefix || '-';
+      this.unescapeSuffix = this.unescapePrefix ? '' : unescapeSuffix || '';
+      this.nestingPrefix = nestingPrefix ? regexEscape(nestingPrefix) : nestingPrefixEscaped || regexEscape('$t(');
+      this.nestingSuffix = nestingSuffix ? regexEscape(nestingSuffix) : nestingSuffixEscaped || regexEscape(')');
+      this.nestingOptionsSeparator = nestingOptionsSeparator || ',';
+      this.maxReplaces = maxReplaces || 1000;
+      this.alwaysFormat = alwaysFormat !== undefined ? alwaysFormat : false;
       this.resetRegExp();
     }
     reset() {
@@ -42539,7 +42557,7 @@ function defineValue(obj, key, val) {
       const deferred = defer();
       if (typeof lngs === 'string') lngs = [lngs];
       const preloaded = this.options.preload || [];
-      const newLngs = lngs.filter(lng => preloaded.indexOf(lng) < 0);
+      const newLngs = lngs.filter(lng => preloaded.indexOf(lng) < 0 && this.services.languageUtils.isSupportedCode(lng));
       if (!newLngs.length) {
         if (callback) callback();
         return Promise.resolve();
@@ -42727,8 +42745,8 @@ function defineValue(obj, key, val) {
     };
     (function(factory) {
         if (true) {
-            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(2) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory,
-            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__,
+            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(2) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory, 
+            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__, 
             __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
         } else {}
     })(function(Inputmask) {
@@ -42822,8 +42840,8 @@ function defineValue(obj, key, val) {
     };
     (function(factory) {
         if (true) {
-            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(3), __webpack_require__(5) ],
-            __WEBPACK_AMD_DEFINE_FACTORY__ = factory, __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__,
+            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(3), __webpack_require__(5) ], 
+            __WEBPACK_AMD_DEFINE_FACTORY__ = factory, __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__, 
             __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
         } else {}
     })(function($, window, undefined) {
@@ -44336,7 +44354,7 @@ function defineValue(obj, key, val) {
             function seekPrevious(pos, newBlock) {
                 var position = pos, tests;
                 if (position <= 0) return 0;
-                while (--position > 0 && (newBlock === true && getTest(position).match.newBlockMarker !== true || newBlock !== true && !isMask(position) && (tests = getTests(position),
+                while (--position > 0 && (newBlock === true && getTest(position).match.newBlockMarker !== true || newBlock !== true && !isMask(position) && (tests = getTests(position), 
                 tests.length < 2 || tests.length === 2 && tests[1].match.def === ""))) {}
                 return position;
             }
@@ -45573,8 +45591,8 @@ function defineValue(obj, key, val) {
     };
     (function(factory) {
         if (true) {
-            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(4) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory,
-            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__,
+            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(4) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory, 
+            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__, 
             __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
         } else {}
     })(function($) {
@@ -45603,8 +45621,8 @@ function defineValue(obj, key, val) {
     };
     (function(factory) {
         if (true) {
-            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(2) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory,
-            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__,
+            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(2) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory, 
+            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__, 
             __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
         } else {}
     })(function(Inputmask) {
@@ -45855,8 +45873,8 @@ function defineValue(obj, key, val) {
     };
     (function(factory) {
         if (true) {
-            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(2) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory,
-            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__,
+            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(2) ], __WEBPACK_AMD_DEFINE_FACTORY__ = factory, 
+            __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__, 
             __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
         } else {}
     })(function(Inputmask) {
@@ -46406,8 +46424,8 @@ function defineValue(obj, key, val) {
     };
     (function(factory) {
         if (true) {
-            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(4), __webpack_require__(2) ],
-            __WEBPACK_AMD_DEFINE_FACTORY__ = factory, __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__,
+            !(__WEBPACK_AMD_DEFINE_ARRAY__ = [ __webpack_require__(4), __webpack_require__(2) ], 
+            __WEBPACK_AMD_DEFINE_FACTORY__ = factory, __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === "function" ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__, 
             __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
         } else {}
     })(function($, Inputmask) {
@@ -49706,7 +49724,7 @@ if (typeof define === 'function' && define.amd) {
 
 ;
 /****************************************************************************
-	modernizr-javascript.js,
+	modernizr-javascript.js, 
 
 	(c) 2016, FCOO
 
@@ -49717,20 +49735,20 @@ if (typeof define === 'function' && define.amd) {
 
 (function ($, window, document, undefined) {
 	"use strict";
-
+	
 	var ns = window;
 
     //Extend the jQuery prototype
     $.fn.extend({
-        modernizrOn : function( test ){
-            return this.modernizrToggle( test, true );
+        modernizrOn : function( test ){ 
+            return this.modernizrToggle( test, true ); 
         },
 
-        modernizrOff: function( test ){
-            return this.modernizrToggle( test, false );
+        modernizrOff: function( test ){ 
+            return this.modernizrToggle( test, false ); 
         },
-
-        modernizrToggle: function( test, on ){
+        
+        modernizrToggle: function( test, on ){ 
 		if ( on === undefined )
             return this.modernizrToggle( test, !this.hasClass( test ) );
 
@@ -52602,19 +52620,19 @@ jquery-base-slider-public.js
 ;
 /* @preserve
  * The MIT License (MIT)
- *
+ * 
  * Copyright (c) 2013-2018 Petka Antonov
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
@@ -52622,7 +52640,7 @@ jquery-base-slider-public.js
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- *
+ * 
  */
 /**
  * bluebird build version 3.7.2
@@ -56214,28 +56232,28 @@ _dereq_('./using.js')(Promise, apiRejection, tryConvertToPromise, createContext,
 _dereq_('./any.js')(Promise);
 _dereq_('./each.js')(Promise, INTERNAL);
 _dereq_('./filter.js')(Promise, INTERNAL);
-
-    util.toFastProperties(Promise);
-    util.toFastProperties(Promise.prototype);
-    function fillTypes(value) {
-        var p = new Promise(INTERNAL);
-        p._fulfillmentHandler0 = value;
-        p._rejectionHandler0 = value;
-        p._promise0 = value;
-        p._receiver0 = value;
-    }
-    // Complete slack tracking, opt out of field-type tracking and
-    // stabilize map
-    fillTypes({a: 1});
-    fillTypes({b: 2});
-    fillTypes({c: 3});
-    fillTypes(1);
-    fillTypes(function(){});
-    fillTypes(undefined);
-    fillTypes(false);
-    fillTypes(new Promise(INTERNAL));
-    debug.setBounds(Async.firstLineError, util.lastLineError);
-    return Promise;
+                                                         
+    util.toFastProperties(Promise);                                          
+    util.toFastProperties(Promise.prototype);                                
+    function fillTypes(value) {                                              
+        var p = new Promise(INTERNAL);                                       
+        p._fulfillmentHandler0 = value;                                      
+        p._rejectionHandler0 = value;                                        
+        p._promise0 = value;                                                 
+        p._receiver0 = value;                                                
+    }                                                                        
+    // Complete slack tracking, opt out of field-type tracking and           
+    // stabilize map                                                         
+    fillTypes({a: 1});                                                       
+    fillTypes({b: 2});                                                       
+    fillTypes({c: 3});                                                       
+    fillTypes(1);                                                            
+    fillTypes(function(){});                                                 
+    fillTypes(undefined);                                                    
+    fillTypes(false);                                                        
+    fillTypes(new Promise(INTERNAL));                                        
+    debug.setBounds(Async.firstLineError, util.lastLineError);               
+    return Promise;                                                          
 
 };
 
@@ -60678,10 +60696,6 @@ module.exports = Yaml;
         Promise.defaultErrorHandler( createErrorObject( e, url ) );
     };
 
-    function callDefaultErrorHandle(reason, url){
-        return Promise.defaultErrorHandler( createErrorObject( reason, url ) );
-    }
-
     //Promise.defaultPrefetch = function(url, options): To be called before ALL fetch
     Promise.defaultPrefetch = null;
 
@@ -60692,7 +60706,36 @@ module.exports = Yaml;
     Promise.fetch( url, options )
     Fetch the url.
     Retries up to options.retries times with delay between of options.retryDeday ms
+    Princip taken from https://medium.com/@yshen4/javascript-fetch-with-retry-fb7e2e8f8cad
+
+    Original code from https://medium.com/@yshen4/javascript-fetch-with-retry-fb7e2e8f8cad:
+
+    const wait = (delay) => (new Promise((resolve) => setTimeout(resolve, delay)));
+    Promise.fetchWithRetry = function(url, tries=2){
+        fetch(url)
+            .then( (response) => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    // 1. throw a new exception
+                    if (res.status === 401) throw new 4xxError('Not authorized', response)
+                    if (res.status === 404) throw new 4xxError(`Resource doesn't exist`, response)
+                    // 2. reject instead of throw, peferred
+                    return Promise.reject(response);
+                }
+            })
+            .catch( (error) => {
+                if (error instanceof 4xxError || tries < 1) {
+                    throw error;
+                } else {
+                    //Retry network error or 5xx errors
+                    const delay = Math.floor(Math.random() * 1000);
+                    wait(delay).then(()=> Promise.fetchWithRetry(url, tries - 1));
+                }
+            })
+    }
     **************************************************************/
+    const wait = (delay) => (new Promise((resolve) => setTimeout(resolve, delay)));
     Promise.fetch = function(url, options) {
         options = $.extend( {}, {
             retries   : 3,
@@ -60710,27 +60753,35 @@ module.exports = Yaml;
         if (options.noCache)
             url = url + (url.indexOf('?') > 0 ? '&' : '?') + 'dummy='+Math.random().toString(36).substr(2, 9);
 
-        if (Promise.defaultPrefetch)
+        if (Promise.defaultPrefetch && !options.noDefaultPrefetch)
             Promise.defaultPrefetch(url, options);
 
         return new Promise(function(resolve, reject) {
-            var wrappedFetch = function(n) {
-                fetch(url, options)
-                    .then(function(response) {
+            fetch(url, options)
+                .then((response) => {
+                    if (response.ok)
                         resolve(response);
-                    })
-                    .catch(function(error) {
-                        if (n > 0) {
-                            setTimeout(function() {
-                                wrappedFetch(--n);
-                            }, options.retryDelay);
-                        }
-                        else {
+                    else
+                        return Promise.reject(response);
+                })
+                .catch((/*error*/reason) => {
+                    if (options.retries > 0){
+                        options.retries--;
+                        options.noCache = false;
+                        options.noDefaultPrefetch = true;
+                        wait(options.retryDelay)
+                            .then(()=> Promise.fetch(url, options) );
+                    }
+                    else {
+
+                        //console.log('HER', error, reject, options);
+                        let error =  createErrorObject(reason, options.url);
+                        if (options.reject)
+                            options.reject(error);
+                        if (options.useDefaultErrorHandler)
                             reject(error);
-                        }
-                    });
-            };
-            wrappedFetch(options.retries);
+                    }
+                });
         });
     };
 
@@ -60848,29 +60899,6 @@ module.exports = Yaml;
 
         if (resolve)
             result = result.then( resolve );
-
-        //Adding error/reject promise
-        var defaultReject = function(reason){
-                return callDefaultErrorHandle(reason, options.url);
-            };
-
-        if (reject){
-            //If options.useDefaultErrorHandler => also needs to call => Promise.defaultErrorHandler
-            if (options.useDefaultErrorHandler)
-                result = result.catch( function( reason ){
-                    reject( createErrorObject( reason, options.url ) );
-                    return defaultReject.call( null, reason );
-                });
-            else
-                //Just use reject as catch
-                result = result.catch( function( reason ){
-                    return reject( createErrorObject( reason, options.url ) );
-                });
-        }
-        else
-            if (!options.useDefaultErrorHandler)
-                //Prevent the use of Promise.defaultErrorHandler
-                result = result.catch( function(){} );
 
         //Adding finally (if any)
         if (fin || Promise.defaultFinally){
@@ -69355,7 +69383,7 @@ return index;
 
     var keys = ['Hours', 'Minutes', 'Seconds', 'Milliseconds'];
     var maxValues = [24, 60, 60, 1000];
-
+    
     // Capitalize first letter
     key = key.charAt(0).toUpperCase() + key.slice(1).toLowerCase();
 
@@ -72116,12 +72144,12 @@ options:
 /*! @websanova/url - v2.6.3 - 2020-01-25 */
 !function(){function t(t,r){var a,o={};if("tld?"!==t){if(r=r||window.location.toString(),!t)return r;if(t=t.toString(),a=r.match(/^mailto:([^\/].+)/))o.protocol="mailto",o.email=a[1];else{if((a=r.match(/(.*?)\/#\!(.*)/))&&(r=a[1]+a[2]),(a=r.match(/(.*?)#(.*)/))&&(o.hash=a[2],r=a[1]),o.hash&&t.match(/^#/))return h(t,o.hash);if((a=r.match(/(.*?)\?(.*)/))&&(o.query=a[2],r=a[1]),o.query&&t.match(/^\?/))return h(t,o.query);if((a=r.match(/(.*?)\:?\/\/(.*)/))&&(o.protocol=a[1].toLowerCase(),r=a[2]),(a=r.match(/(.*?)(\/.*)/))&&(o.path=a[2],r=a[1]),o.path=(o.path||"").replace(/^([^\/])/,"/$1"),t.match(/^[\-0-9]+$/)&&(t=t.replace(/^([^\/])/,"/$1")),t.match(/^\//))return e(t,o.path.substring(1));if((a=(a=e("/-1",o.path.substring(1)))&&a.match(/(.*?)\.([^.]+)$/))&&(o.file=a[0],o.filename=a[1],o.fileext=a[2]),(a=r.match(/(.*)\:([0-9]+)$/))&&(o.port=a[2],r=a[1]),(a=r.match(/(.*?)@(.*)/))&&(o.auth=a[1],r=a[2]),o.auth&&(a=o.auth.match(/(.*)\:(.*)/),o.user=a?a[1]:o.auth,o.pass=a?a[2]:void 0),o.hostname=r.toLowerCase(),"."===t.charAt(0))return e(t,o.hostname);o.port=o.port||("https"===o.protocol?"443":"80"),o.protocol=o.protocol||("443"===o.port?"https":"http")}return t in o?o[t]:"{}"===t?o:void 0}}function e(t,r){var a=t.charAt(0),o=r.split(a);return a===t?o:o[(t=parseInt(t.substring(1),10))<0?o.length+t:t-1]}function h(t,r){for(var a,o=t.charAt(0),e=r.split("&"),h=[],n={},c=[],i=t.substring(1),p=0,u=e.length;p<u;p++)if(""!==(h=(h=e[p].match(/(.*?)=(.*)/))||[e[p],e[p],""])[1].replace(/\s/g,"")){if(h[2]=(a=h[2]||"",decodeURIComponent(a.replace(/\+/g," "))),i===h[1])return h[2];(c=h[1].match(/(.*)\[([0-9]+)\]/))?(n[c[1]]=n[c[1]]||[],n[c[1]][c[2]]=h[2]):n[h[1]]=h[2]}return o===t?n:n[i]}window.url=t}();
 ;
-/*
-  @package NOTY - Dependency-free notification library
-  @version version: 3.2.0-beta
-  @contributors https://github.com/needim/noty/graphs/contributors
-  @documentation Examples and Documentation - https://ned.im/noty
-  @license Licensed under the MIT licenses: http://www.opensource.org/licenses/mit-license.php
+/* 
+  @package NOTY - Dependency-free notification library 
+  @version version: 3.2.0-beta 
+  @contributors https://github.com/needim/noty/graphs/contributors 
+  @documentation Examples and Documentation - https://ned.im/noty 
+  @license Licensed under the MIT licenses: http://www.opensource.org/licenses/mit-license.php 
 */
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -74154,7 +74182,7 @@ Promise$2.prototype = {
     The primary way of interacting with a promise is through its `then` method,
     which registers callbacks to receive either a promise's eventual value or the
     reason why the promise cannot be fulfilled.
-
+  
     ```js
     findUser().then(function(user){
       // user is available
@@ -74162,14 +74190,14 @@ Promise$2.prototype = {
       // user is unavailable, and you are given the reason why
     });
     ```
-
+  
     Chaining
     --------
-
+  
     The return value of `then` is itself a promise.  This second, 'downstream'
     promise is resolved with the return value of the first promise's fulfillment
     or rejection handler, or rejected if the handler throws an exception.
-
+  
     ```js
     findUser().then(function (user) {
       return user.name;
@@ -74179,7 +74207,7 @@ Promise$2.prototype = {
       // If `findUser` fulfilled, `userName` will be the user's name, otherwise it
       // will be `'default name'`
     });
-
+  
     findUser().then(function (user) {
       throw new Error('Found user, but still unhappy');
     }, function (reason) {
@@ -74192,7 +74220,7 @@ Promise$2.prototype = {
     });
     ```
     If the downstream promise does not specify a rejection handler, rejection reasons will be propagated further downstream.
-
+  
     ```js
     findUser().then(function (user) {
       throw new PedagogicalException('Upstream error');
@@ -74204,15 +74232,15 @@ Promise$2.prototype = {
       // The `PedgagocialException` is propagated all the way down to here
     });
     ```
-
+  
     Assimilation
     ------------
-
+  
     Sometimes the value you want to propagate to a downstream promise can only be
     retrieved asynchronously. This can be achieved by returning a promise in the
     fulfillment or rejection handler. The downstream promise will then be pending
     until the returned promise is settled. This is called *assimilation*.
-
+  
     ```js
     findUser().then(function (user) {
       return findCommentsByAuthor(user);
@@ -74220,9 +74248,9 @@ Promise$2.prototype = {
       // The user's comments are now available
     });
     ```
-
+  
     If the assimliated promise rejects, then the downstream promise will also reject.
-
+  
     ```js
     findUser().then(function (user) {
       return findCommentsByAuthor(user);
@@ -74232,15 +74260,15 @@ Promise$2.prototype = {
       // If `findCommentsByAuthor` rejects, we'll have the reason here
     });
     ```
-
+  
     Simple Example
     --------------
-
+  
     Synchronous Example
-
+  
     ```javascript
     let result;
-
+  
     try {
       result = findResult();
       // success
@@ -74248,9 +74276,9 @@ Promise$2.prototype = {
       // failure
     }
     ```
-
+  
     Errback Example
-
+  
     ```js
     findResult(function(result, err){
       if (err) {
@@ -74260,9 +74288,9 @@ Promise$2.prototype = {
       }
     });
     ```
-
+  
     Promise Example;
-
+  
     ```javascript
     findResult().then(function(result){
       // success
@@ -74270,15 +74298,15 @@ Promise$2.prototype = {
       // failure
     });
     ```
-
+  
     Advanced Example
     --------------
-
+  
     Synchronous Example
-
+  
     ```javascript
     let author, books;
-
+  
     try {
       author = findAuthor();
       books  = findBooksByAuthor(author);
@@ -74287,19 +74315,19 @@ Promise$2.prototype = {
       // failure
     }
     ```
-
+  
     Errback Example
-
+  
     ```js
-
+  
     function foundBooks(books) {
-
+  
     }
-
+  
     function failure(reason) {
-
+  
     }
-
+  
     findAuthor(function(author, err){
       if (err) {
         failure(err);
@@ -74324,9 +74352,9 @@ Promise$2.prototype = {
       }
     });
     ```
-
+  
     Promise Example;
-
+  
     ```javascript
     findAuthor().
       then(findBooksByAuthor).
@@ -74336,7 +74364,7 @@ Promise$2.prototype = {
       // something went wrong
     });
     ```
-
+  
     @method then
     @param {Function} onFulfilled
     @param {Function} onRejected
@@ -74348,25 +74376,25 @@ Promise$2.prototype = {
   /**
     `catch` is simply sugar for `then(undefined, onRejection)` which makes it the same
     as the catch block of a try/catch statement.
-
+  
     ```js
     function findAuthor(){
       throw new Error('couldn't find that author');
     }
-
+  
     // synchronous
     try {
       findAuthor();
     } catch(reason) {
       // something went wrong
     }
-
+  
     // async with promises
     findAuthor().catch(function(reason){
       // something went wrong
     });
     ```
-
+  
     @method catch
     @param {Function} onRejection
     Useful for tooling.
@@ -75283,9 +75311,9 @@ module.exports = g;
     let isModernBrowser = function (){
 
         /*
-           userAgent sniffing is not the ideal path, but most browsers revoked the ability to check navigator.mimeTypes
+           userAgent sniffing is not the ideal path, but most browsers revoked the ability to check navigator.mimeTypes 
            for security purposes. As of 2023, browsers have begun implementing navigator.pdfViewerEnabled, but older versions
-           do not have navigator.pdfViewerEnabled or the ability to check navigator.mimeTypes. We're left with basic browser
+           do not have navigator.pdfViewerEnabled or the ability to check navigator.mimeTypes. We're left with basic browser 
            sniffing and assumptions of PDF support based on browser vendor.
         */
 
@@ -75295,21 +75323,21 @@ module.exports = g;
         //Note that MS Edge opts to use a different PDF rendering engine. As of 2024, Edge uses a version of Adobe's Reader
         let isChromium = (win.chrome !== undefined);
 
-        //Safari on macOS has provided native PDF support since 2009.
+        //Safari on macOS has provided native PDF support since 2009. 
         //This code snippet also detects the DuckDuckGo browser, which uses Safari/Webkit under the hood.
         let isSafari = (win.safari !== undefined || (nav.vendor !== undefined && /Apple/.test(nav.vendor) && /Safari/.test(ua)));
 
         //Firefox has provided PDF support via PDFJS since 2013.
         let isFirefox = (win.Mozilla !== undefined || /irefox/.test(ua));
 
-        return isChromium || isSafari || isFirefox;
+        return isChromium || isSafari || isFirefox;  
 
     };
 
     /*
        Special handling for Internet Explorer 11.
        Check for ActiveX support, then whether "AcroPDF.PDF" or "PDF.PdfCtrl" are valid.
-       IE11 uses ActiveX for Adobe Reader and other PDF plugins, but window.ActiveXObject will evaluate to false.
+       IE11 uses ActiveX for Adobe Reader and other PDF plugins, but window.ActiveXObject will evaluate to false. 
        ("ActiveXObject" in window) evaluates to true.
        MS Edge does not support ActiveX so this test will evaluate false for MS Edge.
     */
@@ -75335,7 +75363,7 @@ module.exports = g;
 
         //As of June 2023, no mobile browsers properly support inline PDFs. If mobile, just say no.
         if(isMobileDevice){ return false; }
-
+        
         //Modern browsers began supporting navigator.pdfViewerEnabled in late 2022 and early 2023.
         let supportsPDFVE = (typeof nav.pdfViewerEnabled === "boolean");
 
@@ -75356,20 +75384,20 @@ module.exports = g;
         let prop;
         let paramArray = [];
         let fdf = "";
-
-        //The comment, viewrect, and highlight parameters require page to be set first.
+        
+        //The comment, viewrect, and highlight parameters require page to be set first. 
 
         //Check to ensure page is used if comment, viewrect, or highlight are specified
         if(pdfParams.comment || pdfParams.viewrect || pdfParams.highlight){
 
             if(!pdfParams.page){
-
+                
                 //If page is not set, use the first page
                 pdfParams.page = 1;
-
+                
                 //Inform user that page needs to be set properly
                 embedError("The comment, viewrect, and highlight parameters require a page parameter, but none was specified. Defaulting to page 1.");
-
+            
             }
 
         }
@@ -75385,7 +75413,7 @@ module.exports = g;
             fdf = pdfParams.fdf;
             delete pdfParams.fdf;
         }
-
+        
         //Add all other parameters, as needed
         if(pdfParams){
 
@@ -75468,7 +75496,7 @@ module.exports = g;
             xhr.onload = function() {
 
                 if (xhr.status === 200) {
-
+ 
                     var blob = xhr.response;
                     var link = document.createElement('a');
                     link.innerText = "Download PDF";
@@ -75481,7 +75509,7 @@ module.exports = g;
             };
 
             xhr.send();
-
+            
         }
 
     };
@@ -75494,9 +75522,9 @@ module.exports = g;
 
         let source = url;
 
-        if(embedType === "pdfjs"){
+        if(embedType === "pdfjs"){ 
             //If PDFJS_URL already contains a ?, assume querystring is in place, and use an ampersand to append PDFJS's file parameter
-            let connector = (PDFJS_URL.indexOf("?") !== -1) ? "&" : "?";
+            let connector = (PDFJS_URL.indexOf("?") !== -1) ? "&" : "?"; 
             source = PDFJS_URL + connector + "file=" + encodeURIComponent(url) + pdfOpenFragment;
         } else {
             source += pdfOpenFragment;
@@ -75523,7 +75551,7 @@ module.exports = g;
                 style += "position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%;";
             }
 
-            el.style.cssText = style;
+            el.style.cssText = style; 
 
         }
 
@@ -75584,22 +75612,22 @@ module.exports = g;
         if(forcePDFJS && PDFJS_URL){
             return generatePDFObjectMarkup("pdfjs", targetNode, url, pdfOpenFragment, width, height, id, title, omitInlineStyles, customAttribute, PDFJS_URL);
         }
-
+ 
         // --== Embed attempt #2 ==--
 
-        //Embed PDF if support is detected, or if this is a relatively modern browser
+        //Embed PDF if support is detected, or if this is a relatively modern browser 
         if(supportsPDFs){
             return generatePDFObjectMarkup("iframe", targetNode, url, pdfOpenFragment, width, height, id, title, omitInlineStyles, customAttribute);
         }
-
+        
         // --== Embed attempt #3 ==--
-
+        
         //If everything else has failed and a PDFJS fallback is provided, try to use it
         if(PDFJS_URL){
             return generatePDFObjectMarkup("pdfjs", targetNode, url, pdfOpenFragment, width, height, id, title, omitInlineStyles, customAttribute, PDFJS_URL);
         }
-
-        // --== PDF embed not supported! Use fallback ==--
+        
+        // --== PDF embed not supported! Use fallback ==-- 
 
         //Display the fallback link if available
         if(fallbackLink){
@@ -75617,7 +75645,7 @@ module.exports = g;
 
                     //Asynchronously append the link to the targetNode
                     convertBase64ToDownloadableLink(url, "file.pdf", targetNode, fallbackHTML_default);
-
+                
                 } else {
 
                     //Use default fallback link
@@ -77746,7 +77774,7 @@ options
                 ' ';
         var result = [
             'fas ' + className + colorClassName,
-            $.FONTAWESOME_PREFIX + ' ' + className + borderColorClassName,
+            $.FONTAWESOME_PREFIX + ' ' + className + borderColorClassName
         ];
 
         return options.partOfList ? result : [result];
@@ -83395,14 +83423,20 @@ Base object-class for all type of markers
         options.iconColorName = options.iconColorName || options.textColorName || 'black';
 //BRUGES MÅSKE IKKE:             options.color = options.color || options.textColor || options.iconColor;
 
-        options.size = options.size ? options.size.toLowerCase() : 'nl';
-        options.size =  options.size == 'extrasmall' ? 'xs' :
-                        options.size == 'small' ? 'sm' :
-                        options.size == 'large' ? 'lg' :
-                        options.size == 'xlarge' ? 'xl' :
-                        options.size == 'normal' ? 'nl' :
-                        options.size;
 
+        if (typeof options.size == 'number'){
+            //Individual size
+            options.indvidualSize = true;
+        }
+        else {
+            options.size = options.size ? options.size.toLowerCase() : 'nl';
+            options.size =  options.size == 'extrasmall' ? 'xs' :
+                            options.size == 'small' ? 'sm' :
+                            options.size == 'large' ? 'lg' :
+                            options.size == 'xlarge' ? 'xl' :
+                            options.size == 'normal' ? 'nl' :
+                            options.size;
+        }
         return options;
     };
 
@@ -83480,7 +83514,7 @@ Base object-class for all type of markers
     L.BsMarkerBase = L.Marker.extend({
         options: {
             type       : 'base',  //Type of the marker
-            size       : 'nl',    //Size of the marker. Possble values: 'extrasmall'/'sx', 'small'/'sm', '', 'large'/'lg', 'xlarge'*'xl'
+            size       : 'nl',    //Size of the marker. Possble values: 'extrasmall'/'sx', 'small'/'sm', '', 'large'/'lg', 'xlarge'*'xl' or number
 
             scale      : null,    //Value = 40, 50, 60, 70, 80, 90, 120, 130, 150, 180 or 200: Scale specific icons to fit the other icons. Only for icon-marker
             scaleY     : null,    //Value = 40, 50, 60, 70, 80, 90, 120, 130, 150, 180 or 200: Scale height of specific icons to better fit icons with very low height
@@ -83556,7 +83590,7 @@ Base object-class for all type of markers
             options = options || this.options;
             options = ns._adjustOptions( options );
 
-            if (options.useTouchSize && options.draggable && window.bsIsTouch)
+            if (!options.indvidualSize && options.useTouchSize && options.draggable && window.bsIsTouch)
                 options.size = 'lg';
 
             return options;
@@ -83596,7 +83630,7 @@ Base object-class for all type of markers
         getWH - Return [width,height] of the icon
         *****************************************************/
         getWH: function( sizeId ){
-            var width = ns.size[sizeId || this.size],
+            var width = this.options.indvidualSize ? (sizeId || this.size) : ns.size[sizeId || this.size],
                 height = width;
 
             if (this.options.scale){
@@ -91531,7 +91565,7 @@ var SVG = (function () {
             //bottomcenter need an extra container to be placed at the bottom
             this._controlCorners['bottomcenter'] =
                 L.DomUtil.create(
-                    'div',
+                    'div', 
                     'leaflet-bottom leaflet-center',
                     L.DomUtil.create('div', 'leaflet-control-bottomcenter',    this._controlContainer)
                 );
@@ -92231,7 +92265,7 @@ var SVG = (function () {
         }
     });
 
-
+    
 
 (function() {
         numeral.register('format', 'bps', {
@@ -95043,7 +95077,7 @@ if (Number.prototype.toDegrees === undefined) {
 
 ;
 /*! =======================================================
-                      VERSION  11.0.2
+                      VERSION  11.0.2              
 ========================================================= */
 "use strict";
 
