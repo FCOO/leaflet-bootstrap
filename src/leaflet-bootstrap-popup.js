@@ -414,9 +414,40 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
 
 
     /*********************************************************
-    L.Popup.changeContent - only changes the content
-    of the "body" of the bsModal inside the popup
+    L.Popup.setWidth( width )
+    Set new width of the popup
+    width = NUMBER or {width: NUMBER, minimized: NUMBER, extended: NUMBER}
     *********************************************************/
+    L.Popup.prototype.setWidth = function(width){
+        if (typeof width == 'number')
+            width = {width: width};
+
+        if (!width.width)
+            return this;
+
+        const allNewWidth = {};
+        allNewWidth[$.MODAL_SIZE_NORMAL]    = width.width || width.normal;
+        allNewWidth[$.MODAL_SIZE_MINIMIZED] = width.minimized;
+        allNewWidth[$.MODAL_SIZE_EXTENDED]  = width.extended;
+
+        const setWidth = function(options, size){
+            if (!options) return;
+
+            let newWidth = allNewWidth[size];
+            if (newWidth)
+                options.width = newWidth;
+
+            if (typeof newWidth == 'number')
+                this.bsModal.cssWidth[size].width = newWidth+'px';
+        }.bind(this);
+
+        setWidth(this.modalOptions,           $.MODAL_SIZE_NORMAL);
+        setWidth(this.modalOptions.minimized, $.MODAL_SIZE_MINIMIZED);
+        setWidth(this.modalOptions.extended,  $.MODAL_SIZE_EXTENDED);
+
+        this.$contentNode._bsModalSetHeightAndWidth();
+    };
+
 
 
 

@@ -230,6 +230,13 @@ nextMap.addControl( nextMap.bsScaleControl );
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors</a>'
         }).addTo(nextMap);
 
+
+        let popupWidth = [
+            {width:   300, minimized:   200, extended:   400},
+            {width: 2*300, minimized: 2*200, extended: 2*400}
+        ],
+        popupWidthIndex = 0;
+
         L.marker([54,12], {draggable: true})
             .addTo(nextMap)
             .bindTooltip({icon:'fa-home', text:'Godt'}, {delay:2000})
@@ -240,16 +247,18 @@ nextMap.addControl( nextMap.bsScaleControl );
                 showTooltip: true, 
                 header: {icon:'fa-home', text:'Header'},
                 buttons: [{
-                    icon:'fa-home', text:'Davs', 
-                    onClick: function(){
-                        console.log('test af contextmenu', arguments.length, 'map=', arguments[3]);
+                    icon:'fa-arrows-left-right', text:'Set width', 
+
+                    onClick: function(a, b, button, map, popup){
+                        popupWidthIndex = popupWidthIndex ? 0 : 1;
+                        popup.setWidth( popupWidth[popupWidthIndex] );
                     }
                 },{
                     id: 'standardchckboxbutton1', type: 'standardchckboxbutton', text: 'standardchckboxbutton', 
                     selected: function(){ console.log('HER'); return false; },
                     onClick: function(id, selected){ console.log(id, selected); }
                 }], 
-                width: 300,
+                width: 350,
 scroll: false,
                 content: [{
                     type: 'button', fullWidth: true, text: 'Check af contextmenu',  onClick: function(){
@@ -279,6 +288,7 @@ scroll: false,
                     text: {da:'TextArea - Dette er en lang linie med mange ord', en:'Short'}
                 }],
                 minimized: {
+                    width: 200,
                     content: [{
                         type: 'text', label: {icon:'fa-map-marker', text:'Text small:undefined'},
                         text: 'Text - Dette er en enkel linie'
@@ -304,6 +314,7 @@ scroll: false,
                 },
                 extended: {
 scroll: false,
+                    width: 400,
                     content: [{
                         type: 'menu', 
                         list: [                            
