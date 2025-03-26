@@ -4878,32 +4878,33 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
         if (typeof width == 'number')
             width = {width: width};
 
-        if (!width.width)
-            return this;
-
         const allNewWidth = {};
         allNewWidth[$.MODAL_SIZE_NORMAL]    = width.width || width.normal;
         allNewWidth[$.MODAL_SIZE_MINIMIZED] = width.minimized;
         allNewWidth[$.MODAL_SIZE_EXTENDED]  = width.extended;
 
-        const setWidth = function(options, size){
+        const setWidth = function(size, id){
+            let options = this.modalOptions || this._content;
+            if (id)
+                options = options[id];
             if (!options) return;
 
             let newWidth = allNewWidth[size];
             if (newWidth)
                 options.width = newWidth;
 
-            if (typeof newWidth == 'number')
+            if (this.bsModal && this.bsModal.cssWidth && (typeof newWidth == 'number'))
                 this.bsModal.cssWidth[size].width = newWidth+'px';
         }.bind(this);
 
-        setWidth(this.modalOptions,           $.MODAL_SIZE_NORMAL);
-        setWidth(this.modalOptions.minimized, $.MODAL_SIZE_MINIMIZED);
-        setWidth(this.modalOptions.extended,  $.MODAL_SIZE_EXTENDED);
 
-        this.$contentNode._bsModalSetHeightAndWidth();
+        setWidth($.MODAL_SIZE_NORMAL);
+        setWidth($.MODAL_SIZE_MINIMIZED, 'minimized');
+        setWidth($.MODAL_SIZE_EXTENDED,  'extended');
+
+        if (this.$contentNode)
+            this.$contentNode._bsModalSetHeightAndWidth();
     };
-
 
 
 
