@@ -253,7 +253,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
                     _this.$popupElements.contextmenu();
                 };
 
-            $.each(['_zoomInButton', '_zoomOutButton'], function( index, id ){
+            ['_zoomInButton', '_zoomOutButton'].forEach( id => {
                 if (_this.zoom[id])
                     $(_this.zoom[id]).on('contextmenu', onContextmenu);
             });

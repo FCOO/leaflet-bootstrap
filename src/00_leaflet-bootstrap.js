@@ -99,9 +99,7 @@
 
     L._adjustButtonList = function(list, owner){
         var newList = [];
-        $.each(list, function(index, options){
-            newList.push( L._adjustButton(options, owner) );
-        });
+        (list || []).forEach(options => newList.push( L._adjustButton(options, owner) ) );
         return newList;
     };
     L._adjustButton = function(options, owner){

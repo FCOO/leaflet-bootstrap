@@ -397,7 +397,7 @@ L.BsControl = extention of L.Control with
         if (force || (height != this.lbHeight)){
             this.lbHeight = height;
 
-            $.each(['left', 'center', 'right'], function(index, horizontal){
+            ['left', 'center', 'right'].forEach( horizontal => {
 
                 var topControlList = [],
                     bottomControlList = [];

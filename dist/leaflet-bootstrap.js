@@ -99,9 +99,7 @@
 
     L._adjustButtonList = function(list, owner){
         var newList = [];
-        $.each(list, function(index, options){
-            newList.push( L._adjustButton(options, owner) );
-        });
+        (list || []).forEach(options => newList.push( L._adjustButton(options, owner) ) );
         return newList;
     };
     L._adjustButton = function(options, owner){
@@ -623,7 +621,7 @@ L.BsControl = extention of L.Control with
         if (force || (height != this.lbHeight)){
             this.lbHeight = height;
 
-            $.each(['left', 'center', 'right'], function(index, horizontal){
+            ['left', 'center', 'right'].forEach( horizontal => {
 
                 var topControlList = [],
                     bottomControlList = [];
@@ -3503,7 +3501,7 @@ Can be used as leaflet standard zoom control with Bootstrap style
                     _this.$popupElements.contextmenu();
                 };
 
-            $.each(['_zoomInButton', '_zoomOutButton'], function( index, id ){
+            ['_zoomInButton', '_zoomOutButton'].forEach( id => {
                 if (_this.zoom[id])
                     $(_this.zoom[id]).on('contextmenu', onContextmenu);
             });
@@ -4024,15 +4022,13 @@ semiTransparent: true,
                     $normalIcon.children('.container-stacked-icons').addClass('hide-for-bsl-working');
 
                 this.actionIcons = {};
-                $.each(['warning', 'info', 'help', 'close'], function(index, id){
+                ['warning', 'info', 'help', 'close'].forEach( id => {
                     _this.actionIcons[id] = _this.$container.find('[data-header-icon-id="'+id+'"]');
                     _this.actionIcons[id].toggle(_this.options.showIcons || (id == 'close'));
                 });
 
                 this.sizeIcons = {};
-                $.each(['extend', 'diminish'], function(index, id){
-                    _this.sizeIcons[id] = _this.$container.find('[data-header-icon-id="'+id+'"]');
-                });
+                ['extend', 'diminish'].forEach( id => _this.sizeIcons[id] = _this.$container.find('[data-header-icon-id="'+id+'"]') );
 
                 this.$header = this.$container.find('.modal-header');
 
@@ -4463,6 +4459,10 @@ Note: All buttons in options.buttons will have event-methods
 with arguments = (id, selected, $button, map, owner) where owner = the popup
 Eq., onClick: function(id, selected, $button, map, popup){...}
 
+The options for the content also allows options onResize: function(size, popup, $body, options, map) that is called when the body are resized
+
+
+
 ****************************************************************************/
 (function ($, L/*, window, document, undefined*/) {
     "use strict";
@@ -4658,13 +4658,13 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
         }
 
         //Adjust buttons in content(s) and buttons to include map in arguments for onClick/onChange
-        $.each(['content', 'extended.content', 'minimized.content', 'buttons'], function(index, idStr){
+        ['content', 'extended.content', 'minimized.content', 'buttons'].forEach( idStr => {
             var idList = idStr.split('.'),
                 lastId = idList.pop(),
                 parent = modalOptions,
                 exists = true;
 
-            $.each(idList, function(index, id){
+            idList.forEach(id => {
                 if (parent[id])
                     parent = parent[id];
                 else
@@ -4721,10 +4721,40 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
         //Save the modal-object
         this.bsModal = this.$contentNode.bsModal;
 
+        //Add onResize to the different "body"
+        [$.MODAL_SIZE_NORMAL, $.MODAL_SIZE_MINIMIZED, $.MODAL_SIZE_EXTENDED].forEach( function(size){
+            let id = '';
+            switch (size){
+                case $.MODAL_SIZE_NORMAL    : id = '';          break;
+                case $.MODAL_SIZE_MINIMIZED : id = 'minimized'; break;
+                case $.MODAL_SIZE_EXTENDED  : id = 'extended';  break;
+            }
+
+            let opt     = id ? this.modalOptions[id] : this.modalOptions,
+                bsModal = id ? this.bsModal[id]      : this.bsModal,
+                $body   = bsModal ? bsModal.$body : null;
+
+            if ($body && opt.onResize){
+                $body.resize( function(size, popup, $body, options, map){
+                    if ($body._callingOnResize || !options.onResize)
+                        return;
+
+                    $body._callingOnResize = true;
+
+                    options.onResize(size, popup, $body, options, map);
+
+                    //Delay the allowing of new onResize to allow onResize to also resize
+                    window.setTimeout(function(){ this._callingOnResize = false; }.bind($body), 200);
+
+                }.bind(null, size, this, $body, opt, this._map));
+            }
+
+        }.bind(this));
+
         //If any of the contents (minimized, normal, or extended) should have the same tooltip as the source
         if (this._source && this._source.getTooltip()){
             var $list = [];
-            $.each(['', 'minimized', 'extended'], function(index, id){
+            ['', 'minimized', 'extended'].forEach(id => {
                 var show     = id ? modalOptions[id] && modalOptions[id].showTooltip : modalOptions.showTooltip,
                     elements = id ? _this.bsModal[id] : _this.bsModal;
                 if (show){

@@ -362,15 +362,13 @@ semiTransparent: true,
                     $normalIcon.children('.container-stacked-icons').addClass('hide-for-bsl-working');
 
                 this.actionIcons = {};
-                $.each(['warning', 'info', 'help', 'close'], function(index, id){
+                ['warning', 'info', 'help', 'close'].forEach( id => {
                     _this.actionIcons[id] = _this.$container.find('[data-header-icon-id="'+id+'"]');
                     _this.actionIcons[id].toggle(_this.options.showIcons || (id == 'close'));
                 });
 
                 this.sizeIcons = {};
-                $.each(['extend', 'diminish'], function(index, id){
-                    _this.sizeIcons[id] = _this.$container.find('[data-header-icon-id="'+id+'"]');
-                });
+                ['extend', 'diminish'].forEach( id => _this.sizeIcons[id] = _this.$container.find('[data-header-icon-id="'+id+'"]') );
 
                 this.$header = this.$container.find('.modal-header');
 

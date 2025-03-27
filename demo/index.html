@@ -255,11 +255,14 @@ nextMap.addControl( nextMap.bsScaleControl );
                     }
                 },{
                     id: 'standardchckboxbutton1', type: 'standardchckboxbutton', text: 'standardchckboxbutton', 
-                    selected: function(){ console.log('HER'); return false; },
+                    selected: function(){ return false; },
                     onClick: function(id, selected){ console.log(id, selected); }
                 }], 
                 width: 350,
 scroll: false,
+                onResize: (size, popup, $body, options, map) => { 
+                    console.log('normal resize', size, popup, $body, options, map) 
+                },
                 content: [{
                     type: 'button', fullWidth: true, text: 'Check af contextmenu',  onClick: function(){
                                 console.log('test af contextmenu', arguments.length, 'map=', arguments[3]);

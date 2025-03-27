@@ -7,6 +7,10 @@ Note: All buttons in options.buttons will have event-methods
 with arguments = (id, selected, $button, map, owner) where owner = the popup
 Eq., onClick: function(id, selected, $button, map, popup){...}
 
+The options for the content also allows options onResize: function(size, popup, $body, options, map) that is called when the body are resized
+
+
+
 ****************************************************************************/
 (function ($, L/*, window, document, undefined*/) {
     "use strict";
@@ -202,13 +206,13 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
         }
 
         //Adjust buttons in content(s) and buttons to include map in arguments for onClick/onChange
-        $.each(['content', 'extended.content', 'minimized.content', 'buttons'], function(index, idStr){
+        ['content', 'extended.content', 'minimized.content', 'buttons'].forEach( idStr => {
             var idList = idStr.split('.'),
                 lastId = idList.pop(),
                 parent = modalOptions,
                 exists = true;
 
-            $.each(idList, function(index, id){
+            idList.forEach(id => {
                 if (parent[id])
                     parent = parent[id];
                 else
@@ -265,10 +269,40 @@ Eq., onClick: function(id, selected, $button, map, popup){...}
         //Save the modal-object
         this.bsModal = this.$contentNode.bsModal;
 
+        //Add onResize to the different "body"
+        [$.MODAL_SIZE_NORMAL, $.MODAL_SIZE_MINIMIZED, $.MODAL_SIZE_EXTENDED].forEach( function(size){
+            let id = '';
+            switch (size){
+                case $.MODAL_SIZE_NORMAL    : id = '';          break;
+                case $.MODAL_SIZE_MINIMIZED : id = 'minimized'; break;
+                case $.MODAL_SIZE_EXTENDED  : id = 'extended';  break;
+            }
+
+            let opt     = id ? this.modalOptions[id] : this.modalOptions,
+                bsModal = id ? this.bsModal[id]      : this.bsModal,
+                $body   = bsModal ? bsModal.$body : null;
+
+            if ($body && opt.onResize){
+                $body.resize( function(size, popup, $body, options, map){
+                    if ($body._callingOnResize || !options.onResize)
+                        return;
+
+                    $body._callingOnResize = true;
+
+                    options.onResize(size, popup, $body, options, map);
+
+                    //Delay the allowing of new onResize to allow onResize to also resize
+                    window.setTimeout(function(){ this._callingOnResize = false; }.bind($body), 200);
+
+                }.bind(null, size, this, $body, opt, this._map));
+            }
+
+        }.bind(this));
+
         //If any of the contents (minimized, normal, or extended) should have the same tooltip as the source
         if (this._source && this._source.getTooltip()){
             var $list = [];
-            $.each(['', 'minimized', 'extended'], function(index, id){
+            ['', 'minimized', 'extended'].forEach(id => {
                 var show     = id ? modalOptions[id] && modalOptions[id].showTooltip : modalOptions.showTooltip,
                     elements = id ? _this.bsModal[id] : _this.bsModal;
                 if (show){
