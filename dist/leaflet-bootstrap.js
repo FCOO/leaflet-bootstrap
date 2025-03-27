@@ -4735,13 +4735,13 @@ The options for the content also allows options onResize: function(size, popup, 
                 $body   = bsModal ? bsModal.$body : null;
 
             if ($body && opt.onResize){
-                $body.resize( function(size, popup, $body, options, map){
+                $body.resize( function(size, popup, $body, options/*, map*/){
                     if ($body._callingOnResize || !options.onResize)
                         return;
 
                     $body._callingOnResize = true;
 
-                    options.onResize(size, popup, $body, options, map);
+                    options.onResize.apply(options.contentContext, arguments);
 
                     //Delay the allowing of new onResize to allow onResize to also resize
                     window.setTimeout(function(){ this._callingOnResize = false; }.bind($body), 200);
