@@ -25451,8 +25451,8 @@ return jQuery;
 
 ;
 /*!
-  * Bootstrap v5.3.3 (https://getbootstrap.com/)
-  * Copyright 2011-2024 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
+  * Bootstrap v5.3.5 (https://getbootstrap.com/)
+  * Copyright 2011-2025 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
   */
 (function (global, factory) {
@@ -25657,7 +25657,7 @@ return jQuery;
    * @param {HTMLElement} element
    * @return void
    *
-   * @see https://www.charistheo.io/blog/2021/02/restart-a-css-animation-with-javascript/#restarting-a-css-animation
+   * @see https://www.harrytheo.com/blog/2021/02/restart-a-css-animation-with-javascript/#restarting-a-css-animation
    */
   const reflow = element => {
     element.offsetHeight; // eslint-disable-line no-unused-expressions
@@ -25702,7 +25702,7 @@ return jQuery;
     });
   };
   const execute = (possibleCallback, args = [], defaultValue = possibleCallback) => {
-    return typeof possibleCallback === 'function' ? possibleCallback(...args) : defaultValue;
+    return typeof possibleCallback === 'function' ? possibleCallback.call(...args) : defaultValue;
   };
   const executeAfterTransition = (callback, transitionElement, waitForTransition = true) => {
     if (!waitForTransition) {
@@ -26024,7 +26024,7 @@ return jQuery;
       const bsKeys = Object.keys(element.dataset).filter(key => key.startsWith('bs') && !key.startsWith('bsConfig'));
       for (const key of bsKeys) {
         let pureKey = key.replace(/^bs/, '');
-        pureKey = pureKey.charAt(0).toLowerCase() + pureKey.slice(1, pureKey.length);
+        pureKey = pureKey.charAt(0).toLowerCase() + pureKey.slice(1);
         attributes[pureKey] = normalizeData(element.dataset[key]);
       }
       return attributes;
@@ -26099,7 +26099,7 @@ return jQuery;
    * Constants
    */
 
-  const VERSION = '5.3.3';
+  const VERSION = '5.3.5';
 
   /**
    * Class definition
@@ -28118,7 +28118,6 @@ return jQuery;
     var popperOffsets = computeOffsets({
       reference: referenceClientRect,
       element: popperRect,
-      strategy: 'absolute',
       placement: placement
     });
     var popperClientRect = rectToClientRect(Object.assign({}, popperRect, popperOffsets));
@@ -28446,7 +28445,6 @@ return jQuery;
     state.modifiersData[name] = computeOffsets({
       reference: state.rects.reference,
       element: state.rects.popper,
-      strategy: 'absolute',
       placement: state.placement
     });
   } // eslint-disable-next-line import/no-unused-modules
@@ -29153,7 +29151,7 @@ return jQuery;
     }
     _createPopper() {
       if (typeof Popper === 'undefined') {
-        throw new TypeError('Bootstrap\'s dropdowns require Popper (https://popper.js.org)');
+        throw new TypeError('Bootstrap\'s dropdowns require Popper (https://popper.js.org/docs/v2/)');
       }
       let referenceElement = this._element;
       if (this._config.reference === 'parent') {
@@ -29232,7 +29230,7 @@ return jQuery;
       }
       return {
         ...defaultBsPopperConfig,
-        ...execute(this._config.popperConfig, [defaultBsPopperConfig])
+        ...execute(this._config.popperConfig, [undefined, defaultBsPopperConfig])
       };
     }
     _selectMenuItem({
@@ -30419,7 +30417,7 @@ return jQuery;
       return this._config.sanitize ? sanitizeHtml(arg, this._config.allowList, this._config.sanitizeFn) : arg;
     }
     _resolvePossibleFunction(arg) {
-      return execute(arg, [this]);
+      return execute(arg, [undefined, this]);
     }
     _putElementInTemplate(element, templateElement) {
       if (this._config.html) {
@@ -30518,7 +30516,7 @@ return jQuery;
   class Tooltip extends BaseComponent {
     constructor(element, config) {
       if (typeof Popper === 'undefined') {
-        throw new TypeError('Bootstrap\'s tooltips require Popper (https://popper.js.org)');
+        throw new TypeError('Bootstrap\'s tooltips require Popper (https://popper.js.org/docs/v2/)');
       }
       super(element, config);
 
@@ -30564,7 +30562,6 @@ return jQuery;
       if (!this._isEnabled) {
         return;
       }
-      this._activeTrigger.click = !this._activeTrigger.click;
       if (this._isShown()) {
         this._leave();
         return;
@@ -30752,7 +30749,7 @@ return jQuery;
       return offset;
     }
     _resolvePossibleFunction(arg) {
-      return execute(arg, [this._element]);
+      return execute(arg, [this._element, this._element]);
     }
     _getPopperConfig(attachment) {
       const defaultBsPopperConfig = {
@@ -30790,7 +30787,7 @@ return jQuery;
       };
       return {
         ...defaultBsPopperConfig,
-        ...execute(this._config.popperConfig, [defaultBsPopperConfig])
+        ...execute(this._config.popperConfig, [undefined, defaultBsPopperConfig])
       };
     }
     _setListeners() {
@@ -76380,6 +76377,44 @@ module.exports = g;
         return true;
     };
 
+    /****************************************************************************************
+    $.getTextWidth(text:STRING or []STRING, options:{} OR NUMBER)
+    Return the (maximum) length of text
+    options = font-size (NUMBER) or {fontFamily, fontSize, italic, bold, padding}
+    ****************************************************************************************/
+    $._getTextWidthCanvas = null;
+    $.getTextWidth = $.getTextWidth || function(text, options = {}){
+        $._getTextWidthCanvas = $._getTextWidthCanvas || $('<canvas></canvas>').get(0);
+        const ctx = $._getTextWidthCanvas.getContext("2d");
+
+        let textList = Array.isArray( text ) ? text : [text],
+            result = 0;
+
+        if (typeof options == 'number')
+            options = {fontSize: options};
+
+        options = $.extend({
+            fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color',
+            fontSize  : 12},
+            options
+        );
+
+        options.fontSize = options.fontSize + (typeof options.fontSize == 'number' ? 'px' : '');
+
+        ctx.font = options.fontSize + ' ' + options.fontFamily;
+        if (options.italic)
+            ctx.font = 'italic ' + ctx.font;
+        if (options.bold)
+            ctx.font = 'bold ' + ctx.font;
+
+        textList.forEach( txt => result = Math.max( result, ctx.measureText(txt).width ) );
+
+        return result + (options.padding || 0);
+    };
+
+
+
+
 
     //$.parentOptionsToInherit = []ID = id of options that modal-content can inherit from the modal itself
     $.parentOptionsToInherit = ['small'];
@@ -76697,7 +76732,7 @@ module.exports = g;
             function buildFormControlGroup( options, $parent ){
                 return $parent
                            .attr('id', options.id)
-                           .addClass('flex-column')
+                           .addClass(options.horizontal ? 'flex-row' : 'flex-column')
                            ._bsAppendContent(options.content, null, null, options);
             }
 
@@ -76809,7 +76844,10 @@ module.exports = g;
 
                     case 'formControlGroup' :
                     case 'inputgroup'       :   buildFunc = buildFormControlGroup;  addBorder = true; insideFormGroup = true; buildInsideParent = true; break;
-//                    case 'xx'               :   buildFunc = $.bsXx;               break;
+
+                    case 'content'          :   buildFunc = (typeof options.content === "function") ? options.content : function(){ return options.content; }; break;
+
+                  //case 'xx'               :   buildFunc = $.bsXx;               break;
 
                     default                 :   buildFunc = $.fn._bsAddHtml;        noPadding = true; buildInsideParent = true;
                 }
@@ -76874,8 +76912,9 @@ module.exports = g;
                             .appendTo( $inputGroup );
                 }
                 else
-                    //No-border => the input-group is just a container to keep vertival distance => no horizontal padding
-                    $inputGroup.addClass('px-0');
+                    //No-border => the input-group is just a container to keep vertival distance => no horizontal padding unless horizontalPadding = true
+                    if (!options.horizontalPadding)
+                        $inputGroup.addClass('px-0');
 
                 if (hasLabel)
                     $parent.addClass('child-with-label');
@@ -80199,6 +80238,8 @@ jquery-bootstrap-modal-promise.js
 
         alwaysMaxHeight: BOOLEAN - If true the modal is always the full height of it parent
 
+        allowFullScreen: BOOLEAN - if true the largest size (normal or extended) gets the possibility to be displayed in full-screen
+        noReopenFullScreen: BOOLEAN - if false and allowFullScreen = true and the modal was in full-screen when closed => It will reopen in full-screen. If true the modal will reopen in prevoius size (minimized, normal or extended)
 
         innerHeight     : The fixed height of the content
         innerMaxHeight  : The fixed max-height of the content
@@ -80238,6 +80279,10 @@ jquery-bootstrap-modal-promise.js
         closeText
         noCloseIconOnHeader
         historyList         - The modal gets backward and forward icons in header to go backward and forward in the historyList. See demo and https://github.com/fcoo/history.js
+
+        keepScrollWhenReopen: false, - if true the scrolling of the content is reused. If false all content starts at scroll 0,0 when shown
+
+
 
     **********************************************************/
     var modalId = 0,
@@ -80396,7 +80441,6 @@ jquery-bootstrap-modal-promise.js
         if (currentModal)
             currentModal._bsModalCloseElements();
 
-
         openModals++;
         this.previousModal = currentModal;
         currentModal = this;
@@ -80439,8 +80483,8 @@ jquery-bootstrap-modal-promise.js
     function hide_bs_modal() {
         currentModal = this.previousModal;
 
-        //If in full.screen mode => reset back
-        if (this.bsModal.isFullScreenMode)
+        //If in full-screen mode and dont reopen in full-screen => reset back
+        if (this.bsModal.isFullScreenMode && this.bsModal.noReopenFullScreen)
             this._bsModalFullScreenOff();
 
         //Close elements
@@ -80510,13 +80554,23 @@ jquery-bootstrap-modal-promise.js
     ******************************************************/
     var bsModal_prototype = {
         show  : function(){
-                    this.modal('show');
+            this.modal('show');
 
-                    this.data('bsModalDialog')._bsModalSetHeightAndWidth();
+            this.data('bsModalDialog')._bsModalSetHeightAndWidth();
 
-                    if (this.bsModal.onChange)
-                        this.bsModal.onChange( this.bsModal );
-                },
+            if (this.bsModal.onChange)
+                this.bsModal.onChange( this.bsModal );
+
+            //Scroll all "body" back if keepScrollWhenReopen = false is set
+            if (!this.keepScrollWhenReopen)
+                ['', 'extended', 'minimized'].forEach( size => {
+                    let obj = size ? this.bsModal[size] : this.bsModal;
+                    if (obj && obj.$body){
+                        obj.$body.scrollTop(0);
+                        obj.$body.scrollLeft(0);
+                    }
+                }, this);
+        },
 
         _close: function(){
             this.modal('hide');
@@ -80575,7 +80629,6 @@ jquery-bootstrap-modal-promise.js
                 }
             }
             //***********************************************************
-
             //Update header
             var $iconContainer = this.bsModal.$header.find('.header-icon-container').detach();
             updateElement(this.bsModal.$header, options, '_bsHeaderAndIcons', $.BSMODAL_USE_SQUARE_ICONS);
@@ -80594,6 +80647,8 @@ jquery-bootstrap-modal-promise.js
                     updateElement(containers.$footer,       contentOptions.footer,       '_bsAddHtml' );
                 }
             }, this);
+            
+            
             return this;
         },
 
@@ -81165,6 +81220,12 @@ jquery-bootstrap-modal-promise.js
             .toggleClass('modal-full-screen-with-border', cssWidth.fullScreenWithBorder )
             .css('width', cssWidth.width ? cssWidth.width : '' );
 
+
+        if (this.bsModal.isFullScreenMode){
+            this._bsModalFullScreenOff();
+            this._bsModalFullScreenOn();
+        }            
+
         //Call onChange (if any)
         if (bsModal.onChange)
             bsModal.onChange( bsModal );
@@ -81381,17 +81442,30 @@ jquery-bootstrap-modal-promise.js
         if (options.fullScreen || options.fullScreenWithBorder)
             options.allowFullScreen = false;
 
-        //Set options for full screen with border
-        if (options.fullScreenWithBorder)
-            options.fullScreen = true;
 
-        //Set options for full screen
-        if (options.fullScreen){
-            options.maxWidth             = true;
-            options.alwaysMaxHeight      = true;
-            options.relativeHeightOffset = 0;
+
+        function adjustFullScreenOptions( opt, defaultOpt={} ){
+            if (!opt) return;
+            ['fullScreenWithBorder', 'fullScreen'].forEach( id => {
+                if (opt[id] === undefined)
+                    opt[id] = defaultOpt[id] || false;
+            });
+            if (opt.fullScreenWithBorder)
+                opt.fullScreen = true;
+
+            //Set options for full screen
+            if (opt.fullScreen){
+                opt.maxWidth             = true;
+                opt.alwaysMaxHeight      = true;
+                opt.relativeHeightOffset = 0;
+            }
         }
 
+        //Set options for full screen with border
+        adjustFullScreenOptions(options);
+        adjustFullScreenOptions(options.minimized, options);
+        adjustFullScreenOptions(options.extended, options);
+        
         //Check $.MODAL_NO_VERTICAL_MARGIN
         if ($.MODAL_NO_VERTICAL_MARGIN){
             options.relativeHeightOffset = 0;
@@ -81417,6 +81491,10 @@ jquery-bootstrap-modal-promise.js
         //If allowFullScreen: Find the largest size-mode and set the differnet class-names etc.
         if (options.allowFullScreen)
             options.sizeWithFullScreen = options.extended ? MODAL_SIZE_EXTENDED : MODAL_SIZE_NORMAL;
+
+
+        //Set keepScrollWhenReopen to allow the content to be scrolled back to 0,0 when reopen a modal
+        this.keepScrollWhenReopen = options.keepScrollWhenReopen;
 
         //Create the modal
         $result =
@@ -81498,6 +81576,10 @@ jquery-bootstrap-modal-promise.js
                 $result.show();
         }
 
+        //Save some options in bsModal
+        ['noReopenFullScreen'].forEach( id => {
+            $result.bsModal[id] = options[id];
+        }); 
 
         return $result;
     };
@@ -83329,7 +83411,7 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
                             );
                         }
                     }.bind(this));
-                });
+                }.bind(this));
 
             var column = this._getColumn( sortInfo.column );
 
@@ -83433,6 +83515,7 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
         sortId     = 0;
 
     $.bsTable = function( options ){
+        
         options = $._bsAdjustOptions( options, defaultOptions );
 
         //Fixed first column only needed when horizontal scrolling ( = full width)
@@ -83577,14 +83660,17 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
 
             multiSortList = []{columnIndex, sortIndex} sorted by sortIndex. Is used be each th to define alternative sort-order
         */
+        let anyColumnSortable = false;
         options.columns.forEach( ( columnOptions, index ) => {
-            if (columnOptions.sortable)
+            if (columnOptions.sortable){
                 multiSortList.push( {columnId: columnOptions.id, columnIndex: ''+index, sortIndex: columnOptions.sortIndex });
+                anyColumnSortable = true;
+            }                
         });
         multiSortList.sort(function( c1, c2){ return c1.sortIndex - c2.sortIndex; });
 
         //Create headers
-        if (options.showHeader){
+        if (options.showHeader || anyColumnSortable){
             let anyColumnMinimizable = false;
 
 
@@ -83647,7 +83733,7 @@ TODO:   truncate     : false. If true the column will be truncated. Normally onl
             }, this);
 
 
-            if (anyColumnMinimizable)
+            if (anyColumnMinimizable && options.showHeader)
                 $tr.on('dblclick', function(){
                     let minimize = true;
                     this.columns.forEach( columnOptions => {

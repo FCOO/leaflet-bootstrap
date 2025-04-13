@@ -2524,7 +2524,7 @@ Options for selectiong position-format and to activate context-menu
             tooltipDirection: 'top',
 
             content     : {
-                semiTransparent    : false,
+                //semiTransparent    : false,
                 clickable          : true,
                 noHeader           : true,
                 noVerticalPadding  : true,
@@ -2636,10 +2636,10 @@ Options for selectiong position-format and to activate context-menu
             var cursorOptions = {
                     insideFormGroup  : true,
                     noValidation     : true,
-                    noBorder         : true,
+                    noBorder         : false, //true,
                     noVerticalPadding: true,
                     noPadding        : true,
-                    type             : 'textbox',
+                    type             : 'text', //'textbox',
 
                     text           : function( $inner ){ $inner.addClass('cursor'); },
                     class          :'show-for-control-position-cursor',
@@ -2647,13 +2647,13 @@ Options for selectiong position-format and to activate context-menu
                         type  : 'button',
                         square: true,
                         icon  : iconCursorPosition,
-                        transparent: true,
+                        //transparent: true,
                     },
                     after: !this.options.inclContextmenu ? null : {
                         type  :'button',
                         square: true,
                         icon  : L.BsControl.prototype.options.rightClickIcon,
-                        transparent: true,
+                        //transparent: true,
                         onClick: function(){
                             window.notyInfo(
                                 { icon: L.BsControl.prototype.options.rightClickIcon,
@@ -2749,6 +2749,7 @@ Options for selectiong position-format and to activate context-menu
 
                 if (_this.options.inclContextmenu)
                     options.after = options.after || {};
+                
                 return options;
             }
 
@@ -3159,7 +3160,7 @@ Options for selectiong position-format and to activate context-menu
                     text   : '',
                     square : true,
                     class  : 'disabled show-as-normal',
-                    semiTransparent: true
+                    //semiTransparent: true,
                 },
                 after: {
                     type   : 'button',
@@ -3167,7 +3168,7 @@ Options for selectiong position-format and to activate context-menu
                     text   : '',
                     square : true,
                     class  : 'disabled show-as-normal',
-                    semiTransparent: true
+                    //semiTransparent: true,
                 }
             };
 
