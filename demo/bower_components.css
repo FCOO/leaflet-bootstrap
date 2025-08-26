@@ -1664,6 +1664,17 @@ Bootstrap default = normal size
 Accordion
 ***********************************************/
 /***********************************************
+Grid columns
+Set the number of columns and specify the width of the gutters.
+
+$grid-columns:                12 !default;
+$grid-gutter-width:           1.5rem !default;
+$grid-row-columns:            6 !default;
+
+// Container padding
+$container-padding-x: $grid-gutter-width !default;
+***********************************************/
+/***********************************************
 Card
 ***********************************************/
 /***********************************************
@@ -2281,6 +2292,10 @@ legend + * {
   -webkit-appearance: textfield;
   outline-offset: -2px;
 }
+[type=search]::-webkit-search-cancel-button {
+  cursor: pointer;
+  filter: grayscale(1);
+}
 
 /* rtl:raw:
 [type="tel"],
@@ -2440,7 +2455,7 @@ progress {
 .container-lg,
 .container-md,
 .container-sm {
-  --bs-gutter-x: 1.5rem;
+  --bs-gutter-x: 0.5em;
   --bs-gutter-y: 0;
   width: 100%;
   padding-right: calc(var(--bs-gutter-x) * 0.5);
@@ -2484,7 +2499,7 @@ progress {
 }
 
 .row {
-  --bs-gutter-x: 1.5rem;
+  --bs-gutter-x: 0.5em;
   --bs-gutter-y: 0;
   display: flex;
   flex-wrap: wrap;
@@ -6026,7 +6041,7 @@ textarea.form-control-lg {
   --bs-card-color: ;
   --bs-card-bg: var(--bs-body-bg);
   --bs-card-img-overlay-padding: 1rem;
-  --bs-card-group-margin: 0.75rem;
+  --bs-card-group-margin: 0.25em;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -6172,24 +6187,24 @@ textarea.form-control-lg {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
-  .card-group > .card:not(:last-child) .card-img-top,
-  .card-group > .card:not(:last-child) .card-header {
+  .card-group > .card:not(:last-child) > .card-img-top,
+  .card-group > .card:not(:last-child) > .card-header {
     border-top-right-radius: 0;
   }
-  .card-group > .card:not(:last-child) .card-img-bottom,
-  .card-group > .card:not(:last-child) .card-footer {
+  .card-group > .card:not(:last-child) > .card-img-bottom,
+  .card-group > .card:not(:last-child) > .card-footer {
     border-bottom-right-radius: 0;
   }
   .card-group > .card:not(:first-child) {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }
-  .card-group > .card:not(:first-child) .card-img-top,
-  .card-group > .card:not(:first-child) .card-header {
+  .card-group > .card:not(:first-child) > .card-img-top,
+  .card-group > .card:not(:first-child) > .card-header {
     border-top-left-radius: 0;
   }
-  .card-group > .card:not(:first-child) .card-img-bottom,
-  .card-group > .card:not(:first-child) .card-footer {
+  .card-group > .card:not(:first-child) > .card-img-bottom,
+  .card-group > .card:not(:first-child) > .card-footer {
     border-bottom-left-radius: 0;
   }
 }
@@ -6884,7 +6899,7 @@ textarea.form-control-lg {
   --bs-toast-zindex: 1090;
   --bs-toast-padding-x: 0.75rem;
   --bs-toast-padding-y: 0.5rem;
-  --bs-toast-spacing: 1.5rem;
+  --bs-toast-spacing: 0.5em;
   --bs-toast-max-width: 350px;
   --bs-toast-font-size: 0.875rem;
   --bs-toast-color: ;
@@ -8009,6 +8024,10 @@ textarea.form-control-lg {
 .visually-hidden:not(caption),
 .visually-hidden-focusable:not(:focus):not(:focus-within):not(caption) {
   position: absolute !important;
+}
+.visually-hidden *,
+.visually-hidden-focusable:not(:focus):not(:focus-within) * {
+  overflow: hidden !important;
 }
 
 .stretched-link::after {
@@ -14990,6 +15009,11 @@ HEADER-CONTENT
   --icon-hover-bg: rgb(236.5, 177.375, 0);
   --icon-active-bg: rgb(211, 158.25, 0);
 }
+.header-content .header-icon-container.with-square-icons .header-icon.header-icon-error {
+  --icon-bg: #dc3545;
+  --icon-hover-bg: rgb(210.9493670886, 36.5506329114, 53.2594936709);
+  --icon-active-bg: rgb(189.2151898734, 32.7848101266, 47.7721518987);
+}
 .header-content .header-icon-container.with-square-icons .header-icon.header-icon-selected {
   --icon-bg: rgb(30, 144, 255);
   --icon-hover-bg: rgb(4.5, 131.42, 255);
@@ -15304,6 +15328,9 @@ div.modal-dialog.modal-full-screen {
 div.modal-dialog.modal-full-screen:not(.modal-full-screen-with-border) .modal-content {
   border: none;
   border-radius: 0px;
+}
+div.modal-dialog.modal-fit-width {
+  width: fit-content;
 }
 div.modal-dialog.modal-dialog-inline .modal-content {
   box-shadow: none;
