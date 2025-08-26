@@ -20,13 +20,13 @@
         }
         #map1 {
             _margin: 50px !important;
-            padding: 0; margin: 0; 
-            width:75%; _width:100%; 
+            padding: 0; margin: 0;
+            width:75%; _width:100%;
             height:99%;
         }
         #map2, #map3 {
             margin: 2px !important;
-            padding: 0; margin: 0; 
+            padding: 0; margin: 0;
             width:25%; _width: 50%;
             height:99%;
         }
@@ -74,7 +74,7 @@
     L.Renderer.prototype.options.padding = .5;
 
     $.BSMODAL_USE_SQUARE_ICONS = true;
-    $.FONTAWESOME_PREFIX = 'far'; 
+    $.FONTAWESOME_PREFIX = 'far';
 
     let icon_fa_prefix = 'far fa-';
     $._set_bsHeaderIcons({
@@ -93,7 +93,7 @@
         help    : icon_fa_prefix + 'question',
         close   : icon_fa_prefix + 'xmark'
     });
-    L.BsLegend_close_icon = ['far fa-map fa-scale-x-08', 'fas fa-slash fa-scale-x-08']; 
+    L.BsLegend_close_icon = ['far fa-map fa-scale-x-08', 'fas fa-slash fa-scale-x-08'];
 
 
 //test    L.BsLegend.prototype.options.closeIconOptions.icon = 'fa-home';
@@ -153,7 +153,7 @@
             },
             bsScaleControl: true,
             bsScaleOptions: {
-                //position          : 'bottomleft', 
+                //position          : 'bottomleft',
                 position          : 'bottomright',  //1
                 isExtended: true,
                 tooltipOnButton: false,//!index,
@@ -241,33 +241,33 @@ nextMap.addControl( nextMap.bsScaleControl );
             .addTo(nextMap)
             .bindTooltip({icon:'fa-home', text:'Godt'}, {delay:2000})
             .bindPopup({
-                
+
                 //onOpen: function(popup){ console.log('RIGTIG godt', popup); },
-                
-                showTooltip: true, 
+
+                showTooltip: true,
                 header: {icon:'fa-home', text:'Header'},
                 buttons: [{
-                    icon:'fa-arrows-left-right', text:'Set width', 
+                    icon:'fa-arrows-left-right', text:'Set width',
 
                     onClick: function(a, b, button, map, popup){
                         popupWidthIndex = popupWidthIndex ? 0 : 1;
                         popup.setWidth( popupWidth[popupWidthIndex] );
                     }
                 },{
-                    id: 'standardchckboxbutton1', type: 'standardchckboxbutton', text: 'standardchckboxbutton', 
+                    id: 'standardchckboxbutton1', type: 'standardchckboxbutton', text: 'standardchckboxbutton',
                     selected: function(){ return false; },
                     onClick: function(id, selected){ console.log(id, selected); }
-                }], 
+                }],
                 width: 350,
 scroll: false,
-                onResize: (size, popup, $body, options, map) => { 
-                    console.log('normal resize', size, popup, $body, options, map) 
+                onResize: (size, popup, $body, options, map) => {
+                    console.log('normal resize', size, popup, $body, options, map)
                 },
                 content: [{
                     type: 'button', fullWidth: true, text: 'Check af contextmenu',  onClick: function(){
                                 console.log('test af contextmenu', arguments.length, 'map=', arguments[3]);
                             }
-                    
+
                 },{
                     type: 'textbox', label: {icon:'fa-map-marker', text:'Text small:undefined'},
                     text: 'Text - Dette er en enkel linie'
@@ -319,8 +319,8 @@ scroll: false,
 scroll: false,
                     width: 400,
                     content: [{
-                        type: 'menu', 
-                        list: [                            
+                        type: 'menu',
+                        list: [
                             {type:'radio', id:'test1', radioGroupId: 'test', list: [{id:'test1', text:'Test1'}, {id:'test2', text:'Test2'}],
                             onChange: function(){ console.log('Map ikke forventet', arguments.length, arguments); }},
 
@@ -333,7 +333,7 @@ scroll: false,
                         ]
                     }]
                 }
-                
+
             });
 
 
@@ -357,7 +357,7 @@ scroll: false,
             extendedButton: {
                 square: false,
                 semiTransparent: false,
-                icon: 'fa-map', 
+                icon: 'fa-map',
                 text:'Extended',
             },
             onChange: function( options ){
@@ -369,7 +369,7 @@ scroll: false,
 
 
         var testIB = nextMap.bsPositionControl.addInfoBox({
-            id: 'test', 
+            id: 'test',
             index: 4000,
             class: 'font-monospace',
             before: {
@@ -391,7 +391,7 @@ scroll: false,
                 onClick: function(){ nextMap.bsPositionControl.removeInfoBox(testIB); }
             }
         });
-        
+
         window[id] = nextMap;
         first = false;
     });
@@ -428,23 +428,23 @@ scroll: false,
     Add contextmenu to the map
     **********************************************/
     var first = null;
-    
+
     map1.setContextmenuHeader({icon:'fa-map', text:'MAP 1'});
     map1.addContextmenuItems([
     function(){ return {icon:'fa-map', text: 'Function', onClick: alert}; },
     function(){ return null },
     {
-        icon:'fa-home', text:{da:'Map#1 (w=180)'}, 
-        onClick: function(id, latlng){ 
-            console.log('MAP 1-1',latlng, arguments); 
-        }, 
-        width:180 
+        icon:'fa-home', text:{da:'Map#1 (w=180)'},
+        onClick: function(id, latlng){
+            console.log('MAP 1-1',latlng, arguments);
+        },
+        width:180
     },{
         icon:'fa-map',  text:'Map#1 (dont close)', type:'checkbox',
-        onClick: function(id, latlng){ 
-            console.log('CLICK, MAP 1-2',latlng, arguments); 
-        }, 
-        closeOnClick: false 
+        onClick: function(id, latlng){
+            console.log('CLICK, MAP 1-2',latlng, arguments);
+        },
+        closeOnClick: false
     }]);
 
     map2.setContextmenuHeader({icon:'fa-map', text:'MAP 2'});
@@ -505,7 +505,7 @@ content = {
                 verticalButtons: true,
                 scroll: false,
 
-                _content: '', 
+                _content: '',
                 content: function($body){
                     $body.html( 'Normal ' + moment().format('HH:mm.ss'));
                 },
@@ -520,7 +520,7 @@ content = {
                             text: {da:'Vælg', en:'Select'},
                             icon: ['fa-thumbs-down', 'fa-thumbs-up'],
                             selected: false,
-                            returnFromClick: false,                                
+                            returnFromClick: false,
                             onChange: function(id, selected, _this){
                                 console.log(arguments);
                             }
@@ -566,16 +566,16 @@ content = {
                 fixable: true,
                 _width: 321,
                 __buttons: [
-                    {text:'klik', onClick: function(){ 
-                        console.log('klik', arguments); 
+                    {text:'klik', onClick: function(){
+                        console.log('klik', arguments);
                     }},
                     {text:'klik2', onClick: function(){ console.log('klik2', arguments); }},
                     $.bsButton({icon:'fa-map', text: 'Kort', onClick: function(){ console.log('Kort', arguments); }}),
                     $.bsStandardCheckboxButton({
                         id:'popup_radion_button', type:'radio', text: {da:'Vælg', en:'Select'}, selected: true, small: true,
-                        onChange: function(id, selected, _this, map, owner){ 
-                            console.log('bsStandardCheckboxButton', id,selected, owner, map); 
-                            console.log('theMap',owner.data('theMap') ); 
+                        onChange: function(id, selected, _this, map, owner){
+                            console.log('bsStandardCheckboxButton', id,selected, owner, map);
+                            console.log('theMap',owner.data('theMap') );
                         }
                     })
                 ]
@@ -603,7 +603,7 @@ content = {
     });
 
 
-   
+
     L.polygon([[
         [58.99,14.05],
         [58.98,3.22],
@@ -618,7 +618,7 @@ content = {
         transparent: true,
 
         addInteractive: true,
-        interactive: true, 
+        interactive: true,
         hover: true
     })
         .addTo(map1)
@@ -673,7 +673,7 @@ content = {
         square: true,
 
         content: {
-semiTransparent: false,            
+semiTransparent: false,
             _noVerticalPadding: true,
             noHorizontalPadding: true,
             _noHeader: true,
@@ -720,7 +720,7 @@ semiTransparent: false,
                 width: 555,
                 maxHeight: 222,
                 _height: 222,
-                
+
                 scroll: true,
                 _content: 'Hej',
                 content: {
@@ -993,49 +993,50 @@ semiTransparent: false,
                 //noHorizontalPadding: true,
 
                 buttons   : i == 0 ? [
-                    {id:'button_'+i, icon:'fa-home', text:'IsLast #'+i, _isLastButton: true, 
-                        onClick: function(id, selected, button, map, legend){ 
-                            console.log('click me:', id, map, legend, arguments); legend.updateContent('Skide godt do!'); 
-                        } 
-                    }, 
-                    {id:'button_'+i, icon:'fa-home', text:'click me #'+i, 
-                        onClick: function(id, selected, button, map, legend){ 
-                            console.log('click me:', id, map, legend, arguments); legend.updateContent('Skide godt do!'); 
-                        } 
+                    {id:'button_'+i, icon:'fa-home', text:'IsLast #'+i, _isLastButton: true,
+                        onClick: function(id, selected, button, map, legend){
+                            console.log('click me:', id, map, legend, arguments); legend.updateContent('Skide godt do!');
+                        }
+                    },
+                    {id:'button_'+i, icon:'fa-home', text:'click me #'+i,
+                        onClick: function(id, selected, button, map, legend){
+                            console.log('click me:', id, map, legend, arguments); legend.updateContent('Skide godt do!');
+                        }
                     }
                 ] :[
-                    {id:'button_'+i, icon:'fa-home', text:'IsLast #'+i, _isLastButton: true, 
-                        onClick: function(id, selected, button, map, legend){ 
-                            console.log('click me:', id, map, legend, arguments); legend.updateContent('Skide godt do!'); 
-                        } 
-                    }, 
-                    {id:'button_'+i, icon:'fa-home', text:'click me #'+i, 
-                        onClick: function(id, selected, button, map, legend){ 
-                            console.log('click me:', id, map, legend, arguments); legend.updateContent('Skide godt do!'); 
-                        } 
-                    }, 
+                    {id:'button_'+i, icon:'fa-home', text:'IsLast #'+i, _isLastButton: true,
+                        onClick: function(id, selected, button, map, legend){
+                            console.log('click me:', id, map, legend, arguments); legend.updateContent('Skide godt do!');
+                        }
+                    },
+                    {id:'button_'+i, icon:'fa-home', text:'click me #'+i,
+                        onClick: function(id, selected, button, map, legend){
+                            console.log('click me:', id, map, legend, arguments); legend.updateContent('Skide godt do!');
+                        }
+                    },
 
 // HER>                     $.bsCheckboxButton({id:'checkbox_button_'+i, text: {da:'Vælg mig', en:'Select me'}, icon: ['fa-thumbs-down', 'fa-thumbs-up'], selected: false,
-// HER>                         onChange: function(id, selected, $button, _this, map){ 
-// HER>                             console.log('bsCheckboxButton', arguments.length, id,selected, _this, 'map=null',map); 
+// HER>                         onChange: function(id, selected, $button, _this, map){
+// HER>                             console.log('bsCheckboxButton', arguments.length, id,selected, _this, 'map=null',map);
 // HER>                         }
 // HER>                     }),
 
                     {
-                        type:'checkboxbutton', icon:['fa-home', 'fa-map'], text:'Tra daa', selected: true, 
-                        onChange: function(id, selected, _this, map){ 
-                            console.log('Tradaaa', id,selected, _this, 'map',map); 
+                        type:'checkboxbutton', icon:['fa-home', 'fa-map'], text:'Tra daa', selected: true,
+                        onChange: function(id, selected, _this, map){
+                            console.log('Tradaaa', id,selected, _this, 'map',map);
                         }
                     },
                     {
-                        type:'standardcheckboxbutton', text:'Standard', selected: true, 
-                        onChange: function(id, selected, _this, map){ 
-                            console.log('Standard', id,selected, _this, map); 
+                        type:'standardcheckboxbutton', text:'Standard', selected: true,
+                        onChange: function(id, selected, _this, map){
+                            console.log('Standard', id,selected, _this, map);
                         }
                     }
                             ],
                 onInfo    : function(){ console.log('INFO');},
                 onWarning : function(){ console.log('WARNING');},
+                onError   : function(){ console.log('ERROR');},
                 onRemove  : function(){ console.log('REMOVE');},
             };
 
@@ -1048,14 +1049,16 @@ semiTransparent: false,
 
 		if (i==5)
             legend.hideIcon('info')
-        else
-            legend.hideIcon('warning')
+        else {
+            legend.hideIcon('error');
+            legend.hideIcon('warning');
+        }
 
 //HER        map1.bsLegendControl.removeLegend(legend);
 //HER        legend = map1.bsLegendControl.addLegend(legendOptions);
 //HER        map1.bsLegendControl.addLegend(legend);
 
-    
+
 
     }
 

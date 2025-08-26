@@ -274,6 +274,7 @@ leaflet-bootstrap-control-legend.js
                         },
                         onInfo     : options.onInfo,
                         onWarning  : options.onWarning,
+                        onError    : options.onError,
                         icons      : {},
                         content    : '',
 semiTransparent: true,
