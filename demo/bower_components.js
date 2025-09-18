@@ -42453,6 +42453,8 @@ function defineValue(obj, key, val) {
   const instance = I18n.createInstance();
   instance.createInstance = I18n.createInstance;
 
+  instance.keyFromSelector = keysFromSelector;
+
   return instance;
 
 }));
@@ -50242,7 +50244,7 @@ if (typeof define === 'function' && define.amd) {
             *******************************************************************/
             this.cache.$container =
                 $('<div/>')
-                    .addClass('base-slider-container ' + this.options.handle + ' js-base-slider-' + this.pluginCount );
+                    .addClass(['base-slider-container', this.options.handle, 'js-base-slider-' + this.pluginCount ]);
 
 
             this.cache.$input.before(this.cache.$container);
@@ -50253,11 +50255,7 @@ if (typeof define === 'function' && define.amd) {
             //if options.handleFixed: Remove margin for the handle and put inside outer-container
             if (this.options.handleFixed){
                 this.cache.$container
-                    .css({
-                        'width'       : '100%',
-                        'margin-left' : 0,
-                        'margin-right': 0
-                    })
+                    .addClass('handle-is-fixed')
                     .wrap('<div/>');
                 this.cache.$fullWidthContainer = this.cache.$container.parent();
                 this.cache.$fullWidthContainer.addClass('base-slider-container-full-width');
@@ -79124,7 +79122,7 @@ stringLength: {default: "Please enter a value with valid length", less: "Please 
 uri         : {default: "Please enter a valid URI"}
 */
 ;
-/****************************************************************************
+-/****************************************************************************
 	jquery-bootstrap-header.js,
 
 	(c) 2017, FCOO
@@ -79210,12 +79208,17 @@ uri         : {default: "Please enter a valid URI"}
             new     : square ? 'fa-window-maximize' : [ $.FONTAWESOME_PREFIX_STANDARD + ' fa-window-maximize fa-inside-circle2', $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle'],
 
             error : {
-                icon : square ? 'fa-exclamation' : [ 'fas fa-circle back text-error', $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle', 'fas fa-exclamation fa-inside-circle-xmark'],
+                icon : square ? /*'fa-exclamation'*/'fa-triangle-exclamation' : [ 'fas fa-circle back text-danger', $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle', 'fas fa-exclamation fa-inside-circle-xmark'],
                 class: square ? 'header-icon-error' : null
             },
 
+            alert : {
+                icon : square ? /*'fa-exclamation'*/'fa-diamond-exclamation' : [ 'fas fa-circle back text-alert', $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle', 'fas fa-exclamation fa-inside-circle-xmark'],
+                class: square ? 'header-icon-alert' : null
+            },
+
             warning : {
-                icon : square ? 'fa-exclamation' : [ 'fas fa-circle back text-warning', $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle', 'fas fa-exclamation fa-inside-circle-xmark'],
+                icon : square ? /*'fa-exclamation'*/'fa-circle-exclamation' : [ 'fas fa-circle back text-warning', $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle', 'fas fa-exclamation fa-inside-circle-xmark'],
                 class: square ? 'header-icon-warning' : null
             },
 
@@ -79283,7 +79286,7 @@ uri         : {default: "Please enter a valid URI"}
 
             //Add icons
             let headerIcons = useSquareIcons ? bsHeaderIconsSquare : bsHeaderIcons;
-            ['back', 'forward', 'pin', 'unpin', 'diminish', 'extend', 'fullScreenOn', 'fullScreenOff', 'new', 'error', 'warning', 'info', 'help', 'close'].forEach( (id) => {
+            ['back', 'forward', 'pin', 'unpin', 'diminish', 'extend', 'fullScreenOn', 'fullScreenOff', 'new', 'error', 'alert', 'warning', 'info', 'help', 'close'].forEach( (id) => {
                 let iconOptions = options.icons[id];
                 if (iconOptions && (iconOptions.onClick || (typeof iconOptions == 'function'))){
                     if (typeof iconOptions == 'function')
@@ -81160,6 +81163,7 @@ jquery-bootstrap-modal-promise.js
                 new             : {                                     onClick: options.onNew     ? options.onNew.bind(this)     : null                        },
                 info            : {                                     onClick: options.onInfo    ? options.onInfo.bind(this)    : null                        },
                 warning         : {                                     onClick: options.onWarning ? options.onWarning.bind(this) : null                        },
+                alert           : {                                     onClick: options.onAlert   ? options.onAlert.bind(this)   : null                        },
                 error           : {                                     onClick: options.onError   ? options.onError.bind(this)   : null                        },
                 help            : {                                     onClick: options.onHelp    ? options.onHelp.bind(this)    : null                        },
             }
