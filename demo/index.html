@@ -75,7 +75,7 @@
 
     $.BSMODAL_USE_SQUARE_ICONS = true;
     $.FONTAWESOME_PREFIX = 'far';
-
+/*
     let icon_fa_prefix = 'far fa-';
     $._set_bsHeaderIcons({
         pin     : ['far fa-thumbtack fa-inside-circle', $.FONTAWESOME_PREFIX + ' fa-circle'],
@@ -94,7 +94,7 @@
         close   : icon_fa_prefix + 'xmark'
     });
     L.BsLegend_close_icon = ['far fa-map fa-scale-x-08', 'fas fa-slash fa-scale-x-08'];
-
+*/
 
 //test    L.BsLegend.prototype.options.closeIconOptions.icon = 'fa-home';
 
@@ -1036,6 +1036,7 @@ semiTransparent: false,
                             ],
                 onInfo    : function(){ console.log('INFO');},
                 onWarning : function(){ console.log('WARNING');},
+                onAlert   : function(){ console.log('ALERT');},
                 onError   : function(){ console.log('ERROR');},
                 onRemove  : function(){ console.log('REMOVE');},
             };

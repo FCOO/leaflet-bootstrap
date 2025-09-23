@@ -79208,17 +79208,17 @@ uri         : {default: "Please enter a valid URI"}
             new     : square ? 'fa-window-maximize' : [ $.FONTAWESOME_PREFIX_STANDARD + ' fa-window-maximize fa-inside-circle2', $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle'],
 
             error : {
-                icon : square ? /*'fa-exclamation'*/'fa-triangle-exclamation' : [ 'fas fa-circle back text-danger', $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle', 'fas fa-exclamation fa-inside-circle-xmark'],
+                icon : square ? 'fa-exclamation' : [ 'fas fa-circle back text-danger', $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle', 'fas fa-exclamation fa-inside-circle-xmark'],
                 class: square ? 'header-icon-error' : null
             },
 
             alert : {
-                icon : square ? /*'fa-exclamation'*/'fa-diamond-exclamation' : [ 'fas fa-circle back text-alert', $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle', 'fas fa-exclamation fa-inside-circle-xmark'],
+                icon : square ? 'fa-exclamation' : [ 'fas fa-circle back text-alert', $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle', 'fas fa-exclamation fa-inside-circle-xmark'],
                 class: square ? 'header-icon-alert' : null
             },
 
             warning : {
-                icon : square ? /*'fa-exclamation'*/'fa-circle-exclamation' : [ 'fas fa-circle back text-warning', $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle', 'fas fa-exclamation fa-inside-circle-xmark'],
+                icon : square ? 'fa-exclamation' : [ 'fas fa-circle back text-warning', $.FONTAWESOME_PREFIX_STANDARD + ' fa-circle', 'fas fa-exclamation fa-inside-circle-xmark'],
                 class: square ? 'header-icon-warning' : null
             },
 
@@ -82169,24 +82169,23 @@ jquery-bootstrap-modal-promise.js
     $.bsNotyIcon = {
         info        : 'fa-info-circle',
         information : 'fa-info-circle',
-        alert       : '',
         success     : 'fa-check',
-        error       : 'fa-ban',
-        warning     : 'fa-exclamation-triangle',
+        error       : 'fa-exclamation', //'fa-exclamation-triangle',
+        alert       : 'fa-exclamation', //'fa-exclamation-diamond',
+        warning     : 'fa-exclamation', //'fa-exclamation-circle',
         help        : 'fa-question-circle'
     };
 
     //$.bsNotyName = Name for different noty-type
     $.bsNotyName = {
-        info        : {da:'Information', en:'Information'},
-        information : {da:'Information', en:'Information'},
-        alert       : {da:'Bemærk', en:'Note'},
-        success     : {da:'Succes', en:'Success'},
-        error       : {da:'Fejl', en:'Error'},
-        warning     : {da:'Advarsel', en:'Warning'},
-        help        : {da:'Hjælp', en:'Help'}
+        info        : {da: 'Information', en: 'Information' },
+        information : {da: 'Information', en: 'Information' },
+        success     : {da: 'Succes',      en: 'Success'     },
+        error       : {da: 'Fejl',        en: 'Error'       },
+        alert       : {da: 'Advarsel',    en: 'Alert'       },
+        warning     : {da: 'Advarsel',    en: 'Warning'     },
+        help        : {da: 'Hjælp',       en: 'Help'        }
     };
-
 
 
     /***************************************************************

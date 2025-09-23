@@ -6385,7 +6385,7 @@ textarea.form-control-lg {
   padding: 1.25rem 1rem;
 }
 
-.alert-primary, .noty_theme__jquery-bootstrap.noty_type__alert {
+.alert-primary {
   --bs-alert-color: var(--bs-primary-text-emphasis);
   --bs-alert-bg: var(--bs-primary-bg-subtle);
   --bs-alert-border-color: var(--bs-primary-border-subtle);
@@ -16883,12 +16883,19 @@ Create theme jquery-bootstrap
 To be able to control z-index of noty
 the complete scss for noty is copyed and modified
 *****************************************/
+.alert-alert, .noty_theme__jquery-bootstrap.noty_type__alert {
+  --bs-alert-color: rgb(101.2, 50.4, 8);
+  --bs-alert-bg: rgb(254.6, 229.2, 208);
+  --bs-alert-border-color: tint-color #fd7e14, 60%;
+  --bs-alert-link-color: rgb(101.2, 50.4, 8);
+}
+
 .noty_modal {
   display: none;
 }
 
 .noty_theme__jquery-bootstrap.noty_type__alert {
-  --bs-alert-bg-flash: var(--bs-primary);
+  --bs-alert-bg-flash: var(--bs-alert);
 }
 
 .noty_theme__jquery-bootstrap.noty_type__success {
