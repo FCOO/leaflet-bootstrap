@@ -1034,11 +1034,11 @@ semiTransparent: false,
                         }
                     }
                             ],
-                onInfo    : function(){ console.log('INFO');},
-                onWarning : function(){ console.log('WARNING');},
-                onAlert   : function(){ console.log('ALERT');},
-                onError   : function(){ console.log('ERROR');},
-                onRemove  : function(){ console.log('REMOVE');},
+                onInfo    : function(){ console.log('INFO',    arguemnts);},
+                onWarning : function(){ console.log('WARNING', arguemnts);},
+                onAlert   : function(){ console.log('ALERT',   arguemnts);},
+                onError   : function(){ console.log('ERROR',   arguemnts);},
+                onRemove  : function(){ console.log('REMOVE',  arguemnts);},
             };
 
         var legend = map1.bsLegendControl.addLegend(legendOptions);

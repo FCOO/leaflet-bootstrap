@@ -240,6 +240,11 @@ leaflet-bootstrap-control-legend.js
         /*******************************************
         addTo
         *******************************************/
+        //Adjust onClick in header-icons to be called with ( id, null, $button, map )
+        _adjustHeaderIconOnClick: function( id, onClick ){
+            return onClick ? function(event){ return onClick(id, null, $(event.target), this.parent._map, this); }.bind(this) : null;
+        },
+
         addTo: function( parent ){
             var _this = this,
                 options = this.options,
@@ -272,10 +277,10 @@ leaflet-bootstrap-control-legend.js
                             icon: options.iconArray,
                             text: options.text
                         },
-                        onInfo     : options.onInfo,
-                        onWarning  : options.onWarning,
-                        onAlert    : options.onAlert,
-                        onError    : options.onError,
+                        onInfo     : this._adjustHeaderIconOnClick( 'info',    options.onInfo   ),
+                        onWarning  : this._adjustHeaderIconOnClick( 'warning', options.onWarning),
+                        onAlert    : this._adjustHeaderIconOnClick( 'alert',   options.onAlert  ),
+                        onError    : this._adjustHeaderIconOnClick( 'error',   options.onError  ),
                         icons      : {},
                         content    : '',
                         semiTransparent: true,
