@@ -166,7 +166,10 @@
 			bsLegendOptions: {
 //position: 'bottomleft', //1
 				buttons: {icon:'fa-home', text:'Hej'},
-//maxHeight: 345,
+
+width: 345,
+innerWidth : true,
+
                 semiTransparent   : true,
                 content: {
                     semiTransparent: false,
@@ -978,7 +981,8 @@ semiTransparent: false,
                 icon: 'fa-home', //i != 4 ? [['fas fa-slash', 'fa-long-arrow-alt-up']] : ['far fa-square', 'far fa-heart'],
                 text: '| ' +i+'. header' + (i == 3 ? 'Dette er en meget lang title, der geren skulle blive forkortet, så den ikke løber over' : ''),
                 index: 100-i,
-                content: 'Content',
+
+                content: i == 1 ? 'CONTENT' : function($container, options){ $container.text('Content');},
 
                 showContent: i != 9,
                 showIcons  : i != 9,
@@ -989,8 +993,6 @@ semiTransparent: false,
                     {type:'text', label: {icon:'fa-home', text:'Header'}, text:' Dette er en linie tekst'},
 
                 ] : '',
-                //noVerticalPadding: true,
-                //noHorizontalPadding: true,
 
                 buttons   : i == 0 ? [
                     {id:'button_'+i, icon:'fa-home', text:'IsLast #'+i, _isLastButton: true,
@@ -1015,11 +1017,11 @@ semiTransparent: false,
                         }
                     },
 
-// HER>                     $.bsCheckboxButton({id:'checkbox_button_'+i, text: {da:'Vælg mig', en:'Select me'}, icon: ['fa-thumbs-down', 'fa-thumbs-up'], selected: false,
-// HER>                         onChange: function(id, selected, $button, _this, map){
-// HER>                             console.log('bsCheckboxButton', arguments.length, id,selected, _this, 'map=null',map);
-// HER>                         }
-// HER>                     }),
+                    $.bsCheckboxButton({id:'checkbox_button_'+i, text: {da:'Vælg mig', en:'Select me'}, icon: ['fa-thumbs-down', 'fa-thumbs-up'], selected: false,
+                        onChange: function(id, selected, $button, _this, map){
+                            console.log('bsCheckboxButton', arguments.length, id,selected, _this, 'map=null',map);
+                        }
+                    }),
 
                     {
                         type:'checkboxbutton', icon:['fa-home', 'fa-map'], text:'Tra daa', selected: true,
@@ -1034,11 +1036,11 @@ semiTransparent: false,
                         }
                     }
                             ],
-                onInfo    : function(){ console.log('INFO',    arguemnts);},
-                onWarning : function(){ console.log('WARNING', arguemnts);},
-                onAlert   : function(){ console.log('ALERT',   arguemnts);},
-                onError   : function(){ console.log('ERROR',   arguemnts);},
-                onRemove  : function(){ console.log('REMOVE',  arguemnts);},
+                onInfo    : function(){ console.log('INFO',    arguments);},
+                onWarning : function(){ console.log('WARNING', arguments);},
+                onAlert   : function(){ console.log('ALERT',   arguments);},
+                onError   : function(){ console.log('ERROR',   arguments);},
+                onRemove  : function(){ console.log('REMOVE',  arguments);},
             };
 
         var legend = map1.bsLegendControl.addLegend(legendOptions);

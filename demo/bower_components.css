@@ -1776,6 +1776,11 @@ Modal
 Button And Modal
 Opacity for semi-transparent and transparent content using color-mix
 ************************************************/
+/***********************************************
+$type-2-alert-color
+Conections between "type" and Bootstrap color-class-names
+Used in _noty.scss and _modal.scss
+************************************************/
 :root,
 [data-bs-theme=light] {
   --bs-blue: #0d6efd;
@@ -6399,35 +6404,35 @@ textarea.form-control-lg {
   --bs-alert-link-color: var(--bs-secondary-text-emphasis);
 }
 
-.alert-success, .noty_theme__jquery-bootstrap.noty_type__success {
+.alert-success, .noty_theme__jquery-bootstrap.noty_type__success, .input-group-container.has-alert-background.noty_theme__jquery-bootstrap.noty_type__success, .input-group-container.has-alert-background.alert-success {
   --bs-alert-color: var(--bs-success-text-emphasis);
   --bs-alert-bg: var(--bs-success-bg-subtle);
   --bs-alert-border-color: var(--bs-success-border-subtle);
   --bs-alert-link-color: var(--bs-success-text-emphasis);
 }
 
-.alert-info, .noty_theme__jquery-bootstrap.noty_type__info {
+.alert-info, .noty_theme__jquery-bootstrap.noty_type__info, .input-group-container.has-alert-background.noty_theme__jquery-bootstrap.noty_type__info, .input-group-container.has-alert-background.alert-info {
   --bs-alert-color: var(--bs-info-text-emphasis);
   --bs-alert-bg: var(--bs-info-bg-subtle);
   --bs-alert-border-color: var(--bs-info-border-subtle);
   --bs-alert-link-color: var(--bs-info-text-emphasis);
 }
 
-.alert-warning, .noty_theme__jquery-bootstrap.noty_type__warning {
+.alert-warning, .noty_theme__jquery-bootstrap.noty_type__warning, .input-group-container.has-alert-background.noty_theme__jquery-bootstrap.noty_type__warning, .input-group-container.has-alert-background.alert-warning {
   --bs-alert-color: var(--bs-warning-text-emphasis);
   --bs-alert-bg: var(--bs-warning-bg-subtle);
   --bs-alert-border-color: var(--bs-warning-border-subtle);
   --bs-alert-link-color: var(--bs-warning-text-emphasis);
 }
 
-.alert-danger, .noty_theme__jquery-bootstrap.noty_type__error, form.form-validation .invalid-tooltip {
+.alert-danger, .noty_theme__jquery-bootstrap.noty_type__error, form.form-validation .invalid-tooltip, .input-group-container.has-alert-background.alert-error {
   --bs-alert-color: var(--bs-danger-text-emphasis);
   --bs-alert-bg: var(--bs-danger-bg-subtle);
   --bs-alert-border-color: var(--bs-danger-border-subtle);
   --bs-alert-link-color: var(--bs-danger-text-emphasis);
 }
 
-.alert-light, .noty_theme__jquery-bootstrap.noty_type__help {
+.alert-light, .noty_theme__jquery-bootstrap.noty_type__help, .input-group-container.has-alert-background.alert-help {
   --bs-alert-color: var(--bs-light-text-emphasis);
   --bs-alert-bg: var(--bs-light-bg-subtle);
   --bs-alert-border-color: var(--bs-light-border-subtle);
@@ -14265,6 +14270,63 @@ Common classes for differnet elements
 STYLE FOR DIFFERENT ELEMENTS
 *************************************************/
 /************************************************************
+Icon
+Classes for special BS icons = colored icon using Bootstrap alert colors
+************************************************************/
+i[class*=bs-icon-front-color-], i[class*=bs-icon-back-color-] {
+  --icon-bs-color: inherit;
+  color: var(--icon-bs-color);
+}
+
+i.bs-icon-front-color-success {
+  --icon-bs-color: var(--bs-success-text-emphasis);
+}
+
+i.bs-icon-back-color-success {
+  --icon-bs-color: var(--bs-success-bg-subtle);
+}
+
+i.bs-icon-front-color-alert {
+  --icon-bs-color: var(--bs-alert-text-emphasis);
+}
+
+i.bs-icon-back-color-alert {
+  --icon-bs-color: var(--bs-alert-bg-subtle);
+}
+
+i.bs-icon-front-color-warning {
+  --icon-bs-color: var(--bs-warning-text-emphasis);
+}
+
+i.bs-icon-back-color-warning {
+  --icon-bs-color: var(--bs-warning-bg-subtle);
+}
+
+i.bs-icon-front-color-error {
+  --icon-bs-color: var(--bs-danger-text-emphasis);
+}
+
+i.bs-icon-back-color-error {
+  --icon-bs-color: var(--bs-danger-bg-subtle);
+}
+
+i.bs-icon-front-color-info {
+  --icon-bs-color: var(--bs-info-text-emphasis);
+}
+
+i.bs-icon-back-color-info {
+  --icon-bs-color: var(--bs-info-bg-subtle);
+}
+
+i.bs-icon-front-color-help {
+  --icon-bs-color: var(--bs-light-text-emphasis);
+}
+
+i.bs-icon-back-color-help {
+  --icon-bs-color: var(--bs-light-bg-subtle);
+}
+
+/************************************************************
 TEXT
 
 Additional classes for text
@@ -14300,6 +14362,19 @@ Bootstrap allready have the following classes
 .fst-normal     Text with normal font style>
 
 */
+:root {
+  --bs-alert-text-emphasis: rgb(101.2, 50.4, 8);
+  --bs-alert-bg-subtle: rgb(254.6, 229.2, 208);
+  --bs-alert-border-subtle: tint-color #fd7e14, 60%;
+}
+
+.alert-alert, .noty_theme__jquery-bootstrap.noty_type__alert, .input-group-container.has-alert-background.noty_theme__jquery-bootstrap.noty_type__alert, .input-group-container.has-alert-background.alert-alert {
+  --bs-alert-color: rgb(101.2, 50.4, 8);
+  --bs-alert-bg: rgb(254.6, 229.2, 208);
+  --bs-alert-border-color: tint-color #fd7e14, 60%;
+  --bs-alert-link-color: rgb(101.2, 50.4, 8);
+}
+
 .opacity-0 {
   opacity: 0;
 }
@@ -15884,6 +15959,18 @@ form.form-xs, .input-group-container-xs, .input-group-xs {
 }
 
 /************************************************************
+Style for different background/text-color a la Bootsrap alert
+************************************************************/
+/****************************************************
+Use Bootstrap alert-COLOR for different types
+****************************************************/
+.input-group-container.has-alert-background .input-group {
+  color: var(--bs-alert-color);
+  background-color: var(--bs-alert-bg);
+  border-color: var(--bs-alert-color);
+}
+
+/************************************************************
 Style for input-group
 ************************************************************/
 .input-group-container .input-group {
@@ -16883,23 +16970,16 @@ Create theme jquery-bootstrap
 To be able to control z-index of noty
 the complete scss for noty is copyed and modified
 *****************************************/
-.alert-alert, .noty_theme__jquery-bootstrap.noty_type__alert {
-  --bs-alert-color: rgb(101.2, 50.4, 8);
-  --bs-alert-bg: rgb(254.6, 229.2, 208);
-  --bs-alert-border-color: tint-color #fd7e14, 60%;
-  --bs-alert-link-color: rgb(101.2, 50.4, 8);
-}
-
 .noty_modal {
   display: none;
 }
 
-.noty_theme__jquery-bootstrap.noty_type__alert {
-  --bs-alert-bg-flash: var(--bs-alert);
-}
-
 .noty_theme__jquery-bootstrap.noty_type__success {
   --bs-alert-bg-flash: var(--bs-success);
+}
+
+.noty_theme__jquery-bootstrap.noty_type__alert {
+  --bs-alert-bg-flash: var(--bs-alert);
 }
 
 .noty_theme__jquery-bootstrap.noty_type__warning {

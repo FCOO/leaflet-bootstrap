@@ -3698,6 +3698,14 @@ leaflet-bootstrap-control-legend.js
         initialize
         *******************************************/
         initialize: function(options) {
+            //Check and set options when innerWidth is set
+            if (options.innerWidth){
+                if (options.innerWidth === true)
+                    options.innerWidth = options.width;
+                options.fitWidth = true;
+                options.width = 'fit-content';
+            }
+
             this.options = $.extend(true, this.options, options);
             L.Control.BsButtonBox.prototype.initialize.call(this);
 
@@ -3719,6 +3727,11 @@ leaflet-bootstrap-control-legend.js
 
             this.bsModal = this.$contentContainer.bsModal;
             this.$modalContent = this.bsModal.$content;
+
+            //Set the inner-width
+            if (this.options.innerWidth)
+                this.$modalContent.css('--legend-inner-width', this.options.innerWidth+'px');
+
 
             //Manually implement extend and diminish functionality
             var $header = this.bsModal.$header;
@@ -3927,7 +3940,6 @@ leaflet-bootstrap-control-legend.js
                 'fa-fw fas fa-eye-slash ' + (this.options.hiddenIconClass || '')
             ];
 
-
             this.parent = parent;
             if (!this.$container){
                 //Create modal-content
@@ -3948,20 +3960,18 @@ leaflet-bootstrap-control-legend.js
                         closeButton: false
                     };
 
+                if (parent.options.innerWidth)
+                    modalContentOptions.fitWidth = true;
 
                 //The extended content can be 'normal' content and/or buttons/buttonList
                 if (options.content || options.buttons || options.buttonList){
                     var content = [];
 
                     if (options.content){
-
                         this.$contentContainer =
                             $('<div/>')
                                 .addClass('modal-body')
-                                .addClass(options.contentClassName)
-
-                                .toggleClass('no-vertical-padding',   !!options.noVerticalPadding)
-                                .toggleClass('no-horizontal-padding', !!options.noHorizontalPadding);
+                                .addClass(options.contentClassName);
 
                         this.updateContent();
 
@@ -4017,7 +4027,10 @@ leaflet-bootstrap-control-legend.js
                         {onClick: $.proxy(this.remove, this)},
                         options.closeIconOptions
                     );
-                this.$container    = $('<div/>')._bsModalContent(modalContentOptions);
+                this.$container = $('<div/>')
+                                    ._bsModalContent(modalContentOptions)
+                                    .toggleClass('legend-fit-inner-width', !!parent.options.innerWidth);
+
                 this.bsModal = this.$container.bsModal;
                 this.$modalContent = this.bsModal.$modalContent;
 
