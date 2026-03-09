@@ -3730,7 +3730,7 @@ leaflet-bootstrap-control-legend.js
 
             //Set the inner-width
             if (this.options.innerWidth)
-                this.$modalContent.css('--legend-inner-width', this.options.innerWidth+'px');
+                this.$modalContent.css('--legend-inner-width', this.options.innerWidth+(typeof this.options.innerWidth == 'number' ? 'px' : ''));
 
 
             //Manually implement extend and diminish functionality
