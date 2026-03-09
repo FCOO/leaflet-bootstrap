@@ -167,7 +167,7 @@
 //position: 'bottomleft', //1
 				buttons: {icon:'fa-home', text:'Hej'},
 
-width: 345,
+width: index ? '10rEm' : '20em',
 innerWidth : true,
 
                 semiTransparent   : true,
@@ -1042,6 +1042,10 @@ semiTransparent: false,
                 onError   : function(){ console.log('ERROR',   arguments);},
                 onRemove  : function(){ console.log('REMOVE',  arguments);},
             };
+
+
+		if (i==3)
+            map2.bsLegendControl.addLegend($.extend(true, legendOptions, {buttons: null}));
 
         var legend = map1.bsLegendControl.addLegend(legendOptions);
 

@@ -279,6 +279,26 @@ leaflet-bootstrap-control-legend.js
                 'fa-fw fas fa-eye-slash ' + (this.options.hiddenIconClass || '')
             ];
 
+
+
+            //If innerWidth is given => calc innerWidthPx
+            if (parent.options.innerWidth && !parent.options.innerWidthPx){
+                let innerWidth = parent.options.innerWidth;
+                if (typeof innerWidth == 'number')
+                    parent.options.innerWidthPx = innerWidth;
+                else {
+                    innerWidth = innerWidth.toLowerCase();
+                    let factor = 1;
+                    let unit  = ['px', 'em', 'rem'].find( nextUnit => innerWidth.includes(nextUnit) );
+                    switch (unit){
+                        case 'px' :  factor = 1; break;
+                        case 'em' :  factor = parent.$modalContent.css('font-size'); break;
+                        case 'rem':  factor = $('body').css('font-size'); break;
+                    }
+                    parent.options.innerWidthPx = parseInt(innerWidth) * parseInt(factor);
+                }
+            }
+
             this.parent = parent;
             if (!this.$container){
                 //Create modal-content
