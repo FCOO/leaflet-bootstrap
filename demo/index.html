@@ -978,7 +978,7 @@ semiTransparent: false,
 
     for (var i=0; i<10;i++){
         var legendOptions = {
-                icon: 'fa-home', //i != 4 ? [['fas fa-slash', 'fa-long-arrow-alt-up']] : ['far fa-square', 'far fa-heart'],
+                icon: i== 4 ? $('<div>:-)</div>') : 'fa-home', //i != 4 ? [['fas fa-slash', 'fa-long-arrow-alt-up']] : ['far fa-square', 'far fa-heart'],
                 text: '| ' +i+'. header' + (i == 3 ? 'Dette er en meget lang title, der geren skulle blive forkortet, så den ikke løber over' : ''),
                 index: 100-i,
 

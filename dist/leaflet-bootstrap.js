@@ -3929,7 +3929,10 @@ leaflet-bootstrap-control-legend.js
             if ($.isArray(normalIcon))
                 normalIconIsStackedIcon = true;
             else
-                normalIcon = normalIcon + ' hide-for-bsl-working';
+                if (normalIcon instanceof $)
+                    normalIcon.addClass('hide-for-bsl-working');
+                else
+                    normalIcon = normalIcon + ' hide-for-bsl-working';
             /*
             Create 2+1 icons:
             The first for layer=visible contains of two icons: normal and working
@@ -3939,7 +3942,6 @@ leaflet-bootstrap-control-legend.js
                 [normalIcon, 'show-for-bsl-working fa-fw fas fa-spinner fa-spin no-margin-left'],
                 'fa-fw fas fa-eye-slash ' + (this.options.hiddenIconClass || '')
             ];
-
 
 
             //If innerWidth is given => calc innerWidthPx
