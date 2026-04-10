@@ -691,6 +691,122 @@ leaflet-bootstrap-control-legend.scss
   width: calc(var(--legend-inner-width) + 4 * var(--bs-modal-padding) + 2px);
 }
 
+.legend-content-1 {
+  display: none;
+}
+
+.legend-content-is-1 div.legend-content-1 {
+  display: block;
+}
+.legend-content-is-1 .legend-content-1 {
+  display: initial;
+}
+
+.legend-content-2 {
+  display: none;
+}
+
+.legend-content-is-2 div.legend-content-2 {
+  display: block;
+}
+.legend-content-is-2 .legend-content-2 {
+  display: initial;
+}
+
+.legend-content-3 {
+  display: none;
+}
+
+.legend-content-is-3 div.legend-content-3 {
+  display: block;
+}
+.legend-content-is-3 .legend-content-3 {
+  display: initial;
+}
+
+.legend-content-4 {
+  display: none;
+}
+
+.legend-content-is-4 div.legend-content-4 {
+  display: block;
+}
+.legend-content-is-4 .legend-content-4 {
+  display: initial;
+}
+
+.legend-content-5 {
+  display: none;
+}
+
+.legend-content-is-5 div.legend-content-5 {
+  display: block;
+}
+.legend-content-is-5 .legend-content-5 {
+  display: initial;
+}
+
+.legend-content-6 {
+  display: none;
+}
+
+.legend-content-is-6 div.legend-content-6 {
+  display: block;
+}
+.legend-content-is-6 .legend-content-6 {
+  display: initial;
+}
+
+.legend-content-7 {
+  display: none;
+}
+
+.legend-content-is-7 div.legend-content-7 {
+  display: block;
+}
+.legend-content-is-7 .legend-content-7 {
+  display: initial;
+}
+
+.legend-content-8 {
+  display: none;
+}
+
+.legend-content-is-8 div.legend-content-8 {
+  display: block;
+}
+.legend-content-is-8 .legend-content-8 {
+  display: initial;
+}
+
+.legend-content-9 {
+  display: none;
+}
+
+.legend-content-is-9 div.legend-content-9 {
+  display: block;
+}
+.legend-content-is-9 .legend-content-9 {
+  display: initial;
+}
+
+.legend-content-resize-icon {
+  display: none;
+}
+
+.legend-content-is-sizeable .legend-content-resize-icon {
+  display: block;
+}
+.legend-content-is-sizeable .modal-content.no-modal-extended .legend-content-resize-icon.lcri-deminish {
+  display: none !important;
+}
+.legend-content-is-sizeable .modal-content.no-modal-extended .legend-content-resize-icon {
+  visibility: hidden !important;
+}
+.legend-content-is-sizeable .modal-body, .legend-content-is-sizeable .modal-body-fixed {
+  cursor: pointer;
+}
+
 /***********************************************
 leaflet-bootstrap-control-compass.scss
 ************************************************/
@@ -877,3 +993,5 @@ leaflet-bootstrap-control-position.scss
 .control-position-cursor .no-cursor-on-map .hide-for-no-cursor-on-map > *:not(.show-for-no-cursor-on-map) {
   visibility: hidden !important;
 }
+
+/*# sourceMappingURL=leaflet-bootstrap.css.map */

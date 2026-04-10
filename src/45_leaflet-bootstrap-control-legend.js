@@ -1,6 +1,10 @@
 /****************************************************************************
 leaflet-bootstrap-control-legend.js
 
+
+
+
+
 ****************************************************************************/
 (function ($, L, window, document, undefined) {
     "use strict";
@@ -19,6 +23,7 @@ leaflet-bootstrap-control-legend.js
                     icon: 'fas fa-list',
                     text: {da: 'Signaturforklaring', en:'Legend'}
                 },
+                //Using extend/diminish-icon to extend and diminish legends
                 icons: {
                     extend  : { onClick: function(){/*Empty*/} },
                     diminish: { onClick: function(){/*Empty*/} }
@@ -72,8 +77,10 @@ leaflet-bootstrap-control-legend.js
                 this.$modalContent.css('--legend-inner-width', this.options.innerWidth+(typeof this.options.innerWidth == 'number' ? 'px' : ''));
 
 
-            //Manually implement extend and diminish functionality
+            //Manually implement extend and diminish functionality. Using fullScreenOn/Off-ixcons but keep extend/diminish-names for backward compability
             var $header = this.bsModal.$header;
+
+
             this.extendIcon = $header.find('[data-header-icon-id="extend"]');
             this.extendIcon.on('click', $.proxy(this.extendAll, this) );
 
@@ -315,7 +322,13 @@ leaflet-bootstrap-control-legend.js
                         onWarning  : this._adjustHeaderIconOnClick( 'warning', options.onWarning),
                         onAlert    : this._adjustHeaderIconOnClick( 'alert',   options.onAlert  ),
                         onError    : this._adjustHeaderIconOnClick( 'error',   options.onError  ),
-                        icons      : {},
+                        icons      : {
+                            down   : { className: 'legend-content-resize-icon lcri-deminish', onClick: this.extendContent.bind(this) },
+                            up     : { className: 'legend-content-resize-icon',               onClick: this.extendContent.bind(this) },
+                        },
+
+                        upDownIconAsRadio: true,
+
                         content    : '',
                         semiTransparent: true,
                         closeButton: false
@@ -410,15 +423,17 @@ leaflet-bootstrap-control-legend.js
                 });
 
                 this.sizeIcons = {};
-                ['extend', 'diminish'].forEach( id => _this.sizeIcons[id] = _this.$container.find('[data-header-icon-id="'+id+'"]') );
+                ['extend', 'diminish'].forEach( id => this.sizeIcons[id] = this.$container.find('[data-header-icon-id="'+id+'"]'), this );
+
 
                 this.$header = this.$container.find('.modal-header');
-
 
                 this.toggleContent( this.options.showContent );
                 this.toggle( this.options.show );
 
                 this.setStateNormal();
+
+                this.updateExtendDiminishContent();
 
                 this.workingOff();
             }
@@ -428,7 +443,9 @@ leaflet-bootstrap-control-legend.js
         },
 
         /*******************************************
-        Show or hide icons
+        ********************************************
+        Show or hide action icons
+        ********************************************
         *******************************************/
         toggleIcon: function(id, show){
             this.actionIcons[id].toggle(!!show);
@@ -459,6 +476,12 @@ leaflet-bootstrap-control-legend.js
         setStateHidden   : function(){ return this._setState(false); },
         setStateInvisible: function(){ return this.setStateHidden(); },
 
+
+        /*******************************************
+        ********************************************
+        show/hide the content
+        ********************************************
+        *******************************************/
 
         /*******************************************
         show
@@ -521,8 +544,52 @@ leaflet-bootstrap-control-legend.js
             }
         },
 
+
         /*******************************************
+        ********************************************
+        extend/diminish content
+        ********************************************
+        *******************************************/
+        updateExtendDiminishContent: function(){
+            if (!this.$container) return;
+
+            this.contentSizeList = [];
+            for (var i=1; i<=9; i++){
+                this.$container.removeClass(`legend-content-is-${i}`);
+                if (this.$container.find(`.legend-content-${i}`).length)
+                    this.contentSizeList.push(i);
+            }
+
+            this.$container.toggleClass('legend-content-is-sizeable', !!this.contentSizeList.length);
+            this.$container.off('click.legend-content');
+
+            if (this.contentSizeList.length){
+                this.$container.on('click.legend-content', this.extendContent.bind(this) );
+                this.setContentSize( this.currentContentSizeIndex || 0 );
+            }
+
+        },
+
+        setContentSize: function( index ){
+            this.$container.removeClass(`legend-content-is-${this.currentContentSize}`);
+
+            this.currentContentSizeIndex = index;
+            this.currentContentSize = this.contentSizeList[ index ];
+            this.$container.addClass(`legend-content-is-${this.currentContentSize}`);
+
+            this.$header.modernizrToggle('modal-header-icon-up-on', index < (this.contentSizeList.length-1));
+        },
+
+        extendContent: function(){
+            this.setContentSize( (this.currentContentSizeIndex + 1) % this.contentSizeList.length );
+        },
+
+
+
+        /*******************************************
+        ********************************************
         remove
+        ********************************************
         *******************************************/
         remove: function(e){
             //Since this.parent.removeLegend removed DOM-elements the event must stop propagation
@@ -555,6 +622,11 @@ leaflet-bootstrap-control-legend.js
                 this.$contentContainer
                     .empty()
                     ._bsAppendContent( this.options.content, this.options.contentContext, this.options.contentArg );
+
+            this.updateExtendDiminishContent();
+            this.updateExtendDiminishContent();
+            this.updateExtendDiminishContent();
+            this.updateExtendDiminishContent();
         }
 
     };

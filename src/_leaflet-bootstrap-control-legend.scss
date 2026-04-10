@@ -17,3 +17,33 @@ leaflet-bootstrap-control-legend.scss
 .legend-fit-inner-width {
     width: calc( var(--legend-inner-width) + 4*var(--bs-modal-padding) + 2px);
 }
+
+
+//Classes legend-content-N are used to create different groups of content with different sizes
+//N = 1 to 9
+$max-legend-groups: 9;
+@for $i from 1 through $max-legend-groups {
+    .legend-content-#{$i} { display: none; }
+    .legend-content-is-#{$i} {
+        div.legend-content-#{$i} { display: block; }
+        .legend-content-#{$i} { display: initial; }
+    }
+}
+
+//Icons used to resize the content
+.legend-content-resize-icon { display: none; }
+
+.legend-content-is-sizeable {
+    .legend-content-resize-icon { display: block; }
+
+    //Hide resize-icons when content is minimized
+    .modal-content.no-modal-extended {
+        .legend-content-resize-icon.lcri-deminish { display   : none !important;   }
+        .legend-content-resize-icon               { visibility: hidden !important; }
+    }
+
+    .modal-body, .modal-body-fixed {
+        cursor: pointer;
+    }
+}
+

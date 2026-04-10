@@ -32,7 +32,7 @@
         }
 
         :root {
-            --jb-header-bg: darkgreen;
+            --jb-header-bg: lightgreen;
             --jb-inner-header-bg: MediumSpringGreen;
         }
 
@@ -982,7 +982,40 @@ semiTransparent: false,
                 text: '| ' +i+'. header' + (i == 3 ? 'Dette er en meget lang title, der geren skulle blive forkortet, så den ikke løber over' : ''),
                 index: 100-i,
 
-                content: i == 1 ? 'CONTENT' : function($container, options){ $container.text('Content');},
+                content: ((i == 1) || (i == 9)) ? 'CONTENT' : ($container, options) => {
+
+                    $('<div/>')
+                        .addClass('w-100')
+                        .text('Content 0 (always)')
+                        .appendTo( $container );
+
+                    $('<div/>')
+                        .addClass('legend-content-1 w-100')
+                        .text('Content 1')
+                        .appendTo( $container );
+
+                    $('<div/>')
+                        .addClass('legend-content-2 w-100')
+                        .text('Content 2-1')
+                        .appendTo( $container );
+                    $('<div/>')
+                        .addClass('legend-content-2 w-100')
+                        .text('Content 2-2')
+                        .appendTo( $container );
+
+                    $('<div/>')
+                        .addClass('legend-content-7 w-100')
+                        .text('Content 7-1')
+                        .appendTo( $container );
+                    $('<div/>')
+                        .addClass('legend-content-7 w-100')
+                        .text('Content 7-2')
+                        .appendTo( $container );
+                    $('<div/>')
+                        .addClass('legend-content-7 w-100')
+                        .text('Content 7-3')
+                        .appendTo( $container );
+                },
 
                 showContent: i != 9,
                 showIcons  : i != 9,
@@ -1041,6 +1074,10 @@ semiTransparent: false,
                 onAlert   : function(){ console.log('ALERT',   arguments);},
                 onError   : function(){ console.log('ERROR',   arguments);},
                 onRemove  : function(){ console.log('REMOVE',  arguments);},
+                icons: {
+                    extend2: {onClick: () => console.log('her')}
+                }
+
             };
 
 
