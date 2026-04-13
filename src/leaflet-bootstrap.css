@@ -993,5 +993,3 @@ leaflet-bootstrap-control-position.scss
 .control-position-cursor .no-cursor-on-map .hide-for-no-cursor-on-map > *:not(.show-for-no-cursor-on-map) {
   visibility: hidden !important;
 }
-
-/*# sourceMappingURL=leaflet-bootstrap.css.map */

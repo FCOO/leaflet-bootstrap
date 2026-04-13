@@ -3662,6 +3662,10 @@ Can be used as leaflet standard zoom control with Bootstrap style
 /****************************************************************************
 leaflet-bootstrap-control-legend.js
 
+
+
+
+
 ****************************************************************************/
 (function ($, L, window, document, undefined) {
     "use strict";
@@ -3680,6 +3684,7 @@ leaflet-bootstrap-control-legend.js
                     icon: 'fas fa-list',
                     text: {da: 'Signaturforklaring', en:'Legend'}
                 },
+                //Using extend/diminish-icon to extend and diminish legends
                 icons: {
                     extend  : { onClick: function(){/*Empty*/} },
                     diminish: { onClick: function(){/*Empty*/} }
@@ -3733,8 +3738,10 @@ leaflet-bootstrap-control-legend.js
                 this.$modalContent.css('--legend-inner-width', this.options.innerWidth+(typeof this.options.innerWidth == 'number' ? 'px' : ''));
 
 
-            //Manually implement extend and diminish functionality
+            //Manually implement extend and diminish functionality. Using fullScreenOn/Off-ixcons but keep extend/diminish-names for backward compability
             var $header = this.bsModal.$header;
+
+
             this.extendIcon = $header.find('[data-header-icon-id="extend"]');
             this.extendIcon.on('click', $.proxy(this.extendAll, this) );
 
@@ -3976,7 +3983,13 @@ leaflet-bootstrap-control-legend.js
                         onWarning  : this._adjustHeaderIconOnClick( 'warning', options.onWarning),
                         onAlert    : this._adjustHeaderIconOnClick( 'alert',   options.onAlert  ),
                         onError    : this._adjustHeaderIconOnClick( 'error',   options.onError  ),
-                        icons      : {},
+                        icons      : {
+                            down   : { className: 'legend-content-resize-icon lcri-deminish', onClick: this.extendContent.bind(this) },
+                            up     : { className: 'legend-content-resize-icon',               onClick: this.extendContent.bind(this) },
+                        },
+
+                        upDownIconAsRadio: true,
+
                         content    : '',
                         semiTransparent: true,
                         closeButton: false
@@ -4071,25 +4084,32 @@ leaflet-bootstrap-control-legend.js
                 });
 
                 this.sizeIcons = {};
-                ['extend', 'diminish'].forEach( id => _this.sizeIcons[id] = _this.$container.find('[data-header-icon-id="'+id+'"]') );
+                ['extend', 'diminish'].forEach( id => this.sizeIcons[id] = this.$container.find('[data-header-icon-id="'+id+'"]'), this );
+
 
                 this.$header = this.$container.find('.modal-header');
-
 
                 this.toggleContent( this.options.showContent );
                 this.toggle( this.options.show );
 
                 this.setStateNormal();
 
+                this.updateExtendDiminishContent();
+
                 this.workingOff();
             }
 
             this.$container.appendTo(this.parent.$modalContent);
 
+            this.isCreated = true;
+            this.loadSetting();
+
         },
 
         /*******************************************
-        Show or hide icons
+        ********************************************
+        Show or hide action icons
+        ********************************************
         *******************************************/
         toggleIcon: function(id, show){
             this.actionIcons[id].toggle(!!show);
@@ -4122,6 +4142,58 @@ leaflet-bootstrap-control-legend.js
 
 
         /*******************************************
+        ********************************************
+        save/load settings
+        ********************************************
+        *******************************************/
+        saveSetting: function(){
+            if (this.options.saveSetting && this.isCreated){
+                let setting = {};
+                ['isShown', 'currentContentSize'].forEach( id => {
+                    if (this[id] !== undefined)
+                        setting[id] = this[id];
+                }, this);
+
+                if (this.bsModal && this.bsModal.$modalContent)
+                    setting['size'] = this.bsModal.$modalContent._bsModalGetSize();
+
+                if (this.options.saveSetting)
+                    this.options.saveSetting(setting, this);
+            }
+            return this;
+        },
+
+
+        loadSetting: function(){
+            if (this.options.loadSetting){
+                let setting = this.options.loadSetting(this) || {};
+
+                //Set show
+                if (typeof setting.isShown == 'boolean')
+                    this.toggle( setting.isShown );
+
+                //Set content-size
+                const contentSize = setting.currentContentSize;
+                if (contentSize)
+                    (this.contentSizeList || []).forEach( (size, index) => {
+                        if (size == contentSize)
+                            this.setContentSize( index );
+                    }, this);
+
+                //Set size
+                if (setting.size && this.bsModal && this.bsModal.$modalContent)
+                    this.bsModal.$modalContent._bsModalSetSizeClass( setting.size );
+            }
+            return this;
+        },
+
+        /*******************************************
+        ********************************************
+        show/hide the content
+        ********************************************
+        *******************************************/
+
+        /*******************************************
         show
         *******************************************/
         show: function( extended ){
@@ -4148,6 +4220,7 @@ leaflet-bootstrap-control-legend.js
                 if (!extended)
                     this.$container._bsModalDiminish();
             }
+            this.saveSetting();
             return this;
         },
 
@@ -4180,10 +4253,56 @@ leaflet-bootstrap-control-legend.js
                 if (typeof extended == 'boolean')
                     this.toggle(this.isShown, extended);
             }
+            this.saveSetting();
         },
 
+
         /*******************************************
+        ********************************************
+        extend/diminish content
+        ********************************************
+        *******************************************/
+        updateExtendDiminishContent: function(){
+            if (!this.$container) return;
+
+            this.contentSizeList = [];
+            for (var i=1; i<=9; i++){
+                this.$container.removeClass(`legend-content-is-${i}`);
+                if (this.$container.find(`.legend-content-${i}`).length)
+                    this.contentSizeList.push(i);
+            }
+
+            this.$container.toggleClass('legend-content-is-sizeable', !!this.contentSizeList.length);
+            this.$contentContainer.off('click.legend-content');
+
+            if (this.contentSizeList.length){
+                this.$contentContainer.on('click.legend-content', this.extendContent.bind(this) );
+                this.setContentSize( this.currentContentSizeIndex || 0 );
+            }
+            this.saveSetting();
+        },
+
+        setContentSize: function( index ){
+            this.$container.removeClass(`legend-content-is-${this.currentContentSize}`);
+
+            this.currentContentSizeIndex = index;
+            this.currentContentSize = this.contentSizeList[ index ];
+            this.$container.addClass(`legend-content-is-${this.currentContentSize}`);
+
+            this.$header.modernizrToggle('modal-header-icon-up-on', index < (this.contentSizeList.length-1));
+            this.saveSetting();
+        },
+
+        extendContent: function(){
+            this.setContentSize( (this.currentContentSizeIndex + 1) % this.contentSizeList.length );
+        },
+
+
+
+        /*******************************************
+        ********************************************
         remove
+        ********************************************
         *******************************************/
         remove: function(e){
             //Since this.parent.removeLegend removed DOM-elements the event must stop propagation
@@ -4192,6 +4311,7 @@ leaflet-bootstrap-control-legend.js
         },
 
         onRemove: function(){
+            this.isCreated = false;
             if (this.$container)
                 this.$container.detach();
             this.options.onRemove(this);
@@ -4216,6 +4336,8 @@ leaflet-bootstrap-control-legend.js
                 this.$contentContainer
                     .empty()
                     ._bsAppendContent( this.options.content, this.options.contentContext, this.options.contentArg );
+
+            this.updateExtendDiminishContent();
         }
 
     };

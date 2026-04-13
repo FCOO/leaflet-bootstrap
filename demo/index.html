@@ -1076,6 +1076,15 @@ semiTransparent: false,
                 onRemove  : function(){ console.log('REMOVE',  arguments);},
                 icons: {
                     extend2: {onClick: () => console.log('her')}
+                },
+
+                loadSetting: function(legend){
+                    return {
+                        currentContentSize: i % 2 ? 1 : 7,
+                        //isShown: i > 5, <= working :-)
+                        size: i % 2 ? 1 : 4,
+
+                    }
                 }
 
             };

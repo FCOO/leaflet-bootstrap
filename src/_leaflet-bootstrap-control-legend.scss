@@ -38,7 +38,7 @@ $max-legend-groups: 9;
 
     //Hide resize-icons when content is minimized
     .modal-content.no-modal-extended {
-        .legend-content-resize-icon.lcri-deminish { display   : none !important;   }
+        .legend-content-resize-icon.lcri-deminish { display   : none   !important; }
         .legend-content-resize-icon               { visibility: hidden !important; }
     }
 

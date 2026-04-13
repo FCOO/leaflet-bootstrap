@@ -440,6 +440,9 @@ leaflet-bootstrap-control-legend.js
 
             this.$container.appendTo(this.parent.$modalContent);
 
+            this.isCreated = true;
+            this.loadSetting();
+
         },
 
         /*******************************************
@@ -479,6 +482,52 @@ leaflet-bootstrap-control-legend.js
 
         /*******************************************
         ********************************************
+        save/load settings
+        ********************************************
+        *******************************************/
+        saveSetting: function(){
+            if (this.options.saveSetting && this.isCreated){
+                let setting = {};
+                ['isShown', 'currentContentSize'].forEach( id => {
+                    if (this[id] !== undefined)
+                        setting[id] = this[id];
+                }, this);
+
+                if (this.bsModal && this.bsModal.$modalContent)
+                    setting['size'] = this.bsModal.$modalContent._bsModalGetSize();
+
+                if (this.options.saveSetting)
+                    this.options.saveSetting(setting, this);
+            }
+            return this;
+        },
+
+
+        loadSetting: function(){
+            if (this.options.loadSetting){
+                let setting = this.options.loadSetting(this) || {};
+
+                //Set show
+                if (typeof setting.isShown == 'boolean')
+                    this.toggle( setting.isShown );
+
+                //Set content-size
+                const contentSize = setting.currentContentSize;
+                if (contentSize)
+                    (this.contentSizeList || []).forEach( (size, index) => {
+                        if (size == contentSize)
+                            this.setContentSize( index );
+                    }, this);
+
+                //Set size
+                if (setting.size && this.bsModal && this.bsModal.$modalContent)
+                    this.bsModal.$modalContent._bsModalSetSizeClass( setting.size );
+            }
+            return this;
+        },
+
+        /*******************************************
+        ********************************************
         show/hide the content
         ********************************************
         *******************************************/
@@ -510,6 +559,7 @@ leaflet-bootstrap-control-legend.js
                 if (!extended)
                     this.$container._bsModalDiminish();
             }
+            this.saveSetting();
             return this;
         },
 
@@ -542,6 +592,7 @@ leaflet-bootstrap-control-legend.js
                 if (typeof extended == 'boolean')
                     this.toggle(this.isShown, extended);
             }
+            this.saveSetting();
         },
 
 
@@ -561,13 +612,13 @@ leaflet-bootstrap-control-legend.js
             }
 
             this.$container.toggleClass('legend-content-is-sizeable', !!this.contentSizeList.length);
-            this.$container.off('click.legend-content');
+            this.$contentContainer.off('click.legend-content');
 
             if (this.contentSizeList.length){
-                this.$container.on('click.legend-content', this.extendContent.bind(this) );
+                this.$contentContainer.on('click.legend-content', this.extendContent.bind(this) );
                 this.setContentSize( this.currentContentSizeIndex || 0 );
             }
-
+            this.saveSetting();
         },
 
         setContentSize: function( index ){
@@ -578,6 +629,7 @@ leaflet-bootstrap-control-legend.js
             this.$container.addClass(`legend-content-is-${this.currentContentSize}`);
 
             this.$header.modernizrToggle('modal-header-icon-up-on', index < (this.contentSizeList.length-1));
+            this.saveSetting();
         },
 
         extendContent: function(){
@@ -598,6 +650,7 @@ leaflet-bootstrap-control-legend.js
         },
 
         onRemove: function(){
+            this.isCreated = false;
             if (this.$container)
                 this.$container.detach();
             this.options.onRemove(this);
@@ -623,9 +676,6 @@ leaflet-bootstrap-control-legend.js
                     .empty()
                     ._bsAppendContent( this.options.content, this.options.contentContext, this.options.contentArg );
 
-            this.updateExtendDiminishContent();
-            this.updateExtendDiminishContent();
-            this.updateExtendDiminishContent();
             this.updateExtendDiminishContent();
         }
 
