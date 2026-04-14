@@ -3813,6 +3813,7 @@ leaflet-bootstrap-control-legend.js
             var legendId = legend instanceof L.BsLegend ? legend.id : legend;
             legend = this.legends[legendId];
             if (legend){
+                legend.hide();
                 legend.onRemove();
                 delete this.legends[legendId];
                 this.list.splice(legend.indexInList, 1);
@@ -3990,6 +3991,8 @@ leaflet-bootstrap-control-legend.js
 
                         upDownIconAsRadio: true,
 
+                        onChange: this.onChange.bind(this),
+
                         content    : '',
                         semiTransparent: true,
                         closeButton: false
@@ -4146,44 +4149,51 @@ leaflet-bootstrap-control-legend.js
         save/load settings
         ********************************************
         *******************************************/
-        saveSetting: function(){
-            if (this.options.saveSetting && this.isCreated){
-                let setting = {};
-                ['isShown', 'currentContentSize'].forEach( id => {
-                    if (this[id] !== undefined)
-                        setting[id] = this[id];
-                }, this);
+        getSetting: function(){
+            let result = {};
+            ['isShown', 'currentContentSize'].forEach( id => {
+                if (this[id] !== undefined)
+                    result[id] = this[id];
+            }, this);
+            if (this.bsModal && this.bsModal.$modalContent)
+                result['size'] = this.bsModal.$modalContent._bsModalGetSize();
 
-                if (this.bsModal && this.bsModal.$modalContent)
-                    setting['size'] = this.bsModal.$modalContent._bsModalGetSize();
+            return result;
+        },
 
-                if (this.options.saveSetting)
-                    this.options.saveSetting(setting, this);
-            }
+
+        onChange: function(){
+            if (this.options.onChange && this.isCreated)
+                this.options.onChange(this.getSetting(), this);
             return this;
         },
 
 
+        setSetting: function(setting){
+            //Set show
+            if (typeof setting.isShown == 'boolean')
+                this.toggle( setting.isShown );
+
+            //Set content-size
+            const contentSize = setting.currentContentSize;
+            if (contentSize)
+                (this.contentSizeList || []).forEach( (size, index) => {
+                    if (size == contentSize)
+                        this.setContentSize( index );
+                }, this);
+
+            //Set size
+            if (setting.size && this.bsModal && this.bsModal.$modalContent)
+                this.bsModal.$modalContent._bsModalSetSizeClass( setting.size );
+
+        },
+
         loadSetting: function(){
-            if (this.options.loadSetting){
-                let setting = this.options.loadSetting(this) || {};
-
-                //Set show
-                if (typeof setting.isShown == 'boolean')
-                    this.toggle( setting.isShown );
-
-                //Set content-size
-                const contentSize = setting.currentContentSize;
-                if (contentSize)
-                    (this.contentSizeList || []).forEach( (size, index) => {
-                        if (size == contentSize)
-                            this.setContentSize( index );
-                    }, this);
-
-                //Set size
-                if (setting.size && this.bsModal && this.bsModal.$modalContent)
-                    this.bsModal.$modalContent._bsModalSetSizeClass( setting.size );
-            }
+            if (this.options.setting)
+                this.setSetting( this.options.setting );
+            else
+                if (this.options.loadSetting)
+                    this.setSetting( this.options.loadSetting(this) || {} );
             return this;
         },
 
@@ -4220,7 +4230,7 @@ leaflet-bootstrap-control-legend.js
                 if (!extended)
                     this.$container._bsModalDiminish();
             }
-            this.saveSetting();
+            this.onChange();
             return this;
         },
 
@@ -4253,7 +4263,7 @@ leaflet-bootstrap-control-legend.js
                 if (typeof extended == 'boolean')
                     this.toggle(this.isShown, extended);
             }
-            this.saveSetting();
+            this.onChange();
         },
 
 
@@ -4273,13 +4283,14 @@ leaflet-bootstrap-control-legend.js
             }
 
             this.$container.toggleClass('legend-content-is-sizeable', !!this.contentSizeList.length);
-            this.$contentContainer.off('click.legend-content');
+            if (this.$contentContainer)
+                this.$contentContainer.off('click.legend-content');
 
             if (this.contentSizeList.length){
                 this.$contentContainer.on('click.legend-content', this.extendContent.bind(this) );
                 this.setContentSize( this.currentContentSizeIndex || 0 );
             }
-            this.saveSetting();
+            this.onChange();
         },
 
         setContentSize: function( index ){
@@ -4290,7 +4301,7 @@ leaflet-bootstrap-control-legend.js
             this.$container.addClass(`legend-content-is-${this.currentContentSize}`);
 
             this.$header.modernizrToggle('modal-header-icon-up-on', index < (this.contentSizeList.length-1));
-            this.saveSetting();
+            this.onChange();
         },
 
         extendContent: function(){
@@ -4311,7 +4322,6 @@ leaflet-bootstrap-control-legend.js
         },
 
         onRemove: function(){
-            this.isCreated = false;
             if (this.$container)
                 this.$container.detach();
             this.options.onRemove(this);
