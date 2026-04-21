@@ -23,9 +23,9 @@ leaflet-bootstrap-control-legend.scss
 //N = 1 to 9
 $max-legend-groups: 9;
 @for $i from 1 through $max-legend-groups {
-    .legend-content-#{$i} { display: none; }
+    .legend-content-#{$i} { display: none !important; }
     .legend-content-is-#{$i} {
-        .legend-content-#{$i} { display: var(--display, initial); }
+        .legend-content-#{$i} { display: var(--display, initial) !important; }
 
         div[class^="legend-content-"], div[class*=" legend-content-"]{ --display: block; }
         table[class^="legend-content-"], div[class*=" legend-content-"]{ --display: table; }
@@ -36,7 +36,7 @@ $max-legend-groups: 9;
 .legend-content-resize-icon { display: none; }
 
 .legend-content-is-sizeable {
-    .legend-content-resize-icon { display: block; }
+    .legend-content-resize-icon { display: block ; }
 
     //Hide resize-icons when content is minimized
     .modal-content.no-modal-extended {

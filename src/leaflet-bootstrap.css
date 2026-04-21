@@ -692,11 +692,11 @@ leaflet-bootstrap-control-legend.scss
 }
 
 .legend-content-1 {
-  display: none;
+  display: none !important;
 }
 
 .legend-content-is-1 .legend-content-1 {
-  display: var(--display, initial);
+  display: var(--display, initial) !important;
 }
 .legend-content-is-1 div[class^=legend-content-], .legend-content-is-1 div[class*=" legend-content-"] {
   --display: block;
@@ -706,11 +706,11 @@ leaflet-bootstrap-control-legend.scss
 }
 
 .legend-content-2 {
-  display: none;
+  display: none !important;
 }
 
 .legend-content-is-2 .legend-content-2 {
-  display: var(--display, initial);
+  display: var(--display, initial) !important;
 }
 .legend-content-is-2 div[class^=legend-content-], .legend-content-is-2 div[class*=" legend-content-"] {
   --display: block;
@@ -720,11 +720,11 @@ leaflet-bootstrap-control-legend.scss
 }
 
 .legend-content-3 {
-  display: none;
+  display: none !important;
 }
 
 .legend-content-is-3 .legend-content-3 {
-  display: var(--display, initial);
+  display: var(--display, initial) !important;
 }
 .legend-content-is-3 div[class^=legend-content-], .legend-content-is-3 div[class*=" legend-content-"] {
   --display: block;
@@ -734,11 +734,11 @@ leaflet-bootstrap-control-legend.scss
 }
 
 .legend-content-4 {
-  display: none;
+  display: none !important;
 }
 
 .legend-content-is-4 .legend-content-4 {
-  display: var(--display, initial);
+  display: var(--display, initial) !important;
 }
 .legend-content-is-4 div[class^=legend-content-], .legend-content-is-4 div[class*=" legend-content-"] {
   --display: block;
@@ -748,11 +748,11 @@ leaflet-bootstrap-control-legend.scss
 }
 
 .legend-content-5 {
-  display: none;
+  display: none !important;
 }
 
 .legend-content-is-5 .legend-content-5 {
-  display: var(--display, initial);
+  display: var(--display, initial) !important;
 }
 .legend-content-is-5 div[class^=legend-content-], .legend-content-is-5 div[class*=" legend-content-"] {
   --display: block;
@@ -762,11 +762,11 @@ leaflet-bootstrap-control-legend.scss
 }
 
 .legend-content-6 {
-  display: none;
+  display: none !important;
 }
 
 .legend-content-is-6 .legend-content-6 {
-  display: var(--display, initial);
+  display: var(--display, initial) !important;
 }
 .legend-content-is-6 div[class^=legend-content-], .legend-content-is-6 div[class*=" legend-content-"] {
   --display: block;
@@ -776,11 +776,11 @@ leaflet-bootstrap-control-legend.scss
 }
 
 .legend-content-7 {
-  display: none;
+  display: none !important;
 }
 
 .legend-content-is-7 .legend-content-7 {
-  display: var(--display, initial);
+  display: var(--display, initial) !important;
 }
 .legend-content-is-7 div[class^=legend-content-], .legend-content-is-7 div[class*=" legend-content-"] {
   --display: block;
@@ -790,11 +790,11 @@ leaflet-bootstrap-control-legend.scss
 }
 
 .legend-content-8 {
-  display: none;
+  display: none !important;
 }
 
 .legend-content-is-8 .legend-content-8 {
-  display: var(--display, initial);
+  display: var(--display, initial) !important;
 }
 .legend-content-is-8 div[class^=legend-content-], .legend-content-is-8 div[class*=" legend-content-"] {
   --display: block;
@@ -804,11 +804,11 @@ leaflet-bootstrap-control-legend.scss
 }
 
 .legend-content-9 {
-  display: none;
+  display: none !important;
 }
 
 .legend-content-is-9 .legend-content-9 {
-  display: var(--display, initial);
+  display: var(--display, initial) !important;
 }
 .legend-content-is-9 div[class^=legend-content-], .legend-content-is-9 div[class*=" legend-content-"] {
   --display: block;
