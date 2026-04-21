@@ -4282,11 +4282,11 @@ leaflet-bootstrap-control-legend.js
                     this.contentSizeList.push(i);
             }
 
-            this.$container.toggleClass('legend-content-is-sizeable', !!this.contentSizeList.length);
+            this.$container.toggleClass('legend-content-is-sizeable', this.contentSizeList.length > 1);
             if (this.$contentContainer)
                 this.$contentContainer.off('click.legend-content');
 
-            if (this.contentSizeList.length){
+            if (this.contentSizeList.length > 1){
                 this.$contentContainer.on('click.legend-content', this.extendContent.bind(this) );
                 this.setContentSize( this.currentContentSizeIndex || 0 );
             }

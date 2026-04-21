@@ -25,8 +25,10 @@ $max-legend-groups: 9;
 @for $i from 1 through $max-legend-groups {
     .legend-content-#{$i} { display: none; }
     .legend-content-is-#{$i} {
-        div.legend-content-#{$i} { display: block; }
-        .legend-content-#{$i} { display: initial; }
+        .legend-content-#{$i} { display: var(--display, initial); }
+
+        div[class^="legend-content-"], div[class*=" legend-content-"]{ --display: block; }
+        table[class^="legend-content-"], div[class*=" legend-content-"]{ --display: table; }
     }
 }
 
