@@ -34654,10 +34654,10 @@ function defineValue(obj, key, val) {
   }
 
   /*!
-   * GSAP 3.14.2
+   * GSAP 3.15.0
    * https://gsap.com
    *
-   * @license Copyright 2008-2025, GreenSock. All rights reserved.
+   * @license Copyright 2008-2026, GreenSock. All rights reserved.
    * Subject to the terms at https://gsap.com/standard-license
    * @author: Jack Doyle, jack@greensock.com
   */
@@ -35992,27 +35992,6 @@ function defineValue(obj, key, val) {
       return 1 - ease(1 - p);
     };
   },
-      _propagateYoyoEase = function _propagateYoyoEase(timeline, isYoyo) {
-    var child = timeline._first,
-        ease;
-
-    while (child) {
-      if (child instanceof Timeline) {
-        _propagateYoyoEase(child, isYoyo);
-      } else if (child.vars.yoyoEase && (!child._yoyo || !child._repeat) && child._yoyo !== isYoyo) {
-        if (child.timeline) {
-          _propagateYoyoEase(child.timeline, isYoyo);
-        } else {
-          ease = child._ease;
-          child._ease = child._yEase;
-          child._yEase = ease;
-          child._yoyo = isYoyo;
-        }
-      }
-
-      child = child._next;
-    }
-  },
       _parseEase = function _parseEase(ease, defaultEase) {
     return !ease ? defaultEase : (_isFunction(ease) ? ease : _easeMap[ease] || _configEaseFromString(ease)) || defaultEase;
   },
@@ -36689,8 +36668,6 @@ function defineValue(obj, key, val) {
             if (!this._ts && !prevPaused) {
               return this;
             }
-
-            _propagateYoyoEase(this, isYoyo);
           }
         }
 
@@ -36704,7 +36681,7 @@ function defineValue(obj, key, val) {
 
         this._tTime = tTime;
         this._time = time;
-        this._act = !timeScale;
+        this._act = !!timeScale;
 
         if (!this._initted) {
           this._onUpdate = this.vars.onUpdate;
@@ -37327,6 +37304,7 @@ function defineValue(obj, key, val) {
         fullTargets = parent && parent.data === "nested" ? parent.vars.targets : targets,
         autoOverwrite = tween._overwrite === "auto" && !_suppressOverwrites,
         tl = tween.timeline,
+        reverseEase = vars.easeReverse || yoyoEase,
         cleanVars,
         i,
         p,
@@ -37342,15 +37320,9 @@ function defineValue(obj, key, val) {
         overwritten;
     tl && (!keyframes || !ease) && (ease = "none");
     tween._ease = _parseEase(ease, _defaults.ease);
-    tween._yEase = yoyoEase ? _invertEase(_parseEase(yoyoEase === true ? ease : yoyoEase, _defaults.ease)) : 0;
-
-    if (yoyoEase && tween._yoyo && !tween._repeat) {
-      yoyoEase = tween._yEase;
-      tween._yEase = tween._ease;
-      tween._ease = yoyoEase;
-    }
-
+    tween._rEase = reverseEase && (_parseEase(reverseEase) || tween._ease);
     tween._from = !tl && !!vars.runBackwards;
+    if (tween._from) tween.ratio = 1;
 
     if (!tl || keyframes && !vars.stagger) {
       harness = targets[0] ? _getCache(targets[0]).harness : 0;
@@ -37498,7 +37470,7 @@ function defineValue(obj, key, val) {
           _initTween(tween, time);
 
           _forceAllPropTweens = 0;
-          return skipRecursion ? _warn(property + " not eligible for reset") : 1;
+          return skipRecursion ? _warn(property + " not eligible for reset. Try splitting into individual properties") : 1;
         }
 
         ptCache.push(pt);
@@ -37571,7 +37543,7 @@ function defineValue(obj, key, val) {
       _parseFuncOrString = function _parseFuncOrString(value, tween, i, target, targets) {
     return _isFunction(value) ? value.call(tween, i, target, targets) : _isString(value) && ~value.indexOf("random(") ? _replaceRandom(value) : value;
   },
-      _staggerTweenProps = _callbackNames + "repeat,repeatDelay,yoyo,repeatRefresh,yoyoEase,autoRevert",
+      _staggerTweenProps = _callbackNames + "repeat,repeatDelay,yoyo,repeatRefresh,yoyoEase,easeReverse,autoRevert",
       _staggerPropsToSkip = {};
 
   _forEachName(_staggerTweenProps + ",id,stagger,delay,duration,paused,scrollTrigger", function (name) {
@@ -37600,7 +37572,6 @@ function defineValue(obj, key, val) {
           keyframes = _this3$vars.keyframes,
           defaults = _this3$vars.defaults,
           scrollTrigger = _this3$vars.scrollTrigger,
-          yoyoEase = _this3$vars.yoyoEase,
           parent = vars.parent || _globalTimeline,
           parsedTargets = (_isArray(targets) || _isTypedArray(targets) ? _isNumber(targets[0]) : "length" in vars) ? [targets] : toArray(targets),
           tl,
@@ -37617,6 +37588,7 @@ function defineValue(obj, key, val) {
 
       if (keyframes || stagger || _isFuncOrString(duration) || _isFuncOrString(delay)) {
         vars = _this3.vars;
+        var easeReverse = vars.easeReverse || vars.yoyoEase;
         tl = _this3.timeline = new Timeline({
           data: "nested",
           defaults: defaults || {},
@@ -37642,7 +37614,7 @@ function defineValue(obj, key, val) {
           for (i = 0; i < l; i++) {
             copy = _copyExcluding(vars, _staggerPropsToSkip);
             copy.stagger = 0;
-            yoyoEase && (copy.yoyoEase = yoyoEase);
+            easeReverse && (copy.easeReverse = easeReverse);
             staggerVarsToMerge && _merge(copy, staggerVarsToMerge);
             curTarget = parsedTargets[i];
             copy.duration = +_parseFuncOrString(duration, _assertThisInitialized(_this3), i, curTarget, parsedTargets);
@@ -37749,8 +37721,7 @@ function defineValue(obj, key, val) {
           prevIteration,
           isYoyo,
           ratio,
-          timeline,
-          yoyoEase;
+          timeline;
 
       if (!dur) {
         _renderZeroDurationTween(this, totalTime, suppressEvents, force);
@@ -37783,12 +37754,7 @@ function defineValue(obj, key, val) {
           }
 
           isYoyo = this._yoyo && iteration & 1;
-
-          if (isYoyo) {
-            yoyoEase = this._yEase;
-            time = dur - time;
-          }
-
+          if (isYoyo) time = dur - time;
           prevIteration = _animationCycle(this._tTime, cycleDuration);
 
           if (time === prevTime && !force && this._initted && iteration === prevIteration) {
@@ -37797,8 +37763,6 @@ function defineValue(obj, key, val) {
           }
 
           if (iteration !== prevIteration) {
-            timeline && this._yEase && _propagateYoyoEase(timeline, isYoyo);
-
             if (this.vars.repeatRefresh && !isYoyo && !this._lock && time !== cycleDuration && this._initted) {
               this._lock = force = 1;
               this.render(_roundPrecise(cycleDuration * iteration), true).invalidate()._lock = 0;
@@ -37821,18 +37785,32 @@ function defineValue(obj, key, val) {
           }
         }
 
+        if (this._rEase) {
+          var inv = time < prevTime;
+
+          if (inv !== this._inv) {
+            var segDur = inv ? prevTime : dur - prevTime;
+            this._inv = inv;
+            if (this._from) this.ratio = 1 - this.ratio;
+            this._invRatio = this.ratio;
+            this._invTime = prevTime;
+            this._invRecip = segDur ? (inv ? -1 : 1) / segDur : 0;
+            this._invScale = inv ? -this.ratio : 1 - this.ratio;
+            this._invEase = inv ? this._rEase : this._ease;
+          }
+
+          this.ratio = ratio = this._invRatio + this._invScale * this._invEase((time - this._invTime) * this._invRecip);
+        } else {
+          this.ratio = ratio = this._ease(time / dur);
+        }
+
+        if (this._from) this.ratio = ratio = 1 - ratio;
         this._tTime = tTime;
         this._time = time;
 
         if (!this._act && this._ts) {
           this._act = 1;
           this._lazy = 0;
-        }
-
-        this.ratio = ratio = (yoyoEase || this._ease)(time / dur);
-
-        if (this._from) {
-          this.ratio = ratio = 1 - ratio;
         }
 
         if (!prevTime && tTime && !suppressEvents && !prevIteration) {
@@ -38193,7 +38171,7 @@ function defineValue(obj, key, val) {
     return PropTween;
   }();
 
-  _forEachName(_callbackNames + "parent,duration,ease,delay,overwrite,runBackwards,startAt,yoyo,immediateRender,repeat,repeatDelay,data,paused,reversed,lazy,callbackScope,stringFilter,id,yoyoEase,stagger,inherit,repeatRefresh,keyframes,autoRevert,scrollTrigger", function (name) {
+  _forEachName(_callbackNames + "parent,duration,ease,delay,overwrite,runBackwards,startAt,yoyo,immediateRender,repeat,repeatDelay,data,paused,reversed,lazy,callbackScope,stringFilter,id,yoyoEase,stagger,inherit,repeatRefresh,keyframes,autoRevert,scrollTrigger,easeReverse", function (name) {
     return _reservedProps[name] = 1;
   });
 
@@ -38785,7 +38763,7 @@ function defineValue(obj, key, val) {
       }
     }
   }, _buildModifierPlugin("roundProps", _roundModifier), _buildModifierPlugin("modifiers"), _buildModifierPlugin("snap", snap)) || _gsap;
-  Tween.version = Timeline.version = gsap.version = "3.14.2";
+  Tween.version = Timeline.version = gsap.version = "3.15.0";
   _coreReady = 1;
   _windowExists() && _wake();
   var Power0 = _easeMap.Power0,
@@ -40378,7 +40356,7 @@ function defineValue(obj, key, val) {
   const deepExtend = (target, source, overwrite) => {
     for (const prop in source) {
       if (prop !== '__proto__' && prop !== 'constructor') {
-        if (prop in target) {
+        if (Object.prototype.hasOwnProperty.call(target, prop)) {
           if (isString(target[prop]) || target[prop] instanceof String || isString(source[prop]) || source[prop] instanceof String) {
             if (overwrite) target[prop] = source[prop];
           } else {
@@ -40516,6 +40494,7 @@ function defineValue(obj, key, val) {
     }
     forward(args, lvl, prefix, debugOnly) {
       if (debugOnly && !this.debug) return null;
+      args = args.map(a => isString(a) ? a.replace(/[\r\n\x00-\x1F\x7F]/g, ' ') : a);
       if (isString(args[0])) args[0] = `${prefix}${this.prefix} ${args[0]}`;
       return this.logger[lvl](args);
     }
@@ -40746,11 +40725,15 @@ function defineValue(obj, key, val) {
     } = selector(createProxy());
     const keySeparator = opts?.keySeparator ?? '.';
     const nsSeparator = opts?.nsSeparator ?? ':';
+    const strict = opts?.enableSelector === 'strict';
     if (path.length > 1 && nsSeparator) {
       const ns = opts?.ns;
-      const nsArray = Array.isArray(ns) ? ns : null;
-      if (nsArray && nsArray.length > 1 && nsArray.slice(1).includes(path[0])) {
-        return `${path[0]}${nsSeparator}${path.slice(1).join(keySeparator)}`;
+      const nsList = strict ? Array.isArray(ns) ? ns : ns ? [ns] : null : Array.isArray(ns) ? ns : null;
+      if (nsList) {
+        const candidates = strict ? nsList : nsList.length > 1 ? nsList.slice(1) : [];
+        if (candidates.includes(path[0])) {
+          return `${path[0]}${nsSeparator}${path.slice(1).join(keySeparator)}`;
+        }
       }
     }
     return path.join(keySeparator);
@@ -40953,7 +40936,7 @@ function defineValue(obj, key, val) {
         const resForMissing = missingKeyNoValueFallbackToKey && usedKey ? undefined : res;
         const updateMissing = hasDefaultValue && defaultValue !== res && this.options.updateMissing;
         if (usedKey || usedDefault || updateMissing) {
-          this.logger.log(updateMissing ? 'updateKey' : 'missingKey', lng, namespace, key, updateMissing ? defaultValue : res);
+          this.logger.log(updateMissing ? 'updateKey' : 'missingKey', lng, namespace, needsPluralHandling && !updateMissing ? `${key}${this.pluralResolver.getSuffix(lng, opt.count, opt)}` : key, updateMissing ? defaultValue : res);
           if (keySeparator) {
             const fk = this.resolve(key, {
               ...opt,
@@ -41163,7 +41146,10 @@ function defineValue(obj, key, val) {
       const useOptionsReplaceForData = options.replace && !isString(options.replace);
       let data = useOptionsReplaceForData ? options.replace : options;
       if (useOptionsReplaceForData && typeof options.count !== 'undefined') {
-        data.count = options.count;
+        data = {
+          ...data,
+          count: options.count
+        };
       }
       if (this.options.interpolation.defaultVariables) {
         data = {
@@ -41421,8 +41407,8 @@ function defineValue(obj, key, val) {
       this.prefix = prefix ? regexEscape(prefix) : prefixEscaped || '{{';
       this.suffix = suffix ? regexEscape(suffix) : suffixEscaped || '}}';
       this.formatSeparator = formatSeparator || ',';
-      this.unescapePrefix = unescapeSuffix ? '' : unescapePrefix || '-';
-      this.unescapeSuffix = this.unescapePrefix ? '' : unescapeSuffix || '';
+      this.unescapePrefix = unescapeSuffix ? '' : unescapePrefix ? regexEscape(unescapePrefix) : '-';
+      this.unescapeSuffix = this.unescapePrefix ? '' : unescapeSuffix ? regexEscape(unescapeSuffix) : '';
       this.nestingPrefix = nestingPrefix ? regexEscape(nestingPrefix) : nestingPrefixEscaped || regexEscape('$t(');
       this.nestingSuffix = nestingSuffix ? regexEscape(nestingSuffix) : nestingSuffixEscaped || regexEscape(')');
       this.nestingOptionsSeparator = nestingOptionsSeparator || ',';
@@ -41469,14 +41455,17 @@ function defineValue(obj, key, val) {
         });
       };
       this.resetRegExp();
+      if (!this.escapeValue && typeof str === 'string' && /\$t\([^)]*\{[^}]*\{\{/.test(str)) {
+        this.logger.warn('nesting options string contains interpolated variables with escapeValue: false — ' + 'if any of those values are attacker-controlled they can inject additional ' + 'nesting options (e.g. redirect lng/ns). Sanitise untrusted input before passing ' + 'it to t(), or keep escapeValue: true.');
+      }
       const missingInterpolationHandler = options?.missingInterpolationHandler || this.options.missingInterpolationHandler;
       const skipOnVariables = options?.interpolation?.skipOnVariables !== undefined ? options.interpolation.skipOnVariables : this.options.interpolation.skipOnVariables;
       const todos = [{
         regex: this.regexpUnescape,
-        safeValue: val => regexSafe(val)
+        safeValue: val => val
       }, {
         regex: this.regexp,
-        safeValue: val => this.escapeValue ? regexSafe(this.escape(val)) : regexSafe(val)
+        safeValue: val => this.escapeValue ? this.escape(val) : val
       }];
       todos.forEach(todo => {
         replaces = 0;
@@ -41500,9 +41489,9 @@ function defineValue(obj, key, val) {
             value = makeString(value);
           }
           const safeValue = todo.safeValue(value);
-          str = str.replace(match[0], safeValue);
+          str = str.replace(match[0], regexSafe(safeValue));
           if (skipOnVariables) {
-            todo.regex.lastIndex += value.length;
+            todo.regex.lastIndex += safeValue.length;
             todo.regex.lastIndex -= match[0].length;
           } else {
             todo.regex.lastIndex = 0;
@@ -41552,7 +41541,7 @@ function defineValue(obj, key, val) {
         clonedOptions = clonedOptions.replace && !isString(clonedOptions.replace) ? clonedOptions.replace : clonedOptions;
         clonedOptions.applyPostProcessor = false;
         delete clonedOptions.defaultValue;
-        const keyEndIndex = /{.*}/.test(match[1]) ? match[1].lastIndexOf('}') + 1 : match[1].indexOf(this.formatSeparator);
+        const keyEndIndex = /{.*}/s.test(match[1]) ? match[1].lastIndexOf('}') + 1 : match[1].indexOf(this.formatSeparator);
         if (keyEndIndex !== -1) {
           formatters = match[1].slice(keyEndIndex).split(this.formatSeparator).map(elem => elem.trim()).filter(Boolean);
           match[1] = match[1].slice(0, keyEndIndex);
@@ -41682,10 +41671,14 @@ function defineValue(obj, key, val) {
     format(value, format, lng, options = {}) {
       if (!format) return value;
       if (value == null) return value;
-      const formats = format.split(this.formatSeparator);
-      if (formats.length > 1 && formats[0].indexOf('(') > 1 && !formats[0].includes(')') && formats.find(f => f.includes(')'))) {
-        const lastIndex = formats.findIndex(f => f.includes(')'));
-        formats[0] = [formats[0], ...formats.splice(1, lastIndex)].join(this.formatSeparator);
+      const rawFormats = format.split(this.formatSeparator);
+      const formats = [];
+      for (let i = 0; i < rawFormats.length; i++) {
+        let f = rawFormats[i];
+        while (f.indexOf('(') > -1 && !f.includes(')') && i + 1 < rawFormats.length) {
+          f = `${f}${this.formatSeparator}${rawFormats[++i]}`;
+        }
+        formats.push(f);
       }
       const result = formats.reduce((mem, f) => {
         const {
@@ -41946,6 +41939,7 @@ function defineValue(obj, key, val) {
     nsSeparator: ':',
     pluralSeparator: '_',
     contextSeparator: '_',
+    enableSelector: false,
     partialBundledLanguages: false,
     saveMissing: false,
     updateMissing: false,
@@ -42147,7 +42141,7 @@ function defineValue(obj, key, val) {
           deferred.resolve(t);
           callback(err, t);
         };
-        if (this.languages && !this.isInitialized) return finish(null, this.t.bind(this));
+        if ((this.languages || this.isLanguageChangingTo) && !this.isInitialized) return finish(null, this.t.bind(this));
         this.changeLanguage(this.options.lng, finish);
       };
       if (this.options.resources || !this.options.initAsync) {
@@ -42302,7 +42296,8 @@ function defineValue(obj, key, val) {
       }
       return deferred;
     }
-    getFixedT(lng, ns, keyPrefix) {
+    getFixedT(lng, ns, keyPrefix, fixedOpts) {
+      const scopeNs = fixedOpts?.scopeNs;
       const fixedT = (key, opts, ...rest) => {
         let o;
         if (typeof opts !== 'object') {
@@ -42314,12 +42309,14 @@ function defineValue(obj, key, val) {
         }
         o.lng = o.lng || fixedT.lng;
         o.lngs = o.lngs || fixedT.lngs;
+        const explicitCallNs = o.ns !== undefined && o.ns !== null;
         o.ns = o.ns || fixedT.ns;
         if (o.keyPrefix !== '') o.keyPrefix = o.keyPrefix || keyPrefix || fixedT.keyPrefix;
         const selectorOpts = {
           ...this.options,
           ...o
         };
+        if (Array.isArray(scopeNs) && !explicitCallNs) selectorOpts.ns = scopeNs;
         if (typeof o.keyPrefix === 'function') o.keyPrefix = keysFromSelector(o.keyPrefix, selectorOpts);
         const keySeparator = this.options.keySeparator || '.';
         let resultKey;
@@ -64634,7 +64631,7 @@ Adjusted ES5 version by Niel sHolt
         var json;
 
         try{
-            json = window.jsyaml.load(response);
+            json = window.jsyaml.load(response, {schema: window.jsyaml.JSON_SCHEMA});
         }
         catch (e){
             json = undefined;
@@ -73921,7 +73918,7 @@ See https://ilyashubin.github.io/scrollbooster/
 }).call(this);
 ;
 //! moment-timezone.js
-//! version : 0.6.1
+//! version : 0.6.3
 //! Copyright (c) JS Foundation and other contributors
 //! license : MIT
 //! github.com/moment/moment-timezone
@@ -73951,7 +73948,7 @@ See https://ilyashubin.github.io/scrollbooster/
 	// 	return moment;
 	// }
 
-	var VERSION = "0.6.1",
+	var VERSION = "0.6.3",
 		zones = {},
 		links = {},
 		countries = {},
@@ -74646,7 +74643,7 @@ See https://ilyashubin.github.io/scrollbooster/
 	}
 
 	loadData({
-		"version": "2026a",
+		"version": "2026c",
 		"zones": [
 			"Africa/Abidjan|GMT|0|0||48e5",
 			"Africa/Nairobi|EAT|-30|0||47e5",
@@ -74654,7 +74651,7 @@ See https://ilyashubin.github.io/scrollbooster/
 			"Africa/Lagos|WAT|-10|0||17e6",
 			"Africa/Khartoum|CAT|-20|0||51e5",
 			"Africa/Cairo|EET EEST|-20 -30|0101010101010101010|29NW0 1cL0 1cN0 1fz0 1a10 1fz0 1a10 1fz0 1cN0 1cL0 1cN0 1cL0 1cN0 1cL0 1cN0 1fz0 1a10 1fz0|15e6",
-			"Africa/Casablanca|+01 +00|-10 0|010101010101010101010101|24Pe0 e00 2600 gM0 2600 e00 28M0 e00 2600 gM0 2600 e00 28M0 e00 2600 gM0 2600 e00 2600 gM0 2600 e00 28M0|32e5",
+			"Africa/Casablanca|+01 +00|-10 0|01010101010101|24Pe0 e00 2600 gM0 2600 e00 28M0 e00 2600 gM0 2600 e00 1cL0|32e5",
 			"Europe/Paris|CET CEST|-10 -20|01010101010101010101010|24JB0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00|11e6",
 			"Africa/Johannesburg|SAST|-20|0||84e5",
 			"Africa/Juba|EAT CAT|-30 -20|01|24nx0|",
@@ -74676,6 +74673,7 @@ See https://ilyashubin.github.io/scrollbooster/
 			"America/Coyhaique|-03 -04|30 40|010101010|24Mr0 11B0 1nX0 14p0 1lb0 11B0 1qL0 11B0|",
 			"America/Phoenix|MST|70|0||42e5",
 			"America/New_York|EST EDT|50 40|01010101010101010101010|24E70 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0|21e6",
+			"America/Edmonton|MST MDT CST|70 60 60|0101010101012|24E90 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0|10e5",
 			"America/Los_Angeles|PST PDT|80 70|01010101010101010101010|24Ea0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0|15e6",
 			"America/Halifax|AST ADT|40 30|01010101010101010101010|24E60 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0|39e4",
 			"America/Godthab|-03 -02 -01|30 20 10|0101012121212121212121|24JB0 1qM0 WM0 1qM0 WM0 2so0 1o00 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00|17e3",
@@ -74687,6 +74685,7 @@ See https://ilyashubin.github.io/scrollbooster/
 			"America/Santiago|-03 -04|30 40|01010101010101010101010|24Mr0 11B0 1nX0 14p0 1lb0 11B0 1qL0 11B0 1nX0 11B0 1nX0 11B0 1nX0 11B0 1nX0 11B0 1qL0 WN0 1qL0 11B0 1nX0 11B0|62e5",
 			"America/Scoresbysund|-01 +00 -02|10 0 20|0101010202020202020202|24JB0 1qM0 WM0 1qM0 WM0 1qM0 2pA0 11A0 1o00 11A0 1o00 11A0 1qM0 WM0 1qM0 WM0 1qM0 11A0 1o00 11A0 1o00|452",
 			"America/St_Johns|NST NDT|3u 2u|01010101010101010101010|24E5u 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Rd0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0|11e4",
+			"America/Vancouver|PST PDT MST|80 70 70|0101010101012|24Ea0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0 Op0 1zb0|23e5",
 			"Antarctica/Casey|+11 +08|-b0 -80|010101|24DN0 1lf1 14kX 1lf1 13bX|10",
 			"Asia/Bangkok|+07|-70|0||15e6",
 			"Asia/Vladivostok|+10|-a0|0||60e4",
@@ -74858,14 +74857,13 @@ See https://ilyashubin.github.io/scrollbooster/
 			"America/Chicago|US/Indiana-Starke",
 			"America/Denver|America/Boise",
 			"America/Denver|America/Cambridge_Bay",
-			"America/Denver|America/Edmonton",
 			"America/Denver|America/Inuvik",
 			"America/Denver|America/Shiprock",
-			"America/Denver|America/Yellowknife",
-			"America/Denver|Canada/Mountain",
 			"America/Denver|MST7MDT",
 			"America/Denver|Navajo",
 			"America/Denver|US/Mountain",
+			"America/Edmonton|America/Yellowknife",
+			"America/Edmonton|Canada/Mountain",
 			"America/Godthab|America/Nuuk",
 			"America/Halifax|America/Glace_Bay",
 			"America/Halifax|America/Goose_Bay",
@@ -74884,8 +74882,6 @@ See https://ilyashubin.github.io/scrollbooster/
 			"America/Los_Angeles|America/Ensenada",
 			"America/Los_Angeles|America/Santa_Isabel",
 			"America/Los_Angeles|America/Tijuana",
-			"America/Los_Angeles|America/Vancouver",
-			"America/Los_Angeles|Canada/Pacific",
 			"America/Los_Angeles|Mexico/BajaNorte",
 			"America/Los_Angeles|PST8PDT",
 			"America/Los_Angeles|US/Pacific",
@@ -75007,6 +75003,7 @@ See https://ilyashubin.github.io/scrollbooster/
 			"America/Sao_Paulo|Brazil/East",
 			"America/Sao_Paulo|Etc/GMT+3",
 			"America/St_Johns|Canada/Newfoundland",
+			"America/Vancouver|Canada/Pacific",
 			"Asia/Almaty|Asia/Qostanay",
 			"Asia/Bangkok|Antarctica/Davis",
 			"Asia/Bangkok|Asia/Barnaul",
@@ -75285,7 +75282,7 @@ See https://ilyashubin.github.io/scrollbooster/
 			"BW|Africa/Maputo Africa/Gaborone",
 			"BY|Europe/Minsk",
 			"BZ|America/Belize",
-			"CA|America/St_Johns America/Halifax America/Glace_Bay America/Moncton America/Goose_Bay America/Toronto America/Iqaluit America/Winnipeg America/Resolute America/Rankin_Inlet America/Regina America/Swift_Current America/Edmonton America/Cambridge_Bay America/Inuvik America/Dawson_Creek America/Fort_Nelson America/Whitehorse America/Dawson America/Vancouver America/Panama America/Puerto_Rico America/Phoenix America/Blanc-Sablon America/Atikokan America/Creston",
+			"CA|America/St_Johns America/Halifax America/Glace_Bay America/Moncton America/Goose_Bay America/Toronto America/Iqaluit America/Winnipeg America/Resolute America/Rankin_Inlet America/Regina America/Swift_Current America/Edmonton America/Cambridge_Bay America/Inuvik America/Vancouver America/Dawson_Creek America/Fort_Nelson America/Whitehorse America/Dawson America/Panama America/Puerto_Rico America/Phoenix America/Blanc-Sablon America/Atikokan America/Creston",
 			"CC|Asia/Yangon Indian/Cocos",
 			"CD|Africa/Maputo Africa/Lagos Africa/Kinshasa Africa/Lubumbashi",
 			"CF|Africa/Lagos Africa/Bangui",
@@ -97626,18 +97623,26 @@ latlng-format-base, a class to validate, format, and transform positions (eq. le
     };
 
     //Options for the posible formats. Placed in seperate namespace
+
+
     latLngFormat.LATLNGFORMAT_DMSS = 0; //Degrees Minutes Seconds Decimal Seconds: N65d30'15.3"  d='degree sign'
     latLngFormat.LATLNGFORMAT_DMM  = 1; //Degrees Decimal minutes                : N65d30.258'
     latLngFormat.LATLNGFORMAT_DD   = 2; //Decimal degrees                        : N41.1234d
+    latLngFormat.LATLNGFORMAT_MAPS = 3; //Degrees degrees with sign              : -41.1234
 
-    latLngFormat.LATLNGFORMAT_UTM  = 3; //UTM                                    : 29Q 286657 2492164
-    latLngFormat.LATLNGFORMAT_MGRS = 4; //MGRS                                   : 02U PG 03727 09686
-    latLngFormat.LATLNGFORMAT_NAC  = 5; //NAC                                    : HBV6R RG77T.
+    latLngFormat.LATLNGFORMAT_UTM  = 4; //UTM                                    : 29Q 286657 2492164
+    latLngFormat.LATLNGFORMAT_MGRS = 5; //MGRS                                   : 02U PG 03727 09686
+    latLngFormat.LATLNGFORMAT_NAC  = 6; //NAC                                    : HBV6R RG77T.
 
 
     latLngFormat.LATLNGFORMAT_FIRST = latLngFormat.LATLNGFORMAT_DMSS;
     latLngFormat.LATLNGFORMAT_LAST  = latLngFormat.LATLNGFORMAT_NAC;
 
+//HER
+/*
+latLngFormat.LATLNGFORMAT_FIRST = latLngFormat.LATLNGFORMAT_MAPS;
+latLngFormat.LATLNGFORMAT_LAST  = latLngFormat.LATLNGFORMAT_MAPS;
+//*/
 
     //Default options
     var defaultOptions = {
@@ -97648,6 +97653,9 @@ latlng-format-base, a class to validate, format, and transform positions (eq. le
         preText     : '',
         separator   : ' ',
         postText    : '',
+
+        forceDDAsDot  : false,  //If true delimiters decimal is always "."
+        hemisphereSign: false,  //If true the format uses "-" sign for S and W hemisphere
 
              //lat, lng
         min: [-90, -180],
@@ -97741,7 +97749,7 @@ latlng-format-base, a class to validate, format, and transform positions (eq. le
                     newOptions[id] = newOptions[id] || '';
                 });
                 $.each(['convertMask', 'regexp', 'placeholder'], function(index, id){
-                    if (!$.isArray(newOptions[id]))
+                    if (!Array.isArray(newOptions[id]))
                         newOptions[id] = [newOptions[id], newOptions[id]];
                 });
                 $.extend( this.options, newOptions );
@@ -97823,7 +97831,7 @@ latlng-format-base, a class to validate, format, and transform positions (eq. le
         var inputs = null,
             inputValid = true;
         if (arg1 === undefined){
-            if ($.isArray(arg0))
+            if (Array.isArray(arg0))
                 inputs = arg0;
             else
                 inputs = [ arg0 ];
@@ -97881,7 +97889,7 @@ latlng-format-base, a class to validate, format, and transform positions (eq. le
             else
                 result = method.call( this, this._inputs, options, latLngFormat );
 
-            if (options.joinAsString && $.isArray(result))
+            if (options.joinAsString && Array.isArray(result))
                 result = options.preText + result.join(options.separator) + options.postText;
 
             return result;
@@ -97951,11 +97959,11 @@ latlng-format-base, a class to validate, format, and transform positions (eq. le
             var result = this._valueMethod( this._value );
 
             //Check if both lat and lng are not false
-            if ( $.isArray(result) && ((result[0] === false) || (result[1] === false)) )
+            if ( Array.isArray(result) && ((result[0] === false) || (result[1] === false)) )
                 result = false;
 
             //Round or truncate
-            if (result && options && $.isNumeric(options.precision)) {
+            if (result && options && (typeof options.precision == 'number')) {
                 result[0] = window.precision(result[0], options.precision);
                 result[1] = window.precision(result[1], options.precision);
             }
@@ -98005,16 +98013,17 @@ Set methodes and options for format degrees, minutes, seconds
 
 
 ****************************************************************************/
-
 (function ($, window/*, document, undefined*/) {
     "use strict";
     var LATLNGFORMAT_DMSS = window.latLngFormat.LATLNGFORMAT_DMSS, //Degrees Minutes Seconds Decimal Seconds: N65d30'15.3"  d='degree sign'
         LATLNGFORMAT_DMM  = window.latLngFormat.LATLNGFORMAT_DMM,  //Degrees Decimal minutes                : N65d30.258'
-        LATLNGFORMAT_DD   = window.latLngFormat.LATLNGFORMAT_DD;   //Decimal degrees                        : N41.1234d
+        LATLNGFORMAT_DD   = window.latLngFormat.LATLNGFORMAT_DD,   //Decimal degrees                        : N41.1234d
+        LATLNGFORMAT_MAPS = window.latLngFormat.LATLNGFORMAT_MAPS; //Decimal degrees with "." and without N/S/E/W
 
     window.latLngFormat.formatList[LATLNGFORMAT_DMSS] =
     window.latLngFormat.formatList[LATLNGFORMAT_DMM] =
-    window.latLngFormat.formatList[LATLNGFORMAT_DD] = {
+    window.latLngFormat.formatList[LATLNGFORMAT_DD] =
+    window.latLngFormat.formatList[LATLNGFORMAT_MAPS] = {
 
         /************************************
         getOptions
@@ -98032,13 +98041,21 @@ Set methodes and options for format degrees, minutes, seconds
                 .=seperator         : blank, "." or ","
                 mmm=decimal min     : 0-999
             */
+
+
             var _regexp = {
                     anySpace      : '\\s*',
                     hemisphereLat : '([nNsS])?',    //H=Hemisphere  : [n,N,s,S] (optional,
                     hemisphereLong: '([eEwW])?',    //H=Hemisphere : [e,E,w,W] (optional,
 
+                    sign          : '\\-?',
+
                     DD            : '0*((0?[0-9])|[1-8][0-9])',  //DD=Degrees 0-89      :    0-9, 00-09 or 10-89
                     DDD           : '0*((\\d?\\d)|1[0-7][0-9])', //DDD=Degrees 0-179    :    0-9, 00-99 or 100-179
+
+                    _DD           : '\\-?0*((0?[0-9])|[1-8][0-9])',  //_DD=Degrees  [-]0-89 :    [-]0-9, [-]00-09 or [-]10-89
+                    _DDD          : '\\-?0*((\\d?\\d)|1[0-7][0-9])', //_DDD=Degrees [-]0-179:    [-]0-9, [-]00-99 or [-]100-179
+
 
                     MM            : '\\s' + '((0?[0-9])|[1-5][0-9])', //MM=Minutes: 0-9, 00-09 or 10-59 (allways with a seperator in front)
                 };
@@ -98062,7 +98079,7 @@ Set methodes and options for format degrees, minutes, seconds
             switch (formatId){
                 case LATLNGFORMAT_DMSS:
                     $.extend(result, { //Degrees Minutes Seconds (N41d25'01")
-                        displayMask: "DDD"+dC+"MM'SS"+dS+"s\"H",
+                        displayMask: "DDD"+dC+"MM'SSs\"H",
                         editMask   : "DDD MM SS"+dS+"sH",
                         convertMask: ['DDD', 'MM', 'SS', 's'],
                         regexp     : [ _regexp.anySpace + '(90|'  + _regexp.DD  + _regexp.anySpace + _regexp.MMSSs + ')' + _regexp.anySpace + _regexp.hemisphereLat  + _regexp.anySpace,
@@ -98073,7 +98090,7 @@ Set methodes and options for format degrees, minutes, seconds
 
                 case LATLNGFORMAT_DMM:
                     $.extend(result, { //Degrees Decimal minutes (N41d25.123')
-                        displayMask: "DDD"+dC+"MM"+dS+"mmm'H",
+                        displayMask: "DDD"+dC+"MMmmm'H",
                         editMask   : "DDD MM"+dS+"mmmH",
                         convertMask: ['DDD', 'MM', 'mmm'],
                         regexp     : [ _regexp.anySpace + '(90|'  + _regexp.DD  + _regexp.anySpace + _regexp.MMmmm + ')' + _regexp.anySpace + _regexp.hemisphereLat  + _regexp.anySpace,
@@ -98084,7 +98101,7 @@ Set methodes and options for format degrees, minutes, seconds
 
                 case LATLNGFORMAT_DD:
                     $.extend(result, { //Decimal degrees (N41.1234d)
-                        displayMask: "DDD"+dS+"dddd"+dC+"H",
+                        displayMask: "DDDdddd"+dC+"H",
                         editMask   : "DDD"+dS+"ddddH",
                         convertMask: ['DDD', 'dddd'],
                         regexp     : [ _regexp.anySpace + '(90|'  + _regexp.DD  + _regexp.anySpace + _regexp.dddd + ')' + _regexp.anySpace + _regexp.hemisphereLat  + _regexp.anySpace,
@@ -98092,7 +98109,21 @@ Set methodes and options for format degrees, minutes, seconds
                         placeholder: ["89.9999N", "179.9999E"],
                     });
                     break;
+
+                case LATLNGFORMAT_MAPS:
+                    $.extend(result, { //Decimal degrees (-41.1234)
+                        displayMask : "hDDDdddd",
+                        editMask    : "signDDD"+dS+"dddd",
+                        forceDDAsDot: true,    //Delimiters decimal is always "."
+                        hemisphereSign: true, //Using "-" for hemisphere S and W
+                        convertMask : ['DDD', 'dddd'],
+                        regexp      : [_regexp.anySpace +  _regexp.sign + '(90|'  + _regexp.DD  + _regexp.anySpace + _regexp.dddd + ')',
+                                       _regexp.anySpace +  _regexp.sign + '(180|' + _regexp.DDD + _regexp.anySpace + _regexp.dddd + ')'],
+                        placeholder: ["89.9999", "179.9999"],
+                    });
+                    break;
             }
+
             return result;
         },
 
@@ -98100,7 +98131,7 @@ Set methodes and options for format degrees, minutes, seconds
         format
         ************************************/
         format: function(value, options, latLngFormat){
-
+            //**************************************
             function trim(value, lgd, inclZero){
                 var result = ''+value;
                 if (options.truncate){
@@ -98112,6 +98143,7 @@ Set methodes and options for format degrees, minutes, seconds
                         result = '0'+result;
                 return result;
             }
+            //**************************************
             function appendDecimals(value, lgd){
                 var result = ''+value;
                 //Convert from "100" to "0100" (length: 4)
@@ -98125,6 +98157,7 @@ Set methodes and options for format degrees, minutes, seconds
                 //Prepend decimal delimiters
                 return result ? options.delimitersDecimal+result : result;
             }
+            //**************************************
 
             var parts = latLngFormat.split(value),
                 result = (options.useEditMask ? options.editMask : options.displayMask)
@@ -98132,7 +98165,7 @@ Set methodes and options for format degrees, minutes, seconds
                                             (parts.hemisphere == 1 ? 'E' : 'W') :
                                             (parts.hemisphere == 1 ? 'N' : 'S')
                             )
-                            .replace( options.delimitersDecimal, ''); //delimitersDecimal is added in appendDecimals if not truncate and decimal > 0
+                            .replace('h', parts.hemisphere == 1 ? '' : '-');
 
             result = result.replace(/DDD/ , parts.degrees                   );
             result = result.replace(/dddd/, appendDecimals(parts.degreesDecimal, 4) );
@@ -98141,6 +98174,8 @@ Set methodes and options for format degrees, minutes, seconds
             result = result.replace(/SS/  , trim(parts.seconds, 2, parts.secondsDecimal) );
             result = result.replace(/s/   , appendDecimals(parts.secondsDecimal,   1) );
 
+            if (options.forceDDAsDot)
+                result = result.replace(',', '.');
 
             if (options.truncate){
                 /*
@@ -98149,13 +98184,12 @@ Set methodes and options for format degrees, minutes, seconds
                 a workaround is used
                 */
                 var i = 1;
-                while (i < result.length)
-                    if ( ((result.charAt(i) == '"') || (result.charAt(i) == "'")) &&
-                         !$.isNumeric(result.charAt(i-1))
-                       )
+                while (i < result.length){
+                    if ( ( (result.charAt(i) == '"') || (result.charAt(i) == "'") ) && ('1234567890'.indexOf( result.charAt(i-1) ) == -1) )
                         result = result.slice(0,i) + result.slice(i+1);
                     else
                         i++;
+                }
             }
             return result;
         },
@@ -98209,7 +98243,6 @@ Set methodes and options for format degrees, minutes, seconds
             value = value.split('.');
             $.each(value, function(index, str){ value[index] = str.replace(/\D+/g, ' '); });
             value = value.join('.');
-
             if ((value === '') || !this._valid(value, options))
                 return false;
 
@@ -98236,14 +98269,22 @@ Set methodes and options for format degrees, minutes, seconds
                         break;
                 }
             }
-
             return sign*result;
         },
 
         /**********************************************************
         outputs - return a list of possible output-formats to be used in other applications etc.
         **********************************************************/
-        outputs: function( latLng ){
+        outputs: function( latLng, options ){
+            //***************************************
+            function trimPos(str){
+                str = str.replace(/\D/g, function(char){
+                    return (char=='-') || (char==',') || (char=='.') ? char : ' ';
+                });
+                str = str.trim();
+                return str;
+            }
+            //***************************************
             var result = [];
 
             if (!this.inputIsValid)
@@ -98252,19 +98293,13 @@ Set methodes and options for format degrees, minutes, seconds
             //Create two outputs: 1: As format 2: Without hemisphere, degree, minutes and second chars and with +/-
             result.push( this.format() );
 
-            var format = this.format({asArray: true});
-            if (latLng[0] < 0) format[0] = '-'+format[0];
-            if (latLng[1] < 0) format[1] = '-'+format[1];
+            if (!options.hemisphereSign){
+                var format = this.format({asArray: true});
+                if (latLng[0] < 0) format[0] = '-'+format[0];
+                if (latLng[1] < 0) format[1] = '-'+format[1];
 
-            function trimPos(str){
-                str = str.replace(/\D/g, function(char){
-                    return (char=='-') || (char==',') || (char=='.') ? char : ' ';
-                });
-                str = str.trim();
-                return str;
+                result.push( trimPos(format[0])+' '+trimPos(format[1]) );
             }
-
-            result.push( trimPos(format[0])+' '+trimPos(format[1]) );
 
             return result;
         }

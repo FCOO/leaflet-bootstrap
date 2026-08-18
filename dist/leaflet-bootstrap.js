@@ -2749,7 +2749,7 @@ Options for selectiong position-format and to activate context-menu
 
                 if (_this.options.inclContextmenu)
                     options.after = options.after || {};
-                
+
                 return options;
             }
 
@@ -2897,7 +2897,7 @@ Options for selectiong position-format and to activate context-menu
             this.latLngFormatId = newFormatId;
 
             this.latLngFormatSeparator =
-                [window.latLngFormat.LATLNGFORMAT_DMSS, window.latLngFormat.LATLNGFORMAT_DMM, window.latLngFormat.LATLNGFORMAT_DD].indexOf(newFormatId) >= 0 ?
+                [window.latLngFormat.LATLNGFORMAT_DMSS, window.latLngFormat.LATLNGFORMAT_DMM, window.latLngFormat.LATLNGFORMAT_DD, window.latLngFormat.LATLNGFORMAT_MAPS].indexOf(newFormatId) >= 0 ?
                 '<br>' : '&nbsp;';
 
             //Reste min-width
